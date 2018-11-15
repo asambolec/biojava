@@ -29,10 +29,11 @@ import java.util.LinkedHashMap;
  */
 public class CoxVariables {
 
-	//   public GeneSetResults gsr;
+	// public GeneSetResults gsr;
 	private String cohortName = "";
 	private String geneSet = "";
 	private String genes = "";
+	private LinkedHashMap<String, CoxInfo> coxInfoHashMap = new LinkedHashMap<>();
 
 	/**
 	 *
@@ -52,10 +53,9 @@ public class CoxVariables {
 	 * @return
 	 */
 	public int getUniqueID() {
-		String link = geneSet + "_" + cohortName;
+		String link = new StringBuilder().append(geneSet).append("_").append(cohortName).toString();
 		return link.hashCode();
 	}
-	private LinkedHashMap<String, CoxInfo> coxInfoHashMap = new LinkedHashMap<String, CoxInfo>();
 
 	/**
 	 *
@@ -88,7 +88,8 @@ public class CoxVariables {
 		file = file.replaceAll(">", "%3E");
 		return file;
 	}
-	//   static GeneProfiler geneProfiler = null;
+
+	// static GeneProfiler geneProfiler = null;
 
 	/**
 	 *
@@ -104,7 +105,7 @@ public class CoxVariables {
 		double p = 1.0;
 		for (int i = 0; i < (precision); i++) {
 			dpad = dpad + "0";
-			p = p / 10.0;
+			p /= 10.0;
 		}
 		DecimalFormat df = new DecimalFormat(dpad);
 		if (Math.abs(d) >= p) {
@@ -125,16 +126,17 @@ public class CoxVariables {
 	@Override
 	public String toString() {
 		String coxOutput = geneSet + "\r\n";
-		//    co = co + genes + "\r\n";
-		coxOutput = coxOutput + cohortName + "," + genes.replace(',', ' ') + "\r\n";
+		// co = co + genes + "\r\n";
+		coxOutput = new StringBuilder().append(coxOutput).append(cohortName).append(",").append(genes.replace(',', ' '))
+				.append("\r\n").toString();
 		coxOutput = coxOutput + ",Coe,StdErr,p-value,HR,HR Lo 95%,HR Hi 95%\r\n";
 		for (String variables : coxInfoHashMap.keySet()) {
 			CoxInfo ci = coxInfoHashMap.get(variables);
 
-			coxOutput = coxOutput + "Overall Model Fit p-value=" + fmt(ci.getOverallModelFitPvalue(), 5, 0) + "\r\n";
+			coxOutput = new StringBuilder().append(coxOutput).append("Overall Model Fit p-value=")
+					.append(fmt(ci.getOverallModelFitPvalue(), 5, 0)).append("\r\n").toString();
 			coxOutput = coxOutput + ci.getCoefficientText(false, "", ",", "", "");
 			coxOutput = coxOutput + "\r\n";
-
 
 		}
 

@@ -33,7 +33,6 @@ import org.biojava.nbio.core.sequence.transcription.Table;
 import java.io.InputStream;
 import java.util.*;
 
-
 /**
  * Available translations
  *
@@ -56,17 +55,17 @@ import java.util.*;
  * <li>23 - SCENEDESMUS_MITOCHONDRIAL</li>
  * </ul>
  *
- * Taken from <a
- * href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c"
+ * Taken from
+ * <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c"
  * >NCBI</a> with slight modification and put into the classpath resource.
  *
  * Takes in an ID, name, amino acid string and the locations of amino acids
  * which acts as start codons in the translation table. You can give the 3 codon
  * position strings that correspond to the amino acid string or if you are using
  * the default IUPAC codes you can use the hardcoded ones which are consistent
- * amongst all <a
- * href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c"> codon
- * tables</a>.
+ * amongst all
+ * <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c">
+ * codon tables</a>.
  *
  * The generated {@link IUPACTable} objects do not parse the data further until
  * requested so if you do not use a translation table your only penalty is the
@@ -76,26 +75,21 @@ import java.util.*;
  */
 public class IUPACParser {
 
-	private static class IOD {
-		public static final IUPACParser INSTANCE = new IUPACParser();
-	}
+	public static final String IUPAC_LOCATION = "org/biojava/nbio/core/sequence/iupac.txt";
 
-	public static IUPACParser getInstance() {
-		return IOD.INSTANCE;
-	}
+	private InputStream is;
 
-	public static final String      IUPAC_LOCATION = "org/biojava/nbio/core/sequence/iupac.txt";
+	private List<IUPACTable> tables;
 
-	private InputStream              is;
-	private List<IUPACTable>         tables;
-	private Map<String, IUPACTable>  nameLookup;
+	private Map<String, IUPACTable> nameLookup;
+
 	private Map<Integer, IUPACTable> idLookup;
 
 	/**
 	 * Default version and uses the classpath based IUPAC table
 	 */
 	public IUPACParser() {
-		//use the preCache version to make sure we don't keep a IO handle open
+		// use the preCache version to make sure we don't keep a IO handle open
 		is = new ClasspathResource(IUPAC_LOCATION, true).getInputStream();
 	}
 
@@ -104,6 +98,10 @@ public class IUPACParser {
 	 */
 	public IUPACParser(InputStream is) {
 		this.is = is;
+	}
+
+	public static IUPACParser getInstance() {
+		return IOD.INSTANCE;
 	}
 
 	/**
@@ -133,47 +131,46 @@ public class IUPACParser {
 	}
 
 	private void populateLookups() {
-		if(nameLookup == null) {
-			nameLookup = new HashMap<String, IUPACTable>();
-			idLookup = new HashMap<Integer, IUPACTable>();
-			for(IUPACTable t: getTables()) {
-				nameLookup.put(t.getName(), t);
-				idLookup.put(t.getId(), t);
-			}
+		if (nameLookup != null) {
+			return;
 		}
+		nameLookup = new HashMap<>();
+		idLookup = new HashMap<>();
+		getTables().forEach(t -> {
+			nameLookup.put(t.getName(), t);
+			idLookup.put(t.getId(), t);
+		});
 	}
 
 	private List<IUPACTable> parseTables() {
-		List<IUPACTable> localTables = new ArrayList<IUPACTable>();
+		List<IUPACTable> localTables = new ArrayList<>();
 		List<String> lines = IOUtils.getList(is);
 		Integer id = null;
-		String name, aa, starts, baseone, basetwo, basethree;
+		String name;
+		String aa;
+		String starts;
+		String baseone;
+		String basetwo;
+		String basethree;
 		name = aa = starts = baseone = basetwo = basethree = null;
 		for (String line : lines) {
-			if (line.equalsIgnoreCase("//")) {
-				localTables.add(new IUPACTable(name, id, aa, starts, baseone, basetwo,
-						basethree));
+			if ("//".equalsIgnoreCase(line)) {
+				localTables.add(new IUPACTable(name, id, aa, starts, baseone, basetwo, basethree));
 				name = aa = starts = baseone = basetwo = basethree = null;
 				id = null;
-			}
-			else {
+			} else {
 				String[] keyValue = line.split("\\s*=\\s*");
-				if (keyValue[0].equals("AAs")) {
+				if ("AAs".equals(keyValue[0])) {
 					aa = keyValue[1];
-				}
-				else if (keyValue[0].equals("Starts")) {
+				} else if ("Starts".equals(keyValue[0])) {
 					starts = keyValue[1];
-				}
-				else if (keyValue[0].equals("Base1")) {
+				} else if ("Base1".equals(keyValue[0])) {
 					baseone = keyValue[1];
-				}
-				else if (keyValue[0].equals("Base2")) {
+				} else if ("Base2".equals(keyValue[0])) {
 					basetwo = keyValue[1];
-				}
-				else if (keyValue[0].equals("Base3")) {
+				} else if ("Base3".equals(keyValue[0])) {
 					basethree = keyValue[1];
-				}
-				else {
+				} else {
 					name = keyValue[0];
 					id = Integer.parseInt(keyValue[1]);
 				}
@@ -183,6 +180,10 @@ public class IUPACParser {
 		return localTables;
 	}
 
+	private static class IOD {
+		public static final IUPACParser INSTANCE = new IUPACParser();
+	}
+
 	/**
 	 * Holds the concept of a codon table from the IUPAC format
 	 *
@@ -190,19 +191,19 @@ public class IUPACParser {
 	 */
 	public static class IUPACTable implements Table {
 
-		private final Integer      id;
-		private final String       name;
-		private final String       aminoAcidString;
-		private final String       startCodons;
-		private final String       baseOne;
-		private final String       baseTwo;
-		private final String       baseThree;
+		private final Integer id;
+		private final String name;
+		private final String aminoAcidString;
+		private final String startCodons;
+		private final String baseOne;
+		private final String baseTwo;
+		private final String baseThree;
 
-		private final List<Codon>  codons    = new ArrayList<Codon>();
+		private final List<Codon> codons = new ArrayList<>();
 		private CompoundSet<Codon> compounds = null;
 
-		public IUPACTable(String name, int id, String aminoAcidString,
-				String startCodons, String baseOne, String baseTwo, String baseThree) {
+		public IUPACTable(String name, int id, String aminoAcidString, String startCodons, String baseOne,
+				String baseTwo, String baseThree) {
 			this.aminoAcidString = aminoAcidString;
 			this.startCodons = startCodons;
 			this.name = name;
@@ -213,12 +214,10 @@ public class IUPACParser {
 		}
 
 		/**
-		 * Constructor which uses the basic IUPAC codon table format. Useful
-		 * if you need to specify your own IUPAC table with minimal
-		 * definitions from your side.
+		 * Constructor which uses the basic IUPAC codon table format. Useful if you need
+		 * to specify your own IUPAC table with minimal definitions from your side.
 		 */
-		public IUPACTable(String name, Integer id, String aminoAcidString,
-				String startCodons) {
+		public IUPACTable(String name, Integer id, String aminoAcidString, String startCodons) {
 			this(name, id, aminoAcidString, startCodons,
 					"TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG",
 					"TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG",
@@ -234,22 +233,23 @@ public class IUPACParser {
 		}
 
 		/**
-		 * Returns true if the given compound was a start codon in this
-		 * codon table. This will report true if the compound could ever have
-		 * been a start codon.
+		 * Returns true if the given compound was a start codon in this codon table.
+		 * This will report true if the compound could ever have been a start codon.
 		 *
 		 * @throws IllegalStateException Thrown if
-		 * {@link #getCodons(CompoundSet, CompoundSet)} was not called first.
+		 *                               {@link #getCodons(CompoundSet, CompoundSet)}
+		 *                               was not called first.
 		 */
-				@Override
-		public boolean isStart(AminoAcidCompound compound) throws IllegalStateException {
-			if(this.codons.isEmpty()) {
+		@Override
+		public boolean isStart(AminoAcidCompound compound) {
+			if (this.codons.isEmpty()) {
 				throw new IllegalStateException("Codons are empty; please request getCodons() fist before asking this");
 			}
-			for(Codon codon: codons) {
-				//Only check if the codon was a start codon and then ask if the compound was encoded by it
-				if(codon.isStart()) {
-					if(codon.getAminoAcid().equalsIgnoreCase(compound)) {
+			for (Codon codon : codons) {
+				// Only check if the codon was a start codon and then ask if the compound was
+				// encoded by it
+				if (codon.isStart()) {
+					if (codon.getAminoAcid().equalsIgnoreCase(compound)) {
 						return true;
 					}
 				}
@@ -258,14 +258,14 @@ public class IUPACParser {
 		}
 
 		/**
-		 * Returns a list of codons where the source and target compounds
-		 * are the same as those given by the parameters.
+		 * Returns a list of codons where the source and target compounds are the same
+		 * as those given by the parameters.
 		 *
 		 * @param nucleotides The nucleotide set to use when building BioJava
-		 * representations of codons
-		 * @param aminoAcids The target amino acid compounds objects
+		 *                    representations of codons
+		 * @param aminoAcids  The target amino acid compounds objects
 		 */
-				@Override
+		@Override
 		public List<Codon> getCodons(CompoundSet<NucleotideCompound> nucelotides,
 				CompoundSet<AminoAcidCompound> aminoAcids) {
 
@@ -276,14 +276,13 @@ public class IUPACParser {
 
 				for (int i = 0; i < aminoAcidStrings.size(); i++) {
 
-					List<String> codonString    = codonStrings.get(i);
-					NucleotideCompound one      = getCompound(codonString, 0, nucelotides);
-					NucleotideCompound two      = getCompound(codonString, 1, nucelotides);
-					NucleotideCompound three    = getCompound(codonString, 2, nucelotides);
-					boolean start               = ("M".equals(startCodonStrings.get(i)));
-					boolean stop                = ("*".equals(aminoAcidStrings.get(i)));
-					AminoAcidCompound aminoAcid = aminoAcids
-							.getCompoundForString(aminoAcidStrings.get(i));
+					List<String> codonString = codonStrings.get(i);
+					NucleotideCompound one = getCompound(codonString, 0, nucelotides);
+					NucleotideCompound two = getCompound(codonString, 1, nucelotides);
+					NucleotideCompound three = getCompound(codonString, 2, nucelotides);
+					boolean start = ("M".equals(startCodonStrings.get(i)));
+					boolean stop = ("*".equals(aminoAcidStrings.get(i)));
+					AminoAcidCompound aminoAcid = aminoAcids.getCompoundForString(aminoAcidStrings.get(i));
 					codons.add(new Codon(new CaseInsensitiveTriplet(one, two, three), aminoAcid, start, stop));
 				}
 			}
@@ -291,18 +290,15 @@ public class IUPACParser {
 			return codons;
 		}
 
-		private NucleotideCompound getCompound(List<String> compounds,
-				int position, CompoundSet<NucleotideCompound> nucelotides) {
+		private NucleotideCompound getCompound(List<String> compounds, int position,
+				CompoundSet<NucleotideCompound> nucelotides) {
 			String compound = compounds.get(position);
-			NucleotideCompound returnCompound = nucelotides
-					.getCompoundForString(compound);
+			NucleotideCompound returnCompound = nucelotides.getCompoundForString(compound);
 			if (returnCompound == null) {
 				if ("T".equalsIgnoreCase(compound)) {
-						returnCompound = nucelotides.getCompoundForString("U");
-				}
-				else {
-					throw new ParserException("Cannot find a compound for string "
-							+ compound);
+					returnCompound = nucelotides.getCompoundForString("U");
+				} else {
+					throw new ParserException("Cannot find a compound for string " + compound);
 				}
 			}
 			return returnCompound;
@@ -312,15 +308,12 @@ public class IUPACParser {
 		 * Returns the compound set of codons
 		 */
 		@Override
-	public CompoundSet<Codon> getCodonCompoundSet(
-				final CompoundSet<NucleotideCompound> rnaCompounds,
+		public CompoundSet<Codon> getCodonCompoundSet(final CompoundSet<NucleotideCompound> rnaCompounds,
 				final CompoundSet<AminoAcidCompound> aminoAcidCompounds) {
 			if (compounds == null) {
 				compounds = new AbstractCompoundSet<Codon>() {
 					{
-						for (Codon c : getCodons(rnaCompounds, aminoAcidCompounds)) {
-							addCompound(c);
-						}
+						getCodons(rnaCompounds, aminoAcidCompounds).forEach(c -> addCompound(c));
 					}
 				};
 			}
@@ -328,12 +321,10 @@ public class IUPACParser {
 		}
 
 		private List<List<String>> codonStrings() {
-			List<List<String>> codons = new ArrayList<List<String>>();
+			List<List<String>> codons = new ArrayList<>();
 			for (int i = 0; i < baseOne.length(); i++) {
-				List<String> codon = Arrays.asList(Character
-						.toString(baseOne.charAt(i)),
-						Character.toString(baseTwo.charAt(i)), Character.toString(baseThree
-								.charAt(i)));
+				List<String> codon = Arrays.asList(Character.toString(baseOne.charAt(i)),
+						Character.toString(baseTwo.charAt(i)), Character.toString(baseThree.charAt(i)));
 				codons.add(codon);
 			}
 			return codons;
@@ -348,7 +339,7 @@ public class IUPACParser {
 		}
 
 		private List<String> split(String string) {
-			List<String> split = new ArrayList<String>();
+			List<String> split = new ArrayList<>();
 			for (int i = 0; i < string.length(); i++) {
 				split.add(Character.toString(string.charAt(i)));
 			}

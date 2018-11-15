@@ -31,19 +31,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** How to parse an mmCif file:
+/**
+ * How to parse an mmCif file:
+ * 
  * <pre>
-public static void main(String[] args) throws Exception {
-	String filename =  "/path/to/something.cif.gz" ;
-
-	StructureIOFile reader = new MMCIFFileReader();
-
-	Structure struc = reader.getStructure(filename);
-	System.out.println(struc);
-}
-</pre>
+ * public static void main(String[] args) throws Exception {
+ * 	String filename = "/path/to/something.cif.gz";
+ * 
+ * 	StructureIOFile reader = new MMCIFFileReader();
+ * 
+ * 	Structure struc = reader.getStructure(filename);
+ * 	System.out.println(struc);
+ * }
+ * </pre>
  *
  * @author Andreas Prlic
  * @since 1.7
@@ -51,42 +54,32 @@ public static void main(String[] args) throws Exception {
  */
 public class MMCIFFileReader extends LocalPDBDirectory {
 
-	//private static final Logger logger = LoggerFactory.getLogger(MMCIFFileReader.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(MMCIFFileReader.class);
 
-	public static final String[] MMCIF_SPLIT_DIR    = new String[]{"data","structures","divided" ,"mmCIF"};
-	public static final String[] MMCIF_OBSOLETE_DIR = new String[]{"data","structures","obsolete","mmCIF"};
+	private static final Logger logger = LoggerFactory.getLogger(MMCIFFileReader.class);
+	public static final String[] MMCIF_SPLIT_DIR = new String[] { "data", "structures", "divided", "mmCIF" };
+	public static final String[] MMCIF_OBSOLETE_DIR = new String[] { "data", "structures", "obsolete", "mmCIF" };
 
 	private SimpleMMcifConsumer consumer;
 
-	public static void main(String[] args) throws Exception {
-
-		MMCIFFileReader reader = new MMCIFFileReader();
-		FileParsingParameters params = new FileParsingParameters();
-		reader.setFileParsingParameters(params);
-
-
-		Structure struc = reader.getStructureById("1m4x");
-		System.out.println(struc);
-		System.out.println(struc.toPDB());
-
-
-	}
-
 	/**
-	 * Constructs a new MMCIFFileReader, initializing the extensions member variable.
-	 * The path is initialized in the same way as {@link UserConfiguration},
-	 * i.e. to system property/environment variable {@link UserConfiguration#PDB_DIR}.
-	 * Both autoFetch and splitDir are initialized to false
+	 * Constructs a new MMCIFFileReader, initializing the extensions member
+	 * variable. The path is initialized in the same way as
+	 * {@link UserConfiguration}, i.e. to system property/environment variable
+	 * {@link UserConfiguration#PDB_DIR}. Both autoFetch and splitDir are
+	 * initialized to false
 	 */
-	public MMCIFFileReader(){
+	public MMCIFFileReader() {
 		this(null);
 	}
 
 	/**
 	 * Constructs a new PDBFileReader, initializing the extensions member variable.
-	 * The path is initialized to the given path, both autoFetch and splitDir are initialized to false.
+	 * The path is initialized to the given path, both autoFetch and splitDir are
+	 * initialized to false.
 	 */
-	public MMCIFFileReader(String path){
+	public MMCIFFileReader(String path) {
 		super(path);
 		addExtension(".cif");
 		addExtension(".mmcif");
@@ -94,8 +87,20 @@ public class MMCIFFileReader extends LocalPDBDirectory {
 		addExtension(".mmcif.gz");
 	}
 
+	public static void main(String[] args) throws Exception {
+
+		MMCIFFileReader reader = new MMCIFFileReader();
+		FileParsingParameters params = new FileParsingParameters();
+		reader.setFileParsingParameters(params);
+
+		Structure struc = reader.getStructureById("1m4x");
+		logger.info(String.valueOf(struc));
+		logger.info(struc.toPDB());
+
+	}
+
 	@Override
-	public Structure getStructure(InputStream inStream) throws IOException{
+	public Structure getStructure(InputStream inStream) throws IOException {
 
 		MMcifParser parser = new SimpleMMcifParser();
 
@@ -103,13 +108,11 @@ public class MMCIFFileReader extends LocalPDBDirectory {
 
 		consumer.setFileParsingParameters(getFileParsingParameters());
 
-
 		// The Consumer builds up the BioJava - structure object.
 		// you could also hook in your own and build up you own data model.
 		parser.addMMcifConsumer(consumer);
 
 		parser.parse(new BufferedReader(new InputStreamReader(inStream)));
-
 
 		// now get the protein structure.
 		Structure cifStructure = consumer.getStructure();
@@ -117,17 +120,17 @@ public class MMCIFFileReader extends LocalPDBDirectory {
 		return cifStructure;
 	}
 
-	public SimpleMMcifConsumer getMMcifConsumer(){
+	public SimpleMMcifConsumer getMMcifConsumer() {
 		return consumer;
 	}
 
-//	public void setMMCifConsumer(SimpleMMcifConsumer consumer){
-//		this.consumer = consumer;
-//	}
+	// public void setMMCifConsumer(SimpleMMcifConsumer consumer){
+	// this.consumer = consumer;
+	// }
 
 	@Override
 	protected String getFilename(String pdbId) {
-		return pdbId.toLowerCase()+".cif.gz";
+		return pdbId.toLowerCase() + ".cif.gz";
 	}
 
 	@Override

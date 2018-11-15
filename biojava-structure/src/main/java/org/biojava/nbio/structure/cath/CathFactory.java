@@ -26,9 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controls global {@link CathDatabase CathDatabases} being used.
- * Implements a multiton pattern through {@link #getCathDatabase(String)},
- * and a singleton pattern through {@link #getCathDatabase()}.
+ * Controls global {@link CathDatabase CathDatabases} being used. Implements a
+ * multiton pattern through {@link #getCathDatabase(String)}, and a singleton
+ * pattern through {@link #getCathDatabase()}.
+ * 
  * @author dmyersturnbull
  * @see ScopFactory
  * @see CathInstallation
@@ -45,7 +46,11 @@ public class CathFactory {
 
 	private static CathDatabase cath;
 
-	private static Map<String, CathDatabase> versions = new HashMap<String, CathDatabase>();
+	private static Map<String, CathDatabase> versions = new HashMap<>();
+
+	private CathFactory() {
+
+	}
 
 	/**
 	 * Sets the default (singleton) CathDatabase.
@@ -55,8 +60,8 @@ public class CathFactory {
 	}
 
 	/**
-	 * Returns the default (singleton) CathDatabase.
-	 * If the database is null, this will recreate it (lazy initialization).
+	 * Returns the default (singleton) CathDatabase. If the database is null, this
+	 * will recreate it (lazy initialization).
 	 */
 	public static CathDatabase getCathDatabase() {
 		if (cath == null) {
@@ -65,16 +70,15 @@ public class CathFactory {
 		return cath;
 	}
 
-	private CathFactory() {
-
-	}
-
 	/**
 	 * Returns a CATH database of the specified version.
+	 * 
 	 * @param version For example, "3.5.0"
 	 */
 	public static CathDatabase getCathDatabase(String version) {
-		if (version == null) version = DEFAULT_VERSION;
+		if (version == null) {
+			version = DEFAULT_VERSION;
+		}
 		CathDatabase cath = versions.get(version);
 		if (cath == null) {
 			CathInstallation newCath = new CathInstallation();

@@ -25,15 +25,17 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Enumerates the classification of polymers.
- * This information is derived from the mmcif dictionary
+ * Enumerates the classification of polymers. This information is derived from
+ * the mmcif dictionary
+ * 
  * @author mulvaney
  * @author Andreas Prlic
- * @see <a href="http://mmcif.rcsb.org/dictionaries/mmcif_pdbx.dic/Items/_entity_poly.type.html">link into mmCIF dictionary</a>
+ * @see <a href=
+ *      "http://mmcif.rcsb.org/dictionaries/mmcif_pdbx.dic/Items/_entity_poly.type.html">link
+ *      into mmCIF dictionary</a>
  * @since 1.7
  */
-public enum PolymerType implements Serializable
-{
+public enum PolymerType implements Serializable {
 
 	/**
 	 * polypeptide(L)
@@ -90,44 +92,43 @@ public enum PolymerType implements Serializable
 	 */
 	unknown(null);
 
-	static Map<String,PolymerType> lookupTable = new HashMap<>();
+	static Map<String, PolymerType> lookupTable = new HashMap<>();
 
 	static {
 
-		for (PolymerType rt : PolymerType.values() ) {
-				if ( rt == unknown)
-					continue;
-				lookupTable.put(rt.entity_poly_type,rt);
-				lookupTable.put(rt.entity_poly_type.toLowerCase(),rt);
+		for (PolymerType rt : PolymerType.values()) {
+			if (rt == unknown) {
+				continue;
+			}
+			lookupTable.put(rt.entity_poly_type, rt);
+			lookupTable.put(rt.entity_poly_type.toLowerCase(), rt);
 		}
 	}
 
-
-	PolymerType(String entity_poly_type)
-	{
+	PolymerType(String entity_poly_type) {
 		this.entity_poly_type = entity_poly_type;
 	}
+
 	public final String entity_poly_type;
 
-	public static PolymerType polymerTypeFromString(String polymerType)
-	{
+	public static PolymerType polymerTypeFromString(String polymerType) {
 
-		if ( polymerType.equalsIgnoreCase(peptide.entity_poly_type))
+		if (polymerType.equalsIgnoreCase(peptide.entity_poly_type)) {
 			return peptide;
+		}
 
 		PolymerType ptype = lookupTable.get(polymerType);
-		if ( ptype != null)
+		if (ptype != null) {
 			return ptype;
+		}
 
 		ptype = lookupTable.get(polymerType.toLowerCase());
-		if ( ptype != null)
+		if (ptype != null) {
 			return ptype;
+		}
 
-
-		for(PolymerType pt : PolymerType.values())
-		{
-			if(polymerType.equals(pt.entity_poly_type))
-			{
+		for (PolymerType pt : PolymerType.values()) {
+			if (polymerType.equals(pt.entity_poly_type)) {
 				return pt;
 			}
 		}
@@ -135,22 +136,25 @@ public enum PolymerType implements Serializable
 	}
 
 	/**
-	 * Convenience <tt>Set</tt> of polymer types classified as protein.  This only contains {@link #peptide}
+	 * Convenience <tt>Set</tt> of polymer types classified as protein. This only
+	 * contains {@link #peptide}
 	 */
 	public static final Set<PolymerType> PROTEIN_ONLY;
 
 	/**
-	 * Convenience <tt>Set</tt> of polymer types classified as DNA.  This only contains {@link #dna}
+	 * Convenience <tt>Set</tt> of polymer types classified as DNA. This only
+	 * contains {@link #dna}
 	 */
 	public static final Set<PolymerType> DNA_ONLY;
 
 	/**
-	 * Convenience <tt>Set</tt> of polymer types classified as RNA.  This only contains {@link #rna}
+	 * Convenience <tt>Set</tt> of polymer types classified as RNA. This only
+	 * contains {@link #rna}
 	 */
 	public static final Set<PolymerType> RNA_ONLY;
 
 	/**
-	 * Convenience <tt>Set</tt> of polymer types classified as DNA.  This contains:
+	 * Convenience <tt>Set</tt> of polymer types classified as DNA. This contains:
 	 * <ul>
 	 * <li>{@link #dna}</li>
 	 * <li>{@link #rna}</li>
@@ -167,19 +171,19 @@ public enum PolymerType implements Serializable
 	static {
 		Set<PolymerType> tmp;
 
-		tmp = new HashSet<PolymerType>();
+		tmp = new HashSet<>();
 		tmp.add(peptide);
 		PROTEIN_ONLY = Collections.unmodifiableSet(tmp);
 
-		tmp = new HashSet<PolymerType>();
+		tmp = new HashSet<>();
 		tmp.add(dna);
 		DNA_ONLY = Collections.unmodifiableSet(tmp);
 
-		tmp = new HashSet<PolymerType>();
+		tmp = new HashSet<>();
 		tmp.add(rna);
 		RNA_ONLY = Collections.unmodifiableSet(tmp);
 
-		tmp = new HashSet<PolymerType>();
+		tmp = new HashSet<>();
 		tmp.add(dna);
 		tmp.add(rna);
 		tmp.add(dnarna);

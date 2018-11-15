@@ -41,7 +41,6 @@ public class StructSiteGen extends AbstractBean {
 	String symmetry;
 
 	public StructSiteGen() {
-		super();
 	}
 
 	public String getId() {

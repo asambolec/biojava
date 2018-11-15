@@ -24,16 +24,23 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to work with SurvivalInfo
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class SurvivalInfoHelper {
 
+	private static final Logger logger = LoggerFactory.getLogger(SurvivalInfoHelper.class);
+
 	/**
-	 * For each analysis this allows outputing of the data used in the calculations to a printstream/file. This then
-	 * allows the file to be loaded into R and calculations can be verified.
+	 * For each analysis this allows outputing of the data used in the calculations
+	 * to a printstream/file. This then allows the file to be loaded into R and
+	 * calculations can be verified.
+	 * 
 	 * @param DataT
 	 * @param ps
 	 * @param delimiter
@@ -41,29 +48,26 @@ public class SurvivalInfoHelper {
 	public static void dump(ArrayList<SurvivalInfo> DataT, PrintStream ps, String delimiter) {
 		ArrayList<String> variables = DataT.get(0).getDataVariables();
 		ps.print("Seq" + delimiter);
-		for (String variable : variables) {
-			ps.print(variable + delimiter);
-		}
-		ps.print("TIME" + delimiter + "STATUS" + delimiter + "WEIGHT" + delimiter + "STRATA");
+		variables.forEach(variable -> ps.print(variable + delimiter));
+		ps.print(new StringBuilder().append("TIME").append(delimiter).append("STATUS").append(delimiter)
+				.append("WEIGHT").append(delimiter).append("STRATA").toString());
 
 		ps.println();
-		for (SurvivalInfo si : DataT) {
+		DataT.forEach(si -> {
 			ps.print(si.getOrder() + delimiter);
-			for (String variable : variables) {
-				Double value = si.getVariable(variable);
-				ps.print(value + delimiter);
-			}
+			variables.stream().map(si::getVariable).forEach(value -> ps.print(value + delimiter));
 
-			ps.print(si.getTime() + delimiter + si.getStatus() + delimiter + si.getWeight() + delimiter + si.getStrata());
+			ps.print(new StringBuilder().append(si.getTime()).append(delimiter).append(si.getStatus()).append(delimiter)
+					.append(si.getWeight()).append(delimiter).append(si.getStrata()).toString());
 
 			ps.println();
-		}
-
+		});
 
 	}
 
 	/**
 	 * If any not numeric value then categorical
+	 * 
 	 * @param values
 	 * @return
 	 */
@@ -74,46 +78,46 @@ public class SurvivalInfoHelper {
 			}
 			return false;
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return true;
 		}
 
 	}
 
 	/**
-	 * Take a collection of categorical data and convert it to numeric to be used in cox calculations
+	 * Take a collection of categorical data and convert it to numeric to be used in
+	 * cox calculations
+	 * 
 	 * @param DataT
 	 */
 	public static void categorizeData(ArrayList<SurvivalInfo> DataT) {
 
-		//Go through and get all variable value pairs
-		LinkedHashMap<String, LinkedHashMap<String, Double>> valueMap = new LinkedHashMap<String, LinkedHashMap<String, Double>>();
-		for (SurvivalInfo si : DataT) {
-
-			for (String key : si.unknownDataType.keySet()) {
-				LinkedHashMap<String, Double> map = valueMap.get(key);
-				if (map == null) {
-					map = new LinkedHashMap<String, Double>();
-					valueMap.put(key, map);
-				}
-				map.put(si.unknownDataType.get(key), null);
+		// Go through and get all variable value pairs
+		LinkedHashMap<String, LinkedHashMap<String, Double>> valueMap = new LinkedHashMap<>();
+		DataT.forEach(si -> si.unknownDataType.keySet().forEach(key -> {
+			LinkedHashMap<String, Double> map = valueMap.get(key);
+			if (map == null) {
+				map = new LinkedHashMap<>();
+				valueMap.put(key, map);
 			}
-		}
+			map.put(si.unknownDataType.get(key), null);
+		}));
 
 		for (String variable : valueMap.keySet()) {
 			LinkedHashMap<String, Double> values = valueMap.get(variable);
 			if (isCategorical(values)) {
-				ArrayList<String> categories = new ArrayList<String>(values.keySet());
-				Collections.sort(categories); //go ahead and put in alphabetical order
+				ArrayList<String> categories = new ArrayList<>(values.keySet());
+				Collections.sort(categories); // go ahead and put in alphabetical order
 				if (categories.size() == 2) {
-					for (String value : values.keySet()) {
+					values.keySet().forEach(value -> {
 						int index = categories.indexOf(value);
 						values.put(value, index + 0.0);
-					}
+					});
 				} else {
-					for (String value : values.keySet()) {
+					values.keySet().forEach(value -> {
 						int index = categories.indexOf(value);
 						values.put(value, index + 1.0);
-					}
+					});
 				}
 
 			} else {
@@ -124,39 +128,39 @@ public class SurvivalInfoHelper {
 			}
 		}
 
-		for (SurvivalInfo si : DataT) {
-			for (String key : si.unknownDataType.keySet()) {
-				LinkedHashMap<String, Double> map = valueMap.get(key);
-				String value = si.unknownDataType.get(key);
-				Double d = map.get(value);
-				si.data.put(key, d);
-			}
-		}
+		DataT.forEach(si -> si.unknownDataType.keySet().forEach(key -> {
+			LinkedHashMap<String, Double> map = valueMap.get(key);
+			String value = si.unknownDataType.get(key);
+			Double d = map.get(value);
+			si.data.put(key, d);
+		}));
 
-		for (SurvivalInfo si : DataT) {
-			si.unknownDataType.clear();
-		}
+		DataT.forEach(si -> si.unknownDataType.clear());
 
 	}
 
 	/**
-	 * To test for interactions use two variables and create a third variable where the two are multiplied together.
+	 * To test for interactions use two variables and create a third variable where
+	 * the two are multiplied together.
+	 * 
 	 * @param variable1
 	 * @param variable2
 	 * @param survivalInfoList
 	 * @return
 	 */
-	public static ArrayList<String> addInteraction(String variable1, String variable2, ArrayList<SurvivalInfo> survivalInfoList) {
-		ArrayList<String> variables = new ArrayList<String>();
+	public static ArrayList<String> addInteraction(String variable1, String variable2,
+			ArrayList<SurvivalInfo> survivalInfoList) {
+		ArrayList<String> variables = new ArrayList<>();
 		variables.add(variable1);
 		variables.add(variable2);
-		variables.add(variable1 + ":" + variable2);
-		for (SurvivalInfo si : survivalInfoList) {
+		variables.add(new StringBuilder().append(variable1).append(":").append(variable2).toString());
+		survivalInfoList.forEach(si -> {
 			Double value1 = si.getVariable(variable1);
 			Double value2 = si.getVariable(variable2);
 			Double value3 = value1 * value2;
-			si.addContinuousVariable(variable1 + ":" + variable2, value3);
-		}
+			si.addContinuousVariable(new StringBuilder().append(variable1).append(":").append(variable2).toString(),
+					value3);
+		});
 		return variables;
 	}
 
@@ -169,52 +173,58 @@ public class SurvivalInfoHelper {
 	 * @param survivalInfoList
 	 * @throws Exception
 	 */
-	public static void groupByRange(double[] range, String variable, String groupName, ArrayList<SurvivalInfo> survivalInfoList) throws Exception {
-		ArrayList<String> labels = new ArrayList<String>();
+	public static void groupByRange(double[] range, String variable, String groupName,
+			ArrayList<SurvivalInfo> survivalInfoList) throws Exception {
+		ArrayList<String> labels = new ArrayList<>();
 		for (int i = 0; i < range.length; i++) {
 			String label = "";
 			if (i == 0) {
-				label = "[<=" + range[i] + "]";
+				label = new StringBuilder().append("[<=").append(range[i]).append("]").toString();
 			} else if (i == range.length - 1) {
-				label = "[" + (range[i - 1] + 1) + "-" + range[i] + "]";
+				label = new StringBuilder().append("[").append(range[i - 1] + 1).append("-").append(range[i])
+						.append("]").toString();
 				labels.add(label);
-				label = "[>" + range[i] + "]";
+				label = new StringBuilder().append("[>").append(range[i]).append("]").toString();
 			} else {
-				label = "[" + (range[i - 1] + 1) + "-" + range[i] + "]";
+				label = new StringBuilder().append("[").append(range[i - 1] + 1).append("-").append(range[i])
+						.append("]").toString();
 			}
 			labels.add(label);
 		}
-		ArrayList<String> validLabels = new ArrayList<String>();
+		ArrayList<String> validLabels = new ArrayList<>();
 
-		//need to find the categories so we can set 1 and 0 and not include ranges with no values
+		// need to find the categories so we can set 1 and 0 and not include ranges with
+		// no values
 		for (SurvivalInfo si : survivalInfoList) {
 			Double value = si.getContinuousVariable(variable);
 			if (value == null) {
-				throw new Exception("Variable " + variable + " not found in " + si.toString());
+				throw new Exception(new StringBuilder().append("Variable ").append(variable).append(" not found in ")
+						.append(si.toString()).toString());
 			}
 			int rangeIndex = getRangeIndex(range, value);
 			String label = labels.get(rangeIndex);
-			if (!validLabels.contains(groupName + "_" + label)) {
-				validLabels.add(groupName + "_" + label);
+			if (!validLabels.contains(new StringBuilder().append(groupName).append("_").append(label).toString())) {
+				validLabels.add(new StringBuilder().append(groupName).append("_").append(label).toString());
 			}
 		}
 		Collections.sort(validLabels);
-		System.out.println("Valid Lables:" + validLabels);
+		logger.info("Valid Lables:" + validLabels);
 		for (SurvivalInfo si : survivalInfoList) {
 			Double value = si.getContinuousVariable(variable);
 			if (value == null) {
-				throw new Exception("Variable " + variable + " not found in " + si.toString());
+				throw new Exception(new StringBuilder().append("Variable ").append(variable).append(" not found in ")
+						.append(si.toString()).toString());
 			}
 			int rangeIndex = getRangeIndex(range, value);
 			String label = labels.get(rangeIndex);
-			String inLable = groupName + "_" + label;
-			for (String gl : validLabels) {
+			String inLable = new StringBuilder().append(groupName).append("_").append(label).toString();
+			validLabels.forEach(gl -> {
 				if (gl.equals(inLable)) {
 					si.addContinuousVariable(gl, 1.0);
 				} else {
 					si.addContinuousVariable(gl, 0.0);
 				}
-			}
+			});
 		}
 
 	}
@@ -243,6 +253,7 @@ public class SurvivalInfoHelper {
 		if (value > range[range.length - 1]) {
 			return range.length;
 		}
-		throw new Exception("Value " + value + " not found in range ");
+		throw new Exception(
+				new StringBuilder().append("Value ").append(value).append(" not found in range ").toString());
 	}
 }

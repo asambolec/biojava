@@ -38,43 +38,38 @@ import org.biojava.nbio.structure.align.util.AFPAlignmentDisplay;
 import org.biojava.nbio.structure.align.util.AFPChainScorer;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** A class that does calculations on an AFPChain
+/**
+ * A class that does calculations on an AFPChain
  *
  * @author Andreas Prlic
  *
  */
-public class FatCatAligner
-{
+public class FatCatAligner {
 
+	private static final Logger logger = LoggerFactory.getLogger(FatCatAligner.class);
 	public static final boolean debug = false;
 	public static final boolean printTimeStamps = false;
 
-	AFPChain afpChain ;
+	AFPChain afpChain;
 	Group[] twistedGroups;
 
-
-
-	public AFPChain getAfpChain()
-	{
+	public AFPChain getAfpChain() {
 		return afpChain;
 	}
 
-
-	public Group[] getTwistedGroups()
-	{
+	public Group[] getTwistedGroups() {
 
 		return twistedGroups;
 	}
 
-	public void setTwistedGroups(Group[] twistedGroups)
-	{
+	public void setTwistedGroups(Group[] twistedGroups) {
 		this.twistedGroups = twistedGroups;
 	}
 
-
-	public  void align(Atom[] ca1, Atom[] ca2, boolean doRigid, FatCatParameters params) throws StructureException{
+	public void align(Atom[] ca1, Atom[] ca2, boolean doRigid, FatCatParameters params) throws StructureException {
 
 		long tstart = System.currentTimeMillis();
 
@@ -82,138 +77,141 @@ public class FatCatAligner
 		afpChain.setCa1Length(ca1.length);
 		afpChain.setCa2Length(ca2.length);
 
-
-
-		AFPCalculator.extractAFPChains(params, afpChain,ca1, ca2);
+		AFPCalculator.extractAFPChains(params, afpChain, ca1, ca2);
 
 		long cend = System.currentTimeMillis();
 
-		if (printTimeStamps)
-			System.out.println("calculation took:" + (cend - tstart) + " ms.");
-
-
-		AFPCalculator.sortAfps(afpChain,ca1,ca2);
-
-		if ( printTimeStamps) {
-			long send = System.currentTimeMillis();
-
-
-			System.out.println("sorting  took:" + (send - cend) + " ms.");
+		if (printTimeStamps) {
+			logger.info(
+					new StringBuilder().append("calculation took:").append(cend - tstart).append(" ms.").toString());
 		}
 
-		if ( doRigid)
-			this.twistedGroups = rChainAfp(params, afpChain,ca1,ca2);
+		AFPCalculator.sortAfps(afpChain, ca1, ca2);
 
-		else {
-			this.twistedGroups = chainAfp(params,afpChain,ca1,ca2);
+		if (printTimeStamps) {
+			long send = System.currentTimeMillis();
+
+			logger.info(new StringBuilder().append("sorting  took:").append(send - cend).append(" ms.").toString());
+		}
+
+		if (doRigid) {
+			this.twistedGroups = rChainAfp(params, afpChain, ca1, ca2);
+		} else {
+			this.twistedGroups = chainAfp(params, afpChain, ca1, ca2);
 		}
 
 		// long start = System.currentTimeMillis();
 		long end = System.currentTimeMillis();
-		afpChain.setCalculationTime(end-tstart);
-		if ( printTimeStamps)
-			System.out.println("TOTAL calc time: " + (end -tstart) / 1000.0);
+		afpChain.setCalculationTime(end - tstart);
+		if (printTimeStamps) {
+			logger.info("TOTAL calc time: " + (end - tstart) / 1000.0);
+		}
 
-	}
-
-
-
-
-	/** runs rigid chaining process
-	 *
-	 */
-	private static Group[] rChainAfp(FatCatParameters params, AFPChain afpChain, Atom[] ca1, Atom[] ca2) throws StructureException{
-		params.setMaxTra(0);
-		afpChain.setMaxTra(0);
-		return chainAfp(params,afpChain,ca1,ca2);
 	}
 
 	/**
-	 * run AFP chaining allowing up to maxTra flexible regions.
-	 * Input is original coordinates.
+	 * runs rigid chaining process
 	 *
 	 */
-	private static Group[] chainAfp(FatCatParameters params,AFPChain afpChain, Atom[] ca1, Atom[] ca2) throws StructureException{
+	private static Group[] rChainAfp(FatCatParameters params, AFPChain afpChain, Atom[] ca1, Atom[] ca2)
+			throws StructureException {
+		params.setMaxTra(0);
+		afpChain.setMaxTra(0);
+		return chainAfp(params, afpChain, ca1, ca2);
+	}
+
+	/**
+	 * run AFP chaining allowing up to maxTra flexible regions. Input is original
+	 * coordinates.
+	 *
+	 */
+	private static Group[] chainAfp(FatCatParameters params, AFPChain afpChain, Atom[] ca1, Atom[] ca2)
+			throws StructureException {
 
 		// we don;t want to rotate input atoms, do we?
 		Atom[] ca2clone = StructureTools.cloneAtomArray(ca2);
 
 		List<AFP> afpSet = afpChain.getAfpSet();
 
-		if (debug)
-			System.out.println("entering chainAfp");
+		if (debug) {
+			logger.info("entering chainAfp");
+		}
 		int afpNum = afpSet.size();
 
-		if ( afpNum < 1)
+		if (afpNum < 1) {
 			return new Group[0];
-
-		long bgtime = System.currentTimeMillis();
-		if(debug)    {
-			System.out.println(String.format("total AFP %d\n", afpNum));
 		}
 
-		//run AFP chaining
+		long bgtime = System.currentTimeMillis();
+		if (debug) {
+			logger.info(String.format("total AFP %d%n", afpNum));
+		}
 
-		AFPChainer.doChainAfp(params,afpChain ,ca1,ca2);
+		// run AFP chaining
+
+		AFPChainer.doChainAfp(params, afpChain, ca1, ca2);
 
 		int afpChainLen = afpChain.getAfpChainLen();
 
-		if(afpChainLen < 1)     {
+		if (afpChainLen < 1) {
 
 			afpChain.setShortAlign(true);
 			return new Group[0];
-		} //very short alignment
+		} // very short alignment
 
 		long chaintime = System.currentTimeMillis();
-		if(debug)    {
+		if (debug) {
 
-			System.out.println("Afp chaining: time " + (chaintime-bgtime));
+			logger.info("Afp chaining: time " + (chaintime - bgtime));
 		}
 
 		// do post processing
 
-		AFPPostProcessor.postProcess(params, afpChain,ca1,ca2);
+		AFPPostProcessor.postProcess(params, afpChain, ca1, ca2);
 
 		// Optimize the final alignment
 
-		AFPOptimizer.optimizeAln(params, afpChain,ca1,ca2);
+		AFPOptimizer.optimizeAln(params, afpChain, ca1, ca2);
 
-		AFPOptimizer.blockInfo( afpChain);
+		AFPOptimizer.blockInfo(afpChain);
 
-		AFPOptimizer.updateScore(params,afpChain);
+		AFPOptimizer.updateScore(params, afpChain);
 
-		AFPAlignmentDisplay.getAlign(afpChain,ca1,ca2);
+		AFPAlignmentDisplay.getAlign(afpChain, ca1, ca2);
 
 		Group[] twistedPDB = AFPTwister.twistPDB(afpChain, ca1, ca2clone);
 
-		SigEva sig =  new SigEva();
+		SigEva sig = new SigEva();
 		double probability = sig.calSigAll(params, afpChain);
 		afpChain.setProbability(probability);
-		double normAlignScore = sig.calNS(params,afpChain);
+		double normAlignScore = sig.calNS(params, afpChain);
 		afpChain.setNormAlignScore(normAlignScore);
-		double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2,false);
+		double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2, false);
 		afpChain.setTMScore(tmScore);
 
 		/*
-
-		SIGEVA  sig;
-		probability = sig.calSigAll(maxTra, sparse, pro1Len, pro2Len, alignScore, totalRmsdOpt, optLength, blockNum - 1);
-		normAlignScore = sig.calNS(pro1Len, pro2Len, alignScore, totalRmsdOpt, optLength, blockNum - 1);
-
+		 * 
+		 * SIGEVA sig; probability = sig.calSigAll(maxTra, sparse, pro1Len, pro2Len,
+		 * alignScore, totalRmsdOpt, optLength, blockNum - 1); normAlignScore =
+		 * sig.calNS(pro1Len, pro2Len, alignScore, totalRmsdOpt, optLength, blockNum -
+		 * 1);
+		 * 
 		 */
 
-		//if(maxTra == 0)       probability = sig.calSigRigid(pro1Len, pro2Len, alignScore, totalRmsdOpt, optLength);
-		//else  probability = sig.calSigFlexi(pro1Len, pro2Len, alignScore, totalRmsdOpt, optLength, blockNum - 1);
+		// if(maxTra == 0) probability = sig.calSigRigid(pro1Len, pro2Len, alignScore,
+		// totalRmsdOpt, optLength);
+		// else probability = sig.calSigFlexi(pro1Len, pro2Len, alignScore,
+		// totalRmsdOpt, optLength, blockNum - 1);
 
-		if(debug)    {
+		if (debug) {
 
 			long nowtime = System.currentTimeMillis();
 			long diff = nowtime - chaintime;
-			System.out.println("Alignment optimization: time "+ diff);
+			logger.info("Alignment optimization: time " + diff);
 
-			System.out.println("score:      " + afpChain.getAlignScore());
-			System.out.println("opt length: " + afpChain.getOptLength());
-			System.out.println("opt rmsd:   "+ afpChain.getTotalRmsdOpt());
+			logger.info("score:      " + afpChain.getAlignScore());
+			logger.info("opt length: " + afpChain.getOptLength());
+			logger.info("opt rmsd:   " + afpChain.getTotalRmsdOpt());
 
 		}
 		return twistedPDB;

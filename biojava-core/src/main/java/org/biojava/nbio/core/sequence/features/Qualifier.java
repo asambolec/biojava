@@ -38,8 +38,8 @@ public class Qualifier {
 	 */
 	public Qualifier(String name, String value) {
 		// TODO Auto-generated constructor stub
-		this.name=name;
-		this.value=value;
+		this.name = name;
+		this.value = value;
 		needsQuotes = false;
 	}
 
@@ -48,8 +48,8 @@ public class Qualifier {
 	 */
 	public Qualifier(String name, String value, boolean needsQuotes) {
 		// TODO Auto-generated constructor stub
-		this.name=name;
-		this.value=value;
+		this.name = name;
+		this.value = value;
 		this.needsQuotes = needsQuotes;
 	}
 
@@ -73,12 +73,14 @@ public class Qualifier {
 	public boolean needsQuotes() {
 		return needsQuotes;
 	}
+
 	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	/**
 	 * @param needsQuotes the needsQuotes to set
 	 */
@@ -95,6 +97,7 @@ public class Qualifier {
 
 	@Override
 	public String toString() {
-		return "Qualifier[ name='" + name +"' value='"+ value + "' ]";
+		return new StringBuilder().append("Qualifier[ name='").append(name).append("' value='").append(value)
+				.append("' ]").toString();
 	}
 }

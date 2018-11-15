@@ -41,8 +41,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class CytobandParser {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(CytobandParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(CytobandParser.class);
 
 	public static final String DEFAULT_LOCATION = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz";
 
@@ -50,14 +49,14 @@ public class CytobandParser {
 
 		CytobandParser me = new CytobandParser();
 		try {
-			SortedSet<Cytoband> cytobands = me.getAllCytobands(new URL(
-					DEFAULT_LOCATION));
-			SortedSet<StainType> types = new TreeSet<StainType>();
-			for (Cytoband c : cytobands) {
+			SortedSet<Cytoband> cytobands = me.getAllCytobands(new URL(DEFAULT_LOCATION));
+			SortedSet<StainType> types = new TreeSet<>();
+			cytobands.forEach(c -> {
 				logger.info("Cytoband: {}", c);
-				if (!types.contains(c.getType()))
+				if (!types.contains(c.getType())) {
 					types.add(c.getType());
-			}
+				}
+			});
 			logger.info("Strain Type: {}", types);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -72,18 +71,14 @@ public class CytobandParser {
 
 	}
 
-	public SortedSet<Cytoband> getAllCytobands(InputStream instream)
-			throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				instream));
+	public SortedSet<Cytoband> getAllCytobands(InputStream instream) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
 		String line = null;
-		SortedSet<Cytoband> cytobands = new TreeSet<Cytoband>();
+		SortedSet<Cytoband> cytobands = new TreeSet<>();
 		while ((line = reader.readLine()) != null) {
 			String[] spl = line.split("\t");
 			if (spl.length != 5) {
-				logger.warn(
-						"WRONG LINE LENGHT, expected 5, but got {} for: {}",
-						spl.length, line);
+				logger.warn("WRONG LINE LENGHT, expected 5, but got {} for: {}", spl.length, line);
 			}
 
 			Cytoband b = new Cytoband();
@@ -92,8 +87,9 @@ public class CytobandParser {
 			b.setEnd(Integer.parseInt(spl[2]));
 			b.setLocus(spl[3]);
 			StainType type = StainType.getStainTypeFromString(spl[4]);
-			if (type == null)
+			if (type == null) {
 				logger.warn("unknown type: {}", spl[4]);
+			}
 			b.setType(type);
 			cytobands.add(b);
 		}

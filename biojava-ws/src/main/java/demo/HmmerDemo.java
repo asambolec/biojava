@@ -29,22 +29,25 @@ import org.biojava.nbio.ws.hmmer.HmmerResult;
 import org.biojava.nbio.ws.hmmer.RemoteHmmerScan;
 
 import java.util.SortedSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** 
- * The cookbook recipe for how to request Pfam annotations for a protein sequence using the Hmmer3 service
+/**
+ * The cookbook recipe for how to request Pfam annotations for a protein
+ * sequence using the Hmmer3 service
  *
  * @author Andreas Prlic
  * @since 3.0.3
  */
 public class HmmerDemo {
 
-	public static void main(String[] args) throws Exception {
+	private static final Logger logger = LoggerFactory.getLogger(HmmerDemo.class);
 
+	public static void main(String[] args) throws Exception {
 
 		// first we get a UniProt sequence
 		String uniProtID = "P08487";
 		ProteinSequence seq = getUniprot(uniProtID);
-
 
 		// now we submit this sequence to the Hmmer web site
 		RemoteHmmerScan hmmer = new RemoteHmmerScan();
@@ -53,30 +56,26 @@ public class HmmerDemo {
 
 		// and now let's print out the obtained annotations
 
-		System.out.println(String.format("#\t%15s\t%10s\t%s\t%s\t%8s\t%s",
-				"Domain","ACC", "Start","End","eValue","Description"));
+		logger.info(String.format("#\t%15s\t%10s\t%s\t%s\t%8s\t%s", "Domain", "ACC", "Start", "End", "eValue",
+				"Description"));
 
 		int counter = 0;
 		for (HmmerResult hmmerResult : results) {
-			//System.out.println(hmmerResult);
+			// System.out.println(hmmerResult);
 
-			for ( HmmerDomain domain : hmmerResult.getDomains()) {
+			for (HmmerDomain domain : hmmerResult.getDomains()) {
 				counter++;
-				System.out.println(String.format("%d\t%15s\t%10s\t%5d\t%5d\t%.2e\t%s",
-						counter,
-						hmmerResult.getName(), domain.getHmmAcc(),
-						domain.getSqFrom(),domain.getSqTo(),
-						domain.getEvalue(), hmmerResult.getDesc()
-						));
+				logger.info(String.format("%d\t%15s\t%10s\t%5d\t%5d\t%.2e\t%s", counter, hmmerResult.getName(),
+						domain.getHmmAcc(), domain.getSqFrom(), domain.getSqTo(), domain.getEvalue(),
+						hmmerResult.getDesc()));
 
 			}
 
 		}
 
-
 	}
 
-	/** 
+	/**
 	 * Fetch a protein sequence from the UniProt web site
 	 *
 	 * @param uniProtID
@@ -86,7 +85,8 @@ public class HmmerDemo {
 	private static ProteinSequence getUniprot(String uniProtID) throws Exception {
 
 		AminoAcidCompoundSet set = AminoAcidCompoundSet.getAminoAcidCompoundSet();
-		UniprotProxySequenceReader<AminoAcidCompound> uniprotSequence = new UniprotProxySequenceReader<AminoAcidCompound>(uniProtID,set);
+		UniprotProxySequenceReader<AminoAcidCompound> uniprotSequence = new UniprotProxySequenceReader<>(uniProtID,
+				set);
 
 		ProteinSequence seq = new ProteinSequence(uniprotSequence);
 

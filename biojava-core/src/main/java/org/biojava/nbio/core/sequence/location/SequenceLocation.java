@@ -29,29 +29,31 @@ import org.biojava.nbio.core.sequence.template.AbstractSequence;
 import org.biojava.nbio.core.sequence.template.Compound;
 
 import java.util.List;
+
 /**
  * A location in a sequence that keeps a reference to its parent sequence
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  * @author Paolo Pavan
  */
 public class SequenceLocation<S extends AbstractSequence<C>, C extends Compound> extends SimpleLocation {
 	private S sequence;
 
-	public SequenceLocation(int start, int end,S sequence){
-		super(start,end);
+	public SequenceLocation(int start, int end, S sequence) {
+		super(start, end);
 		this.sequence = sequence;
 
 	}
 
-
-	public SequenceLocation(int start, int end, S sequence, Strand strand, boolean circular, List<Location> subLocations) {
+	public SequenceLocation(int start, int end, S sequence, Strand strand, boolean circular,
+			List<Location> subLocations) {
 		super(new SimplePoint(start), new SimplePoint(end), strand, circular, subLocations);
 
 		this.sequence = sequence;
 	}
 
-	public SequenceLocation(int start, int end,S sequence, Strand strand){
-		super(start,end);
+	public SequenceLocation(int start, int end, S sequence, Strand strand) {
+		super(start, end);
 		this.sequence = sequence;
 		setStrand(strand);
 

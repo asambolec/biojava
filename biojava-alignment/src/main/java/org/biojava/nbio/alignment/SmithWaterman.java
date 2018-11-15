@@ -35,18 +35,21 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 import java.util.List;
 
 /**
- * Smith and Waterman defined an algorithm for pairwise local sequence alignments (best match of sections from each
- * {@link Sequence}).  This class performs such local sequence comparisons efficiently by dynamic programming.
+ * Smith and Waterman defined an algorithm for pairwise local sequence
+ * alignments (best match of sections from each {@link Sequence}). This class
+ * performs such local sequence comparisons efficiently by dynamic programming.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class SmithWaterman<S extends Sequence<C>, C extends Compound> extends AbstractPairwiseSequenceAligner<S, C> {
 
 	/**
-	 * Before running a pairwise local sequence alignment, data must be sent in via calls to
-	 * {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * Before running a pairwise local sequence alignment, data must be sent in via
+	 * calls to {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	public SmithWaterman() {
@@ -56,10 +59,10 @@ public class SmithWaterman<S extends Sequence<C>, C extends Compound> extends Ab
 	/**
 	 * Prepares for a pairwise local sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
+	 * @param query      the first {@link Sequence} of the pair to align
+	 * @param target     the second {@link Sequence} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public SmithWaterman(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
 		super(query, target, gapPenalty, subMatrix, true);
@@ -69,7 +72,7 @@ public class SmithWaterman<S extends Sequence<C>, C extends Compound> extends Ab
 
 	@Override
 	protected void setProfile(List<Step> sx, List<Step> sy) {
-		profile = pair = new SimpleSequencePair<S, C>(getQuery(), getTarget(), sx, xyStart[0],
+		profile = pair = new SimpleSequencePair<>(getQuery(), getTarget(), sx, xyStart[0],
 				getQuery().getLength() - xyMax[0], sy, xyStart[1], getTarget().getLength() - xyMax[1]);
 	}
 

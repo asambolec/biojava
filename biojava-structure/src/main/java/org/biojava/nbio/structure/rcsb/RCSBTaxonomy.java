@@ -27,7 +27,8 @@ package org.biojava.nbio.structure.rcsb;
 /**
  * Corresponds to a taxonomy in a {@code describeMol} XML file.
  *
- * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB RESTful</a>
+ * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB
+ *      RESTful</a>
  *
  * @author dmyerstu
  * @since 3.0.6

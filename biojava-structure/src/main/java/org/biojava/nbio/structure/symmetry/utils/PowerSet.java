@@ -33,8 +33,8 @@ import org.biojava.nbio.structure.symmetry.core.QuatSymmetryDetector;
  * <p>
  * Code taken from StackOverflow best answer in:
  * http://stackoverflow.com/questions/4640034/calculating-all-of-the-subsets
- * -of-a-set-of-numbers. HashSet changed to LinkedHashSet for the consistent order
- * of the subsets and easier testing.
+ * -of-a-set-of-numbers. HashSet changed to LinkedHashSet for the consistent
+ * order of the subsets and easier testing.
  * <p>
  * Currently used to calculate the possible LOCAL symmetries in
  * {@link QuatSymmetryDetector}.
@@ -52,21 +52,21 @@ public class PowerSet<T> {
 	 * @return the set of power Sets of the original Set
 	 */
 	public Set<Set<T>> powerSet(Set<T> originalSet) {
-		Set<Set<T>> sets = new LinkedHashSet<Set<T>>();
+		Set<Set<T>> sets = new LinkedHashSet<>();
 		if (originalSet.isEmpty()) {
 			sets.add(new LinkedHashSet<T>());
 			return sets;
 		}
-		List<T> list = new ArrayList<T>(originalSet);
+		List<T> list = new ArrayList<>(originalSet);
 		T head = list.get(0);
-		Set<T> rest = new LinkedHashSet<T>(list.subList(1, list.size()));
-		for (Set<T> set : powerSet(rest)) {
-			Set<T> newSet = new LinkedHashSet<T>();
+		Set<T> rest = new LinkedHashSet<>(list.subList(1, list.size()));
+		powerSet(rest).forEach(set -> {
+			Set<T> newSet = new LinkedHashSet<>();
 			newSet.add(head);
 			newSet.addAll(set);
 			sets.add(newSet);
 			sets.add(set);
-		}
+		});
 		return sets;
 	}
 }

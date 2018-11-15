@@ -25,7 +25,6 @@
  */
 package org.biojava.nbio.core.sequence.template;
 
-
 public interface Compound {
 
 	public boolean equalsIgnoreCase(Compound compound);

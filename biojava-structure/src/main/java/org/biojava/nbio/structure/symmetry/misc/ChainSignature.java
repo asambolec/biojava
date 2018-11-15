@@ -51,11 +51,13 @@ public class ChainSignature implements Comparable<ChainSignature> {
 	}
 
 	@Override
-	public boolean equals (Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
-		if((obj == null) || (obj.getClass() != this.getClass())) return false;
+		if ((obj == null) || (obj.getClass() != this.getClass())) {
+			return false;
+		}
 
 		ChainSignature other = (ChainSignature) obj;
 		if (representative == null) {
@@ -89,7 +91,7 @@ public class ChainSignature implements Comparable<ChainSignature> {
 		builder.append("(");
 		builder.append(representative);
 		builder.append(")");
-		if (chainCount> 1) {
+		if (chainCount > 1) {
 			builder.append(chainCount);
 		}
 		return builder.toString();

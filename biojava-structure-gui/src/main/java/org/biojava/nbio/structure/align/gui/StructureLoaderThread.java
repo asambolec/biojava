@@ -31,15 +31,18 @@ import org.biojava.nbio.structure.quaternary.BioAssemblyTools;
 
 import javax.swing.*;
 import java.awt.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StructureLoaderThread extends SwingWorker<String, Object> {
 
+	private static final Logger logger = LoggerFactory.getLogger(StructureLoaderThread.class);
+	static JFrame progressFrame = null;
 	String name;
 	boolean showBiolAssembly;
-
 	UserConfiguration config;
 
-	StructureLoaderThread(UserConfiguration config, String name, boolean showBiolAssembly){
+	StructureLoaderThread(UserConfiguration config, String name, boolean showBiolAssembly) {
 		this.name = name;
 		this.showBiolAssembly = showBiolAssembly;
 
@@ -49,20 +52,20 @@ public class StructureLoaderThread extends SwingWorker<String, Object> {
 	@Override
 	protected String doInBackground() {
 
-		System.out.println("loading " + name );
+		logger.info("loading " + name);
 
-		AtomCache cache = new AtomCache(config.getPdbFilePath(),config.getCacheFilePath());
+		AtomCache cache = new AtomCache(config.getPdbFilePath(), config.getCacheFilePath());
 		Structure s = null;
 		try {
-			if ( showBiolAssembly) {
-				s= StructureIO.getBiologicalAssembly(name);
+			if (showBiolAssembly) {
+				s = StructureIO.getBiologicalAssembly(name);
 
 				int atomCount = StructureTools.getNrAtoms(s);
 
-				if ( atomCount > 200000){
+				if (atomCount > 200000) {
 					// uh oh, we are probably going to exceed 512 MB usage...
 					// scale down to something smaller
-					System.err.println("Structure very large. Reducing display to C alpha atoms only");
+					logger.error("Structure very large. Reducing display to C alpha atoms only");
 					s = BioAssemblyTools.getReducedStructure(s);
 				}
 
@@ -70,21 +73,20 @@ public class StructureLoaderThread extends SwingWorker<String, Object> {
 				s = cache.getStructure(name);
 			}
 
-			System.out.println("done loading structure...");
-
+			logger.info("done loading structure...");
 
 			StructureAlignmentJmol jmol = new StructureAlignmentJmol();
 			jmol.setStructure(s);
 
-			jmol.evalString("set antialiasDisplay on; select all;spacefill off; wireframe off; backbone off; cartoon;color cartoon chain; select ligand;wireframe 0.16;spacefill 0.5; select all; color cartoon structure;");
+			jmol.evalString(
+					"set antialiasDisplay on; select all;spacefill off; wireframe off; backbone off; cartoon;color cartoon chain; select ligand;wireframe 0.16;spacefill 0.5; select all; color cartoon structure;");
 			jmol.evalString("save STATE state_1");
 
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 
-
-		} catch (Exception e){
-			e.printStackTrace();
-
-			JOptionPane.showMessageDialog(null, "Error while loading " + name + ":" + e.getMessage());
+			JOptionPane.showMessageDialog(null, new StringBuilder().append("Error while loading ").append(name)
+					.append(":").append(e.getMessage()).toString());
 
 			s = new StructureImpl();
 		}
@@ -95,49 +97,38 @@ public class StructureLoaderThread extends SwingWorker<String, Object> {
 
 	public static void showProgressBar() {
 
-		if ( progressFrame == null){
+		if (progressFrame == null) {
 
-			SwingUtilities.invokeLater(new Runnable() {
+			SwingUtilities.invokeLater(() -> {
+				// TODO Auto-generated method stub
 
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
+				final JFrame frame = new JFrame("Loading ...");
+				final JProgressBar progressBar = new JProgressBar();
 
+				progressBar.setIndeterminate(true);
 
-					final JFrame frame = new JFrame("Loading ...");
-					final JProgressBar progressBar = new JProgressBar();
-
-					progressBar.setIndeterminate(true);
-
-					final JPanel contentPane = new JPanel();
-					contentPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-					contentPane.setLayout(new BorderLayout());
-					contentPane.add(new JLabel("Loading ..."), BorderLayout.NORTH);
-					contentPane.add(progressBar, BorderLayout.CENTER);
-					frame.setContentPane(contentPane);
-					frame.pack();
-					frame.setLocationRelativeTo(null);
-					progressFrame = frame;
-					frame.setVisible(true);
-				}
+				final JPanel contentPane = new JPanel();
+				contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+				contentPane.setLayout(new BorderLayout());
+				contentPane.add(new JLabel("Loading ..."), BorderLayout.NORTH);
+				contentPane.add(progressBar, BorderLayout.CENTER);
+				frame.setContentPane(contentPane);
+				frame.pack();
+				frame.setLocationRelativeTo(null);
+				progressFrame = frame;
+				frame.setVisible(true);
 			});
 
 		}
 
-
 	}
 
-	static JFrame progressFrame = null;
 	private void hideProgressBar() {
 
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				if ( progressFrame != null){
-					progressFrame.dispose();
-					progressFrame = null;
-				}
+		SwingUtilities.invokeLater(() -> {
+			if (progressFrame != null) {
+				progressFrame.dispose();
+				progressFrame = null;
 			}
 		});
 

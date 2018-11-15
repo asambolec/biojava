@@ -34,9 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.biojava.nbio.core.sequence.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GenericGenbankHeaderParser<S extends AbstractSequence<C>, C extends Compound> implements SequenceHeaderParserInterface<S,C> {
+public class GenericGenbankHeaderParser<S extends AbstractSequence<C>, C extends Compound>
+		implements SequenceHeaderParserInterface<S, C> {
 
+	private static final Logger logger = LoggerFactory.getLogger(GenericGenbankHeaderParser.class);
 	private String accession = null;
 	private String identifier = null;
 	private String name = null;
@@ -45,9 +49,11 @@ public class GenericGenbankHeaderParser<S extends AbstractSequence<C>, C extends
 	private boolean versionSeen;
 	private ArrayList<String> comments = new ArrayList<>();
 	private List<AbstractReference> references = new ArrayList<>();
+	private String description;
 
 	/**
 	 * Parse the header and set the values in the sequence
+	 * 
 	 * @param header
 	 * @param sequence
 	 */
@@ -78,64 +84,78 @@ public class GenericGenbankHeaderParser<S extends AbstractSequence<C>, C extends
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setVersion(int version) throws ParserException {
-		if (this.versionSeen) throw new ParserException("Current BioEntry already has a version");
-		else {
+	public void setVersion(int version) {
+		if (this.versionSeen) {
+			throw new ParserException("Current BioEntry already has a version");
+		} else {
 			try {
 				this.version = version;
 				this.versionSeen = true;
 			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
 				throw new ParserException("Could not parse version as an integer");
 			}
 		}
 	}
 
-
 	/**
-	 * {@inheritDoc}
-	 * The last accession passed to this routine will always be the one used.
+	 * {@inheritDoc} The last accession passed to this routine will always be the
+	 * one used.
 	 */
-	public void setAccession(String accession) throws ParserException {
-		if (accession==null) throw new ParserException("Accession cannot be null");
+	public void setAccession(String accession) {
+		if (accession == null) {
+			throw new ParserException("Accession cannot be null");
+		}
 		this.accession = accession;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setDescription(String description) throws ParserException {
-		if (this.description!=null) throw new ParserException("Current BioEntry already has a description");
+	public void setDescription(String description) {
+		if (this.description != null) {
+			throw new ParserException("Current BioEntry already has a description");
+		}
 		this.description = description;
 	}
-	private String description;
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setIdentifier(String identifier) throws ParserException {
-		if (identifier==null) throw new ParserException("Identifier cannot be null");
-		if (this.identifier!=null) throw new ParserException("Current BioEntry already has a identifier");
+	public void setIdentifier(String identifier) {
+		if (identifier == null) {
+			throw new ParserException("Identifier cannot be null");
+		}
+		if (this.identifier != null) {
+			throw new ParserException("Current BioEntry already has a identifier");
+		}
 		this.identifier = identifier;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setName(String name) throws ParserException {
-		if (name==null) throw new ParserException("Name cannot be null");
-		if (this.name!=null) throw new ParserException("Current BioEntry already has a name");
+	public void setName(String name) {
+		if (name == null) {
+			throw new ParserException("Name cannot be null");
+		}
+		if (this.name != null) {
+			throw new ParserException("Current BioEntry already has a name");
+		}
 		this.name = name;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setComment(String comment) throws ParserException {
-		if (comment==null) throw new ParserException("Comment cannot be null");
+	public void setComment(String comment) {
+		if (comment == null) {
+			throw new ParserException("Comment cannot be null");
+		}
 		this.comments.add(comment);
 	}
 
-	public void addReference(AbstractReference abstractReference){
-	    this.references.add(abstractReference);
-    }
+	public void addReference(AbstractReference abstractReference) {
+		this.references.add(abstractReference);
+	}
 }

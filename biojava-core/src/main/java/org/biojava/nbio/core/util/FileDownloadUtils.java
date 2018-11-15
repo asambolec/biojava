@@ -42,8 +42,8 @@ public class FileDownloadUtils {
 	private static final Logger logger = LoggerFactory.getLogger(FileDownloadUtils.class);
 
 	/**
-	 * Copy the content of file src to dst TODO since java 1.7 this is provided
-	 * in java.nio.file.Files
+	 * Copy the content of file src to dst TODO since java 1.7 this is provided in
+	 * java.nio.file.Files
 	 *
 	 * @param src
 	 * @param dst
@@ -59,8 +59,10 @@ public class FileDownloadUtils {
 		FileChannel destination = null;
 
 		try {
-			// we need the supress warnings here (the warning that the stream is not closed is harmless)
-			// see http://stackoverflow.com/questions/12970407/does-filechannel-close-close-the-underlying-stream
+			// we need the supress warnings here (the warning that the stream is not closed
+			// is harmless)
+			// see
+			// http://stackoverflow.com/questions/12970407/does-filechannel-close-close-the-underlying-stream
 			source = new FileInputStream(src).getChannel();
 			destination = new FileOutputStream(dst).getChannel();
 			destination.transferFrom(source, 0, source.size());
@@ -94,8 +96,8 @@ public class FileDownloadUtils {
 
 	/**
 	 * Download the content provided at URL url and store the result to a local
-	 * file, using a temp file to cache the content in case something goes wrong
-	 * in download
+	 * file, using a temp file to cache the content in case something goes wrong in
+	 * download
 	 *
 	 * @param url
 	 * @param destination
@@ -104,14 +106,15 @@ public class FileDownloadUtils {
 	public static void downloadFile(URL url, File destination) throws IOException {
 		int count = 0;
 		int maxTries = 10;
-		int timeout = 60000; //60 sec
+		int timeout = 60000; // 60 sec
 
 		File tempFile = File.createTempFile(getFilePrefix(destination), "." + getFileExtension(destination));
 
 		// Took following recipe from stackoverflow:
 		// http://stackoverflow.com/questions/921262/how-to-download-and-save-a-file-from-internet-using-java
 		// It seems to be the most efficient way to transfer a file
-		// See: http://docs.oracle.com/javase/7/docs/api/java/nio/channels/FileChannel.html
+		// See:
+		// http://docs.oracle.com/javase/7/docs/api/java/nio/channels/FileChannel.html
 		ReadableByteChannel rbc = null;
 		FileOutputStream fos = null;
 		while (true) {
@@ -125,7 +128,9 @@ public class FileDownloadUtils {
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 				break;
 			} catch (SocketTimeoutException e) {
-				if (++count == maxTries) throw e;
+				if (++count == maxTries) {
+					throw e;
+				}
 			} finally {
 				if (rbc != null) {
 					rbc.close();
@@ -189,18 +194,19 @@ public class FileDownloadUtils {
 	 * Pings a HTTP URL. This effectively sends a HEAD request and returns
 	 * <code>true</code> if the response code is in the 200-399 range.
 	 *
-	 * @param url The HTTP URL to be pinged.
-	 * @param timeout The timeout in millis for both the connection timeout and
-	 * the response read timeout. Note that the total timeout is effectively two
-	 * times the given timeout.
-	 * @return <code>true</code> if the given HTTP URL has returned response
-	 * code 200-399 on a HEAD request within the given timeout, otherwise
-	 * <code>false</code>.
+	 * @param url     The HTTP URL to be pinged.
+	 * @param timeout The timeout in millis for both the connection timeout and the
+	 *                response read timeout. Note that the total timeout is
+	 *                effectively two times the given timeout.
+	 * @return <code>true</code> if the given HTTP URL has returned response code
+	 *         200-399 on a HEAD request within the given timeout, otherwise
+	 *         <code>false</code>.
 	 * @author BalusC,
-	 * http://stackoverflow.com/questions/3584210/preferred-java-way-to-ping-a-http-url-for-availability
+	 *         http://stackoverflow.com/questions/3584210/preferred-java-way-to-ping-a-http-url-for-availability
 	 */
 	public static boolean ping(String url, int timeout) {
-		//url = url.replaceFirst("https", "http"); // Otherwise an exception may be thrown on invalid SSL certificates.
+		// url = url.replaceFirst("https", "http"); // Otherwise an exception may be
+		// thrown on invalid SSL certificates.
 
 		try {
 			HttpURLConnection connection = (HttpURLConnection) prepareURLConnection(url, timeout);
@@ -208,6 +214,7 @@ public class FileDownloadUtils {
 			int responseCode = connection.getResponseCode();
 			return (200 <= responseCode && responseCode <= 399);
 		} catch (IOException exception) {
+			logger.error(exception.getMessage(), exception);
 			return false;
 		}
 	}
@@ -215,21 +222,21 @@ public class FileDownloadUtils {
 	/**
 	 * Prepare {@link URLConnection} with customised timeouts.
 	 *
-	 * @param url The URL
-	 * @param timeout The timeout in millis for both the connection timeout and
-	 * the response read timeout. Note that the total timeout is effectively two
-	 * times the given timeout.
+	 * @param url     The URL
+	 * @param timeout The timeout in millis for both the connection timeout and the
+	 *                response read timeout. Note that the total timeout is
+	 *                effectively two times the given timeout.
 	 *
-	 * <p>
-	 * Example of code.      <code>
+	 *                <p>
+	 *                Example of code. <code>
 		 * UrlConnection conn = prepareURLConnection("http://www.google.com/", 20000);
 	 * conn.connect();
 	 * conn.getInputStream();
 	 * </code>
-	 * <p>
+	 *                <p>
 	 *
-	 * <bold>NB. User should execute connect() method before getting input
-	 * stream.</bold>
+	 *                <bold>NB. User should execute connect() method before getting
+	 *                input stream.</bold>
 	 * @return
 	 * @throws IOException
 	 * @author Jacek Grzebyta

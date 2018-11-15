@@ -43,12 +43,11 @@ public class ResidueGroup {
 	/**
 	 * Create a ResidueGroup object from a maximally connected component.
 	 *
-	 * @param component
-	 *            set of residues connected
+	 * @param component set of residues connected
 	 */
 	public ResidueGroup(Set<Integer> component) {
 		// Transform component into sorted List of residues
-		residues = new ArrayList<Integer>(component);
+		residues = new ArrayList<>(component);
 		Collections.sort(residues);
 	}
 
@@ -73,29 +72,32 @@ public class ResidueGroup {
 	 * </pre>
 	 *
 	 * Compatibility is an intransitive relation, which means that for three
-	 * ResidueGroups {A,B,C}, if A is compatible with B and B is compatible with
-	 * C, then A is not necessarily compatible with C.
+	 * ResidueGroups {A,B,C}, if A is compatible with B and B is compatible with C,
+	 * then A is not necessarily compatible with C.
 	 *
-	 * @param c2
-	 *            second maximally connected component
+	 * @param c2 second maximally connected component
 	 * @return true if compatible, false otherwise
 	 */
 	public boolean isCompatible(ResidueGroup other) {
 
 		// Same order needed is necessary
-		if (this.order() != other.order())
+		if (this.order() != other.order()) {
 			return false;
+		}
 
 		// Use the method of the smallest ResidueGroup
-		if (this.residues.get(0) > other.residues.get(0))
+		if (this.residues.get(0) > other.residues.get(0)) {
 			return other.isCompatible(this);
+		}
 
 		// Check for intercalation of residues
 		for (int i = 0; i < order() - 1; i++) {
-			if (other.residues.get(i) > residues.get(i + 1))
+			if (other.residues.get(i) > residues.get(i + 1)) {
 				return false;
-			if (residues.get(i) > other.residues.get(i + 1))
+			}
+			if (residues.get(i) > other.residues.get(i + 1)) {
 				return false;
+			}
 		}
 
 		return true;
@@ -104,12 +106,12 @@ public class ResidueGroup {
 	/**
 	 * Combine the ResidueGroup with the alignment block.
 	 *
-	 * @param alignRes
-	 *            the alignment block, will be modified.
+	 * @param alignRes the alignment block, will be modified.
 	 */
 	public void combineWith(List<List<Integer>> alignRes) {
-		for (int i = 0; i < order(); i++)
+		for (int i = 0; i < order(); i++) {
 			alignRes.get(i).add(residues.get(i));
+		}
 	}
 
 }

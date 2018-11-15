@@ -34,8 +34,8 @@ import org.biojava.nbio.structure.symmetry.internal.CeSymm;
 import org.biojava.nbio.structure.symmetry.internal.CeSymmResult;
 
 /**
- * Quick demo of how to call CE-Symm programmatically.
- * Some examples of different symmetry types are proposed.
+ * Quick demo of how to call CE-Symm programmatically. Some examples of
+ * different symmetry types are proposed.
  *
  * @author Spencer Bliven
  * @author Aleix Lafita
@@ -43,42 +43,31 @@ import org.biojava.nbio.structure.symmetry.internal.CeSymmResult;
  */
 public class DemoCeSymm {
 
-	public static void main(String[] args)
-			throws IOException, StructureException {
+	public static void main(String[] args) throws IOException, StructureException {
 
 		/*
 		 * Some examples:
 		 *
-		 * CLOSED
-		 * 2-fold: 1hiv.A,
-		 * 3-fold: 4i4q, 4dou
-		 * 5-fold: 2jaj.A
-		 * 6-fold: 1u6d
-		 * 7-fold: 1jof.A
-		 * 8-fold: 1vzw, d1i4na_
+		 * CLOSED 2-fold: 1hiv.A, 3-fold: 4i4q, 4dou 5-fold: 2jaj.A 6-fold: 1u6d 7-fold:
+		 * 1jof.A 8-fold: 1vzw, d1i4na_
 		 *
-		 * OPEN
-		 * ankyrin: 1n0r.A, 3ehq.A
-		 * leucine repeats: 2bnh.A, 3o6n
-		 * helical: 1d0b.A
+		 * OPEN ankyrin: 1n0r.A, 3ehq.A leucine repeats: 2bnh.A, 3o6n helical: 1d0b.A
 		 *
-		 * MULTIPLE AXES
-		 * dihedral: 4hhb, 1vym, 1mmi, 1hiv
-		 * hierarchical: 4gcr, 1ppr.O, 1hiv
-		 * monoclonal Ab: 4NZU
+		 * MULTIPLE AXES dihedral: 4hhb, 1vym, 1mmi, 1hiv hierarchical: 4gcr, 1ppr.O,
+		 * 1hiv monoclonal Ab: 4NZU
 		 *
 		 * - For more examples see the symmetry benchmark
 		 */
 
-		//Set the name of the protein structure to analyze
+		// Set the name of the protein structure to analyze
 		String name = "1u6d";
 
-		//Download the atoms
+		// Download the atoms
 		AtomCache cache = new AtomCache();
 		Structure s = cache.getStructure(name);
 		Atom[] atoms = StructureTools.getRepresentativeAtomArray(s);
 
-		//Choose some parameters
+		// Choose some parameters
 		CESymmParameters params = new CESymmParameters();
 		params.setRefineMethod(RefineMethod.SEQUENCE_FUNCTION);
 		params.setSymmType(SymmetryType.AUTO);
@@ -86,10 +75,10 @@ public class DemoCeSymm {
 		params.setSymmLevels(0);
 		params.setSSEThreshold(2);
 
-		//Run the alignment
+		// Run the alignment
 		CeSymmResult result = CeSymm.analyze(atoms, params);
 
-		//Display the results in jmol
+		// Display the results in jmol
 		SymmetryDisplay.display(result);
 	}
 

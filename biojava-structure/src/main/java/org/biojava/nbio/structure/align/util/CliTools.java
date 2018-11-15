@@ -41,6 +41,8 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for autoconfiguring javabeans based on command line arguments.
@@ -49,32 +51,31 @@ import java.util.*;
  */
 
 public class CliTools {
+	private static final Logger logger = LoggerFactory.getLogger(CliTools.class);
+
 	private CliTools() {
 	}
 
-
 	/**
-	 * Configure a JavaBean based on a set of command line arguments.
-	 * For a command line construct such as "-foo 42", this method will use
-	 * available <code>BeanInfo</code> (usually obtained by introspection)
-	 * to find a property named "foo".  The argument will be interpreted
-	 * according to the type of the "foo" property, then the appropriate
-	 * mutator method (generally named setFoo) will be called to configure
-	 * the property on the bean.
+	 * Configure a JavaBean based on a set of command line arguments. For a command
+	 * line construct such as "-foo 42", this method will use available
+	 * <code>BeanInfo</code> (usually obtained by introspection) to find a property
+	 * named "foo". The argument will be interpreted according to the type of the
+	 * "foo" property, then the appropriate mutator method (generally named setFoo)
+	 * will be called to configure the property on the bean.
 	 *
 	 * <p>
 	 * Currently supported property types are <code>int, double,
 	 * boolean, String, File, Reader, Writer, InputStream, OutputStream, Enum</code>,
-	 * plus arrays of all the above types.  In the case of arrays, the option
-	 * may appear multiple times on the command line, otherwise recurrance of
-	 * the same option is an error.
+	 * plus arrays of all the above types. In the case of arrays, the option may
+	 * appear multiple times on the command line, otherwise recurrance of the same
+	 * option is an error.
 	 * </p>
 	 *
 	 * <p>
-	 * For stream types, the parameter is interpreted as a filename unless it
-	 * is equal to "-" in which case standard input or standard output are
-	 * used as appropriate.  Each of the standard streams may only be used
-	 * one.
+	 * For stream types, the parameter is interpreted as a filename unless it is
+	 * equal to "-" in which case standard input or standard output are used as
+	 * appropriate. Each of the standard streams may only be used one.
 	 * </p>
 	 *
 	 * <p>
@@ -85,14 +86,13 @@ public class CliTools {
 	 *
 	 * @param bean
 	 * @param args
-	 * @return A string array which contains any 'anonymous' arguments (may be empty)
+	 * @return A string array which contains any 'anonymous' arguments (may be
+	 *         empty)
 	 * @throws ConfigurationException
 	 */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static String[] configureBean(Object bean, String[] args)
-	throws ConfigurationException
-	{
+	public static String[] configureBean(Object bean, String[] args) throws ConfigurationException {
 		BeanInfo bi;
 		try {
 			bi = Introspector.getBeanInfo(bean.getClass());
@@ -100,14 +100,14 @@ public class CliTools {
 			throw new ConfigurationException("Couldn't get information for target bean " + ex.getMessage());
 		}
 
-		Map<String,PropertyDescriptor> propertiesByName = new HashMap<String, PropertyDescriptor>();
-		for (PropertyDescriptor pd : bi.getPropertyDescriptors() ) {
+		Map<String, PropertyDescriptor> propertiesByName = new HashMap<>();
+		for (PropertyDescriptor pd : bi.getPropertyDescriptors()) {
 			propertiesByName.put(pd.getName(), pd);
 		}
 
-		List<String> anonArgs = new ArrayList<String>();
-		Map<PropertyDescriptor,List<String>> arrayProps = new HashMap<PropertyDescriptor, List<String>>();
-		Set<PropertyDescriptor> usedProps = new HashSet<PropertyDescriptor>();
+		List<String> anonArgs = new ArrayList<>();
+		Map<PropertyDescriptor, List<String>> arrayProps = new HashMap<>();
+		Set<PropertyDescriptor> usedProps = new HashSet<>();
 
 		boolean stdInUsed = false;
 		boolean stdOutUsed = false;
@@ -115,12 +115,13 @@ public class CliTools {
 		for (int i = 0; i < args.length; ++i) {
 			String arg = args[i];
 
-			//System.out.println("checking argument: " + arg);
+			// System.out.println("checking argument: " + arg);
 
-			if ( arg == null)
+			if (arg == null) {
 				continue;
+			}
 
-			if ((arg.length() > 0 ) && arg.charAt(0) == '-') {
+			if ((arg.length() > 0) && arg.charAt(0) == '-') {
 				PropertyDescriptor pd = propertiesByName.get(arg.substring(1));
 
 				boolean arrayMode = false;
@@ -132,13 +133,15 @@ public class CliTools {
 						String altPropName = Introspector.decapitalize(arg.substring(3));
 						pd = propertiesByName.get(altPropName);
 						if (pd == null) {
-							throw new ConfigurationException("No property named " + arg.substring(1) + " or " + altPropName);
+							throw new ConfigurationException(new StringBuilder().append("No property named ")
+									.append(arg.substring(1)).append(" or ").append(altPropName).toString());
 						}
 						propType = pd.getPropertyType();
 						if (propType == Boolean.TYPE) {
 							propVal = Boolean.FALSE;
 						} else {
-							throw new ConfigurationException("Negatory option " + arg + " does not refer to a boolean property");
+							throw new ConfigurationException(new StringBuilder().append("Negatory option ").append(arg)
+									.append(" does not refer to a boolean property").toString());
 						}
 					} else {
 						throw new ConfigurationException("No property named " + arg.substring(1));
@@ -153,30 +156,36 @@ public class CliTools {
 
 					if (propType == Integer.TYPE) {
 						try {
-							propVal = new Integer(args[++i]);
+							propVal = Integer.valueOf(args[++i]);
 						} catch (Exception ex) {
-							throw new ConfigurationException("Option " + arg + " requires an integer parameter");
+							logger.error(ex.getMessage(), ex);
+							throw new ConfigurationException(new StringBuilder().append("Option ").append(arg)
+									.append(" requires an integer parameter").toString());
 						}
-					} else if (propType == Double.TYPE || propType == Double.class ) {
+					} else if (propType == Double.TYPE || propType == Double.class) {
 						try {
-							propVal = new Double(args[++i]);
+							propVal = Double.valueOf(args[++i]);
 						} catch (Exception ex) {
-							throw new ConfigurationException("Option " + arg + " requires a numerical parameter");
+							logger.error(ex.getMessage(), ex);
+							throw new ConfigurationException(new StringBuilder().append("Option ").append(arg)
+									.append(" requires a numerical parameter").toString());
 						}
 					} else if (propType == String.class) {
 						propVal = args[++i];
 					} else if (propType == Boolean.TYPE) {
 
 						String val = args[++i];
-						if ( val == null )
+						if (val == null) {
 							propVal = Boolean.TRUE;
-						else {
-							if ( val.equalsIgnoreCase("true") || val.equalsIgnoreCase("t"))
+						} else {
+							if ("true".equalsIgnoreCase(val) || "t".equalsIgnoreCase(val)) {
 								propVal = Boolean.TRUE;
-							else if( val.equalsIgnoreCase("false") || val.equalsIgnoreCase("f"))
+							} else if ("false".equalsIgnoreCase(val) || "f".equalsIgnoreCase(val)) {
 								propVal = Boolean.FALSE;
-							else
-								throw new ConfigurationException("Option "+arg+" requires a boolean parameter");
+							} else {
+								throw new ConfigurationException(new StringBuilder().append("Option ").append(arg)
+										.append(" requires a boolean parameter").toString());
+							}
 						}
 					} else if (File.class.isAssignableFrom(propType)) {
 						// can't distinguish if the file is for reading or writing
@@ -194,7 +203,9 @@ public class CliTools {
 							try {
 								propVal = new FileReader(new File(name));
 							} catch (Exception ex) {
-								throw new ConfigurationException("Can't open " + name + " for input");
+								logger.error(ex.getMessage(), ex);
+								throw new ConfigurationException(new StringBuilder().append("Can't open ").append(name)
+										.append(" for input").toString());
 							}
 						}
 					} else if (InputStream.class.isAssignableFrom(propType)) {
@@ -209,7 +220,9 @@ public class CliTools {
 							try {
 								propVal = new FileInputStream(new File(name));
 							} catch (Exception ex) {
-								throw new ConfigurationException("Can't open " + name + " for input");
+								logger.error(ex.getMessage(), ex);
+								throw new ConfigurationException(new StringBuilder().append("Can't open ").append(name)
+										.append(" for input").toString());
 							}
 						}
 					} else if (Writer.class.isAssignableFrom(propType)) {
@@ -224,7 +237,9 @@ public class CliTools {
 							try {
 								propVal = new FileWriter(new File(name));
 							} catch (Exception ex) {
-								throw new ConfigurationException("Can't open " + name + " for output");
+								logger.error(ex.getMessage(), ex);
+								throw new ConfigurationException(new StringBuilder().append("Can't open ").append(name)
+										.append(" for output").toString());
 							}
 						}
 					} else if (OutputStream.class.isAssignableFrom(propType)) {
@@ -239,24 +254,28 @@ public class CliTools {
 							try {
 								propVal = new FileOutputStream(new File(name));
 							} catch (Exception ex) {
-								throw new ConfigurationException("Can't open " + name + " for output");
+								logger.error(ex.getMessage(), ex);
+								throw new ConfigurationException(new StringBuilder().append("Can't open ").append(name)
+										.append(" for output").toString());
 							}
 						}
-					} else if( propType.isEnum()) {
+					} else if (propType.isEnum()) {
 						String name = args[++i];
 						try {
 							propVal = Enum.valueOf(propType, name);
 						} catch (Exception ex) {
+							logger.error(ex.getMessage(), ex);
 							try {
 								// Try with uppercase version, as common for enums
 								propVal = Enum.valueOf(propType, name.toUpperCase());
-							}  catch (Exception ex2) {
-								//give up
+							} catch (Exception ex2) {
+								logger.error(ex2.getMessage(), ex2);
+								// give up
 								StringBuilder errMsg = new StringBuilder();
 								errMsg.append("Option ").append(arg);
 								errMsg.append(" requires a ").append(propType.getSimpleName());
 								errMsg.append(" parameter. One of: ");
-								for(Object val: propType.getEnumConstants() ) {
+								for (Object val : propType.getEnumConstants()) {
 									Enum enumVal = (Enum) val;
 									errMsg.append(enumVal.name());
 									errMsg.append(" ");
@@ -266,12 +285,14 @@ public class CliTools {
 						}
 
 					} else {
-						System.err.println("Unsupported optionType for " + arg + " propType:" + propType);
+						logger.error(new StringBuilder().append("Unsupported optionType for ").append(arg)
+								.append(" propType:").append(propType).toString());
 						System.exit(1);
 					}
 				}
 
-				//System.out.println("setting to: " + propVal + " " + propVal.getClass().getName());
+				// System.out.println("setting to: " + propVal + " " +
+				// propVal.getClass().getName());
 
 				if (arrayMode) {
 					List valList = arrayProps.get(pd);
@@ -285,11 +306,11 @@ public class CliTools {
 						throw new ConfigurationException("Multiple values supplied for " + pd.getName());
 					}
 					try {
-						pd.getWriteMethod().invoke(bean, new Object[] {propVal});
-					} catch (InvocationTargetException ex) {
-						throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
+						pd.getWriteMethod().invoke(bean, new Object[] { propVal });
 					} catch (Exception ex) {
-						throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
+						logger.error(ex.getMessage(), ex);
+						throw new ConfigurationException(new StringBuilder().append("Error configuring '")
+								.append(pd.getName()).append("'").toString());
 					}
 					usedProps.add(pd);
 				}
@@ -298,7 +319,7 @@ public class CliTools {
 			}
 		}
 
-		for (Iterator api = arrayProps.entrySet().iterator(); api.hasNext(); ) {
+		for (Iterator api = arrayProps.entrySet().iterator(); api.hasNext();) {
 			Map.Entry me = (Map.Entry) api.next();
 			PropertyDescriptor pd = (PropertyDescriptor) me.getKey();
 			List vals = (List) me.getValue();
@@ -311,17 +332,18 @@ public class CliTools {
 				} else if (compType == Double.TYPE) {
 					valArray = CollectionTools.toDoubleArray(vals);
 				} else {
-					throw new ConfigurationException("Arrays of type " + compType.getName() + " are currently unsupported");
+					throw new ConfigurationException(new StringBuilder().append("Arrays of type ")
+							.append(compType.getName()).append(" are currently unsupported").toString());
 				}
 			} else {
 				valArray = vals.toArray((Object[]) Array.newInstance(compType, vals.size()));
 			}
 			try {
-				pd.getWriteMethod().invoke(bean, new Object[] {valArray});
-			} catch (InvocationTargetException ex) {
-				throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
+				pd.getWriteMethod().invoke(bean, new Object[] { valArray });
 			} catch (Exception ex) {
-				throw new ConfigurationException("Error configuring '" + pd.getName() + "'");
+				logger.error(ex.getMessage(), ex);
+				throw new ConfigurationException(
+						new StringBuilder().append("Error configuring '").append(pd.getName()).append("'").toString());
 			}
 		}
 
@@ -331,26 +353,27 @@ public class CliTools {
 	/**
 	 * Constructs a comma-separated list of values for an enum.
 	 *
-	 * Example:
-	 * > getEnumValues(ScoringStrategy.class)
-	 * "CA_SCORING, SIDE_CHAIN_SCORING, SIDE_CHAIN_ANGLE_SCORING, CA_AND_SIDE_CHAIN_ANGLE_SCORING, or SEQUENCE_CONSERVATION"
+	 * Example: > getEnumValues(ScoringStrategy.class) "CA_SCORING,
+	 * SIDE_CHAIN_SCORING, SIDE_CHAIN_ANGLE_SCORING,
+	 * CA_AND_SIDE_CHAIN_ANGLE_SCORING, or SEQUENCE_CONSERVATION"
+	 * 
 	 * @param enumClass
 	 * @return
 	 */
 	public static <T extends Enum<?>> String getEnumValuesAsString(Class<T> enumClass) {
-		//ScoringStrategy[] vals = ScoringStrategy.values();
+		// ScoringStrategy[] vals = ScoringStrategy.values();
 		T[] vals = enumClass.getEnumConstants();
 
 		StringBuilder str = new StringBuilder();
-		if(vals.length == 1) {
+		if (vals.length == 1) {
 			str.append(vals[0].name());
-		} else if(vals.length > 1 ) {
-			for(int i=0;i<vals.length-1;i++) {
+		} else if (vals.length > 1) {
+			for (int i = 0; i < vals.length - 1; i++) {
 				str.append(vals[i].name());
 				str.append(", ");
 			}
 			str.append("or ");
-			str.append(vals[vals.length-1].name());
+			str.append(vals[vals.length - 1].name());
 		}
 
 		return str.toString();

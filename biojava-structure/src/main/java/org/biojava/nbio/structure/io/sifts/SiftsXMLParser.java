@@ -44,235 +44,224 @@ public class SiftsXMLParser {
 
 	private final static Logger logger = LoggerFactory.getLogger(SiftsXMLParser.class);
 
-
+	static boolean debug = false;
 
 	Document dom;
+
 	List<SiftsEntity> entities;
 
-	static boolean debug = false;
-	public SiftsXMLParser(){
-		entities = new ArrayList<SiftsEntity>();
+	public SiftsXMLParser() {
+		entities = new ArrayList<>();
 	}
 
-	public List<SiftsEntity> getEntities(){
+	public List<SiftsEntity> getEntities() {
 		return entities;
 	}
 
+	public void parseXmlFile(InputStream is) {
+		entities = new ArrayList<>();
 
-	public void parseXmlFile(InputStream is){
-		entities = new ArrayList<SiftsEntity>();
-
-		//get the factory
+		// get the factory
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		try {
 
-			//Using factory get an instance of document builder
+			// Using factory get an instance of document builder
 			DocumentBuilder db = dbf.newDocumentBuilder();
 
-			//parse using builder to get DOM representation of the XML file
+			// parse using builder to get DOM representation of the XML file
 			dom = db.parse(is);
 
 			parseDocument();
 
-		}catch(ParserConfigurationException pce) {
-			pce.printStackTrace();
-		}catch(SAXException se) {
-			se.printStackTrace();
-		}catch(IOException ioe) {
-			ioe.printStackTrace();
+		} catch (IOException | SAXException | ParserConfigurationException ioe) {
+			logger.error(ioe.getMessage(), ioe);
 		}
 	}
 
+	private void parseDocument() {
+		// get the root element
+		Element docEle = dom.getDocumentElement();
 
+		// get a nodelist of entities
 
-		private void parseDocument(){
-			//get the root element
-			Element docEle = dom.getDocumentElement();
+		NodeList nl = docEle.getElementsByTagName("entity");
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
 
-			//get a nodelist of  entities
+				// get the entity element
+				Element el = (Element) nl.item(i);
+				// get the Employee object
+				SiftsEntity e = getSiftsEntity(el);
 
-			NodeList nl = docEle.getElementsByTagName("entity");
-			if(nl != null && nl.getLength() > 0) {
-				for(int i = 0 ; i < nl.getLength();i++) {
+				// add it to list
+				entities.add(e);
+			}
+		}
+	}
 
-					//get the entity element
-					Element el = (Element)nl.item(i);
-					//get the Employee object
-					SiftsEntity e = getSiftsEntity(el);
+	/**
+	 * <entity type="protein" entityId="A">
+	 */
+	private SiftsEntity getSiftsEntity(Element empEl) {
 
-					//add it to list
-					entities.add(e);
-				}
+		// for each <employee> element get text or int values of
+		// name ,id, age and name
+
+		String type = empEl.getAttribute("type");
+		String entityId = empEl.getAttribute("entityId");
+
+		// Create a new Employee with the value read from the xml nodes
+		SiftsEntity entity = new SiftsEntity(type, entityId);
+
+		// get nodelist of segments...
+		NodeList nl = empEl.getElementsByTagName("segment");
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+
+				// get the entity element
+				Element el = (Element) nl.item(i);
+
+				SiftsSegment s = getSiftsSegment(el);
+
+				logger.debug("new segment: " + s);
+				entity.addSegment(s);
+
 			}
 		}
 
-		/**
-		 * <entity type="protein" entityId="A">
-		 */
-		private SiftsEntity getSiftsEntity(Element empEl) {
+		logger.debug("new SIFTS entity: " + entity);
+		return entity;
+	}
 
-			//for each <employee> element get text or int values of
-			//name ,id, age and name
+	/**
+	 * segId="4hhb_A_1_140" start="1" end="140"
+	 *
+	 * @param el
+	 * @return
+	 */
+	private SiftsSegment getSiftsSegment(Element el) {
 
-			String type = empEl.getAttribute("type");
-			String entityId = empEl.getAttribute("entityId");
+		String segId = el.getAttribute("segId");
+		String start = el.getAttribute("start");
+		String end = el.getAttribute("end");
+		SiftsSegment seg = new SiftsSegment(segId, start, end);
 
-			//Create a new Employee with the value read from the xml nodes
-			SiftsEntity entity = new SiftsEntity(type,entityId);
-
-			// get nodelist of segments...
-			NodeList nl = empEl.getElementsByTagName("segment");
-			if(nl != null && nl.getLength() > 0) {
-				for(int i = 0 ; i < nl.getLength();i++) {
-
-					//get the entity element
-					Element el = (Element)nl.item(i);
-
-					SiftsSegment s = getSiftsSegment(el);
-
-					logger.debug("new segment: " + s);
-					entity.addSegment(s);
-
-				}
-			}
-
-			logger.debug("new SIFTS entity: " + entity);
-			return entity;
+		if (debug) {
+			logger.info("parsed " + seg);
 		}
 
-		/** segId="4hhb_A_1_140" start="1" end="140"
-		 *
-		 * @param el
-		 * @return
-		 */
-		private SiftsSegment getSiftsSegment(Element el) {
+		// get nodelist of segments...
+		NodeList nl = el.getElementsByTagName("listResidue");
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				// get the entity element
+				Element listResidueEl = (Element) nl.item(i);
 
-			String segId = el.getAttribute("segId");
-			String start = el.getAttribute("start");
-			String end = el.getAttribute("end");
-			SiftsSegment seg = new SiftsSegment(segId,start,end);
+				NodeList residueNodes = listResidueEl.getElementsByTagName("residue");
+				if (residueNodes != null && residueNodes.getLength() > 0) {
+					for (int j = 0; j < residueNodes.getLength(); j++) {
+						Element residue = (Element) residueNodes.item(j);
 
-			if ( debug )
-				System.out.println("parsed " + seg);
-
-			// get nodelist of segments...
-			NodeList nl = el.getElementsByTagName("listResidue");
-			if(nl != null && nl.getLength() > 0) {
-				for(int i = 0 ; i < nl.getLength();i++) {
-					//get the entity element
-					Element listResidueEl = (Element)nl.item(i);
-
-					NodeList residueNodes = listResidueEl.getElementsByTagName("residue");
-					if(residueNodes != null && residueNodes.getLength() > 0) {
-						for(int j = 0 ; j < residueNodes.getLength();j++) {
-							Element residue = (Element) residueNodes.item(j);
-
-							SiftsResidue pos = getResidue(residue);
-							seg.addResidue(pos);
-						}
-					}
-
-				}
-			}
-
-
-			return seg;
-		}
-
-		/**
-		 *  <residue dbResNum="1" dbResName="THR">
-					<crossRefDb dbSource="PDB" dbVersion="20101103"
-					dbCoordSys="PDBresnum" dbAccessionId="1a4w" dbResNum="1H"
-					dbResName="THR" dbChainId="L"></crossRefDb>
-					<crossRefDb dbSource="UniProt" dbVersion="157-2"
-					dbCoordSys="UniProt" dbAccessionId="P00734"
-					dbResNum="328" dbResName="T"></crossRefDb>
-					<crossRefDb dbSource="SCOP" dbVersion="1.75"
-					dbCoordSys="PDBresnum" dbAccessionId="26083"
-					dbResNum="1H" dbResName="THR" dbChainId="L"></crossRefDb>
-					<residueDetail dbSource="MSD" property="Annotation">
-					Not_Observed</residueDetail>
-				</residue>
-
-		 */
-		private SiftsResidue getResidue(Element residue) {
-
-			SiftsResidue res = new SiftsResidue();
-
-			String dbResNumS = residue.getAttribute("dbResNum");
-			res.setNaturalPos(Integer.parseInt(dbResNumS));
-
-			String seqResName = residue.getAttribute("dbResName");
-			res.setSeqResName(seqResName);
-
-			boolean observed = true;
-
-			List<String> details = getTextValues(residue, "residueDetail");
-
-			if ( details != null && details.contains("Not_Observed")){
-				observed = false;
-			}
-			res.setNotObserved(! observed);
-			//else if ( detail != null && detail.trim().equalsIgnoreCase("Conflict")){
-				//
-			//}
-
-			NodeList nl = residue.getElementsByTagName("crossRefDb");
-			if(nl != null && nl.getLength() > 0) {
-				for(int i = 0 ; i < nl.getLength();i++) {
-					//get the entity element
-					Element crossRefEl = (Element)nl.item(i);
-
-					String dbSource = crossRefEl.getAttribute("dbSource");
-					String dbCoordSys = crossRefEl.getAttribute("dbCoordSys");
-					String dbAccessionId = crossRefEl.getAttribute("dbAccessionId");
-					String dbResNum = crossRefEl.getAttribute("dbResNum");
-					String dbResName = crossRefEl.getAttribute("dbResName");
-					String dbChainId = crossRefEl.getAttribute("dbChainId");
-
-				//	System.out.println(dbSource + " " + dbCoordSys + " " + dbAccessionId + " " + dbResNum + " " + dbResName + " " + dbChainId);
-
-					if ( dbSource.equals("PDB") && ( dbCoordSys.equals("PDBresnum"))){
-						res.setPdbResNum(dbResNum);
-						res.setPdbResName(dbResName);
-						res.setChainId(dbChainId);
-						res.setPdbId(dbAccessionId);
-					} else if ( dbSource.equals("UniProt")){
-						res.setUniProtPos(Integer.parseInt(dbResNum));
-						res.setUniProtResName(dbResName);
-						res.setUniProtAccessionId(dbAccessionId);
+						SiftsResidue pos = getResidue(residue);
+						seg.addResidue(pos);
 					}
 				}
+
 			}
-			return res;
 		}
 
+		return seg;
+	}
 
+	/**
+	 * <residue dbResNum="1" dbResName="THR">
+	 * <crossRefDb dbSource="PDB" dbVersion="20101103" dbCoordSys="PDBresnum"
+	 * dbAccessionId="1a4w" dbResNum="1H" dbResName="THR" dbChainId=
+	 * "L"></crossRefDb>
+	 * <crossRefDb dbSource="UniProt" dbVersion="157-2" dbCoordSys="UniProt"
+	 * dbAccessionId="P00734" dbResNum="328" dbResName="T"></crossRefDb>
+	 * <crossRefDb dbSource="SCOP" dbVersion="1.75" dbCoordSys="PDBresnum"
+	 * dbAccessionId="26083" dbResNum="1H" dbResName="THR" dbChainId=
+	 * "L"></crossRefDb> <residueDetail dbSource="MSD" property="Annotation">
+	 * Not_Observed</residueDetail> </residue>
+	 * 
+	 */
+	private SiftsResidue getResidue(Element residue) {
 
-		/**
-		 * I take a xml element and the tag name, look for the tag and get
-		 * the text content
-		 * i.e for <employee><name>John</name></employee> xml snippet if
-		 * the Element points to employee node and tagName is 'name' I will return John
-		 */
-		@SuppressWarnings("unused")
-		private String getTextValue(Element ele, String tagName) {
-			String textVal = null;
-			NodeList nl = ele.getElementsByTagName(tagName);
-			if(nl != null && nl.getLength() > 0) {
-				Element el = (Element)nl.item(0);
-				textVal = el.getFirstChild().getNodeValue();
-			}
+		SiftsResidue res = new SiftsResidue();
 
-			return textVal;
+		String dbResNumS = residue.getAttribute("dbResNum");
+		res.setNaturalPos(Integer.parseInt(dbResNumS));
+
+		String seqResName = residue.getAttribute("dbResName");
+		res.setSeqResName(seqResName);
+
+		boolean observed = true;
+
+		List<String> details = getTextValues(residue, "residueDetail");
+
+		if (details != null && details.contains("Not_Observed")) {
+			observed = false;
 		}
+		res.setNotObserved(!observed);
+		// else if ( detail != null && detail.trim().equalsIgnoreCase("Conflict")){
+		//
+		// }
+
+		NodeList nl = residue.getElementsByTagName("crossRefDb");
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				// get the entity element
+				Element crossRefEl = (Element) nl.item(i);
+
+				String dbSource = crossRefEl.getAttribute("dbSource");
+				String dbCoordSys = crossRefEl.getAttribute("dbCoordSys");
+				String dbAccessionId = crossRefEl.getAttribute("dbAccessionId");
+				String dbResNum = crossRefEl.getAttribute("dbResNum");
+				String dbResName = crossRefEl.getAttribute("dbResName");
+				String dbChainId = crossRefEl.getAttribute("dbChainId");
+
+				// System.out.println(dbSource + " " + dbCoordSys + " " + dbAccessionId + " " +
+				// dbResNum + " " + dbResName + " " + dbChainId);
+
+				if ("PDB".equals(dbSource) && ("PDBresnum".equals(dbCoordSys))) {
+					res.setPdbResNum(dbResNum);
+					res.setPdbResName(dbResName);
+					res.setChainId(dbChainId);
+					res.setPdbId(dbAccessionId);
+				} else if ("UniProt".equals(dbSource)) {
+					res.setUniProtPos(Integer.parseInt(dbResNum));
+					res.setUniProtResName(dbResName);
+					res.setUniProtAccessionId(dbAccessionId);
+				}
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * I take a xml element and the tag name, look for the tag and get the text
+	 * content i.e for <employee><name>John</name></employee> xml snippet if the
+	 * Element points to employee node and tagName is 'name' I will return John
+	 */
+	@SuppressWarnings("unused")
+	private String getTextValue(Element ele, String tagName) {
+		String textVal = null;
+		NodeList nl = ele.getElementsByTagName(tagName);
+		if (nl != null && nl.getLength() > 0) {
+			Element el = (Element) nl.item(0);
+			textVal = el.getFirstChild().getNodeValue();
+		}
+
+		return textVal;
+	}
 
 	private List<String> getTextValues(Element ele, String tagName) {
-		List<String>values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 		NodeList nl = ele.getElementsByTagName(tagName);
-		if(nl != null && nl.getLength() > 0) {
-			for ( int i = 0 ;i < nl.getLength() ; i ++) {
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
 
 				Element n = (Element) nl.item(i);
 
@@ -280,18 +269,13 @@ public class SiftsXMLParser {
 				String k = n.getNodeName();
 
 				String val = n.getFirstChild().getNodeValue();
-				if ( val != null)
+				if (val != null) {
 					values.add(val);
+				}
 			}
 		}
 
 		return values;
 	}
 
-
-
-
-
-
-
-	}
+}

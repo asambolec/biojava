@@ -22,12 +22,11 @@ package org.biojava.nbio.structure.domain.pdp;
 
 import java.util.Arrays;
 
-
 public class CutSites {
 	int ncuts;
 	int[] cut_sites;
 
-	public CutSites(){
+	public CutSites() {
 		ncuts = 0;
 
 		cut_sites = new int[PDPParameters.MAX_CUTS];
@@ -35,22 +34,24 @@ public class CutSites {
 
 	@Override
 	public String toString() {
-		return "CutSites [ncuts=" + ncuts + ", cut_sites="
-				+ Arrays.toString(cut_sites) + "]";
+		return new StringBuilder().append("CutSites [ncuts=").append(ncuts).append(", cut_sites=")
+				.append(Arrays.toString(cut_sites)).append("]").toString();
 	}
+
 	public int getNcuts() {
 		return ncuts;
 	}
+
 	public void setNcuts(int ncuts) {
 		this.ncuts = ncuts;
 	}
+
 	public int[] getCut_sites() {
 		return cut_sites;
 	}
+
 	public void setCut_sites(int[] cut_sites) {
 		this.cut_sites = cut_sites;
 	}
-
-
 
 }

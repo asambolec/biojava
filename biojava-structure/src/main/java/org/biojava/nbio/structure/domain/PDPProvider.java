@@ -37,6 +37,7 @@ import org.biojava.nbio.structure.align.util.AtomCache;
  * Implementations will probably want to also implement {@link DomainProvider},
  * which provides a very similar set of methods for general structure domain
  * decomposition.
+ * 
  * @author Andreas Prlic
  * @since 3.0.2
  */
@@ -44,20 +45,25 @@ public interface PDPProvider {
 
 	/**
 	 * Get a list of all PDP domains for a given PDB entry
+	 * 
 	 * @param pdbId PDB ID
 	 * @return Set of domain names, e.g. "PDP:4HHBAa"
 	 * @throws IOException
 	 */
 	public SortedSet<String> getPDPDomainNamesForPDB(String pdbId) throws IOException;
+
 	/**
 	 * Get the structure for a particular PDP domain
+	 * 
 	 * @param pdpDomainName PDP identifier, e.g. "PDP:4HHBAa"
-	 * @param cache AtomCache, responsible for fetching and storing the coordinates
+	 * @param cache         AtomCache, responsible for fetching and storing the
+	 *                      coordinates
 	 * @return Structure representing the PDP domain
-	 * @throws IOException For IO errors, e.g. when parsing PDP information
+	 * @throws IOException        For IO errors, e.g. when parsing PDP information
 	 * @throws StructureException For errors creating the structure
 	 */
 	public Structure getDomain(String pdpDomainName, AtomCache cache) throws IOException, StructureException;
+
 	/**
 	 * Get a StructureIdentifier representing the specified PDP domain.
 	 *

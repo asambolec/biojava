@@ -23,7 +23,7 @@ package org.biojava.nbio.aaproperties.xml;
 import javax.xml.bind.annotation.*;
 import java.util.List;
 
-@XmlRootElement(name = "compoundcomposition", namespace ="http://biojava.org")
+@XmlRootElement(name = "compoundcomposition", namespace = "http://biojava.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class AminoAcidComposition {
 	/**
@@ -57,11 +57,12 @@ public class AminoAcidComposition {
 	@XmlElement(name = "isotope", required = false)
 	private List<Name2Count> isotopeList;
 
-	public AminoAcidComposition(){}
+	public AminoAcidComposition() {
+	}
 
 	public AminoAcidComposition(String symbol, String shortName, String name, List<Name2Count> elementList,
-			List<Name2Count> isotopeList){
-		if(symbol.length() != 1){
+			List<Name2Count> isotopeList) {
+		if (symbol.length() != 1) {
 			throw new Error("Symbol attribute must be of length 1.");
 		}
 		this.symbol = symbol.toUpperCase();
@@ -72,8 +73,8 @@ public class AminoAcidComposition {
 	}
 
 	@Override
-	public String toString(){
-		return symbol + ", " + shortName + ", " + name;
+	public String toString() {
+		return new StringBuilder().append(symbol).append(", ").append(shortName).append(", ").append(name).toString();
 	}
 
 	public String getSymbol() {
@@ -88,7 +89,7 @@ public class AminoAcidComposition {
 		this.shortName = shortName;
 	}
 
-	public String getShorName(){
+	public String getShorName() {
 		return this.shortName;
 	}
 
@@ -96,15 +97,15 @@ public class AminoAcidComposition {
 		this.name = name;
 	}
 
-	public String getName(){
+	public String getName() {
 		return this.name;
 	}
 
-	public List<Name2Count> getElementList(){
+	public List<Name2Count> getElementList() {
 		return this.elementList;
 	}
 
-	public List<Name2Count> getIsotopeList(){
+	public List<Name2Count> getIsotopeList() {
 		return this.isotopeList;
 	}
 }

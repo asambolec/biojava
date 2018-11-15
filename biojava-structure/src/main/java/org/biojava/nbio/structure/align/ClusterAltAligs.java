@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/** A class that clusters alternative alignments according to their
- * similarity.
+/**
+ * A class that clusters alternative alignments according to their similarity.
  *
  * @author Andreas Prlic
  * @since 1.5
@@ -38,14 +38,12 @@ public class ClusterAltAligs {
 
 	public static final int DEFAULT_CLUSTER_CUTOFF = 95;
 
-
-	public static void cluster(AlternativeAlignment[] aligs ){
+	public static void cluster(AlternativeAlignment[] aligs) {
 		cluster(aligs, DEFAULT_CLUSTER_CUTOFF);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void cluster(AlternativeAlignment[] aligs, int cutoff){
-
+	public static void cluster(AlternativeAlignment[] aligs, int cutoff) {
 
 		List alist = Arrays.asList(aligs);
 		List testAligs = new ArrayList(alist);
@@ -54,9 +52,9 @@ public class ClusterAltAligs {
 		List excludeList = new ArrayList();
 
 		// check how similar the eqrs are...
-		for ( int i=0 ; i< aligs.length;i++){
+		for (int i = 0; i < aligs.length; i++) {
 			AlternativeAlignment a = aligs[i];
-			if ( excludeList.contains(a)){
+			if (excludeList.contains(a)) {
 				continue;
 			}
 			int[] idxA = a.getIdx1();
@@ -65,36 +63,35 @@ public class ClusterAltAligs {
 			List remainList = new ArrayList();
 			List currentCluster = new ArrayList();
 
-			currentCluster.add( new Integer(i));
+			currentCluster.add(Integer.valueOf(i));
 			excludeList.add(a);
 
-			int j=-1;
-			while (iter.hasNext()){
+			int j = -1;
+			while (iter.hasNext()) {
 				j++;
 				AlternativeAlignment b = (AlternativeAlignment) iter.next();
-				if ( excludeList.contains(b))
+				if (excludeList.contains(b)) {
 					continue;
+				}
 
 				int[] idxB = b.getIdx1();
 
 				// compare the eqrs..
 				int samepos = 0;
 
-				for ( int x = 0 ; x < idxA.length ;x++){
-					int p1 =idxA[x];
-					for (int y =0; y< idxB.length ; y++){
-						int p2 = idxB[y];
-						if ( p1 == p2){
+				for (int p1 : idxA) {
+					for (int p2 : idxB) {
+						if (p1 == p2) {
 							samepos++;
 						}
 					}
 				}
-				float perpos = (samepos / (float)idxA.length) * 100;
-				//System.out.println("aa " + i + " samepos:"+ samepos +
-				//		" l1:"+ idxA.length + " l2:" + idxB.length + " perpos:" + perpos);
+				float perpos = (samepos / (float) idxA.length) * 100;
+				// System.out.println("aa " + i + " samepos:"+ samepos +
+				// " l1:"+ idxA.length + " l2:" + idxB.length + " perpos:" + perpos);
 
-				if ( perpos > cutoff){
-					currentCluster.add(new Integer(j));
+				if (perpos > cutoff) {
+					currentCluster.add(Integer.valueOf(j));
 					excludeList.add(b);
 				} else {
 					remainList.add(b);
@@ -102,7 +99,7 @@ public class ClusterAltAligs {
 
 			}
 			clusters.add(currentCluster);
-			if ( remainList.size() == 0) {
+			if (remainList.size() == 0) {
 				break;
 			}
 		}
@@ -111,17 +108,17 @@ public class ClusterAltAligs {
 
 		Iterator iter = clusters.iterator();
 		int cpos = 0;
-		while (iter.hasNext()){
+		while (iter.hasNext()) {
 			cpos++;
-			//System.out.println("cluster "+cpos+":");
+			// System.out.println("cluster "+cpos+":");
 			List cluster = (List) iter.next();
 			Iterator iter2 = cluster.iterator();
-			while (iter2.hasNext()){
+			while (iter2.hasNext()) {
 				Integer i = (Integer) iter2.next();
 
 				AlternativeAlignment alig = aligs[i.intValue()];
 				alig.setCluster(cpos);
-				//System.out.println( " ("+ aligs[i.intValue()]+")");
+				// System.out.println( " ("+ aligs[i.intValue()]+")");
 
 			}
 

@@ -33,10 +33,9 @@ import java.util.*;
  * from a compound set. To allow us to support the redundant set of Nucleotide
  * compounds this class will use case-insensitive encoding. The values assigned
  * to these compounds is also done at runtime; if you want a predictable
- * ordering then override and use your own encodings. However all
- * encodings are calculated using lexographical ordering of the compounds
- * so if a CompoundSet does not change then this encoding should not cauuse
- * a problem.
+ * ordering then override and use your own encodings. However all encodings are
+ * calculated using lexographical ordering of the compounds so if a CompoundSet
+ * does not change then this encoding should not cauuse a problem.
  *
  * @author ayates
  */
@@ -64,13 +63,19 @@ public class FourBitSequenceReader<C extends Compound> extends BitSequenceReader
 
 	/**
 	 * A four bit per compound implementation of the bit array worker code. This
-	 * version can handle upto 16 compounds but this does mean that its ability
-	 * to compress a normal sequence is halved (compared to the 1/4 performance
-	 * seen with the 2bit workers).
+	 * version can handle upto 16 compounds but this does mean that its ability to
+	 * compress a normal sequence is halved (compared to the 1/4 performance seen
+	 * with the 2bit workers).
 	 *
 	 * @param <C> Must extend NucleotideCompound
 	 */
 	public static class FourBitArrayWorker<C extends Compound> extends BitArrayWorker<C> {
+
+		/**
+		 * Masking value used for extracting the right most 2 bits from a byte
+		 */
+		private final static byte MASK = (byte) ((int) Math.pow(2, 0) | (int) Math.pow(2, 1) | (int) Math.pow(2, 2)
+				| (int) Math.pow(2, 3));
 
 		public FourBitArrayWorker(CompoundSet<C> compoundSet, int length) {
 			super(compoundSet, length);
@@ -87,17 +92,11 @@ public class FourBitSequenceReader<C extends Compound> extends BitSequenceReader
 		public FourBitArrayWorker(String sequence, CompoundSet<C> compoundSet) {
 			super(sequence, compoundSet);
 		}
-		/**
-		 * Masking value used for extracting the right most 2 bits from a byte
-		 */
-		private final static byte MASK = (byte) ((int) Math.pow(2, 0) | (int) Math.pow(2, 1) | (int) Math.pow(2, 2) | (int) Math.pow(2, 3));
-
 
 		@Override
 		protected byte bitMask() {
 			return MASK;
 		}
-
 
 		@Override
 		protected int compoundsPerDatatype() {
@@ -105,22 +104,22 @@ public class FourBitSequenceReader<C extends Compound> extends BitSequenceReader
 		}
 
 		/**
-		 * Returns a Map which encodes the contents of CompoundSet. This
-		 * version is case-insensitive i.e. C and c both encode for the same
-		 * position. We sort lexigraphically so if the compound set has
-		 * not changed then neither will this.
+		 * Returns a Map which encodes the contents of CompoundSet. This version is
+		 * case-insensitive i.e. C and c both encode for the same position. We sort
+		 * lexigraphically so if the compound set has not changed then neither will
+		 * this.
 		 */
 
 		@Override
 		protected Map<C, Integer> generateCompoundsToIndex() {
 			final CompoundSet<C> cs = getCompoundSet();
-			Map<C, Integer> map = new HashMap<C, Integer>();
+			Map<C, Integer> map = new HashMap<>();
 			int index = 0;
 			for (C currentCompound : sortedCompounds(cs)) {
 				C upperCasedCompound = getOptionalUpperCasedCompound(currentCompound, cs);
 
-				//if it has the uppercased compound then set this
-				//compounds' value to that one
+				// if it has the uppercased compound then set this
+				// compounds' value to that one
 				if (map.containsKey(upperCasedCompound)) {
 					map.put(currentCompound, map.get(upperCasedCompound));
 				} else {
@@ -143,9 +142,8 @@ public class FourBitSequenceReader<C extends Compound> extends BitSequenceReader
 		}
 
 		private List<C> sortedCompounds(final CompoundSet<C> cs) {
-			List<C> compounds = new ArrayList<C>(cs.getAllCompounds());
+			List<C> compounds = new ArrayList<>(cs.getAllCompounds());
 			Collections.sort(compounds, new Comparator<C>() {
-
 
 				@Override
 				public int compare(C o1, C o2) {
@@ -165,21 +163,19 @@ public class FourBitSequenceReader<C extends Compound> extends BitSequenceReader
 		protected List<C> generateIndexToCompounds() {
 			CompoundSet<C> cs = getCompoundSet();
 			Map<C, Integer> lookup = getCompoundsToIndexLookup();
-			Map<Integer, C> tempMap = new HashMap<Integer, C>();
-			//First get the reverse lookup working
-			for (C compound : lookup.keySet()) {
+			Map<Integer, C> tempMap = new HashMap<>();
+			// First get the reverse lookup working
+			lookup.keySet().forEach(compound -> {
 				C upperCasedCompound = getOptionalUpperCasedCompound(compound, cs);
 				Integer pos = lookup.get(upperCasedCompound);
 				tempMap.put(pos, upperCasedCompound);
-			}
+			});
 
-			//Then populate the results by going back through the sorted integer keys
-			List<C> compounds = new ArrayList<C>();
-			List<Integer> keys = new ArrayList<Integer>(tempMap.keySet());
+			// Then populate the results by going back through the sorted integer keys
+			List<C> compounds = new ArrayList<>();
+			List<Integer> keys = new ArrayList<>(tempMap.keySet());
 			Collections.sort(keys);
-			for (Integer key : keys) {
-				compounds.add(tempMap.get(key));
-			}
+			keys.forEach(key -> compounds.add(tempMap.get(key)));
 
 			return compounds;
 		}

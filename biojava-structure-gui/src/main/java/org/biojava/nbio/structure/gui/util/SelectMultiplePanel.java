@@ -40,10 +40,12 @@ import org.biojava.nbio.structure.align.client.StructureName;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.align.util.UserConfiguration;
 import org.biojava.nbio.structure.align.webstart.WebStartMain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A Text Panel that allows the user to specify multiple structure
- * identifiers, space separated.
+ * A Text Panel that allows the user to specify multiple structure identifiers,
+ * space separated.
  *
  * @author Aleix Lafita
  * @since 4.1.1
@@ -51,15 +53,17 @@ import org.biojava.nbio.structure.align.webstart.WebStartMain;
  */
 public class SelectMultiplePanel extends JPanel {
 
+	private static final Logger logger = LoggerFactory.getLogger(SelectMultiplePanel.class);
+
 	private static final long serialVersionUID = 757947454156959178L;
 
 	JTextField input;
 
-	public SelectMultiplePanel(){
+	public SelectMultiplePanel() {
 		this(true);
 	}
 
-	public SelectMultiplePanel(boolean show2boxes){
+	public SelectMultiplePanel(boolean show2boxes) {
 
 		Box vBox = Box.createVerticalBox();
 
@@ -70,7 +74,7 @@ public class SelectMultiplePanel extends JPanel {
 		this.add(vBox);
 	}
 
-	private Box getDomainPanel(JTextField f){
+	private Box getDomainPanel(JTextField f) {
 
 		JLabel l01 = new JLabel("Input structures:");
 
@@ -78,7 +82,7 @@ public class SelectMultiplePanel extends JPanel {
 		hBox.add(Box.createGlue());
 		hBox.add(l01);
 
-		f.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		f.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 		f.setToolTipText("Provide structure identifiers space separated.");
 
 		hBox.add(Box.createVerticalGlue());
@@ -90,9 +94,9 @@ public class SelectMultiplePanel extends JPanel {
 
 	public List<Structure> getStructures() throws StructureException {
 
-		List<Structure> structures = new ArrayList<Structure>();
+		List<Structure> structures = new ArrayList<>();
 
-		for (StructureIdentifier name:getNames()){
+		for (StructureIdentifier name : getNames()) {
 			structures.add(getStructure(name));
 		}
 		return structures;
@@ -100,18 +104,19 @@ public class SelectMultiplePanel extends JPanel {
 
 	public List<StructureIdentifier> getNames() {
 
-		List<StructureIdentifier> names = new ArrayList<StructureIdentifier>();
+		List<StructureIdentifier> names = new ArrayList<>();
 
 		String raw = input.getText().trim();
 		String[] split = raw.split(" ");
-		for (String name:split){
-			if (name != null && !name.isEmpty())
+		for (String name : split) {
+			if (name != null && !name.isEmpty()) {
 				names.add(new StructureName(name.trim()));
+			}
 		}
 		return names;
 	}
 
-	private Structure getStructure(StructureIdentifier name) throws StructureException{
+	private Structure getStructure(StructureIdentifier name) throws StructureException {
 
 		UserConfiguration config = WebStartMain.getWebStartConfig();
 
@@ -121,8 +126,8 @@ public class SelectMultiplePanel extends JPanel {
 		try {
 			s = cache.getStructure(name);
 			s.setName(name.getIdentifier());
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 		return s;
 	}

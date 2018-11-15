@@ -38,108 +38,96 @@ package org.biojava.nbio.structure.align.webstart;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-public final class  JNLPProxy
+public final class JNLPProxy
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 {
 
-private static final Object  basicServiceObject
-	= getBasicServiceObject ( );
+	private static final Logger logger = LoggerFactory.getLogger(JNLPProxy.class);
 
-@SuppressWarnings("rawtypes")
-private static final Class   basicServiceClass
-	= getBasicServiceClass ( );
+	private static final Object basicServiceObject = getBasicServiceObject();
 
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+	@SuppressWarnings("rawtypes")
+	private static final Class basicServiceClass = getBasicServiceClass();
 
-public static void  main ( String [ ]  args )
-	throws Exception
-//////////////////////////////////////////////////////////////////////
-{
-	showDocument ( new URL ( args [ 0 ] ) );
-}
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+	private JNLPProxy() {
+	}
 
-@SuppressWarnings("unchecked")
-public static boolean  showDocument ( URL  url )
-//////////////////////////////////////////////////////////////////////
-{
-	if ( basicServiceObject == null )
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+
+	public static void main(String[] args) throws Exception
+	//////////////////////////////////////////////////////////////////////
 	{
-			System.out.println("basisServiceObject = null");
+		showDocument(new URL(args[0]));
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+
+	@SuppressWarnings("unchecked")
+	public static boolean showDocument(URL url)
+	//////////////////////////////////////////////////////////////////////
+	{
+		if (basicServiceObject == null) {
+			logger.info("basisServiceObject = null");
 			return false;
+		}
+
+		try {
+			Method method = basicServiceClass.getMethod("showDocument", new Class[] { URL.class });
+
+			Boolean resultBoolean = (Boolean) method.invoke(basicServiceObject, new Object[] { url });
+
+			boolean success = resultBoolean.booleanValue();
+			if (!success) {
+				logger.info("invocation of method failed!");
+			}
+			return success;
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+
+			throw new RuntimeException(ex.getMessage());
+		}
 	}
 
-	try
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+
+	@SuppressWarnings({ "unchecked" })
+	private static Object getBasicServiceObject()
+	//////////////////////////////////////////////////////////////////////
 	{
-		Method  method = basicServiceClass.getMethod (
-			"showDocument", new Class [ ] { URL.class } );
+		try {
+			Class serviceManagerClass = Class.forName("javax.jnlp.ServiceManager");
 
-		Boolean  resultBoolean = ( Boolean )
-			method.invoke ( basicServiceObject, new Object [ ] { url } );
+			Method lookupMethod = serviceManagerClass.getMethod("lookup", new Class[] { String.class });
 
-		boolean success = resultBoolean.booleanValue ( );
-		if ( ! success )
-		System.out.println("invocation of method failed!");
-		return success;
+			return lookupMethod.invoke(null, new Object[] { "javax.jnlp.BasicService" });
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			return null;
+		}
 	}
-	catch ( Exception  ex )
+
+	@SuppressWarnings("rawtypes")
+	private static Class getBasicServiceClass()
+	//////////////////////////////////////////////////////////////////////
 	{
-		ex.printStackTrace ( );
-
-		throw new RuntimeException ( ex.getMessage ( ) );
+		try {
+			return Class.forName("javax.jnlp.BasicService");
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			return null;
+		}
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 }
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-
-@SuppressWarnings({ "unchecked" })
-private static Object  getBasicServiceObject ( )
-//////////////////////////////////////////////////////////////////////
-{
-	try
-	{
-		Class  serviceManagerClass
-			= Class.forName ( "javax.jnlp.ServiceManager" );
-
-		Method  lookupMethod = serviceManagerClass.getMethod ( "lookup",
-			new Class [ ] { String.class } );
-
-		return lookupMethod.invoke (
-			null, new Object [ ] { "javax.jnlp.BasicService" } );
-	}
-	catch ( Exception  ex )
-	{
-		return null;
-	}
-}
-
-@SuppressWarnings("rawtypes")
-private static Class  getBasicServiceClass ( )
-//////////////////////////////////////////////////////////////////////
-{
-	try
-	{
-		return Class.forName ( "javax.jnlp.BasicService" );
-	}
-	catch ( Exception  ex )
-	{
-		return null;
-	}
-}
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-
-private  JNLPProxy ( ) { }
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-}
-

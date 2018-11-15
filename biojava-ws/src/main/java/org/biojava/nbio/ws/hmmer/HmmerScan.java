@@ -25,13 +25,14 @@ import org.biojava.nbio.core.sequence.ProteinSequence;
 import java.io.IOException;
 import java.util.SortedSet;
 
-/** Interface for performing Hmmscans on sequences.
+/**
+ * Interface for performing Hmmscans on sequences.
  *
  * @author Andreas Prlic
  * @since 3.0.3
  */
 public interface HmmerScan {
 
-	public  SortedSet<HmmerResult> scan(ProteinSequence sequence) throws IOException;
+	public SortedSet<HmmerResult> scan(ProteinSequence sequence) throws IOException;
 
 }

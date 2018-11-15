@@ -27,43 +27,46 @@ import org.biojava.nbio.core.sequence.loader.UniprotProxySequenceReader;
 import java.util.LinkedHashMap;
 
 /**
- * If you have a uniprot ID then it is possible to get a collection
- * of other id(s) that the protein is known by. This is a place holder
- * for the alternative source database and the id for the same protein.
- * Currently implement when the {@link UniprotProxySequenceReader} is used
- * to load a protein sequence
+ * If you have a uniprot ID then it is possible to get a collection of other
+ * id(s) that the protein is known by. This is a place holder for the
+ * alternative source database and the id for the same protein. Currently
+ * implement when the {@link UniprotProxySequenceReader} is used to load a
+ * protein sequence
  *
  * @author Scooter Willis <willishf at gmail dot com>
  * @author Paolo Pavan
  */
 public class DBReferenceInfo extends Qualifier {
-	private LinkedHashMap<String, String> properties = new LinkedHashMap<String, String>();
+	private LinkedHashMap<String, String> properties = new LinkedHashMap<>();
 	private String database = "";
 	private String id = "";
 
 	/**
 	 * The source database and id
+	 * 
 	 * @param database
 	 * @param id
 	 */
-	public DBReferenceInfo(String database, String id){
-		super("dbxref","");
+	public DBReferenceInfo(String database, String id) {
+		super("dbxref", "");
 		this.database = database;
 		this.id = id;
 	}
 
 	/**
 	 * Add a property and type to associate with this DBReferenceInfo
+	 * 
 	 * @param type
 	 * @param value
 	 */
 
-	public void addProperty(String type, String value){
+	public void addProperty(String type, String value) {
 		properties.put(type, value);
 	}
 
 	/**
 	 * Get the properties
+	 * 
 	 * @return the properties
 	 */
 	public LinkedHashMap<String, String> getProperties() {
@@ -107,9 +110,7 @@ public class DBReferenceInfo extends Qualifier {
 
 	@Override
 	public String toString() {
-		return database + ":" + id + ":" + properties;
+		return new StringBuilder().append(database).append(":").append(id).append(":").append(properties).toString();
 	}
-
-
 
 }

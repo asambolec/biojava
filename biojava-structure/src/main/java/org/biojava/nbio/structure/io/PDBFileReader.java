@@ -31,28 +31,30 @@ import java.io.InputStream;
 
 /**
  * <p>
- *  The wrapper class for parsing a PDB file.
- *  </p>
+ * The wrapper class for parsing a PDB file.
+ * </p>
  *
  *
- *  <p>
- *  Several flags can be set for this class
- *  <ul>
+ * <p>
+ * Several flags can be set for this class
+ * <ul>
  *
- * <li> {@link #setAutoFetch(boolean)} - if the PDB file can not be found locally, should it be fetched
- *  from the PDB ftp servers? (default:false)</li>
- *  <li> Other parameters can be set using the {@link #setFileParsingParameters(FileParsingParameters)}</li>
- *  </ul>
- *  </p>
+ * <li>{@link #setAutoFetch(boolean)} - if the PDB file can not be found
+ * locally, should it be fetched from the PDB ftp servers? (default:false)</li>
+ * <li>Other parameters can be set using the
+ * {@link #setFileParsingParameters(FileParsingParameters)}</li>
+ * </ul>
+ * </p>
  *
  *
  *
- *<h2>Example</h2>
+ * <h2>Example</h2>
  * <p>
  * Q: How can I get a Structure object from a PDB file?
  * </p>
  * <p>
  * A:
+ * 
  * <pre>
  * public {@link Structure} loadStructure(String pathToPDBFile){
  * 	{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
@@ -69,6 +71,7 @@ import java.io.InputStream;
  * </pre>
  *
  * Access PDB files from a directory, take care of compressed PDB files
+ * 
  * <pre>
  * public {@link Structure} loadStructureById() {
  * 	String path = "/path/to/PDB/directory/";
@@ -92,17 +95,17 @@ import java.io.InputStream;
  */
 public class PDBFileReader extends LocalPDBDirectory {
 
-	//private static final Logger logger = LoggerFactory.getLogger(PDBFileReader.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(PDBFileReader.class);
 
-	public static final String[] PDB_SPLIT_DIR    = new String[]{"data","structures","divided" ,"pdb"};
-	public static final String[] PDB_OBSOLETE_DIR = new String[]{"data","structures","obsolete","pdb"};
-
+	public static final String[] PDB_SPLIT_DIR = new String[] { "data", "structures", "divided", "pdb" };
+	public static final String[] PDB_OBSOLETE_DIR = new String[] { "data", "structures", "obsolete", "pdb" };
 
 	/**
 	 * Constructs a new PDBFileReader, initializing the extensions member variable.
-	 * The path is initialized in the same way as {@link UserConfiguration},
-	 * i.e. to system property/environment variable {@link UserConfiguration#PDB_DIR}.
-	 * Both autoFetch and splitDir are initialized to false
+	 * The path is initialized in the same way as {@link UserConfiguration}, i.e. to
+	 * system property/environment variable {@link UserConfiguration#PDB_DIR}. Both
+	 * autoFetch and splitDir are initialized to false
 	 */
 	public PDBFileReader() {
 		this(null);
@@ -110,10 +113,13 @@ public class PDBFileReader extends LocalPDBDirectory {
 
 	/**
 	 * Constructs a new PDBFileReader, initializing the extensions member variable.
-	 * The path is initialized to the given path, both autoFetch and splitDir are initialized to false.
+	 * The path is initialized to the given path, both autoFetch and splitDir are
+	 * initialized to false.
 	 *
-	 * <p>If path is null, initialize using the system property/environment variable
+	 * <p>
+	 * If path is null, initialize using the system property/environment variable
 	 * {@link UserConfiguration#PDB_DIR}.
+	 * 
 	 * @param path Path to the PDB file directory
 	 */
 	public PDBFileReader(String path) {
@@ -129,7 +135,7 @@ public class PDBFileReader extends LocalPDBDirectory {
 
 	@Override
 	protected String getFilename(String pdbId) {
-		return "pdb"+pdbId.toLowerCase()+".ent.gz";
+		return new StringBuilder().append("pdb").append(pdbId.toLowerCase()).append(".ent.gz").toString();
 	}
 
 	@Override
@@ -137,8 +143,8 @@ public class PDBFileReader extends LocalPDBDirectory {
 		PDBFileParser pdbpars = new PDBFileParser();
 		pdbpars.setFileParsingParameters(getFileParsingParameters());
 
-		Structure struc = pdbpars.parsePDBFile(inStream) ;
-		return struc ;
+		Structure struc = pdbpars.parsePDBFile(inStream);
+		return struc;
 	}
 
 	@Override
@@ -150,7 +156,5 @@ public class PDBFileReader extends LocalPDBDirectory {
 	protected String[] getObsoleteDirPath() {
 		return PDB_OBSOLETE_DIR;
 	}
-
-
 
 }

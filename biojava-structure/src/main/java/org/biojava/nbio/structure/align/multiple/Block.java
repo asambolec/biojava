@@ -50,8 +50,7 @@ public interface Block extends ScoresCache {
 	/**
 	 * Set the back-reference to its parent BlockSet.
 	 *
-	 * @param parent
-	 *            the parent BlockSet.
+	 * @param parent the parent BlockSet.
 	 * @see #getBlockSet()
 	 */
 	public void setBlockSet(BlockSet parent);
@@ -66,8 +65,7 @@ public interface Block extends ScoresCache {
 	public BlockSet getBlockSet();
 
 	/**
-	 * Returns the double List containing the aligned residues for each
-	 * structure.
+	 * Returns the double List containing the aligned residues for each structure.
 	 * <p>
 	 * alignRes.get(structure).get(residue) = alignRes.get(size).get(length).
 	 *
@@ -79,8 +77,7 @@ public interface Block extends ScoresCache {
 	/**
 	 * Set the double List containing the aligned residues for each structure.
 	 *
-	 * @param alignRes
-	 *            a double List of Integers with the aligned residues.
+	 * @param alignRes a double List of Integers with the aligned residues.
 	 * @see #getAlignRes()
 	 */
 	public void setAlignRes(List<List<Integer>> alignRes);
@@ -104,8 +101,7 @@ public interface Block extends ScoresCache {
 	public int size();
 
 	/**
-	 * Returns the number of aligned positions (columns) without gaps in the
-	 * Block.
+	 * Returns the number of aligned positions (columns) without gaps in the Block.
 	 *
 	 * @return int number of aligned residues.
 	 * @see #updateCoreLength()
@@ -115,44 +111,41 @@ public interface Block extends ScoresCache {
 	public int getCoreLength();
 
 	/**
-	 * Returns the number of non null positions (residues) of each structure in
-	 * the alignment Block. The values can be used to compute the coverages.
+	 * Returns the number of non null positions (residues) of each structure in the
+	 * alignment Block. The values can be used to compute the coverages.
 	 * 
 	 * @return List of residue counts for each structure
 	 */
 	public List<Integer> getAlignResCounts();
 
 	/**
-	 * Calculates and returns the first position of the specified structure in
-	 * the alignment that is not null. This will return the aligment index, not
-	 * the reisude aligned in that position.
+	 * Calculates and returns the first position of the specified structure in the
+	 * alignment that is not null. This will return the aligment index, not the
+	 * reisude aligned in that position.
 	 *
-	 * @param str
-	 *            structure index
+	 * @param str structure index
 	 *
 	 * @return the first non null aligned position of the structure
 	 */
 	public int getStartIndex(int str);
 
 	/**
-	 * Calculates and returns the first residue of the specified structure in
-	 * the alignment that is not null. This will return the aligned residue, not
-	 * the alignment index.
+	 * Calculates and returns the first residue of the specified structure in the
+	 * alignment that is not null. This will return the aligned residue, not the
+	 * alignment index.
 	 *
-	 * @param str
-	 *            structure index
+	 * @param str structure index
 	 *
 	 * @return the first non null aligned residue of the structure
 	 */
 	public int getStartResidue(int str);
 
 	/**
-	 * Calculates and returns the last position of the specified structure in
-	 * the alignment that is not null. This will return the aligment index, not
-	 * the reisude aligned in that position.
+	 * Calculates and returns the last position of the specified structure in the
+	 * alignment that is not null. This will return the aligment index, not the
+	 * reisude aligned in that position.
 	 *
-	 * @param str
-	 *            structure index
+	 * @param str structure index
 	 *
 	 * @return the last non null aligned position of the structure
 	 */
@@ -163,8 +156,7 @@ public interface Block extends ScoresCache {
 	 * alignment that is not null. This will return the aligned residue, not the
 	 * alignment index.
 	 *
-	 * @param str
-	 *            structure index
+	 * @param str structure index
 	 *
 	 * @return the last non null aligned residue of the structure
 	 */

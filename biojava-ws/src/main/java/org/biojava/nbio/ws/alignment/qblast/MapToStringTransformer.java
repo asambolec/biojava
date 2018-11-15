@@ -25,8 +25,6 @@ package org.biojava.nbio.ws.alignment.qblast;
 
 import java.util.Map;
 
-
-
 /**
  * Transforms Map to String. Used by {@linkplain NCBIQBlastService} to join
  * given map of arguments to a single String to pass to QBlast service
@@ -54,11 +52,12 @@ public class MapToStringTransformer {
 	/**
 	 * Creates {@code MapToStringTransformer} with given values
 	 *
-	 * @param mappingSequence sequence inserted between {@code key} and
-	 *            {@code value}
-	 * @param separatorSequence sequence inserted between every pair of
-	 *            {@code Map} entries
-	 * @param nullValue sequence inserted for every {@code null} key or value
+	 * @param mappingSequence   sequence inserted between {@code key} and
+	 *                          {@code value}
+	 * @param separatorSequence sequence inserted between every pair of {@code Map}
+	 *                          entries
+	 * @param nullValue         sequence inserted for every {@code null} key or
+	 *                          value
 	 */
 	public MapToStringTransformer(String mappingSequence, String separatorSequence, String nullValue) {
 		this.setMappingSequence(mappingSequence);
@@ -71,8 +70,8 @@ public class MapToStringTransformer {
 	 * {@code key} {@code mappingSequence} {@code value} , joined by
 	 * {@code separatorSequence}
 	 * <p>
-	 * Calls {@code toString()} for keys and values, replacing {@code null} with
-	 * the value of {@code nullValue} property
+	 * Calls {@code toString()} for keys and values, replacing {@code null} with the
+	 * value of {@code nullValue} property
 	 * <p>
 	 * For example, if we have a map with two entries: {@code ("key1", "1")} and
 	 * {@code ("key2", "2")} this method would return {@code "key1=1&key2=2"} if
@@ -83,14 +82,14 @@ public class MapToStringTransformer {
 	 */
 	public String transform(Map<?, ?> map) {
 		StringBuilder sb = new StringBuilder();
-		for (Object key : map.keySet()) {
+		map.keySet().forEach(key -> {
 			sb.append(getSeparatorSequence());
 			String keyString = key != null ? key.toString() : getNullValue();
 			sb.append(keyString);
 			sb.append(getMappingSequence());
 			String valueString = map.get(key) != null ? map.get(key).toString() : getNullValue();
 			sb.append(valueString);
-		}
+		});
 		return sb.substring(1);
 	}
 

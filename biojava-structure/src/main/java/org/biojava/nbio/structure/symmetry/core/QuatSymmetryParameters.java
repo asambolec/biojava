@@ -68,8 +68,7 @@ public class QuatSymmetryParameters implements Serializable {
 	}
 
 	/**
-	 * @param rmsdThreshold
-	 *            the rmsdThreshold to set
+	 * @param rmsdThreshold the rmsdThreshold to set
 	 */
 	public void setRmsdThreshold(double rmsdThreshold) {
 		this.rmsdThreshold = rmsdThreshold;
@@ -99,8 +98,7 @@ public class QuatSymmetryParameters implements Serializable {
 	}
 
 	/**
-	 * @param helixRmsdToRiseRatio
-	 *            the helixRmsdToRiseRatio to set
+	 * @param helixRmsdToRiseRatio the helixRmsdToRiseRatio to set
 	 */
 	public void setHelixRmsdToRiseRatio(double helixRmsdToRiseRatio) {
 		this.helixRmsdToRiseRatio = helixRmsdToRiseRatio;
@@ -138,8 +136,7 @@ public class QuatSymmetryParameters implements Serializable {
 	}
 
 	/**
-	 * @param localTimeLimit
-	 *            the localTimeLimit to set
+	 * @param localTimeLimit the localTimeLimit to set
 	 */
 	public void setLocalTimeLimit(double localTimeLimit) {
 		this.localTimeLimit = localTimeLimit;
@@ -153,28 +150,26 @@ public class QuatSymmetryParameters implements Serializable {
 	}
 
 	/**
-	 * @param localTimeStart
-	 *            the time when local calculations started
+	 * @param localTimeStart the time when local calculations started
 	 */
 	public void useLocalTimeLimit(double localTimeStart) {
 		this.localTimeStart = localTimeStart;
 	}
 
 	/**
-	 * @param combinations
-	 *            a set of combinations considered fo far by the local
-	 *            symmetry search
+	 * @param combinations a set of combinations considered fo far by the local
+	 *                     symmetry search
 	 * @return true, if the number of combinations
 	 */
 	public boolean isLocalLimitsExceeded(Set<?> combinations) {
-		if(combinations.size()>maximumLocalCombinations) {
+		if (combinations.size() > maximumLocalCombinations) {
 			return true;
 		}
 		return isLocalLimitsExceeded();
 	}
 
 	public boolean isLocalLimitsExceeded() {
-		//use the time limit only if the start time was set
+		// use the time limit only if the start time was set
 		if (localTimeStart < 0) {
 			return false;
 		}
@@ -194,9 +189,8 @@ public class QuatSymmetryParameters implements Serializable {
 	/**
 	 * On-the-fly Jmol bioassembly generation.
 	 * 
-	 * @param useJmolBioAssemblies
-	 *            true if Jmol on the fly bioassembly generation is used, false
-	 *            otherwise
+	 * @param useJmolBioAssemblies true if Jmol on the fly bioassembly generation is
+	 *                             used, false otherwise
 	 */
 	public void setOnTheFly(boolean useJmolBioAssemblies) {
 		this.onTheFly = useJmolBioAssemblies;
@@ -204,16 +198,13 @@ public class QuatSymmetryParameters implements Serializable {
 
 	@Override
 	public String toString() {
-		return "QuatSymmetryParameters [rmsdThreshold=" + rmsdThreshold
-				+ ", angleThreshold=" + angleThreshold
-				+ ", helixRmsdThreshold=" + helixRmsdThreshold
-				+ ", helixRmsdToRiseRatio=" + helixRmsdToRiseRatio
-				+ ", minimumHelixRise=" + minimumHelixRise
-				+ ", minimumHelixAngle=" + minimumHelixAngle
-				+ ", maximumLocalCombinations=" + maximumLocalCombinations
-				+ ", localTimeStart=" + localTimeStart
-				+ ", localTimeLimit=" + localTimeLimit + ", onTheFly="
-				+ onTheFly + "]";
+		return new StringBuilder().append("QuatSymmetryParameters [rmsdThreshold=").append(rmsdThreshold)
+				.append(", angleThreshold=").append(angleThreshold).append(", helixRmsdThreshold=")
+				.append(helixRmsdThreshold).append(", helixRmsdToRiseRatio=").append(helixRmsdToRiseRatio)
+				.append(", minimumHelixRise=").append(minimumHelixRise).append(", minimumHelixAngle=")
+				.append(minimumHelixAngle).append(", maximumLocalCombinations=").append(maximumLocalCombinations)
+				.append(", localTimeStart=").append(localTimeStart).append(", localTimeLimit=").append(localTimeLimit)
+				.append(", onTheFly=").append(onTheFly).append("]").toString();
 	}
 
 }

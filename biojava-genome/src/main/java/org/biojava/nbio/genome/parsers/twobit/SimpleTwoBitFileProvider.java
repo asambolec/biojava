@@ -36,55 +36,50 @@ import java.nio.file.Paths;
  * Created by yana on 4/4/17.
  */
 public class SimpleTwoBitFileProvider {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleTwoBitFileProvider.class);
+	private static final Logger logger = LoggerFactory.getLogger(SimpleTwoBitFileProvider.class);
 
-    public static synchronized void downloadIfNoTwoBitFileExists(File twoBitFileLocalLocation, String genomeAssembly) throws IOException {
+	public static synchronized void downloadIfNoTwoBitFileExists(File twoBitFileLocalLocation, String genomeAssembly)
+			throws IOException {
 
-        if ( ! twoBitFileLocalLocation.exists() ) {
+		// check the parent directory exists
+		if (twoBitFileLocalLocation.exists()) {
+			return;
+		}
+		// download to a temporary file
+		File tmp = File.createTempFile(genomeAssembly, ".2bit");
+		URL twoBitFileURL = getTwoBitURL(genomeAssembly);
+		logger.info(new StringBuilder().append("downloading ").append(twoBitFileURL).append(" to ")
+				.append(tmp.getAbsolutePath()).toString());
+		// 2bit files are large and take a while to download
+		FileDownloadUtils.downloadFile(twoBitFileURL, tmp);
+		Path p = Paths.get(twoBitFileLocalLocation.getAbsolutePath());
+		Path dir = p.getParent();
+		if (!Files.exists(dir)) {
+			Files.createDirectories(dir);
+		}
+		logger.info(new StringBuilder().append("renaming ").append(tmp.getAbsolutePath()).append(" to ")
+				.append(twoBitFileLocalLocation.getAbsolutePath()).toString());
+		// after the download rename
+		tmp.renameTo(twoBitFileLocalLocation);
+	}
 
-            // download to a temporary file
-            File tmp = File.createTempFile(genomeAssembly,".2bit");
-            URL twoBitFileURL = getTwoBitURL(genomeAssembly);
+	public static URL getTwoBitURL(String genomeAssembly) throws MalformedURLException {
 
-            logger.info("downloading " + twoBitFileURL + " to " + tmp.getAbsolutePath());
+		String url = "";
+		if ("hg19".equals(genomeAssembly) || "hg37".equals(genomeAssembly)) {
+			url = "http://cdn.rcsb.org/gene/hg37/hg19.2bit";
+		} else if ("hg38".equals(genomeAssembly)) {
+			url = "http://cdn.rcsb.org/gene/hg38/hg38.2bit";
+		}
+		return new URL(url);
+	}
 
-            // 2bit files are large and take a while to download
-            FileDownloadUtils.downloadFile(twoBitFileURL, tmp);
-
-            // check the parent directory exists
-
-            Path p = Paths.get(twoBitFileLocalLocation.getAbsolutePath());
-
-            Path dir = p.getParent();
-            if (! Files.exists(dir)) {
-                Files.createDirectories(dir);
-            }
-
-            logger.info("renaming " + tmp.getAbsolutePath() +" to " + twoBitFileLocalLocation.getAbsolutePath());
-            // after the download rename
-            tmp.renameTo(twoBitFileLocalLocation);
-
-        }
-    }
-
-    public static URL getTwoBitURL(String genomeAssembly) throws MalformedURLException {
-
-        String url="";
-        if (genomeAssembly.equals("hg19") || genomeAssembly.equals("hg37") ) {
-            url = "http://cdn.rcsb.org/gene/hg37/hg19.2bit";
-        }
-        else if (genomeAssembly.equals("hg38")) {
-            url = "http://cdn.rcsb.org/gene/hg38/hg38.2bit";
-        }
-        return new URL(url);
-    }
-
-    public static void main(String[] args){
-        try {
-            downloadIfNoTwoBitFileExists(new File("/Users/yana/spark/2bit/hg38.2bit"),"hg38");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public static void main(String[] args) {
+		try {
+			downloadIfNoTwoBitFileExists(new File("/Users/yana/spark/2bit/hg38.2bit"), "hg38");
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
 
 }

@@ -24,7 +24,6 @@
 
 package demo;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureTools;
@@ -37,17 +36,17 @@ import org.biojava.nbio.structure.align.gui.jmol.StructureAlignmentJmol;
 import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.model.AfpChainWriter;
 import org.biojava.nbio.structure.align.util.AtomCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class CookBook {
 
-public class CookBook
-{
+	private static final Logger logger = LoggerFactory.getLogger(CookBook.class);
 
+	public static void main(String[] args) {
 
-	public static void main(String[] args){
-
-		String name1="1HNG.B";
-		String name2="1A64.A";
-
+		String name1 = "1HNG.B";
+		String name2 = "1A64.A";
 
 		try {
 
@@ -57,7 +56,6 @@ public class CookBook
 			// the cache takes care of loading the structures
 			// Downloads files to a temp dir by default
 			AtomCache cache = new AtomCache();
-
 
 			//////////////////////////////
 			// no need to change anything below this line
@@ -72,7 +70,7 @@ public class CookBook
 			Atom[] ca2 = StructureTools.getAtomCAArray(structure2);
 
 			// do the actual alignment
-			AFPChain afpChain = algorithm.align(ca1,ca2);
+			AFPChain afpChain = algorithm.align(ca1, ca2);
 
 			// just name the two molecules
 			afpChain.setName1(name1);
@@ -80,31 +78,28 @@ public class CookBook
 
 			// print and display results:
 
-
 			// flexible original results:
-			System.out.println(afpChain.toFatcat(ca1,ca2));
+			logger.info(afpChain.toFatcat(ca1, ca2));
 
 			// show the alignment in 3D in jmol
-			StructureAlignmentJmol jmol= StructureAlignmentDisplay.display(afpChain, ca1, ca2);
+			StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
 			// set the display title for the frame
-			jmol.setTitle(algorithm.getAlgorithmName() + " : " + name1 + " vs. " + name2);
+			jmol.setTitle(new StringBuilder().append(algorithm.getAlgorithmName()).append(" : ").append(name1)
+					.append(" vs. ").append(name2).toString());
 
-			// here we open up the alignment - text panel that can interact with the 3D jmol display.
-			DisplayAFP.showAlignmentPanel(afpChain, ca1,ca2,jmol);
+			// here we open up the alignment - text panel that can interact with the 3D jmol
+			// display.
+			DisplayAFP.showAlignmentPanel(afpChain, ca1, ca2, jmol);
 
 			// we can print an XML version
-			//System.out.println(AFPChainXMLConverter.toXML(afpChain, ca1, ca2));
+			// System.out.println(AFPChainXMLConverter.toXML(afpChain, ca1, ca2));
 
 			// or print the same output as original FATCAT
-			System.out.println(AfpChainWriter.toFatCat(afpChain, ca1, ca2));
+			logger.info(AfpChainWriter.toFatCat(afpChain, ca1, ca2));
 
-
-
-
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

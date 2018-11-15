@@ -29,13 +29,16 @@ import org.biojava.nbio.core.sequence.template.AbstractSequence;
 import org.biojava.nbio.core.sequence.template.Compound;
 
 /**
- * Interface class to handle describing arbitrary features. A feature can be found at multiple locations in a sequence such as
- * the surface of a protein where different sequence positions make up that feature. Ligand binding pocket is another example.
- * The location in its current form knows the start and stop position in a sequence and thus should contain knowledge about the
+ * Interface class to handle describing arbitrary features. A feature can be
+ * found at multiple locations in a sequence such as the surface of a protein
+ * where different sequence positions make up that feature. Ligand binding
+ * pocket is another example. The location in its current form knows the start
+ * and stop position in a sequence and thus should contain knowledge about the
  * actual sequence.
  *
- * A feature can contain features to handle cases where a domain is a feature and the secondary structures covered by that domain
- * and other requirements for grouping.
+ * A feature can contain features to handle cases where a domain is a feature
+ * and the secondary structures covered by that domain and other requirements
+ * for grouping.
  *
  * @author Scooter Willis <willishf at gmail dot com>
  * @author Paolo Pavan
@@ -44,6 +47,7 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Get the short description that can be used to describe the feature
+	 * 
 	 * @return
 	 */
 
@@ -51,51 +55,52 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Set the short description that can be used to describe the feature
+	 * 
 	 * @param shortDescription
 	 */
 
 	public void setShortDescription(String shortDescription);
 
-	  /**
+	/**
 	 * Get the description that can be used to describe the feature
+	 * 
 	 * @return
 	 */
 
 	public String getDescription();
 
-
-	  /**
+	/**
 	 * Set the description that can be used to describe the feature
+	 * 
 	 * @return
 	 */
 
 	public void setDescription(String description);
 
-		/**
-	 * The location(s) of this feature where the location should contain a reference to parent and sequence etc.
+	/**
+	 * The location(s) of this feature where the location should contain a reference
+	 * to parent and sequence etc.
 	 * <p>
-	 * The location may be complicated, or simply a range.
-	 * The annotation is assumed to apply to all the region contained
-	 * within the location.
+	 * The location may be complicated, or simply a range. The annotation is assumed
+	 * to apply to all the region contained within the location.
 	 *
 	 * @return a Location anchoring this feature
 	 */
 	public AbstractLocation getLocations();
 
-		/**
+	/**
 	 * The new location for this feature.
 	 * <p>
-	 * The location may be complicated or simply a range. The annotation is
-	 * assumed to apply to the entire region contained within the location.
-	 * Any values returned from methods that rely on the old location must
-	 * not be affected.
+	 * The location may be complicated or simply a range. The annotation is assumed
+	 * to apply to the entire region contained within the location. Any values
+	 * returned from methods that rely on the old location must not be affected.
 	 *
 	 * @param loc the new Location for this feature
 	 *
 	 */
 	public void setLocation(AbstractLocation loc);
 
-		/**
+	/**
 	 * The type of the feature.
 	 *
 	 * @return the type of this sequence
@@ -105,13 +110,12 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 	/**
 	 * Change the type of this feature.
 	 *
-	 * @param type  new type String
+	 * @param type new type String
 	 *
 	 */
 	public void setType(String type);
 
-
-		/**
+	/**
 	 * The source of the feature. This may be a program or process.
 	 *
 	 * @return the source, or generator
@@ -128,6 +132,7 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Set the parent feature
+	 * 
 	 * @param feature
 	 */
 
@@ -135,6 +140,7 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Get the parent feature
+	 * 
 	 * @return
 	 */
 
@@ -142,6 +148,7 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Get the features contained by this feature
+	 * 
 	 * @return
 	 */
 
@@ -149,13 +156,13 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Set the children features
+	 * 
 	 * @param features
 	 */
 
 	public void setChildrenFeatures(List<FeatureInterface<S, C>> features);
 
-
-		/**
+	/**
 	 * @return the userObject
 	 */
 	public Object getUserObject();
@@ -165,9 +172,9 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 	 */
 	public void setUserObject(Object userObject);
 
-
 	/**
 	 * Get the qualifiers for this feature
+	 * 
 	 * @return
 	 */
 
@@ -175,12 +182,15 @@ public interface FeatureInterface<S extends AbstractSequence<C>, C extends Compo
 
 	/**
 	 * Set the qualifiers
+	 * 
 	 * @param qualifiers
 	 */
 
 	public void setQualifiers(Map<String, List<Qualifier>> qualifiers);
+
 	/**
 	 * Add a qualifier
+	 * 
 	 * @param qualifier
 	 */
 

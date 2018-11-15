@@ -28,7 +28,8 @@ import org.biojava.nbio.core.sequence.template.Compound;
 
 /**
  * The plain fasta header takes everything in the header as a single entity. It
- * is useful for non-standard header formats that don't follow a single rule.<br>
+ * is useful for non-standard header formats that don't follow a single
+ * rule.<br>
  * If the user has a custom header with local data that is kept constant all
  * over the data then they can create their own implementation of a
  * FastaHeaderParserInterface
@@ -63,8 +64,7 @@ public class PlainFastaHeaderParser<S extends AbstractSequence<C>, C extends Com
 		if (data.length == 1) {
 			sequence.setAccession(new AccessionID(data[0]));
 		} else {
-			throw new RuntimeException(
-					"No header or Some Error Occurred while reading header");
+			throw new RuntimeException("No header or Some Error Occurred while reading header");
 		}
 	}
 }

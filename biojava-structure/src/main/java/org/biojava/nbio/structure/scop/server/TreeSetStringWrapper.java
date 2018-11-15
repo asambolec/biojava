@@ -36,30 +36,27 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.TreeSet;
 
-
-
-@XmlRootElement(name = "TreeSetStringWrapper", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "TreeSetStringWrapper", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class TreeSetStringWrapper implements Serializable{
-
+public class TreeSetStringWrapper implements Serializable {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4193799052494327416L;
-	TreeSet<String> data;
-
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(TreeSetStringWrapper.class);
-		} catch (Exception e){
+			jaxbContext = JAXBContext.newInstance(TreeSetStringWrapper.class);
+		} catch (Exception e) {
 			throw new RuntimeException("Could not initialize JAXB context for " + TreeSetStringWrapper.class, e);
 		}
 	}
 
-	public TreeSetStringWrapper(){
-		data = new TreeSet<String>();
+	TreeSet<String> data;
+
+	public TreeSetStringWrapper() {
+		data = new TreeSet<>();
 	}
 
 	public TreeSet<String> getData() {
@@ -69,7 +66,8 @@ public class TreeSetStringWrapper implements Serializable{
 	public void setData(TreeSet<String> data) {
 		this.data = data;
 	}
-	public  String toXML(){
+
+	public String toXML() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -81,18 +79,19 @@ public class TreeSetStringWrapper implements Serializable{
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			throw new RuntimeException("Could not convert " + getClass() + " to XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(
+					new StringBuilder().append("Could not convert ").append(getClass()).append(" to XML").toString(),
+					e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static TreeSetStringWrapper fromXML(String xml){
+	public static TreeSetStringWrapper fromXML(String xml) {
 
 		TreeSetStringWrapper job = null;
 
@@ -104,12 +103,12 @@ public class TreeSetStringWrapper implements Serializable{
 
 			job = (TreeSetStringWrapper) un.unmarshal(bais);
 
-		} catch (Exception e){
-			throw new RuntimeException("Could not parse " + TreeSetStringWrapper.class + " from XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(new StringBuilder().append("Could not parse ").append(TreeSetStringWrapper.class)
+					.append(" from XML").toString(), e);
 		}
 
 		return job;
 	}
-
 
 }

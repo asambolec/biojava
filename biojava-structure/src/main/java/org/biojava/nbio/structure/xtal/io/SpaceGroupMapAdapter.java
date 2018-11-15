@@ -34,17 +34,19 @@ class SpaceGroupMapAdapter extends XmlAdapter<SpaceGroupMapElements[], Map<Integ
 	public SpaceGroupMapElements[] marshal(Map<Integer, SpaceGroup> arg0) throws Exception {
 		SpaceGroupMapElements[] mapElements = new SpaceGroupMapElements[arg0.size()];
 		int i = 0;
-		for (Map.Entry<Integer, SpaceGroup> entry : arg0.entrySet())
+		for (Map.Entry<Integer, SpaceGroup> entry : arg0.entrySet()) {
 			mapElements[i++] = new SpaceGroupMapElements(entry.getKey(), entry.getValue());
+		}
 
 		return mapElements;
 	}
 
 	@Override
 	public Map<Integer, SpaceGroup> unmarshal(SpaceGroupMapElements[] arg0) throws Exception {
-		Map<Integer, SpaceGroup> r = new TreeMap<Integer, SpaceGroup>();
-		for (SpaceGroupMapElements mapelement : arg0)
+		Map<Integer, SpaceGroup> r = new TreeMap<>();
+		for (SpaceGroupMapElements mapelement : arg0) {
 			r.put(mapelement.key, mapelement.value);
+		}
 		return r;
 	}
 }

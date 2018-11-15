@@ -52,12 +52,14 @@ import org.biojava.nbio.structure.gui.util.ScopSelectPanel;
 import org.biojava.nbio.structure.gui.util.StructurePairSelector;
 import org.biojava.nbio.structure.symmetry.internal.CESymmParameters;
 import org.biojava.nbio.structure.symmetry.internal.CeSymm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A JFrame that allows to trigger a symmetry analysis, either from files
- * in a directory or after manual upload
- * Adapted from the AlignmentGui class in biojava.
- * Only one structure is inputted and only the CeSymm algorihm can be chosen.
+ * A JFrame that allows to trigger a symmetry analysis, either from files in a
+ * directory or after manual upload Adapted from the AlignmentGui class in
+ * biojava. Only one structure is inputted and only the CeSymm algorihm can be
+ * chosen.
  *
  * @author Aleix Lafita
  * @since 4.2.0
@@ -65,52 +67,37 @@ import org.biojava.nbio.structure.symmetry.internal.CeSymm;
  */
 public class SymmetryGui extends JFrame {
 
+	private static final Logger logger = LoggerFactory.getLogger(SymmetryGui.class);
+
 	private final static long serialVersionUID = 0l;
 
-	private CESymmParameters params = new CESymmParameters();
-	private JButton abortB;
+	static final ResourceManager resourceManager = ResourceManager.getResourceManager("ce");
 
-	private SelectPDBPanel  tab1 ;
-	private PDBUploadPanel  tab2;
-	private ScopSelectPanel tab3;
-
-	private Thread thread;
-	private AlignmentCalculationRunnable alicalc;
-	private JTabbedPane masterPane;
-	private JTabbedPane tabPane;
-	private JProgressBar progress;
-
-	public static void main(String[] args){
-		SymmetryGui.getInstance();
-	}
-
-	static final ResourceManager resourceManager =
-			ResourceManager.getResourceManager("ce");
-
-	private static final String MAIN_TITLE =
-			"Symmetry Analysis Tool: CE-Symm - V.1.0";
+	private static final String MAIN_TITLE = "Symmetry Analysis Tool: CE-Symm - V.1.0";
 
 	private static final SymmetryGui me = new SymmetryGui();
 
-	public static SymmetryGui getInstance(){
+	private CESymmParameters params = new CESymmParameters();
 
-		AbstractUserArgumentProcessor.printAboutMe();
+	private JButton abortB;
 
-		AligUIManager.setLookAndFeel();
+	private SelectPDBPanel tab1;
 
-		if (!me.isVisible()) me.setVisible(true);
-		if (! me.isActive()) me.requestFocus();
+	private PDBUploadPanel tab2;
 
-		return me;
-	}
+	private ScopSelectPanel tab3;
 
-	public static SymmetryGui getInstanceNoVisibilityChange(){
-		return me;
-	}
+	private Thread thread;
+
+	private AlignmentCalculationRunnable alicalc;
+
+	private JTabbedPane masterPane;
+
+	private JTabbedPane tabPane;
+
+	private JProgressBar progress;
 
 	private SymmetryGui() {
-		super();
-
 		thread = null;
 
 		JMenuBar menu = MenuCreator.initAlignmentGUIMenu(this);
@@ -123,12 +110,12 @@ public class SymmetryGui extends JFrame {
 		tab2 = new PDBUploadPanel(false);
 		tab3 = new ScopSelectPanel(false);
 
-		//setup tabPane
+		// setup tabPane
 		tabPane = new JTabbedPane();
 
 		tabPane.addTab("Select PDB ID", null, tab1, "Select PDB ID to analyze");
-		tabPane.addTab("Domain",null, tab3,"Select domain to analyze.");
-		tabPane.addTab("Custom file",null, tab2,"Analyze your own file.");
+		tabPane.addTab("Domain", null, tab3, "Select domain to analyze.");
+		tabPane.addTab("Custom file", null, tab2, "Analyze your own file.");
 
 		Box hBoxAlgo = setupAlgorithm();
 		Box vBox = Box.createVerticalBox();
@@ -150,9 +137,33 @@ public class SymmetryGui extends JFrame {
 		this.setVisible(true);
 	}
 
+	public static void main(String[] args) {
+		SymmetryGui.getInstance();
+	}
+
+	public static SymmetryGui getInstance() {
+
+		AbstractUserArgumentProcessor.printAboutMe();
+
+		AligUIManager.setLookAndFeel();
+
+		if (!me.isVisible()) {
+			me.setVisible(true);
+		}
+		if (!me.isActive()) {
+			me.requestFocus();
+		}
+
+		return me;
+	}
+
+	public static SymmetryGui getInstanceNoVisibilityChange() {
+		return me;
+	}
+
 	private Box setupAlgorithm() {
 
-		String[] algorithms = {"JCE-symmetry"};
+		String[] algorithms = { "JCE-symmetry" };
 		JLabel algoLabel = new JLabel("Symmetry algorithm: ");
 
 		JComboBox algorithmList = new JComboBox(algorithms);
@@ -160,6 +171,7 @@ public class SymmetryGui extends JFrame {
 
 		Action paramAction = new AbstractAction("Parameters") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
@@ -180,25 +192,26 @@ public class SymmetryGui extends JFrame {
 		return hBoxAlgo;
 	}
 
-	private Box initButtons(){
+	private Box initButtons() {
 
-		progress =new JProgressBar();
+		progress = new JProgressBar();
 		progress.setIndeterminate(false);
-		progress.setMaximumSize(new Dimension(10,100));
+		progress.setMaximumSize(new Dimension(10, 100));
 		progress.setVisible(false);
 
 		Action action1 = new AbstractAction("Analyze") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				// Perform action...
-				//System.out.println("calc structure alignment");
+				// System.out.println("calc structure alignment");
 				int selectedIndex = masterPane.getSelectedIndex();
-				if (selectedIndex == 0)
+				if (selectedIndex == 0) {
 					calcAlignment();
-				else {
-					System.err.println("Unknown TAB: " + selectedIndex);
+				} else {
+					logger.error("Unknown TAB: " + selectedIndex);
 				}
 			}
 		};
@@ -207,6 +220,7 @@ public class SymmetryGui extends JFrame {
 
 		Action action3 = new AbstractAction("Abort") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
@@ -221,6 +235,7 @@ public class SymmetryGui extends JFrame {
 
 		Action action2 = new AbstractAction("Exit") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
@@ -237,15 +252,14 @@ public class SymmetryGui extends JFrame {
 		hBox.add(Box.createGlue());
 		hBox.add(progress);
 		hBox.add(abortB);
-		//hBox.add(Box.createGlue());
+		// hBox.add(Box.createGlue());
 		hBox.add(submitB);
 
 		return hBox;
 	}
 
 	protected void configureParameters() {
-		System.out.println("configure parameters for " +
-				CeSymm.algorithmName);
+		logger.info("configure parameters for " + CeSymm.algorithmName);
 
 		// show a new config GUI
 		new ParameterGUI(params, CeSymm.algorithmName);
@@ -253,7 +267,7 @@ public class SymmetryGui extends JFrame {
 
 	public void cleanUp() {
 
-		if ( alicalc != null) {
+		if (alicalc != null) {
 			alicalc.cleanup();
 		}
 	}
@@ -263,38 +277,35 @@ public class SymmetryGui extends JFrame {
 		int pos = tabPane.getSelectedIndex();
 		StructurePairSelector tab = null;
 
-		if (pos == 0 ){
+		if (pos == 0) {
 			tab = tab1;
 
-		} else if (pos == 1){
+		} else if (pos == 1) {
 			tab = tab3;
 
-		} else if (pos == 2){
+		} else if (pos == 2) {
 			tab = tab2;
 		}
-
 
 		try {
 			Structure s = tab.getStructure1();
 
-			if ( s == null) {
-				System.err.println("Please select structure");
-				return ;
+			if (s == null) {
+				logger.error("Please select structure");
+				return;
 			}
 
 			StructureIdentifier name = new PassthroughIdentifier("custom");
 
-			if  ( pos == 0){
+			if (pos == 0) {
 				name = tab1.getName1();
 			} else {
 				name = s.getStructureIdentifier();
 			}
 
-			System.out.println("Analyzing: " + name);
-
+			logger.info("Analyzing: " + name);
 
 			alicalc = new SymmetryCalc(this, s);
-
 
 			thread = new Thread(alicalc);
 			thread.start();
@@ -302,29 +313,25 @@ public class SymmetryGui extends JFrame {
 			progress.setIndeterminate(true);
 			ProgressThreadDrawer drawer = new ProgressThreadDrawer(progress);
 			drawer.start();
-		} catch (StructureException e){
-			JOptionPane.showMessageDialog(null,
-					"Could not align structures. Exception: " + e.getMessage());
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,
-					"Could not align structures. Exception: " + e.getMessage());
+		} catch (IOException | StructureException e) {
+			JOptionPane.showMessageDialog(null, "Could not align structures. Exception: " + e.getMessage());
 		}
 	}
 
-	public void notifyCalcFinished(){
+	public void notifyCalcFinished() {
 		abortB.setEnabled(false);
 		thread = null;
 		progress.setIndeterminate(false);
 		this.repaint();
 	}
 
-	private void abortCalc(){
-		System.err.println("Interrupting alignment ...");
-		if ( alicalc != null )
+	private void abortCalc() {
+		logger.error("Interrupting alignment ...");
+		if (alicalc != null) {
 			alicalc.interrupt();
+		}
 		notifyCalcFinished();
 	}
-
 
 	public CESymmParameters getParameters() {
 		return params;
@@ -334,28 +341,29 @@ public class SymmetryGui extends JFrame {
 
 class ProgressThreadDrawer extends Thread {
 
-	JProgressBar progress;
+	private static final Logger logger = LoggerFactory.getLogger(ProgressThreadDrawer.class);
 	static int interval = 300;
+	JProgressBar progress;
 
 	public ProgressThreadDrawer(JProgressBar progress) {
 		this.progress = progress;
 	}
 
-
 	@Override
 	public void run() {
 		progress.setVisible(true);
 		boolean finished = false;
-		while ( ! finished) {
+		while (!finished) {
 			try {
 				progress.repaint();
-				if ( ! progress.isIndeterminate() ){
-					finished =false;
+				if (!progress.isIndeterminate()) {
+					finished = false;
 					break;
 				}
 
 				sleep(interval);
-			} catch (InterruptedException e){
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
 			}
 			progress.repaint();
 		}

@@ -28,35 +28,37 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MyOpenPdbFileListener
-implements ActionListener {
+public class MyOpenPdbFileListener implements ActionListener {
+	private static final Logger logger = LoggerFactory.getLogger(MyOpenPdbFileListener.class);
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-		if ( cmd.equals("Open PDB file")){
-			final JFileChooser fc = new JFileChooser();
+		if (!"Open PDB file".equals(cmd)) {
+			return;
+		}
+		final JFileChooser fc = new JFileChooser();
+		// In response to a button click:
+		int returnVal = fc.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
 
-			//					In response to a button click:
-			int returnVal = fc.showOpenDialog(null);
-			if ( returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
+			PDBFileReader reader = new PDBFileReader();
+			try {
+				Structure s = reader.getStructure(file);
+				StructureAlignmentJmol jmol = new StructureAlignmentJmol(null, null, null);
+				jmol.setStructure(s);
 
-				PDBFileReader reader = new PDBFileReader();
-				try {
-					Structure s = reader.getStructure(file);
-					StructureAlignmentJmol jmol = new StructureAlignmentJmol(null,null,null);
-					jmol.setStructure(s);
-
-					jmol.evalString("set antialiasDisplay on; select all;spacefill off; wireframe off; backbone off; cartoon;color cartoon chain; select ligand;wireframe 0.16;spacefill 0.5; select all; color cartoon structure;");
-					jmol.evalString("save STATE state_1");
-				} catch (Exception ex){
-					ex.printStackTrace();
-				}
-
-
+				jmol.evalString(
+						"set antialiasDisplay on; select all;spacefill off; wireframe off; backbone off; cartoon;color cartoon chain; select ligand;wireframe 0.16;spacefill 0.5; select all; color cartoon structure;");
+				jmol.evalString("save STATE state_1");
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
+
 		}
 	}
 }
-

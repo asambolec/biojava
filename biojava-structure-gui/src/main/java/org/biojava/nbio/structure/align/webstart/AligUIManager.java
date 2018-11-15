@@ -26,56 +26,53 @@ package org.biojava.nbio.structure.align.webstart;
 
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class AligUIManager {
 
-public class AligUIManager
-{
+	private static final Logger logger = LoggerFactory.getLogger(AligUIManager.class);
 
-	public static void setLookAndFeel(){
+	public static void setLookAndFeel() {
 		try {
 
-
 			String system = UIManager.getSystemLookAndFeelClassName();
-			if ( system != null) {
-				//System.out.println("setting look and feel to " + system);
+			if (system != null) {
+				// System.out.println("setting look and feel to " + system);
 				UIManager.setLookAndFeel(system);
 
 			}
 
-			//System.out.println("Installed Look And Feels:");
+			// System.out.println("Installed Look And Feels:");
 			LookAndFeelInfo[] feels = UIManager.getInstalledLookAndFeels();
 
-			if ( feels != null){
-				//for ( LookAndFeelInfo info: feels){
-					//System.out.println(info.getName() + " " + info.getClassName());
-			  // }
+			if (feels != null) {
+				// for ( LookAndFeelInfo info: feels){
+				// System.out.println(info.getName() + " " + info.getClassName());
+				// }
 			}
 
+			// System.out.println("Auxiliary Look And Feels:");
+			// LookAndFeel[] looks = UIManager.getAuxiliaryLookAndFeels();
+			// printLookAndFeel(looks);
 
-			//System.out.println("Auxiliary Look And Feels:");
-		  // LookAndFeel[] looks = UIManager.getAuxiliaryLookAndFeels();
-			//printLookAndFeel(looks);
-
-
-
-
-		} catch ( Exception e ) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-//   private static void printLookAndFeel(LookAndFeel[] looks)
-//   {
-//
-//      if ( looks != null){
-//         System.out.println("got " + looks.length + " lookAndFeels");
-//         for (LookAndFeel laf : looks){
-//            System.out.println(laf.getDescription());
-//         }
-//      } else {
-//         System.out.println("No other LookAndFeels found.");
-//      }
-//
-//   }
+	// private static void printLookAndFeel(LookAndFeel[] looks)
+	// {
+	//
+	// if ( looks != null){
+	// System.out.println("got " + looks.length + " lookAndFeels");
+	// for (LookAndFeel laf : looks){
+	// System.out.println(laf.getDescription());
+	// }
+	// } else {
+	// System.out.println("No other LookAndFeels found.");
+	// }
+	//
+	// }
 }

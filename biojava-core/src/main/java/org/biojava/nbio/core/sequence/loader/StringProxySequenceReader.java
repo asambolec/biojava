@@ -37,7 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An example of a ProxySequenceReader that is created from a String. Used for testing
+ * An example of a ProxySequenceReader that is created from a String. Used for
+ * testing
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  * @param <C>
  */
@@ -46,9 +48,10 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 
 	private String sequence;
 	private CompoundSet<C> compoundSet;
-	private List<C> parsedCompounds = new ArrayList<C>();
+	private List<C> parsedCompounds = new ArrayList<>();
 
-	public StringProxySequenceReader() {}
+	public StringProxySequenceReader() {
+	}
 
 	public StringProxySequenceReader(String sequence, CompoundSet<C> compoundSet) throws CompoundNotFoundException {
 		this.sequence = sequence;
@@ -70,12 +73,14 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 		for (int i = 0; i < sequence.length();) {
 			String compoundStr = null;
 			C compound = null;
-			for (int compoundStrLength = 1; compound == null && compoundStrLength <= compoundSet.getMaxSingleCompoundStringLength(); compoundStrLength++) {
+			for (int compoundStrLength = 1; compound == null
+					&& compoundStrLength <= compoundSet.getMaxSingleCompoundStringLength(); compoundStrLength++) {
 				compoundStr = sequence.substring(i, i + compoundStrLength);
 				compound = compoundSet.getCompoundForString(compoundStr);
 			}
 			if (compound == null) {
-				throw new CompoundNotFoundException("Compound "+compoundStr+" not found");
+				throw new CompoundNotFoundException(
+						new StringBuilder().append("Compound ").append(compoundStr).append(" not found").toString());
 			} else {
 				i += compoundStr.length();
 			}
@@ -83,7 +88,7 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 		}
 	}
 
-	public void setContents(String sequence, ArrayList features) throws CompoundNotFoundException{
+	public void setContents(String sequence, ArrayList features) throws CompoundNotFoundException {
 		setContents(sequence);
 	}
 
@@ -107,7 +112,6 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 		return this.parsedCompounds.lastIndexOf(compound) + 1;
 	}
 
-
 	@Override
 	public String toString() {
 		return getSequenceAsString();
@@ -123,16 +127,14 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 		return this.parsedCompounds;
 	}
 
-
-
-	public String getSequenceAsString(Integer bioBegin, Integer bioEnd,Strand strand) {
-		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<C>();
+	public String getSequenceAsString(Integer bioBegin, Integer bioEnd, Strand strand) {
+		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<>();
 		return sequenceAsStringHelper.getSequenceAsString(this.parsedCompounds, compoundSet, bioBegin, bioEnd, strand);
 	}
 
 	@Override
 	public SequenceView<C> getSubSequence(final Integer bioBegin, final Integer bioEnd) {
-		return new SequenceProxyView<C>(StringProxySequenceReader.this,bioBegin,bioEnd);
+		return new SequenceProxyView<>(StringProxySequenceReader.this, bioBegin, bioEnd);
 	}
 
 	@Override
@@ -142,15 +144,13 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 
 	@Override
 	public CompoundSet<C> getCompoundSet() {
-	  return compoundSet;
+		return compoundSet;
 	}
-
 
 	@Override
 	public AccessionID getAccession() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
-
 
 	@Override
 	public int countCompounds(C... compounds) {
@@ -163,33 +163,36 @@ public class StringProxySequenceReader<C extends Compound> implements ProxySeque
 	}
 
 	@Override
-	public boolean equals(Object o){
+	public boolean equals(Object o) {
 
-		if(! Equals.classEqual(this, o)) {
+		if (!Equals.classEqual(this, o)) {
 			return false;
 		}
 
-		Sequence<C> other = (Sequence<C>)o;
-		if ( other.getCompoundSet() != getCompoundSet())
+		Sequence<C> other = (Sequence<C>) o;
+		if (other.getCompoundSet() != getCompoundSet()) {
 			return false;
+		}
 
 		List<C> rawCompounds = getAsList();
 		List<C> otherCompounds = other.getAsList();
 
-		if ( rawCompounds.size() != otherCompounds.size())
+		if (rawCompounds.size() != otherCompounds.size()) {
 			return false;
+		}
 
-		for (int i = 0 ; i < rawCompounds.size() ; i++){
+		for (int i = 0; i < rawCompounds.size(); i++) {
 			Compound myCompound = rawCompounds.get(i);
 			Compound otherCompound = otherCompounds.get(i);
-			if ( ! myCompound.equalsIgnoreCase(otherCompound))
+			if (!myCompound.equalsIgnoreCase(otherCompound)) {
 				return false;
+			}
 		}
 		return true;
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		String s = getSequenceAsString();
 		return s.hashCode();
 	}

@@ -32,7 +32,6 @@ public class RefinerFailedException extends Exception {
 	private static final long serialVersionUID = -3592155787060329421L;
 
 	public RefinerFailedException() {
-		super();
 	}
 
 	public RefinerFailedException(String message, Throwable cause) {

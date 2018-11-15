@@ -28,9 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-
-/** 
+/**
  * An iterator over all groups of a structure.
+ * 
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
@@ -38,73 +38,93 @@ import java.util.NoSuchElementException;
 
 public class GroupIterator implements Iterator<Group> {
 
-	private Structure structure   ;
-	private int current_model_pos ;
-	private int current_chain_pos ;
-	private int current_group_pos ;
-	private boolean fixed_model   ;
-	
+	private Structure structure;
+	private int currentModelPos;
+	private int currentChainPos;
+	private int currentGroupPos;
+	private boolean fixedModel;
 
 	/**
 	 * Constructs a GroupIterator object over all models
 	 *
-	 * @param struct  a Structure object
+	 * @param struct a Structure object
 	 */
-	public GroupIterator (Structure struct) {
-		structure = struct     ;
-		current_model_pos = 0  ;
-		current_chain_pos = 0  ;
-		current_group_pos = -1 ;
-		fixed_model = false    ;
+	public GroupIterator(Structure struct) {
+		structure = struct;
+		currentModelPos = 0;
+		currentChainPos = 0;
+		currentGroupPos = -1;
+		fixedModel = false;
 	}
+
 	/**
 	 * Constructs a GroupIterator object over a specific model
 	 *
-	 * @param struct  a Structure object
+	 * @param struct a Structure object
 	 */
-	public GroupIterator (Structure struct, int modelNr) {
-		structure = struct     ;
-		current_model_pos = modelNr;
-		current_chain_pos = 0  ;
-		current_group_pos = -1 ;
-		fixed_model = true     ;
+	public GroupIterator(Structure struct, int modelNr) {
+		structure = struct;
+		currentModelPos = modelNr;
+		currentChainPos = 0;
+		currentGroupPos = -1;
+		fixedModel = true;
 	}
 
-
 	/** needed to do a copy of iterator ... */
-	private Structure getStructure() { return structure         ;}
-	private int  getModelPos()       { return current_model_pos ;}
-	private void setModelPos(int pos){ current_model_pos = pos  ;}
-	private int  getChainPos()       { return current_chain_pos ;}
-	private void setChainPos(int pos){ current_chain_pos = pos  ;}
-	private int  getGroupPos()       { return current_group_pos ;}
-	private void setGroupPos(int pos){ current_group_pos = pos  ;}
+	private Structure getStructure() {
+		return structure;
+	}
 
-	/**  Creates and returns a copy of this object. */
+	private int getModelPos() {
+		return currentModelPos;
+	}
+
+	private void setModelPos(int pos) {
+		currentModelPos = pos;
+	}
+
+	private int getChainPos() {
+		return currentChainPos;
+	}
+
+	private void setChainPos(int pos) {
+		currentChainPos = pos;
+	}
+
+	private int getGroupPos() {
+		return currentGroupPos;
+	}
+
+	private void setGroupPos(int pos) {
+		currentGroupPos = pos;
+	}
+
+	/** Creates and returns a copy of this object. */
 	@Override
-	public Object clone () {
+	public Object clone() {
 
-		GroupIterator gr = new GroupIterator(this.getStructure()) ;
+		GroupIterator gr = new GroupIterator(this.getStructure());
 		gr.setModelPos(this.getModelPos());
 		gr.setChainPos(this.getChainPos());
 		gr.setGroupPos(this.getGroupPos());
-		gr.fixed_model = this.fixed_model;
-		return gr ;
+		gr.fixedModel = this.fixedModel;
+		return gr;
 
 	}
-
 
 	/** is there a group after the current one in the structure? */
 	@Override
 	public boolean hasNext() {
-		return hasSubGroup(current_model_pos,current_chain_pos , current_group_pos +1) ;
+		return hasSubGroup(currentModelPos, currentChainPos, currentGroupPos + 1);
 	}
 
-	/** recursive method to determine if there is a next group. Helper
-	 * method for hasNext().
+	/**
+	 * recursive method to determine if there is a next group. Helper method for
+	 * hasNext().
+	 * 
 	 * @see #hasNext
 	 */
-	private boolean hasSubGroup(int tmp_model,int tmp_chain,int tmp_group) {
+	private boolean hasSubGroup(int tmp_model, int tmp_chain, int tmp_group) {
 
 		if (tmp_model >= structure.nrModels()) {
 			return false;
@@ -113,8 +133,9 @@ public class GroupIterator implements Iterator<Group> {
 		List<Chain> model = structure.getModel(tmp_model);
 
 		if (tmp_chain >= model.size()) {
-			if(fixed_model)
+			if (fixedModel) {
 				return false;
+			}
 			return hasSubGroup(tmp_model + 1, 0, 0);
 		}
 
@@ -125,87 +146,88 @@ public class GroupIterator implements Iterator<Group> {
 
 	}
 
-	/** Get the model number of the current model.
+	/**
+	 * Get the model number of the current model.
 	 *
 	 * @return the number of the model
 	 */
-	public int getCurrentModel(){
+	public int getCurrentModel() {
 
-		return current_model_pos;
+		return currentModelPos;
 	}
 
-	/** Get the current Chain. Returns null if we are at the end of the iteration.
+	/**
+	 * Get the current Chain. Returns null if we are at the end of the iteration.
 	 *
 	 * @return the Chain of the current position
 	 */
-	public Chain getCurrentChain(){
-		if ( current_model_pos >= structure.nrModels()){
+	public Chain getCurrentChain() {
+		if (currentModelPos >= structure.nrModels()) {
 			return null;
 		}
 
-		List<Chain> model =  structure.getModel(current_model_pos);
+		List<Chain> model = structure.getModel(currentModelPos);
 
-		if ( current_chain_pos >= model.size() ){
+		if (currentChainPos >= model.size()) {
 			return null;
 		}
 
-		return model.get(current_chain_pos);
+		return model.get(currentChainPos);
 
 	}
 
-	/** get next Group.
+	/**
+	 * get next Group.
+	 * 
 	 * @return next Group
 	 * @throws NoSuchElementException ...
 	 */
 	@Override
-	public Group next()
-	throws NoSuchElementException
-	{
+	public Group next() {
 
-		return getNextGroup(current_model_pos,current_chain_pos,current_group_pos+1);
+		return getNextGroup(currentModelPos, currentChainPos, currentGroupPos + 1);
 	}
 
-	/** recursive method to retrieve the next group. Helper
-	 * method for gext().
+	/**
+	 * recursive method to retrieve the next group. Helper method for gext().
+	 * 
 	 * @see #next
 	 */
-	private Group getNextGroup(int tmp_model,int tmp_chain,int tmp_group)
-	throws NoSuchElementException
-	{
+	private Group getNextGroup(int tmp_model, int tmp_chain, int tmp_group) {
 
-		if ( tmp_model >= structure.nrModels()){
+		if (tmp_model >= structure.nrModels()) {
 			throw new NoSuchElementException("arrived at end of structure!");
 		}
 
 		List<Chain> model = structure.getModel(tmp_model);
 
-		if ( tmp_chain >= model.size() ){
-			if(fixed_model)
+		if (tmp_chain >= model.size()) {
+			if (fixedModel) {
 				throw new NoSuchElementException("arrived at end of model!");
-			return getNextGroup(tmp_model+1,0,0);
+			}
+			return getNextGroup(tmp_model + 1, 0, 0);
 		}
 
-		Chain     chain = model.get(tmp_chain);
+		Chain chain = model.get(tmp_chain);
 
-		if (tmp_group  >= chain.getAtomLength()){
+		if (tmp_group >= chain.getAtomLength()) {
 			// start search at beginning of next chain.
-			return getNextGroup(tmp_model,tmp_chain+1,0);
+			return getNextGroup(tmp_model, tmp_chain + 1, 0);
 		} else {
-			current_model_pos = tmp_model;
-			current_chain_pos = tmp_chain;
-			current_group_pos = tmp_group;
-			return chain.getAtomGroup(current_group_pos);
+			currentModelPos = tmp_model;
+			currentChainPos = tmp_chain;
+			currentGroupPos = tmp_group;
+			return chain.getAtomGroup(currentGroupPos);
 		}
 
 	}
 
-	/** does nothing .
+	/**
+	 * does nothing .
 	 */
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException("Cannot call remove() for GroupIterator");
 	}
 
-
 }
-

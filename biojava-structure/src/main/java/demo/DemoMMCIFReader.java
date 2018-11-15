@@ -30,16 +30,20 @@ import org.biojava.nbio.structure.io.MMCIFFileReader;
 import org.biojava.nbio.structure.io.StructureProvider;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** An example of how to read MMcif files
+/**
+ * An example of how to read MMcif files
  *
  * @author Andreas Prlic
  *
  */
-public class DemoMMCIFReader
-{
+public class DemoMMCIFReader {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoMMCIFReader.class);
+
+	public static void main(String[] args) {
 
 		DemoMMCIFReader demo = new DemoMMCIFReader();
 
@@ -49,11 +53,11 @@ public class DemoMMCIFReader
 
 	}
 
-	/** 
+	/**
 	 * A basic example how to load an mmCif file and get a Structure object
 	 *
 	 */
-	public void loadSimple(){
+	public void loadSimple() {
 		String pdbId = "4hhb";
 
 		AtomCache cache = new AtomCache();
@@ -64,55 +68,53 @@ public class DemoMMCIFReader
 		try {
 			Structure s = StructureIO.getStructure(pdbId);
 
-			System.out.println(pdbId + " has nr atoms: " + StructureTools.getNrAtoms(s));
+			logger.info(new StringBuilder().append(pdbId).append(" has nr atoms: ").append(StructureTools.getNrAtoms(s))
+					.toString());
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
-
 	/**
-	 * An example demonstrating how to directly use the mmCif file parsing classes. This could potentially be used
-	 * to use the parser to populate a data-structure that is different from the biojava-structure data model.
+	 * An example demonstrating how to directly use the mmCif file parsing classes.
+	 * This could potentially be used to use the parser to populate a data-structure
+	 * that is different from the biojava-structure data model.
 	 *
 	 */
-	public void loadFromDirectAccess(){
+	public void loadFromDirectAccess() {
 		String pdbId = "1A4W";
 
 		StructureProvider pdbreader = new MMCIFFileReader();
 
 		try {
 			Structure s = pdbreader.getStructureById(pdbId);
-			
-			System.out.println("Getting chain H of 1A4W");
+
+			logger.info("Getting chain H of 1A4W");
 
 			List<Chain> hs = s.getNonPolyChainsByPDB("H");
 
 			Chain h = hs.get(0);
 			List<Group> ligands = h.getAtomGroups();
 
-			System.out.println("These ligands have been found in chain " + h.getName());
+			logger.info("These ligands have been found in chain " + h.getName());
 
-			for (Group l:ligands){
-				System.out.println(l);
-			}
+			ligands.forEach(l -> logger.info(String.valueOf(l)));
 
-			System.out.println("Accessing QWE directly: ");
-			Group qwe = s.getNonPolyChainsByPDB("H").get(2).getGroupByPDB(new ResidueNumber("H",373,null));
+			logger.info("Accessing QWE directly: ");
+			Group qwe = s.getNonPolyChainsByPDB("H").get(2).getGroupByPDB(new ResidueNumber("H", 373, null));
 
-			System.out.println(qwe.getChemComp());
+			logger.info(String.valueOf(qwe.getChemComp()));
 
-			System.out.println(h.getSeqResSequence());
-			System.out.println(h.getAtomSequence());
-			System.out.println(h.getAtomGroups(GroupType.HETATM));
+			logger.info(h.getSeqResSequence());
+			logger.info(h.getAtomSequence());
+			logger.info(String.valueOf(h.getAtomGroups(GroupType.HETATM)));
 
-			System.out.println("Entities: " + s.getEntityInfos());
+			logger.info("Entities: " + s.getEntityInfos());
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
-
 
 	}
 }

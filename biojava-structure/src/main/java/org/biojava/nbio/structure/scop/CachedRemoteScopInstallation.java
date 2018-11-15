@@ -38,21 +38,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/** An extension of the RemoteScopInstallation that caches some of the data locally.
+/**
+ * An extension of the RemoteScopInstallation that caches some of the data
+ * locally.
  *
  * @author Andreas Prlic
  *
  */
-public class CachedRemoteScopInstallation extends SerializableCache<String,ScopDomain> implements ScopDatabase {
+public class CachedRemoteScopInstallation extends SerializableCache<String, ScopDomain> implements ScopDatabase {
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedRemoteScopInstallation.class);
 
 	private static final String CACHE_FILE_NAME = "remotescopinstallation.ser";
 
-	RemoteScopInstallation proxy ;
+	RemoteScopInstallation proxy;
 
-	SerializableCache<Integer,ScopDescription> scopDescriptionCache ;
+	SerializableCache<Integer, ScopDescription> scopDescriptionCache;
 
 	public CachedRemoteScopInstallation() throws IOException {
 		this(true);
@@ -64,23 +65,23 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 
 		proxy = new RemoteScopInstallation();
 
-		scopDescriptionCache = new SerializableCache<Integer,ScopDescription>("scopDescriptionCache.ser");
+		scopDescriptionCache = new SerializableCache<>("scopDescriptionCache.ser");
 
-		if ( ! useCache) {
+		if (!useCache) {
 			logger.warn(getClass().getSimpleName() + " disabling cache");
 			disableCache();
 			scopDescriptionCache.disableCache();
 		} else {
 
-			if ( serializedCache.size() < 8000){
+			if (serializedCache.size() < 8000) {
 				loadRepresentativeDomains();
 			}
 		}
 
 	}
 
-
-	/** get the ranges of representative domains from the centralized server
+	/**
+	 * get the ranges of representative domains from the centralized server
 	 *
 	 */
 	private void loadRepresentativeDomains() throws IOException {
@@ -89,67 +90,63 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 		try {
 			u = new URL(RemoteScopInstallation.DEFAULT_SERVER + "getRepresentativeScopDomains");
 		} catch (MalformedURLException e) {
-			throw new IOException("URL " + RemoteScopInstallation.DEFAULT_SERVER + "getRepresentativeScopDomains" + " is wrong", e);
+			throw new IOException(new StringBuilder().append("URL ").append(RemoteScopInstallation.DEFAULT_SERVER)
+					.append("getRepresentativeScopDomains").append(" is wrong").toString(), e);
 		}
-		logger.info("Using " + u + " to download representative domains");
+		logger.info(new StringBuilder().append("Using ").append(u).append(" to download representative domains")
+				.toString());
 		InputStream response = URLConnectionTools.getInputStream(u);
 		String xml = JFatCatClient.convertStreamToString(response);
-		ScopDomains results  = ScopDomains.fromXML(xml);
+		ScopDomains results = ScopDomains.fromXML(xml);
 
-		logger.info("got " + results.getScopDomain().size() + " domain ranges for Scop domains from server.");
-		for (ScopDomain dom : results.getScopDomain()){
+		logger.info(new StringBuilder().append("got ").append(results.getScopDomain().size())
+				.append(" domain ranges for Scop domains from server.").toString());
+		results.getScopDomain().forEach(dom -> {
 			String scopId = dom.getScopId();
 			serializedCache.put(scopId, dom);
-		}
+		});
 
 	}
-
-
 
 	@Override
 	public List<ScopDescription> getByCategory(ScopCategory category) {
 		return proxy.getByCategory(category);
 	}
 
-
 	@Override
 	public List<ScopDescription> filterByClassificationId(String query) {
 		return proxy.filterByClassificationId(query);
 	}
-
 
 	@Override
 	public List<ScopNode> getTree(ScopDomain domain) {
 		return proxy.getTree(domain);
 	}
 
-
 	@Override
 	public List<ScopDomain> filterByDomainName(String query) {
 		return proxy.filterByDomainName(query);
 	}
-
 
 	@Override
 	public List<ScopDescription> filterByDescription(String query) {
 		return proxy.filterByClassificationId(query);
 	}
 
-
 	@Override
 	public ScopDescription getScopDescriptionBySunid(int sunid) {
 
 		ScopDescription desc = scopDescriptionCache.get(sunid);
-		if ( desc != null)
+		if (desc != null) {
 			return desc;
+		}
 
-
-		desc =  proxy.getScopDescriptionBySunid(sunid);
-		if ( desc != null)
-			scopDescriptionCache.cache(sunid,desc);
+		desc = proxy.getScopDescriptionBySunid(sunid);
+		if (desc != null) {
+			scopDescriptionCache.cache(sunid, desc);
+		}
 		return desc;
 	}
-
 
 	@Override
 	public List<ScopDomain> getDomainsForPDB(String pdbId) {
@@ -157,15 +154,14 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 		return proxy.getDomainsForPDB(pdbId);
 	}
 
-
 	@Override
 	public ScopDomain getDomainByScopID(String scopId) {
 		ScopDomain dom;
 
-		if ( serializedCache != null){
-			if ( serializedCache.containsKey(scopId)) {
+		if (serializedCache != null) {
+			if (serializedCache.containsKey(scopId)) {
 				dom = serializedCache.get(scopId);
-				if ( dom != null) {
+				if (dom != null) {
 					return dom;
 				}
 			}
@@ -173,19 +169,17 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 
 		dom = proxy.getDomainByScopID(scopId);
 
-		if ( dom != null)
+		if (dom != null) {
 			cache(scopId, dom);
-
+		}
 
 		return dom;
 	}
-
 
 	@Override
 	public ScopNode getScopNode(int sunid) {
 		return proxy.getScopNode(sunid);
 	}
-
 
 	@Override
 	public String getScopVersion() {
@@ -196,7 +190,6 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 	public void setScopVersion(String version) {
 		proxy.setScopVersion(version);
 	}
-
 
 	@Override
 	public List<ScopDomain> getScopDomainsBySunid(Integer sunid) {
@@ -212,8 +205,7 @@ public class CachedRemoteScopInstallation extends SerializableCache<String,ScopD
 
 	@Override
 	public List<String> getComments(int sunid) {
-		return new ArrayList<String>(1);
+		return new ArrayList<>(1);
 	}
-
 
 }

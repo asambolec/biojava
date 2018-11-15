@@ -35,23 +35,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * It is {@link DBReferenceInfo} which implements {@link FeatureInterface}. It allows to keep a dbReferenceInfo as a feature.
+ * It is {@link DBReferenceInfo} which implements {@link FeatureInterface}. It
+ * allows to keep a dbReferenceInfo as a feature.
  *
  * @author Jacek Grzebyta
  * @author Paolo Pavan
  * @param <S>
  * @param <C>
  */
-public class FeatureDbReferenceInfo<S extends AbstractSequence<C>, C extends Compound> extends DBReferenceInfo implements FeatureInterface<S,C> {
+public class FeatureDbReferenceInfo<S extends AbstractSequence<C>, C extends Compound> extends DBReferenceInfo
+		implements FeatureInterface<S, C> {
 
 	private AbstractLocation location;
-	private FeatureInterface<S,C> parentFeature;
-	private List<FeatureInterface<S, C>> childrenFeatures = new ArrayList<FeatureInterface<S, C>>();
+	private FeatureInterface<S, C> parentFeature;
+	private List<FeatureInterface<S, C>> childrenFeatures = new ArrayList<>();
 	private String description = "";
 	private String shortDescription = "";
 	private Object userObject;
-	private Map<String, List<Qualifier>> qualifiers = new HashMap<String,List<Qualifier>>();
-
+	private Map<String, List<Qualifier>> qualifiers = new HashMap<>();
 
 	public FeatureDbReferenceInfo(String database, String id) {
 		super(database, id);
@@ -94,7 +95,7 @@ public class FeatureDbReferenceInfo<S extends AbstractSequence<C>, C extends Com
 
 	@Override
 	public void setType(String type) {
-	   super.setDatabase(type);
+		super.setDatabase(type);
 	}
 
 	@Override
@@ -108,12 +109,12 @@ public class FeatureDbReferenceInfo<S extends AbstractSequence<C>, C extends Com
 	}
 
 	@Override
-	public void setParentFeature(FeatureInterface<S,C> feature) {
+	public void setParentFeature(FeatureInterface<S, C> feature) {
 		this.parentFeature = feature;
 	}
 
 	@Override
-	public FeatureInterface<S,C> getParentFeature() {
+	public FeatureInterface<S, C> getParentFeature() {
 		return this.parentFeature;
 	}
 
@@ -150,15 +151,15 @@ public class FeatureDbReferenceInfo<S extends AbstractSequence<C>, C extends Com
 	@Override
 	public void addQualifier(String key, Qualifier qualifier) {
 		if (qualifiers == null) {
-			qualifiers = new HashMap<String, List<Qualifier>>();
+			qualifiers = new HashMap<>();
 		}
 		// Check for key. Update list of values
-		if (qualifiers.containsKey(key)){
+		if (qualifiers.containsKey(key)) {
 			List<Qualifier> vals = qualifiers.get(key);
 			vals.add(qualifier);
 			qualifiers.put(key, vals);
 		} else {
-			List<Qualifier> vals = new ArrayList<Qualifier>();
+			List<Qualifier> vals = new ArrayList<>();
 			vals.add(qualifier);
 			qualifiers.put(key, vals);
 		}

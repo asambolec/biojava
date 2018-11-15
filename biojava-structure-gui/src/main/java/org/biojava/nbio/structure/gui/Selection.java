@@ -26,9 +26,10 @@ import java.util.List;
 
 public interface Selection {
 
-
 	public void clear();
+
 	public List<AtomInfo> getSelection();
+
 	public void setSelection(List<AtomInfo> selection);
 
 }

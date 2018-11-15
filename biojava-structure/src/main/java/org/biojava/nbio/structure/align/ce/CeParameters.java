@@ -32,88 +32,58 @@ import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Contains the parameters that can be sent to CE
  *
  * @author Andreas Prlic
  *
  */
-public class CeParameters implements ConfigStrucAligParams  {
-
-	protected int winSize;
-	protected double rmsdThr;
-	protected double rmsdThrJoin;
-	protected double maxOptRMSD;
-
-	public static enum ScoringStrategy {
-		CA_SCORING("CA only"),
-		SIDE_CHAIN_SCORING("Sidechain orientation"),
-		SIDE_CHAIN_ANGLE_SCORING("Angle between sidechains"),
-		CA_AND_SIDE_CHAIN_ANGLE_SCORING("CA distance+Angle between sidechains"),
-		SEQUENCE_CONSERVATION("Sequence Conservation");
-		public static ScoringStrategy DEFAULT_SCORING_STRATEGY = CA_SCORING;
-
-		private String name;
-		private ScoringStrategy(String name) {
-			this.name = name;
-		}
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-
-	protected ScoringStrategy scoringStrategy;
-	//String[] alignmentAtoms;
-	protected int maxGapSize;
-
-	protected boolean showAFPRanges;
-	protected int  sideChainScoringType;
-
-	/**
-	 * Whether the CE algorithm should extend the best found trace with dynamic programming,
-	 * while keeping RMSD at about the same level. (Shindyalov and Bourne, 1998)
-	 * This is useful for edge cases with remote homology, but can be slow for large structures.
-	 */
-	private boolean optimizeAlignment;
+public class CeParameters implements ConfigStrucAligParams {
 
 	protected static final double DEFAULT_GAP_OPEN = 5.0;
 	protected static final double DEFAULT_GAP_EXTENSION = 0.5;
 	protected static final double DISTANCE_INCREMENT = 0.5;
 	protected static final double DEFAULT_oRmsdThr = 2.0;
 	protected static final String DEFAULT_SUBSTITUTION_MATRIX = "PRLA000101";
-
+	protected int winSize;
+	protected double rmsdThr;
+	protected double rmsdThrJoin;
+	protected double maxOptRMSD;
+	protected ScoringStrategy scoringStrategy;
+	// String[] alignmentAtoms;
+	protected int maxGapSize;
+	protected boolean showAFPRanges;
+	protected int sideChainScoringType;
+	/**
+	 * Whether the CE algorithm should extend the best found trace with dynamic
+	 * programming, while keeping RMSD at about the same level. (Shindyalov and
+	 * Bourne, 1998) This is useful for edge cases with remote homology, but can be
+	 * slow for large structures.
+	 */
+	private boolean optimizeAlignment;
 	protected double gapOpen;
 	protected double gapExtension;
 	protected double distanceIncrement;
 	protected double oRmsdThr;
-
 	protected int maxNrIterationsForOptimization;
-
 	protected SubstitutionMatrix<AminoAcidCompound> substitutionMatrix;
 	protected double seqWeight;
 
-	public CeParameters(){
+	public CeParameters() {
 		reset();
 	}
 
 	@Override
 	public String toString() {
-		return "CeParameters [scoringStrategy=" + scoringStrategy
-		+ ", maxGapSize=" + maxGapSize
-		+ ", rmsdThr=" + rmsdThr
-		+ ", rmsdThrJoin="+ rmsdThrJoin
-		+ ", winSize=" + winSize
-		+ ", showAFPRanges=" + showAFPRanges
-		+ ", maxOptRMSD=" + maxOptRMSD
-		+ ", seqWeight=" + seqWeight
-		+ "]";
+		return new StringBuilder().append("CeParameters [scoringStrategy=").append(scoringStrategy)
+				.append(", maxGapSize=").append(maxGapSize).append(", rmsdThr=").append(rmsdThr)
+				.append(", rmsdThrJoin=").append(rmsdThrJoin).append(", winSize=").append(winSize)
+				.append(", showAFPRanges=").append(showAFPRanges).append(", maxOptRMSD=").append(maxOptRMSD)
+				.append(", seqWeight=").append(seqWeight).append("]").toString();
 	}
 
-
 	@Override
-	public void reset(){
+	public void reset() {
 		winSize = 8;
 		rmsdThr = 3.0;
 		rmsdThrJoin = 4.0;
@@ -132,69 +102,73 @@ public class CeParameters implements ConfigStrucAligParams  {
 		optimizeAlignment = true;
 	}
 
-	/** The window size to look at
+	/**
+	 * The window size to look at
 	 *
 	 * @return window size
 	 */
 	public Integer getWinSize() {
 		return winSize;
 	}
+
 	public void setWinSize(Integer winSize) {
 		this.winSize = winSize;
 	}
 
-	/** RMSD Threshold
+	/**
+	 * RMSD Threshold
 	 *
 	 * @return RMSD threshold
 	 */
 	public Double getRmsdThr() {
 		return rmsdThr;
 	}
+
 	public void setRmsdThr(Double rmsdThr) {
 		this.rmsdThr = rmsdThr;
 	}
 
-	/** RMSD threshold for joining of AFPs
+	/**
+	 * RMSD threshold for joining of AFPs
 	 *
 	 * @return rmsd threshold
 	 */
 	public Double getRmsdThrJoin() {
 		return rmsdThrJoin;
 	}
+
 	public void setRmsdThrJoin(Double rmsdThrJoin) {
 		this.rmsdThrJoin = rmsdThrJoin;
 	}
 
-	public ScoringStrategy getScoringStrategy()
-	{
+	public ScoringStrategy getScoringStrategy() {
 		return scoringStrategy;
 	}
 
-
-	/** Set the scoring strategy to use. 0 is default CE scoring scheme. 1 uses
-	 * Side chain orientation.
+	/**
+	 * Set the scoring strategy to use. 0 is default CE scoring scheme. 1 uses Side
+	 * chain orientation.
 	 *
 	 * @param scoringStrategy
 	 */
-	public void setScoringStrategy(ScoringStrategy scoringStrategy)
-	{
+	public void setScoringStrategy(ScoringStrategy scoringStrategy) {
 		this.scoringStrategy = scoringStrategy;
 	}
 
-
-
-	/** Set the Max gap size parameter. Default 30. For unlimited gaps set to -1
+	/**
+	 * Set the Max gap size parameter. Default 30. For unlimited gaps set to -1
 	 *
 	 * @param maxGapSize
 	 */
-	public void setMaxGapSize(Integer maxGapSize){
+	public void setMaxGapSize(Integer maxGapSize) {
 		this.maxGapSize = maxGapSize;
 	}
 
-	/** the Max gap size parameter G . default is 30, which was
-	 * described to obtained empirically in the CE paper.
-	 * the larger the max gap size, the longer the compute time,
-	 * but in same cases drastically improved results. Set to -1 for unlimited gap size.
+	/**
+	 * the Max gap size parameter G . default is 30, which was described to obtained
+	 * empirically in the CE paper. the larger the max gap size, the longer the
+	 * compute time, but in same cases drastically improved results. Set to -1 for
+	 * unlimited gap size.
 	 *
 	 * @return max gap size parameter
 	 */
@@ -202,29 +176,31 @@ public class CeParameters implements ConfigStrucAligParams  {
 		return maxGapSize;
 	}
 
-
 	@Override
 	public List<String> getUserConfigHelp() {
-		List<String> params =new ArrayList<String>();
-		String helpMaxGap = "This parameter configures the maximum gap size G, that is applied during the AFP extension. The larger the value, the longer the calculation time can become, Default value is 30. Set to 0 for no limit. " ;
-		//String helpRmsdThr = "This configures the RMSD threshold applied during the trace of the fragment matrix.";
+		List<String> params = new ArrayList<>();
+		String helpMaxGap = "This parameter configures the maximum gap size G, that is applied during the AFP extension. The larger the value, the longer the calculation time can become, Default value is 30. Set to 0 for no limit. ";
+		// String helpRmsdThr = "This configures the RMSD threshold applied during the
+		// trace of the fragment matrix.";
 		String helpWinSize = "This configures the fragment size m of Aligned Fragment Pairs (AFPs).";
 
 		params.add(helpMaxGap);
-		//params.add(helpRmsdThr);
+		// params.add(helpRmsdThr);
 		params.add(helpWinSize);
-		params.add("Which scoring function to use: "+CliTools.getEnumValuesAsString(ScoringStrategy.class) );
+		params.add("Which scoring function to use: " + CliTools.getEnumValuesAsString(ScoringStrategy.class));
 		params.add("The maximum RMSD at which to stop alignment optimization. (default: unlimited=99)");
-		params.add("Gap opening penalty during alignment optimization [default: "+DEFAULT_GAP_OPEN+"].");
-		params.add("Gap extension penalty during alignment optimization [default: "+DEFAULT_GAP_EXTENSION+"].");
+		params.add(new StringBuilder().append("Gap opening penalty during alignment optimization [default: ")
+				.append(DEFAULT_GAP_OPEN).append("].").toString());
+		params.add(new StringBuilder().append("Gap extension penalty during alignment optimization [default: ")
+				.append(DEFAULT_GAP_EXTENSION).append("].").toString());
 		return params;
 	}
 
 	@Override
 	public List<String> getUserConfigParameters() {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		params.add("MaxGapSize");
-		//params.add("RmsdThr");
+		// params.add("RmsdThr");
 		params.add("WinSize");
 		params.add("ScoringStrategy");
 		params.add("MaxOptRMSD");
@@ -235,10 +211,10 @@ public class CeParameters implements ConfigStrucAligParams  {
 	}
 
 	@Override
-	public List<String> getUserConfigParameterNames(){
-		List<String> params = new ArrayList<String>();
+	public List<String> getUserConfigParameterNames() {
+		List<String> params = new ArrayList<>();
 		params.add("max. gap size G (during AFP extension).");
-		//params.add("RMSD threshold during trace of the fragment matrix.");
+		// params.add("RMSD threshold during trace of the fragment matrix.");
 		params.add("fragment size m");
 		params.add("Which scoring function to use");
 		params.add("RMSD threshold for alignment.");
@@ -250,9 +226,9 @@ public class CeParameters implements ConfigStrucAligParams  {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List<Class> getUserConfigTypes() {
-		List<Class> params = new ArrayList<Class>();
+		List<Class> params = new ArrayList<>();
 		params.add(Integer.class);
-		//params.add(Double.class);
+		// params.add(Double.class);
 		params.add(Integer.class);
 		params.add(ScoringStrategy.class);
 		params.add(Double.class);
@@ -261,109 +237,87 @@ public class CeParameters implements ConfigStrucAligParams  {
 		return params;
 	}
 
-
-
 	/**
 	 * @return whether information about AFPs should be printed
 	 */
-	public boolean isShowAFPRanges()
-	{
+	public boolean isShowAFPRanges() {
 		return showAFPRanges;
 	}
-	public void setShowAFPRanges(boolean showAFPRanges)
-	{
+
+	public void setShowAFPRanges(boolean showAFPRanges) {
 		this.showAFPRanges = showAFPRanges;
 	}
 
-
-
-
-
-	/** set the maximum RMSD cutoff to be applied during alignment optimization. (default: 99 = unlimited)
+	/**
+	 * set the maximum RMSD cutoff to be applied during alignment optimization.
+	 * (default: 99 = unlimited)
 	 *
 	 * @param param maxOptRMSD
 	 */
-	public void setMaxOptRMSD(Double param){
-		if ( param == null)
+	public void setMaxOptRMSD(Double param) {
+		if (param == null) {
 			param = 99d;
+		}
 		maxOptRMSD = param;
 	}
 
-	/** Returns the maximum RMSD cutoff to be applied during alignment optimization (default: 99 = unlimited)
+	/**
+	 * Returns the maximum RMSD cutoff to be applied during alignment optimization
+	 * (default: 99 = unlimited)
 	 *
 	 * @return maxOptRMSD
 	 */
-	public Double getMaxOptRMSD()
-	{
+	public Double getMaxOptRMSD() {
 		return maxOptRMSD;
 	}
 
-
-
-	public Double getGapOpen()
-	{
+	public Double getGapOpen() {
 		return gapOpen;
 	}
 
-
-
-	public void setGapOpen(Double gapOpen)
-	{
+	public void setGapOpen(Double gapOpen) {
 		this.gapOpen = gapOpen;
 	}
 
-
-
-	public Double getGapExtension()
-	{
+	public Double getGapExtension() {
 		return gapExtension;
 	}
 
-
-
-	public void setGapExtension(Double gapExtension)
-	{
+	public void setGapExtension(Double gapExtension) {
 		this.gapExtension = gapExtension;
 	}
 
-
-
-	public Double getDistanceIncrement()
-	{
+	public Double getDistanceIncrement() {
 		return distanceIncrement;
 	}
 
-
-
-	public void setDistanceIncrement(Double distanceIncrement)
-	{
+	public void setDistanceIncrement(Double distanceIncrement) {
 		this.distanceIncrement = distanceIncrement;
 	}
 
-
-
-	/** Get the Original RMSD threshold from which the alignment optimization is started
+	/**
+	 * Get the Original RMSD threshold from which the alignment optimization is
+	 * started
 	 *
 	 * @return oRMSDThreshold
 	 */
-	public Double getORmsdThr()
-	{
+	public Double getORmsdThr() {
 		return oRmsdThr;
 	}
 
-
-
-	/** Set the Original RMSD threshold from which the alignment optimization is started
+	/**
+	 * Set the Original RMSD threshold from which the alignment optimization is
+	 * started
 	 *
 	 * @param oRmsdThr the threshold
 	 */
-	public void setORmsdThr(Double oRmsdThr)
-	{
+	public void setORmsdThr(Double oRmsdThr) {
 		this.oRmsdThr = oRmsdThr;
 	}
 
-
-	/** Get the maximum nr of times the (slow) optimiziation of alignment should iterate. Default: unlimited
+	/**
+	 * Get the maximum nr of times the (slow) optimiziation of alignment should
+	 * iterate. Default: unlimited
 	 *
 	 * @param maxNrIterationsForOptimization
 	 */
@@ -371,8 +325,9 @@ public class CeParameters implements ConfigStrucAligParams  {
 		return maxNrIterationsForOptimization;
 	}
 
-
-	/** Set the maximum nr of times the (slow) optimiziation of alignment should iterate. Default: unlimited
+	/**
+	 * Set the maximum nr of times the (slow) optimiziation of alignment should
+	 * iterate. Default: unlimited
 	 *
 	 * @param maxNrIterationsForOptimization
 	 */
@@ -380,9 +335,10 @@ public class CeParameters implements ConfigStrucAligParams  {
 		this.maxNrIterationsForOptimization = maxNrIterationsForOptimization;
 	}
 
-
-	/** Should sequence conservation be considered as part of the alignment? If yes, this weight factor allows to determine how much.
-	 *  By default this is set to 0, meaning no contribution of the sequence alignment score.
+	/**
+	 * Should sequence conservation be considered as part of the alignment? If yes,
+	 * this weight factor allows to determine how much. By default this is set to 0,
+	 * meaning no contribution of the sequence alignment score.
 	 *
 	 * @return seqWeight the weight factor (default 0)
 	 */
@@ -391,9 +347,10 @@ public class CeParameters implements ConfigStrucAligParams  {
 		return seqWeight;
 	}
 
-
-	/** Should sequence conservation be considered as part of the alignment? If yes, this weight factor allows to determine how much.
-	 *  By default this is set to 0, meaning no contribution of the sequence alignment score.
+	/**
+	 * Should sequence conservation be considered as part of the alignment? If yes,
+	 * this weight factor allows to determine how much. By default this is set to 0,
+	 * meaning no contribution of the sequence alignment score.
 	 *
 	 * @param seqWeight the weight factor (default 0)
 	 */
@@ -401,34 +358,34 @@ public class CeParameters implements ConfigStrucAligParams  {
 		this.seqWeight = seqWeight;
 	}
 
-
-	/** Sets the  substitution matrix to be used for influencing the alignment with sequence conservation information.
-	 * Default: SDM matrix (Prlic et al 2000)
+	/**
+	 * Sets the substitution matrix to be used for influencing the alignment with
+	 * sequence conservation information. Default: SDM matrix (Prlic et al 2000)
+	 * 
 	 * @return substitutionMatrix
 	 */
 	public SubstitutionMatrix<AminoAcidCompound> getSubstitutionMatrix() {
-		if ( substitutionMatrix == null){
+		if (substitutionMatrix == null) {
 			substitutionMatrix = SubstitutionMatrixHelper.getMatrixFromAAINDEX(DEFAULT_SUBSTITUTION_MATRIX);
 
 		}
 		return substitutionMatrix;
 	}
 
-
-	/** Sets the  substitution matrix to be used for influencing the alignment with sequence conservation information.
-	 * Default: SDM matrix (Prlic et al 2000)
+	/**
+	 * Sets the substitution matrix to be used for influencing the alignment with
+	 * sequence conservation information. Default: SDM matrix (Prlic et al 2000)
+	 * 
 	 * @param substitutionMatrix
 	 */
-	public void setSubstitutionMatrix(
-			SubstitutionMatrix<AminoAcidCompound> substitutionMatrix) {
+	public void setSubstitutionMatrix(SubstitutionMatrix<AminoAcidCompound> substitutionMatrix) {
 		this.substitutionMatrix = substitutionMatrix;
 	}
 
-
 	/**
-	 * Whether the CE algorithm should extend the best found trace with dynamic programming,
-	 * while keeping RMSD at about the same level. This is useful for edge cases with remote homology,
-	 * but can be slow for large structures.
+	 * Whether the CE algorithm should extend the best found trace with dynamic
+	 * programming, while keeping RMSD at about the same level. This is useful for
+	 * edge cases with remote homology, but can be slow for large structures.
 	 *
 	 * @return optimizeAlignment
 	 */
@@ -437,14 +394,33 @@ public class CeParameters implements ConfigStrucAligParams  {
 	}
 
 	/**
-	 * Whether the CE algorithm should extend the best found trace with dynamic programming,
-	 * while keeping RMSD at about the same level. This is useful for edge cases with remote homology,
-	 * but can be slow for large structures.
+	 * Whether the CE algorithm should extend the best found trace with dynamic
+	 * programming, while keeping RMSD at about the same level. This is useful for
+	 * edge cases with remote homology, but can be slow for large structures.
 	 *
 	 * @param optimizeAlignment
 	 */
 	public void setOptimizeAlignment(boolean optimizeAlignment) {
 		this.optimizeAlignment = optimizeAlignment;
+	}
+
+	public static enum ScoringStrategy {
+		CA_SCORING("CA only"), SIDE_CHAIN_SCORING("Sidechain orientation"),
+		SIDE_CHAIN_ANGLE_SCORING("Angle between sidechains"),
+		CA_AND_SIDE_CHAIN_ANGLE_SCORING("CA distance+Angle between sidechains"),
+		SEQUENCE_CONSERVATION("Sequence Conservation");
+		public static ScoringStrategy DEFAULT_SCORING_STRATEGY = CA_SCORING;
+
+		private String name;
+
+		private ScoringStrategy(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 
 }

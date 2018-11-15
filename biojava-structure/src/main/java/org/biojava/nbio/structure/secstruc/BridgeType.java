@@ -34,8 +34,7 @@ package org.biojava.nbio.structure.secstruc;
  */
 public enum BridgeType {
 
-	parallel("parallel", 'p'),
-	antiparallel("antiparallel", 'a');
+	parallel("parallel", 'p'), antiparallel("antiparallel", 'a');
 
 	public final Character type;
 	public final String name;
@@ -48,8 +47,9 @@ public enum BridgeType {
 	public static BridgeType fromCharacter(Character stype) {
 
 		for (BridgeType c : BridgeType.values()) {
-			if (c.type.equals(stype))
+			if (c.type.equals(stype)) {
 				return c;
+			}
 		}
 		return null;
 	}

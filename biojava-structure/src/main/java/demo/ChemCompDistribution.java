@@ -24,7 +24,7 @@ import org.biojava.nbio.structure.io.mmcif.DownloadChemCompProvider;
 
 public class ChemCompDistribution {
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		DownloadChemCompProvider c = new DownloadChemCompProvider();
 		c.setDownloadAll(true);

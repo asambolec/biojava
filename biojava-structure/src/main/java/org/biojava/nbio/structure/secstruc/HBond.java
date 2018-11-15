@@ -31,7 +31,7 @@ import java.io.Serializable;
 public class HBond implements Serializable {
 
 	private static final long serialVersionUID = 8246764841329431337L;
-	
+
 	private double energy;
 	private int partner;
 
@@ -52,7 +52,7 @@ public class HBond implements Serializable {
 
 	@Override
 	public String toString() {
-		return partner + " | " + (energy / 1000.0);
+		return new StringBuilder().append(partner).append(" | ").append(energy / 1000.0).toString();
 	}
 
 	public double getEnergy() {

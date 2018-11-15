@@ -30,10 +30,10 @@ public class StructureAtomLinkage {
 	private final StructureAtom atom2;
 	private final double distance;
 
-	public StructureAtomLinkage(final StructureAtom atom1,
-			final StructureAtom atom2, final double distance) {
-		if (atom1 == null || atom2 == null)
+	public StructureAtomLinkage(final StructureAtom atom1, final StructureAtom atom2, final double distance) {
+		if (atom1 == null || atom2 == null) {
 			throw new IllegalArgumentException("Null atom(s)");
+		}
 		this.atom1 = atom1;
 		this.atom2 = atom2;
 		this.distance = distance;
@@ -53,18 +53,22 @@ public class StructureAtomLinkage {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == this)
+		if (obj == this) {
 			return true;
+		}
 
-		if (!(obj instanceof StructureAtomLinkage))
+		if (!(obj instanceof StructureAtomLinkage)) {
 			return false;
+		}
 
 		StructureAtomLinkage aLink = (StructureAtomLinkage) obj;
-		if (aLink.atom1.equals(atom1) && aLink.atom2.equals(atom2))
+		if (aLink.atom1.equals(atom1) && aLink.atom2.equals(atom2)) {
 			return true;
+		}
 
-		if (aLink.atom1.equals(atom2) && aLink.atom2.equals(atom1))
+		if (aLink.atom1.equals(atom2) && aLink.atom2.equals(atom1)) {
 			return true;
+		}
 
 		return false;
 	}
@@ -78,8 +82,9 @@ public class StructureAtomLinkage {
 
 	@Override
 	public String toString() {
-		String dat =  atom1.toString() + "-" + atom2.toString() + " distance: " + String.format("%.2f",distance);
-		dat = dat.replaceAll("\t"," ");
+		String dat = new StringBuilder().append(atom1.toString()).append("-").append(atom2.toString())
+				.append(" distance: ").append(String.format("%.2f", distance)).toString();
+		dat = dat.replaceAll("\t", " ");
 		return dat;
 	}
 }

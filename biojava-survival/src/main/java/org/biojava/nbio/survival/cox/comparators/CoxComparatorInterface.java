@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.survival.cox.comparators;
 
-
 import org.biojava.nbio.survival.cox.CoxVariables;
 
 import java.util.Comparator;
@@ -31,7 +30,10 @@ import java.util.Comparator;
  */
 public interface CoxComparatorInterface extends Comparator<CoxVariables> {
 	public String getDescription();
+
 	public void setDescription(String description);
+
 	public String getModelVariables();
+
 	public String getSortVariable();
 }

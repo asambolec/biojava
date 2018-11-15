@@ -40,8 +40,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-
-/** Utility classes for the XML serialization and de-serialization of SCOP.
+/**
+ * Utility classes for the XML serialization and de-serialization of SCOP.
  *
  * @author Andreas Prlic
  * @since 3.0.2
@@ -52,8 +52,8 @@ public class XMLUtil {
 	static JAXBContext jaxbContextScopDescription;
 	static {
 		try {
-			jaxbContextScopDescription= JAXBContext.newInstance(ScopDescription.class);
-		} catch (JAXBException e){
+			jaxbContextScopDescription = JAXBContext.newInstance(ScopDescription.class);
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
@@ -61,8 +61,8 @@ public class XMLUtil {
 	static JAXBContext jaxbContextScopDomain;
 	static {
 		try {
-			jaxbContextScopDomain= JAXBContext.newInstance(ScopDomain.class);
-		} catch (JAXBException e){
+			jaxbContextScopDomain = JAXBContext.newInstance(ScopDomain.class);
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
@@ -70,8 +70,8 @@ public class XMLUtil {
 	static JAXBContext jaxbContextScopNode;
 	static {
 		try {
-			jaxbContextScopNode= JAXBContext.newInstance(ScopNode.class);
-		} catch (JAXBException e){
+			jaxbContextScopNode = JAXBContext.newInstance(ScopNode.class);
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
@@ -79,8 +79,8 @@ public class XMLUtil {
 	static JAXBContext jaxbContextDomains;
 	static {
 		try {
-			jaxbContextDomains= JAXBContext.newInstance(TreeSet.class);
-		} catch (JAXBException e){
+			jaxbContextDomains = JAXBContext.newInstance(TreeSet.class);
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
@@ -88,8 +88,8 @@ public class XMLUtil {
 	static JAXBContext jaxbContextStringSortedSet;
 	static {
 		try {
-			jaxbContextStringSortedSet= JAXBContext.newInstance(TreeSetStringWrapper.class);
-		} catch (JAXBException e){
+			jaxbContextStringSortedSet = JAXBContext.newInstance(TreeSetStringWrapper.class);
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
@@ -98,19 +98,18 @@ public class XMLUtil {
 	static {
 		try {
 			jaxbContextComments = JAXBContext.newInstance(ListStringWrapper.class);
-		} catch( JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not initialize JAXB context", e);
 		}
 	}
 
-
-	public static String getScopDescriptionXML(ScopDescription desc){
+	public static String getScopDescriptionXML(ScopDescription desc) {
 
 		return converScopDescription(desc);
 
 	}
 
-	public static ScopDescription getScopDescriptionFromXML(String xml){
+	public static ScopDescription getScopDescriptionFromXML(String xml) {
 
 		ScopDescription job = null;
 
@@ -122,7 +121,7 @@ public class XMLUtil {
 
 			job = (ScopDescription) un.unmarshal(bais);
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
@@ -140,17 +139,16 @@ public class XMLUtil {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( desc, ps);
+			m.marshal(desc, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
 		return baos.toString();
 	}
 
-	public static String getScopDescriptionsXML(List<ScopDescription> descriptions){
+	public static String getScopDescriptionsXML(List<ScopDescription> descriptions) {
 
 		ScopDescriptions container = new ScopDescriptions();
 		container.setScopDescription(descriptions);
@@ -159,9 +157,7 @@ public class XMLUtil {
 
 	}
 
-
-
-	public static String getCommentsXML(List<String> comments ){
+	public static String getCommentsXML(List<String> comments) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		PrintStream ps = new PrintStream(baos);
@@ -175,16 +171,16 @@ public class XMLUtil {
 			ListStringWrapper wrapper = new ListStringWrapper();
 			wrapper.setData(comments);
 
-			m.marshal( wrapper, ps);
+			m.marshal(wrapper, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
 		return baos.toString();
 	}
-	public static List<String> getCommentsFromXML(String xml){
+
+	public static List<String> getCommentsFromXML(String xml) {
 
 		List<String> comments = null;
 
@@ -197,15 +193,14 @@ public class XMLUtil {
 			ListStringWrapper wrapper = (ListStringWrapper) un.unmarshal(bais);
 			comments = wrapper.getData();
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
 		return comments;
 	}
 
-
-	public static String getScopNodeXML(ScopNode scopNode){
+	public static String getScopNodeXML(ScopNode scopNode) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		PrintStream ps = new PrintStream(baos);
@@ -216,17 +211,16 @@ public class XMLUtil {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( scopNode, ps);
+			m.marshal(scopNode, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
 		return baos.toString();
 	}
 
-	public static ScopNode getScopNodeFromXML(String xml){
+	public static ScopNode getScopNodeFromXML(String xml) {
 		ScopNode job = null;
 
 		try {
@@ -237,7 +231,7 @@ public class XMLUtil {
 
 			job = (ScopNode) un.unmarshal(bais);
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not parse from XML", e);
 		}
 
@@ -251,7 +245,7 @@ public class XMLUtil {
 		return container.toXML();
 	}
 
-	public static String getScopDomainXML(ScopDomain domain){
+	public static String getScopDomainXML(ScopDomain domain) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		PrintStream ps = new PrintStream(baos);
@@ -262,17 +256,16 @@ public class XMLUtil {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( domain, ps);
+			m.marshal(domain, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 
 		return baos.toString();
 	}
 
-	public static ScopDomain getScopDomainFromXML(String xml){
+	public static ScopDomain getScopDomainFromXML(String xml) {
 		ScopDomain job = null;
 
 		try {
@@ -283,7 +276,7 @@ public class XMLUtil {
 
 			job = (ScopDomain) un.unmarshal(bais);
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 
@@ -297,8 +290,7 @@ public class XMLUtil {
 		return container.toXML();
 	}
 
-
-	public static String getDomainsXML(SortedSet<Domain> domains){
+	public static String getDomainsXML(SortedSet<Domain> domains) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		PrintStream ps = new PrintStream(baos);
@@ -309,15 +301,15 @@ public class XMLUtil {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( domains, ps);
+			m.marshal(domains, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 
 		return baos.toString();
 	}
+
 	@SuppressWarnings("unchecked")
 	public static SortedSet<Domain> getDomainsFromXML(String xml) {
 
@@ -330,18 +322,18 @@ public class XMLUtil {
 
 			domains = (SortedSet<Domain>) un.unmarshal(bais);
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 
 		return domains;
 	}
 
-	public static String getDomainRangesXML(SortedSet<String> domainRanges){
-		if ( ! (domainRanges instanceof TreeSet)) {
+	public static String getDomainRangesXML(SortedSet<String> domainRanges) {
+		if (!(domainRanges instanceof TreeSet)) {
 			throw new IllegalArgumentException("SortedSet needs to be a TreeSet!");
 		}
-		TreeSet<String> data = (TreeSet<String>)domainRanges;
+		TreeSet<String> data = (TreeSet<String>) domainRanges;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		PrintStream ps = new PrintStream(baos);
@@ -353,17 +345,16 @@ public class XMLUtil {
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			TreeSetStringWrapper wrapper = new TreeSetStringWrapper();
 			wrapper.setData(data);
-			m.marshal( wrapper, ps);
+			m.marshal(wrapper, ps);
 
-
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 
 		return baos.toString();
 	}
 
-	public static SortedSet<String> getDomainRangesFromXML(String xml){
+	public static SortedSet<String> getDomainRangesFromXML(String xml) {
 		SortedSet<String> domains = null;
 		try {
 
@@ -374,7 +365,7 @@ public class XMLUtil {
 			TreeSetStringWrapper wrapper = (TreeSetStringWrapper) un.unmarshal(bais);
 			domains = wrapper.getData();
 
-		} catch (JAXBException e){
+		} catch (JAXBException e) {
 			throw new RuntimeException("Could not serialize to XML", e);
 		}
 

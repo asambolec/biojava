@@ -32,33 +32,29 @@ import java.net.URL;
 
 public class WebStartDBSearchResults {
 
-	public static void main(String[] argv){
+	public static void main(String[] argv) {
 
-		if (argv.length  == 0 ) {
+		if (argv.length == 0) {
 
-			JOptionPane.showMessageDialog(null,
-			"Not enough arguments!");
+			JOptionPane.showMessageDialog(null, "Not enough arguments!");
 			return;
 
-
-		} else if ( argv.length == 2){
-			String path =  argv[1];
+		} else if (argv.length == 2) {
+			String path = argv[1];
 
 			DBResultTable table = new DBResultTable();
 			UserConfiguration config = WebStartMain.getDefaultConfig();
 			try {
 				URL u = new URL(path);
 
-				//File f = new File(u.toURI());
+				// File f = new File(u.toURI());
 
-				table.show(u,config);
-			} catch (Exception e){
-				JOptionPane.showMessageDialog(null,
-						e.getMessage());
+				table.show(u, config);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
 				return;
 			}
 		}
-
 
 	}
 }

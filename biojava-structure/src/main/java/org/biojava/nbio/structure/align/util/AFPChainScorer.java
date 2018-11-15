@@ -24,7 +24,6 @@
 
 package org.biojava.nbio.structure.align.util;
 
-
 import javax.vecmath.Matrix4d;
 
 import org.biojava.nbio.structure.Atom;
@@ -39,33 +38,34 @@ public class AFPChainScorer {
 
 	private static final Logger logger = LoggerFactory.getLogger(AFPChainScorer.class);
 
-
-	public  static double getTMScore(AFPChain align, Atom[] ca1, Atom[] ca2) throws StructureException
-	{
+	public static double getTMScore(AFPChain align, Atom[] ca1, Atom[] ca2) throws StructureException {
 		return getTMScore(align, ca1, ca2, true);
 	}
 
-	public  static double getTMScore(AFPChain align, Atom[] ca1, Atom[] ca2, boolean normalizeMin) throws StructureException
-	{
-		if ( align.getNrEQR() == 0)
+	public static double getTMScore(AFPChain align, Atom[] ca1, Atom[] ca2, boolean normalizeMin)
+			throws StructureException {
+		if (align.getNrEQR() == 0) {
 			return -1;
-
+		}
 
 		// Create new arrays for the subset of atoms in the alignment.
 		Atom[] ca1aligned = new Atom[align.getOptLength()];
 		Atom[] ca2aligned = new Atom[align.getOptLength()];
-		int pos=0;
+		int pos = 0;
 		int[] blockLens = align.getOptLen();
 		int[][][] optAln = align.getOptAln();
-		assert(align.getBlockNum() <= optAln.length);
+		assert (align.getBlockNum() <= optAln.length);
 
-		for(int block=0;block< align.getBlockNum();block++) {
+		for (int block = 0; block < align.getBlockNum(); block++) {
 
-			if ( ! ( blockLens[block] <= optAln[block][0].length)) {
-				logger.warn("AFPChainScorer getTMScore: errors reconstructing alignment block [" + block + "]. Length is " + blockLens[block] + " but should be <=" + optAln[block][0].length);
+			if (!(blockLens[block] <= optAln[block][0].length)) {
+				logger.warn(
+						new StringBuilder().append("AFPChainScorer getTMScore: errors reconstructing alignment block [")
+								.append(block).append("]. Length is ").append(blockLens[block])
+								.append(" but should be <=").append(optAln[block][0].length).toString());
 			}
 
-			for(int i=0;i<blockLens[block];i++) {
+			for (int i = 0; i < blockLens[block]; i++) {
 				int pos1 = optAln[block][0][i];
 				int pos2 = optAln[block][1][i];
 				Atom a1 = ca1[pos1];
@@ -77,16 +77,18 @@ public class AFPChainScorer {
 			}
 		}
 
-		// this can happen when we load an old XML serialization which did not support modern ChemComp representation of modified residues.
-		if ( pos != align.getOptLength()){
-			logger.warn("AFPChainScorer getTMScore: Problems reconstructing alignment! nr of loaded atoms is " + pos + " but should be " + align.getOptLength());
+		// this can happen when we load an old XML serialization which did not support
+		// modern ChemComp representation of modified residues.
+		if (pos != align.getOptLength()) {
+			logger.warn(new StringBuilder()
+					.append("AFPChainScorer getTMScore: Problems reconstructing alignment! nr of loaded atoms is ")
+					.append(pos).append(" but should be ").append(align.getOptLength()).toString());
 			// we need to resize the array, because we allocated too many atoms earlier on.
 			ca1aligned = (Atom[]) resizeArray(ca1aligned, pos);
 			ca2aligned = (Atom[]) resizeArray(ca2aligned, pos);
 		}
-		//Superimpose
-		Matrix4d trans = SuperPositions.superpose(Calc.atomsToPoints(ca1aligned), 
-				Calc.atomsToPoints(ca2aligned));
+		// Superimpose
+		Matrix4d trans = SuperPositions.superpose(Calc.atomsToPoints(ca1aligned), Calc.atomsToPoints(ca2aligned));
 
 		Calc.transform(ca2aligned, trans);
 
@@ -94,21 +96,23 @@ public class AFPChainScorer {
 	}
 
 	/**
-	 * Reallocates an array with a new size, and copies the contents
-	 * of the old array to the new array.
-	 * @param oldArray  the old array, to be reallocated.
-	 * @param newSize   the new array size.
-	 * @return          A new array with the same contents.
+	 * Reallocates an array with a new size, and copies the contents of the old
+	 * array to the new array.
+	 * 
+	 * @param oldArray the old array, to be reallocated.
+	 * @param newSize  the new array size.
+	 * @return A new array with the same contents.
 	 */
-	private static Object resizeArray (Object oldArray, int newSize) {
+	private static Object resizeArray(Object oldArray, int newSize) {
 		int oldSize = java.lang.reflect.Array.getLength(oldArray);
 		@SuppressWarnings("rawtypes")
 		Class elementType = oldArray.getClass().getComponentType();
-		Object newArray = java.lang.reflect.Array.newInstance(
-				elementType,newSize);
-		int preserveLength = Math.min(oldSize,newSize);
-		if (preserveLength > 0)
-			System.arraycopy (oldArray,0,newArray,0,preserveLength);
-		return newArray; }
+		Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
+		int preserveLength = Math.min(oldSize, newSize);
+		if (preserveLength > 0) {
+			System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
+		}
+		return newArray;
+	}
 
 }

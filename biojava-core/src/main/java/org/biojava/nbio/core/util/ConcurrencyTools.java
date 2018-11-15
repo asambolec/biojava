@@ -29,8 +29,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.*;
 
 /**
- * Static utility to easily share a thread pool for concurrent/parallel/lazy execution.  To exit cleanly,
- * {@link #shutdown()} or {@link #shutdownAndAwaitTermination()} must be called after all tasks have been submitted.
+ * Static utility to easily share a thread pool for concurrent/parallel/lazy
+ * execution. To exit cleanly, {@link #shutdown()} or
+ * {@link #shutdownAndAwaitTermination()} must be called after all tasks have
+ * been submitted.
  *
  * @author Mark Chapman
  */
@@ -40,10 +42,12 @@ public class ConcurrencyTools {
 
 	private static ThreadPoolExecutor pool;
 	private static int tasks = 0;
-	private ConcurrencyTools() { }
+
+	private ConcurrencyTools() {
+	}
 
 	/**
-	 * Returns current shared thread pool.  Starts up a new pool, if necessary.
+	 * Returns current shared thread pool. Starts up a new pool, if necessary.
 	 *
 	 * @return shared thread pool
 	 */
@@ -55,7 +59,8 @@ public class ConcurrencyTools {
 	}
 
 	/**
-	 * Sets thread pool to reserve a given number of processor cores for foreground or other use.
+	 * Sets thread pool to reserve a given number of processor cores for foreground
+	 * or other use.
 	 *
 	 * @param cpus number of processor cores to reserve
 	 */
@@ -92,23 +97,23 @@ public class ConcurrencyTools {
 	 * @param threads number of threads in pool
 	 */
 	public static void setThreadPoolSize(int threads) {
-		setThreadPool(   new ThreadPoolExecutor(threads, threads,
-									  0L, TimeUnit.MILLISECONDS,
-									  new LinkedBlockingQueue<Runnable>()));
-
+		setThreadPool(new ThreadPoolExecutor(threads, threads, 0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>()));
 
 	}
 
 	/**
-	 * Sets thread pool to any given {@link ThreadPoolExecutor} to allow use of an alternative execution style.
+	 * Sets thread pool to any given {@link ThreadPoolExecutor} to allow use of an
+	 * alternative execution style.
 	 *
 	 * @param pool thread pool to share
 	 */
 	public static void setThreadPool(ThreadPoolExecutor pool) {
-		if (ConcurrencyTools.pool != pool) {
-			shutdown();
-			ConcurrencyTools.pool = pool;
+		if (ConcurrencyTools.pool == pool) {
+			return;
 		}
+		shutdown();
+		ConcurrencyTools.pool = pool;
 	}
 
 	/**
@@ -121,7 +126,8 @@ public class ConcurrencyTools {
 	}
 
 	/**
-	 * Closes the thread pool.  Waits 1 minute for a clean exit; if necessary, waits another minute for cancellation.
+	 * Closes the thread pool. Waits 1 minute for a clean exit; if necessary, waits
+	 * another minute for cancellation.
 	 */
 	public static void shutdownAndAwaitTermination() {
 		shutdown();
@@ -136,6 +142,7 @@ public class ConcurrencyTools {
 					}
 				}
 			} catch (InterruptedException ie) {
+				logger.error(ie.getMessage(), ie);
 				pool.shutdownNow(); // (re-)cancel if current thread also interrupted
 				Thread.currentThread().interrupt(); // preserve interrupt status
 			}
@@ -145,24 +152,25 @@ public class ConcurrencyTools {
 	/**
 	 * Queues up a task and adds a log entry.
 	 *
-	 * @param <T> type returned from the submitted task
-	 * @param task submitted task
+	 * @param         <T> type returned from the submitted task
+	 * @param task    submitted task
 	 * @param message logged message
 	 * @return future on which the desired value is retrieved by calling get()
 	 */
-	public static<T> Future<T> submit(Callable<T> task, String message) {
-		logger.debug("Task " + (++tasks) + " submitted to shared thread pool. " + message);
+	public static <T> Future<T> submit(Callable<T> task, String message) {
+		logger.debug(new StringBuilder().append("Task ").append(++tasks).append(" submitted to shared thread pool. ")
+				.append(message).toString());
 		return getThreadPool().submit(task);
 	}
 
 	/**
 	 * Queues up a task and adds a default log entry.
 	 *
-	 * @param <T> type returned from the submitted task
+	 * @param      <T> type returned from the submitted task
 	 * @param task submitted task
 	 * @return future on which the desired value is retrieved by calling get()
 	 */
-	public static<T> Future<T> submit(Callable<T> task) {
+	public static <T> Future<T> submit(Callable<T> task) {
 		return submit(task, "");
 	}
 

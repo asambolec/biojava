@@ -35,6 +35,7 @@ import org.biojava.nbio.structure.align.ce.CeParameters;
  */
 public class CESymmParameters extends CeParameters {
 
+	public static final double DEFAULT_SYMMETRY_THRESHOLD = 0.4;
 	private int maxSymmOrder;
 	private int userOrder;
 	private SymmetryType symmType;
@@ -51,45 +52,10 @@ public class CESymmParameters extends CeParameters {
 	private boolean gaps;
 	private int optimizationSteps;
 
-	public static enum OrderDetectorMethod {
-		SEQUENCE_FUNCTION, GRAPH_COMPONENT, ANGLE, USER_INPUT;
-		public static final OrderDetectorMethod DEFAULT = SEQUENCE_FUNCTION;
-	}
-
-	public static enum RefineMethod {
-		NOT_REFINED, SEQUENCE_FUNCTION, GRAPH_COMPONENT;
-		public static final RefineMethod DEFAULT = SEQUENCE_FUNCTION;
-	}
-
-	public static final double DEFAULT_SYMMETRY_THRESHOLD = 0.4;
-
-	/**
-	 * The internal symmetry detection can be divided into two types: CLOSE:
-	 * includes the circular and dihedral symmetries, and OPEN: includes the
-	 * helical and protein repeats symmetries.
-	 * <p>
-	 * All internal symmetry cases share one property: all the repeats have the
-	 * same 3D transformation.
-	 * <p>
-	 * AUTO option automatically identifies the type. The criterion for
-	 * classification is that the CLOSE symmetry generates CeSymm alignments
-	 * with circular permutations (2 blocks in AFPChain), whereas the OPEN
-	 * symmetry generates alignments without a CP (only one block in AFPChain).
-	 */
-	public enum SymmetryType {
-		CLOSED, OPEN, AUTO;
-		public static final SymmetryType DEFAULT = AUTO;
-	}
-
 	public CESymmParameters() {
 		reset();
 	}
 
-	@Override
-	public CESymmParameters clone() {
-		return new CESymmParameters(this);
-	}
-	
 	public CESymmParameters(CESymmParameters o) {
 		this.maxSymmOrder = o.maxSymmOrder;
 		this.symmType = o.symmType;
@@ -123,6 +89,11 @@ public class CESymmParameters extends CeParameters {
 	}
 
 	@Override
+	public CESymmParameters clone() {
+		return new CESymmParameters(this);
+	}
+
+	@Override
 	public void reset() {
 		super.reset();
 		maxSymmOrder = 8;
@@ -150,10 +121,9 @@ public class CESymmParameters extends CeParameters {
 		params.add("Sets the maximum order of symmetry of the protein.");
 
 		// userOrder help explanation
-		params.add("Order of symmetry determined by the user. "
-				+ "Use it with the USER_INPUT order option. Imposes an order"
-				+ " of symmetry to the alignment. If 0 the order is set "
-				+ "automatically.");
+		params.add(new StringBuilder().append("Order of symmetry determined by the user. ")
+				.append("Use it with the USER_INPUT order option. Imposes an order")
+				.append(" of symmetry to the alignment. If 0 the order is set ").append("automatically.").toString());
 
 		StringBuilder symmTypes = new StringBuilder("Type of Symmetry: ");
 		SymmetryType[] vals = SymmetryType.values();
@@ -200,38 +170,35 @@ public class CESymmParameters extends CeParameters {
 		// optimization help explanation
 		params.add("Optimize the refined alignment if true.");
 		// seed help explanation
-		params.add("Random seed for the Monte Carlo optimization, "
-				+ "for reproducibility of results.");
+		params.add("Random seed for the Monte Carlo optimization, " + "for reproducibility of results.");
 		// symmetry levels
-		params.add("Specify the maximum number of symmetry levels to explore "
-				+ "recursively. If equal to 1, only C and H symmetries can be "
-				+ "found. If equal to 2, D and two-level hierarchical C and H "
-				+ "can be found, etc. If equal to 0, the number of recursive "
-				+ "iterations is unbounded (until thresholds reached).");
+		params.add(new StringBuilder().append("Specify the maximum number of symmetry levels to explore ")
+				.append("recursively. If equal to 1, only C and H symmetries can be ")
+				.append("found. If equal to 2, D and two-level hierarchical C and H ")
+				.append("can be found, etc. If equal to 0, the number of recursive ")
+				.append("iterations is unbounded (until thresholds reached).").toString());
 		// unrefined score threshold
-		params.add("Unrefined score threshold: TM-score values for the optimal"
-				+ " self-alignment, before refinement, below the "
-				+ "threshold will be considered asymmetric.");
+		params.add(new StringBuilder().append("Unrefined score threshold: TM-score values for the optimal")
+				.append(" self-alignment, before refinement, below the ")
+				.append("threshold will be considered asymmetric.").toString());
 		// refined score threshold
-		params.add("Refined score threshold: TM-score values for the refined "
-				+ "multiple alignment of repeats below the "
-				+ "threshold will be considered asymmetric.");
+		params.add(new StringBuilder().append("Refined score threshold: TM-score values for the refined ")
+				.append("multiple alignment of repeats below the ").append("threshold will be considered asymmetric.")
+				.toString());
 		// SSE threshold
-		params.add("SSE threshold: The minimum number of secondary structure "
-				+ "elements (strands or helices) in each symmetrical repeat. "
-				+ "If the repeats do not have enough SSE, the structure will "
-				+ "be considered asymmetric. 0 means no restriction.");
+		params.add(new StringBuilder().append("SSE threshold: The minimum number of secondary structure ")
+				.append("elements (strands or helices) in each symmetrical repeat. ")
+				.append("If the repeats do not have enough SSE, the structure will ")
+				.append("be considered asymmetric. 0 means no restriction.").toString());
 		// min core repeat length
-		params.add("Minimum core length: the minimum number of non-gapped "
-				+ "residues in every symmetric repeat.");
+		params.add("Minimum core length: the minimum number of non-gapped " + "residues in every symmetric repeat.");
 		// distance cutoff
-		params.add("Distance Cutoff: the maximum allowed distance (in A) "
-				+ "between two aligned residues.");
+		params.add("Distance Cutoff: the maximum allowed distance (in A) " + "between two aligned residues.");
 
 		// gaps
-		params.add("Internal Gaps: allow up to 50% of repeats to have gaps in "
-				+ "the multiple alignment if true, "
-				+ "otherwise all repeats must be aligned at each position.");
+		params.add(new StringBuilder().append("Internal Gaps: allow up to 50% of repeats to have gaps in ")
+				.append("the multiple alignment if true, ")
+				.append("otherwise all repeats must be aligned at each position.").toString());
 
 		// optimization steps
 		params.add("Optimization Steps: maximum number of optimization steps:"
@@ -384,7 +351,7 @@ public class CESymmParameters extends CeParameters {
 	public void setUnrefinedScoreThreshold(Double unrefinedScoreThreshold) {
 		this.unrefinedScoreThreshold = unrefinedScoreThreshold;
 	}
-	
+
 	public double getRefinedScoreThreshold() {
 		return refinedScoreThreshold;
 	}
@@ -435,17 +402,42 @@ public class CESymmParameters extends CeParameters {
 
 	@Override
 	public String toString() {
-		return "CESymmParameters [maxSymmOrder=" + maxSymmOrder
-				+ ", userOrder=" + userOrder + ", symmType=" + symmType
-				+ ", orderDetectorMethod=" + orderDetectorMethod
-				+ ", refineMethod=" + refineMethod + ", optimization="
-				+ optimization + ", rndSeed=" + rndSeed + ", symmLevels="
-				+ symmLevels + ", unrefinedScoreThreshold="
-				+ unrefinedScoreThreshold + ", refinedScoreThreshold="
-				+ refinedScoreThreshold + ", sseThreshold=" + sseThreshold
-				+ ", minCoreLength=" + minCoreLength + ", distanceCutoff="
-				+ distanceCutoff + ", gaps=" + gaps + ", optimizationSteps="
-				+ optimizationSteps + "]";
+		return new StringBuilder().append("CESymmParameters [maxSymmOrder=").append(maxSymmOrder).append(", userOrder=")
+				.append(userOrder).append(", symmType=").append(symmType).append(", orderDetectorMethod=")
+				.append(orderDetectorMethod).append(", refineMethod=").append(refineMethod).append(", optimization=")
+				.append(optimization).append(", rndSeed=").append(rndSeed).append(", symmLevels=").append(symmLevels)
+				.append(", unrefinedScoreThreshold=").append(unrefinedScoreThreshold).append(", refinedScoreThreshold=")
+				.append(refinedScoreThreshold).append(", sseThreshold=").append(sseThreshold).append(", minCoreLength=")
+				.append(minCoreLength).append(", distanceCutoff=").append(distanceCutoff).append(", gaps=").append(gaps)
+				.append(", optimizationSteps=").append(optimizationSteps).append("]").toString();
+	}
+
+	public static enum OrderDetectorMethod {
+		SEQUENCE_FUNCTION, GRAPH_COMPONENT, ANGLE, USER_INPUT;
+		public static final OrderDetectorMethod DEFAULT = SEQUENCE_FUNCTION;
+	}
+
+	public static enum RefineMethod {
+		NOT_REFINED, SEQUENCE_FUNCTION, GRAPH_COMPONENT;
+		public static final RefineMethod DEFAULT = SEQUENCE_FUNCTION;
+	}
+
+	/**
+	 * The internal symmetry detection can be divided into two types: CLOSE:
+	 * includes the circular and dihedral symmetries, and OPEN: includes the helical
+	 * and protein repeats symmetries.
+	 * <p>
+	 * All internal symmetry cases share one property: all the repeats have the same
+	 * 3D transformation.
+	 * <p>
+	 * AUTO option automatically identifies the type. The criterion for
+	 * classification is that the CLOSE symmetry generates CeSymm alignments with
+	 * circular permutations (2 blocks in AFPChain), whereas the OPEN symmetry
+	 * generates alignments without a CP (only one block in AFPChain).
+	 */
+	public enum SymmetryType {
+		CLOSED, OPEN, AUTO;
+		public static final SymmetryType DEFAULT = AUTO;
 	}
 
 }

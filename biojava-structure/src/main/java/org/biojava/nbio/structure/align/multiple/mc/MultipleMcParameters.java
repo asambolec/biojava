@@ -47,14 +47,14 @@ public class MultipleMcParameters implements ConfigStrucAligParams {
 	/**
 	 * Constructor with DEFAULT values of the parameters.
 	 */
-	public MultipleMcParameters(){
+	public MultipleMcParameters() {
 		reset();
 	}
 
 	@Override
 	public List<String> getUserConfigParameters() {
 
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		params.add("RandomSeed");
 		params.add("MinBlockLen");
 		params.add("MinAlignedStructures");
@@ -69,7 +69,7 @@ public class MultipleMcParameters implements ConfigStrucAligParams {
 	@Override
 	public List<String> getUserConfigParameterNames() {
 
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		params.add("Random Seed");
 		params.add("Minimum Block Length");
 		params.add("Minimum Structures per Column");
@@ -85,7 +85,7 @@ public class MultipleMcParameters implements ConfigStrucAligParams {
 	@SuppressWarnings("rawtypes")
 	public List<Class> getUserConfigTypes() {
 
-		List<Class> params = new ArrayList<Class>();
+		List<Class> params = new ArrayList<>();
 		params.add(Integer.class);
 		params.add(Integer.class);
 		params.add(Integer.class);
@@ -100,28 +100,22 @@ public class MultipleMcParameters implements ConfigStrucAligParams {
 	@Override
 	public List<String> getUserConfigHelp() {
 
-		List<String> params =new ArrayList<String>();
-		String randomSeed =
-				"Random seed for the optimizer random number generator.";
-		String minBlockLen =
-				"Minimum number of aligned positions in a Block of the "
-				+ "Multiple Alignment.";
-		String minAlignedStructures =
-				"Minimum number of structures aligned in a column (without "
-				+ "gaps). If it is 0 the minimum is calculated as a third of "
-				+ "the total number of structures.";
+		List<String> params = new ArrayList<>();
+		String randomSeed = "Random seed for the optimizer random number generator.";
+		String minBlockLen = "Minimum number of aligned positions in a Block of the " + "Multiple Alignment.";
+		String minAlignedStructures = new StringBuilder()
+				.append("Minimum number of structures aligned in a column (without ")
+				.append("gaps). If it is 0 the minimum is calculated as a third of ")
+				.append("the total number of structures.").toString();
 		String gapOpen = "Penalty for opening a gap in any of the structures.";
-		String gapExtension = "Penalty for extending a gapped region in any of"
-				+ " the structures.";
-		String dCutoff = "Distance Cutoff: the maximum allowed distance (in A) "
-				+ "between two aligned residues.";
-		String convergenceSteps =
-				"Number of steps without a change in the alignment before "
-				+ "stopping. Proportional to the calculation time. "
-				+"If it is 0 the convergence steps are calculated proportional"
-				+ " to the number of structures and their length.";
-		String nrThreads =
-				"Number of threads to be used for the seed calculation (all-"
+		String gapExtension = "Penalty for extending a gapped region in any of" + " the structures.";
+		String dCutoff = "Distance Cutoff: the maximum allowed distance (in A) " + "between two aligned residues.";
+		String convergenceSteps = new StringBuilder()
+				.append("Number of steps without a change in the alignment before ")
+				.append("stopping. Proportional to the calculation time. ")
+				.append("If it is 0 the convergence steps are calculated proportional")
+				.append(" to the number of structures and their length.").toString();
+		String nrThreads = "Number of threads to be used for the seed calculation (all-"
 				+ "to-all pairwise alignments) and the MC optimization.";
 
 		params.add(randomSeed);
@@ -137,12 +131,11 @@ public class MultipleMcParameters implements ConfigStrucAligParams {
 
 	@Override
 	public String toString() {
-		return "MultipleMcParameters [randomSeed=" + randomSeed
-				+ ", minBlockLen=" + minBlockLen + ", minAlignedStructures="
-				+ minAlignedStructures + ", gapOpen=" + gapOpen
-				+ ", gapExtension=" + gapExtension + ", distanceCutoff="
-				+ distanceCutoff + ", convergenceSteps=" + convergenceSteps
-				+ ", nrThreads=" + nrThreads + "]";
+		return new StringBuilder().append("MultipleMcParameters [randomSeed=").append(randomSeed)
+				.append(", minBlockLen=").append(minBlockLen).append(", minAlignedStructures=")
+				.append(minAlignedStructures).append(", gapOpen=").append(gapOpen).append(", gapExtension=")
+				.append(gapExtension).append(", distanceCutoff=").append(distanceCutoff).append(", convergenceSteps=")
+				.append(convergenceSteps).append(", nrThreads=").append(nrThreads).append("]").toString();
 	}
 
 	@Override

@@ -21,15 +21,14 @@
 package org.biojava.nbio.structure.quaternary;
 
 /**
- * An ordered pair represents a component of a cartesian product. The cartesian product
- * of two sets A and B is the set of all ordered pairs of the elements of both sets.
+ * An ordered pair represents a component of a cartesian product. The cartesian
+ * product of two sets A and B is the set of all ordered pairs of the elements
+ * of both sets.
  *
  * See http://en.wikipedia.org/wiki/Cartesian_product for more details.
  *
- * Example:
- *  A = {1, 2, 3}
- *  B = {4, 5}
- *  The ordered pairs are {1, 4}, {1, 5}, {2, 4}, .., {3, 5}
+ * Example: A = {1, 2, 3} B = {4, 5} The ordered pairs are {1, 4}, {1, 5}, {2,
+ * 4}, .., {3, 5}
  *
  * @author Peter Rose
  *
@@ -81,7 +80,7 @@ public class OrderedPair<T> {
 
 	@Override
 	public String toString() {
-		return "[" + element1.toString() + "," +
-		element2.toString() + "]";
+		return new StringBuilder().append("[").append(element1.toString()).append(",").append(element2.toString())
+				.append("]").toString();
 	}
 }

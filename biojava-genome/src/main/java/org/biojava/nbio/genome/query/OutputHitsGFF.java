@@ -39,7 +39,8 @@ public class OutputHitsGFF {
 
 	private static final Logger logger = LoggerFactory.getLogger(OutputHitsGFF.class);
 
-	public void process(File blastXMLFile, File gffFile, File gffOutputFile, double maxEScore, double percentageAligned, boolean includeFrameShift, boolean includeNegativeStrand) throws Exception {
+	public void process(File blastXMLFile, File gffFile, File gffOutputFile, double maxEScore, double percentageAligned,
+			boolean includeFrameShift, boolean includeNegativeStrand) throws Exception {
 		BlastXMLQuery blastXMLQuery = new BlastXMLQuery(blastXMLFile.getAbsolutePath());
 		LinkedHashMap<String, ArrayList<String>> hits = blastXMLQuery.getHitsQueryDef(maxEScore);
 		FeatureList listGenes = GeneMarkGTFReader.read(gffFile.getAbsolutePath());
@@ -56,31 +57,29 @@ public class OutputHitsGFF {
 				if (!includeFrameShift) {
 					boolean frameShift = false;
 					FeatureList cdsList = gene.selectByType("CDS");
-					for(FeatureI cdsFeature : cdsList){
-						int frame = ((Feature)cdsFeature).frame();
-						if(frame != 0){
+					for (FeatureI cdsFeature : cdsList) {
+						int frame = ((Feature) cdsFeature).frame();
+						if (frame != 0) {
 							frameShift = true;
 							break;
 						}
 					}
-					if(frameShift)
+					if (frameShift) {
 						continue;
+					}
 				}
 				hitGenes.add(geneFeature);
 			}
 		}
 
-	//    GeneMarkGTFReader.write(hitGenes, gffOutputFile.getAbsolutePath());
+		// GeneMarkGTFReader.write(hitGenes, gffOutputFile.getAbsolutePath());
 	}
 
-
-		public static void main(String[] args) {
+	public static void main(String[] args) {
 		try {
 			OutputHitsGFF outputHitsGFF = new OutputHitsGFF();
-			outputHitsGFF.process(new File("hits-uniprot_fungi.xml"),
-					new File("genemark_hmm.gtf"),
+			outputHitsGFF.process(new File("hits-uniprot_fungi.xml"), new File("genemark_hmm.gtf"),
 					new File("genemark_hits_hmm.gtf"), 0, 100, true, true);
-
 
 		} catch (Exception e) {
 			logger.error("Execution: ", e);

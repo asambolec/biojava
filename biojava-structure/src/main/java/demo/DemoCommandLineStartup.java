@@ -26,8 +26,7 @@ package demo;
 
 import org.biojava.nbio.structure.align.ce.CeMain;
 
-public class DemoCommandLineStartup
-{
+public class DemoCommandLineStartup {
 
 	public static void main(String[] arg) throws Exception {
 

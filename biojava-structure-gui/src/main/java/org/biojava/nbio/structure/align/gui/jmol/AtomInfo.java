@@ -24,33 +24,34 @@ package org.biojava.nbio.structure.align.gui.jmol;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** This class uniquely describes an atom
+/**
+ * This class uniquely describes an atom
  *
  * @author Andreas Prlic
  *
  */
 public class AtomInfo {
 
-	String chainId;
-	String atomName;
-
-	String residueName;
-	String residueNumber;
-	int modelNumber;
-
-	private static Pattern inscodePatter ;
+	private static final Logger logger = LoggerFactory.getLogger(AtomInfo.class);
+	private static Pattern inscodePatter;
 	static {
 		inscodePatter = Pattern.compile("([0-9]+)([a-zA-Z]*)?");
 	}
 
+	String chainId;
+	String atomName;
+	String residueName;
+	String residueNumber;
+	int modelNumber;
+
 	public AtomInfo() {
-		super();
 
 	}
 
-	public static AtomInfo fromString(String atomInfo){
+	public static AtomInfo fromString(String atomInfo) {
 		return AtomInfoParser.parse(atomInfo);
 	}
 
@@ -66,7 +67,8 @@ public class AtomInfo {
 		return residueName;
 	}
 
-	/** Including insertion code
+	/**
+	 * Including insertion code
 	 *
 	 * @param residueName
 	 */
@@ -86,19 +88,13 @@ public class AtomInfo {
 		return chainId;
 	}
 
-
-
 	public void setChainId(String chainId) {
 		this.chainId = chainId;
 	}
 
-
-
 	public String getAtomName() {
 		return atomName;
 	}
-
-
 
 	public void setAtomName(String name) {
 		this.atomName = name;
@@ -109,35 +105,35 @@ public class AtomInfo {
 		String aa3 = "";
 		boolean printResName = true;
 
-		String chain1 ="";
+		String chain1 = "";
 		String res1 = "";
 
 		aa3 = residueName;
 		res1 = residueNumber;
 		chain1 = chainId;
 
-		StringBuffer buf = new StringBuffer();
-		if ( printResName) {
-			if ( !aa3.equals("")){
+		StringBuilder buf = new StringBuilder();
+		if (printResName) {
+			if (!"".equals(aa3)) {
 				buf.append("[");
 				buf.append(aa3);
 				buf.append("]");
 			}
 		}
-		if ( ! res1.equals("")) {
+		if (!"".equals(res1)) {
 
 			// let's check if there is an insertion code...
 			Matcher matcher = inscodePatter.matcher(res1);
 
 			boolean found = matcher.find();
-			if ( ! found) {
-				System.err.println("JmolTools: could not parse the residue number string " + res1);
+			if (!found) {
+				logger.error("JmolTools: could not parse the residue number string " + res1);
 				buf.append(res1);
 			} else {
 				String residueNumber = matcher.group(1);
 				String insCode = matcher.group(2);
 				buf.append(residueNumber);
-				if ( insCode != null && ! ( insCode.equals(""))) {
+				if (insCode != null && !("".equals(insCode))) {
 					buf.append("^");
 					buf.append(insCode);
 				}
@@ -145,23 +141,20 @@ public class AtomInfo {
 
 		}
 
-		if ( ! chain1.equals("")){
+		if (!"".equals(chain1)) {
 			buf.append(":");
 			buf.append(chain1);
 		}
 
-		if ( atomName != null) {
+		if (atomName != null) {
 			buf.append(".");
 			buf.append(atomName);
 		}
-		if ( modelNumber > 0) {
+		if (modelNumber > 0) {
 			buf.append("/");
 			buf.append(modelNumber);
 		}
 		return buf.toString();
 	}
-
-
-
 
 }

@@ -21,7 +21,6 @@
 
 package org.biojava.nbio.structure;
 
-
 /**
  * An exception during the parsing of a PDB file.
  *
@@ -34,31 +33,32 @@ package org.biojava.nbio.structure;
 public class StructureException extends Exception {
 
 	public static final long serialVersionUID = 62946250941673093l;
+
 	/**
 	 * Constructs a StructureException object.
 	 *
-	 * @param s  a String ...
+	 * @param s a String ...
 	 */
 	public StructureException(String s) {
-	super(s);
+		super(s);
 	}
 
 	/**
 	 * Constructs a StructureException object.
 	 *
-	 * @param t  a Throwable object
-	 * @param message  a String ...
+	 * @param t       a Throwable object
+	 * @param message a String ...
 	 */
-	public StructureException(String message, Throwable t){
+	public StructureException(String message, Throwable t) {
 		super(message, t);
 	}
 
 	/**
 	 * Constructs a StructureException object.
 	 *
-	 * @param t  a Throwable object
+	 * @param t a Throwable object
 	 */
-	public StructureException (Throwable t) {
-	super(t);
+	public StructureException(Throwable t) {
+		super(t);
 	}
 }

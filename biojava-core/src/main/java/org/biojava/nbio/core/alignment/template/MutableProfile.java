@@ -31,12 +31,14 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 import java.util.List;
 
 /**
- * Defines a mutable (editable) data structure for a {@link Profile}.  Returned {@link List}s are modifiable.
+ * Defines a mutable (editable) data structure for a {@link Profile}. Returned
+ * {@link List}s are modifiable.
  *
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public interface MutableProfile<S extends Sequence<C>, C extends Compound> extends Profile<S, C> {
 

@@ -21,9 +21,9 @@
  */
 package org.biojava.nbio.core.sequence.template;
 
-
 /**
  * The details of a Compound
+ * 
  * @author Andy Yates
  */
 public abstract class AbstractCompound implements Compound {
@@ -35,9 +35,8 @@ public abstract class AbstractCompound implements Compound {
 	private String description = null;
 	private Float molecularWeight = null;
 
-
 	// Added an empty constructor for Serialization
-	public AbstractCompound(){
+	public AbstractCompound() {
 		this.base = null;
 		this.upperedBase = null;
 	}
@@ -56,42 +55,42 @@ public abstract class AbstractCompound implements Compound {
 	}
 
 	@Override
-public String getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
 	@Override
-public void setDescription(String description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	@Override
-public String getShortName() {
+	public String getShortName() {
 		return shortName;
 	}
 
 	@Override
-public void setShortName(String shortName) {
+	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
 
 	@Override
-public String getLongName() {
+	public String getLongName() {
 		return longName;
 	}
 
 	@Override
-public void setLongName(String longName) {
+	public void setLongName(String longName) {
 		this.longName = longName;
 	}
 
 	@Override
-public Float getMolecularWeight() {
+	public Float getMolecularWeight() {
 		return molecularWeight;
 	}
 
 	@Override
-public void setMolecularWeight(Float molecularWeight) {
+	public void setMolecularWeight(Float molecularWeight) {
 		this.molecularWeight = molecularWeight;
 	}
 

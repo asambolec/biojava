@@ -34,25 +34,22 @@ import org.biojava.nbio.structure.align.fatcat.calc.FatCatParameters;
 import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.util.ConfigurationException;
 
-
-public class FatCat
-{
+public class FatCat {
 
 	/**
-	 *  version history:
-	 *  1.1 - Added more parameters to the command line
-	 *  1.0 - Initial version
+	 * version history: 1.1 - Added more parameters to the command line 1.0 -
+	 * Initial version
 	 */
 	public static final String VERSION = "1.1";
 
 	public static String newline = System.getProperty("line.separator");
 
-	FatCatAligner aligner;
-
 	public static final String algorithmName = "jFatCat";
 
+	FatCatAligner aligner;
 
-	/** See demo/FatCatDemo.java for an example how to run.
+	/**
+	 * See demo/FatCatDemo.java for an example how to run.
 	 *
 	 * Launch FatCat from command line.
 	 *
@@ -66,34 +63,33 @@ public class FatCat
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return "JFatCat v. " + VERSION;
 	}
 
-
-	public AFPChain alignRigid(Atom[] ca1, Atom[] ca2) throws StructureException{
+	public AFPChain alignRigid(Atom[] ca1, Atom[] ca2) throws StructureException {
 		StructureAlignment fatCat = new FatCatRigid();
-		return fatCat.align(ca1,ca2);
+		return fatCat.align(ca1, ca2);
 	}
 
-	public AFPChain alignRigid(Atom[] ca1, Atom[] ca2, FatCatParameters params) throws StructureException{
+	public AFPChain alignRigid(Atom[] ca1, Atom[] ca2, FatCatParameters params) throws StructureException {
 
-		AFPChain afpChain = align(ca1,ca2,params,true);
+		AFPChain afpChain = align(ca1, ca2, params, true);
 		afpChain.setAlgorithmName(FatCatRigid.algorithmName);
-		afpChain.setVersion(VERSION+"");
+		afpChain.setVersion(VERSION + "");
 		return afpChain;
 	}
 
-	public AFPChain alignFlexible(Atom[] ca1, Atom[] ca2, FatCatParameters params) throws StructureException{
+	public AFPChain alignFlexible(Atom[] ca1, Atom[] ca2, FatCatParameters params) throws StructureException {
 
-		AFPChain afpChain = align(ca1,ca2,params,false);
+		AFPChain afpChain = align(ca1, ca2, params, false);
 		afpChain.setAlgorithmName(FatCatFlexible.algorithmName);
-		afpChain.setVersion(VERSION+"");
+		afpChain.setVersion(VERSION + "");
 		return afpChain;
 	}
 
-
-	protected AFPChain align(Atom[] ca1, Atom[] ca2, FatCatParameters params, boolean doRigid) throws StructureException{
+	protected AFPChain align(Atom[] ca1, Atom[] ca2, FatCatParameters params, boolean doRigid)
+			throws StructureException {
 
 		aligner = new FatCatAligner();
 
@@ -101,12 +97,12 @@ public class FatCat
 
 		return aligner.getAfpChain();
 
-
 	}
 
-	public FatCatAligner getFatCatAligner(){
-		if ( aligner == null)
+	public FatCatAligner getFatCatAligner() {
+		if (aligner == null) {
 			aligner = new FatCatAligner();
+		}
 		return aligner;
 	}
 

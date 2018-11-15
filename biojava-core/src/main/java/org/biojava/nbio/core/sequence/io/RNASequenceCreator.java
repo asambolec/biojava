@@ -37,48 +37,51 @@ import java.util.List;
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
-public class RNASequenceCreator implements
-		SequenceCreatorInterface<NucleotideCompound> {
+public class RNASequenceCreator implements SequenceCreatorInterface<NucleotideCompound> {
 
 	private final CompoundSet<NucleotideCompound> compoundSet;
-/**
- *
- * @param compoundSet
- */
+
+	/**
+	 *
+	 * @param compoundSet
+	 */
 	public RNASequenceCreator(CompoundSet<NucleotideCompound> compoundSet) {
 		this.compoundSet = compoundSet;
 	}
-/**
- *
- * @param sequence
- * @param index
- * @return
- * @throws CompoundNotFoundException
- */
+
+	/**
+	 *
+	 * @param sequence
+	 * @param index
+	 * @return
+	 * @throws CompoundNotFoundException
+	 */
 	@Override
-public AbstractSequence<NucleotideCompound> getSequence(String sequence, long index) throws CompoundNotFoundException {
+	public AbstractSequence<NucleotideCompound> getSequence(String sequence, long index)
+			throws CompoundNotFoundException {
 		return new RNASequence(sequence, compoundSet);
 	}
-/**
- *
- * @param proxyLoader
- * @param index
- * @return
- */
+
+	/**
+	 *
+	 * @param proxyLoader
+	 * @param index
+	 * @return
+	 */
 	@Override
-public AbstractSequence<NucleotideCompound> getSequence(
-			ProxySequenceReader<NucleotideCompound> proxyLoader, long index) {
+	public AbstractSequence<NucleotideCompound> getSequence(ProxySequenceReader<NucleotideCompound> proxyLoader,
+			long index) {
 		return new RNASequence(proxyLoader, compoundSet);
 	}
-/**
- *
- * @param list
- * @return
- */
+
+	/**
+	 *
+	 * @param list
+	 * @return
+	 */
 	@Override
-public AbstractSequence<NucleotideCompound> getSequence(List<NucleotideCompound> list) {
-		ArrayListProxySequenceReader<NucleotideCompound> store =
-			new ArrayListProxySequenceReader<NucleotideCompound>();
+	public AbstractSequence<NucleotideCompound> getSequence(List<NucleotideCompound> list) {
+		ArrayListProxySequenceReader<NucleotideCompound> store = new ArrayListProxySequenceReader<>();
 		store.setCompoundSet(compoundSet);
 		store.setContents(list);
 		return new RNASequence(store);

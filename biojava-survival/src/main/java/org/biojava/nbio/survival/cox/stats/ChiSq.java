@@ -44,24 +44,22 @@ public class ChiSq {
 	public static double chiSq(double x, int n) {
 		double p = Math.exp(-0.5 * x);
 		if ((n % 2) == 1) {
-			p = p * Math.sqrt(2 * x / Math.PI);
+			p *= Math.sqrt(2 * x / Math.PI);
 		}
 		double k = n;
 		while (k >= 2) {
 			p = p * x / k;
-			k = k - 2;
+			k -= 2;
 		}
 		double t = p;
 		double a = n;
 		while (t > 0.000001 * p) {
-			a = a + 2;
+			a += 2;
 			t = t * x / a;
-			p = p + t;
+			p += t;
 		}
 		return 1 - p;
 	}
-
-
 
 	/**
 	 * @param args the command line arguments

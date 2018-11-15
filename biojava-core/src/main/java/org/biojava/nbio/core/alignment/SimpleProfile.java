@@ -41,45 +41,27 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 import java.io.Serializable;
 import java.util.*;
 
-
 /**
- * Implements a data structure for the results of sequence alignment.  Every {@link List} returned is unmodifiable.
+ * Implements a data structure for the results of sequence alignment. Every
+ * {@link List} returned is unmodifiable.
  *
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements Serializable, Profile<S, C> {
 
-
 	private static final long serialVersionUID = 1L;
 
-	private List<AlignedSequence<S, C>> list;
-	private List<S> originals;
-	private int length;
+	protected static final SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum65();
 
-	/**
-	 * Creates a pair profile for the given already aligned sequences.
-	 *
-	 * @param query the first sequence of the pair
-	 * @param target the second sequence of the pair
-	 * @throws IllegalArgumentException if sequences differ in size
-	 */
-	protected SimpleProfile(AlignedSequence<S, C> query, AlignedSequence<S, C> target) {
-		if (query.getLength() != target.getLength()) {
-			throw new IllegalArgumentException("Aligned sequences differ in size");
-		}
-		list = new ArrayList<AlignedSequence<S, C>>();
-		list.add(query);
-		list.add(target);
-		list = Collections.unmodifiableList(list);
-		originals = new ArrayList<S>();
-		originals.add(query.getOriginalSequence());
-		originals.add(target.getOriginalSequence());
-		originals = Collections.unmodifiableList(originals);
-		length = query.getLength();
-	}
+	private List<AlignedSequence<S, C>> list;
+
+	private List<S> originals;
+
+	private int length;
 
 	/**
 	 * Creates a profile from a single sequence.
@@ -87,87 +69,32 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 	 * @param sequence sequence to seed profile
 	 */
 	public SimpleProfile(S sequence) {
-		List<Step> s = new ArrayList<Step>();
+		List<Step> s = new ArrayList<>();
 		for (int i = 0; i < sequence.getLength(); i++) {
 			s.add(Step.COMPOUND);
 		}
-		list = new ArrayList<AlignedSequence<S, C>>();
+		list = new ArrayList<>();
 		list.add(new SimpleAlignedSequence<S, C>(sequence, s));
 		list = Collections.unmodifiableList(list);
-		originals = new ArrayList<S>();
+		originals = new ArrayList<>();
 		originals.add(sequence);
 		originals = Collections.unmodifiableList(originals);
 		length = sequence.getLength();
 	}
 
 	/**
-	 * Creates a pair profile for the given sequences.
-	 *
-	 * @param query the first sequence of the pair
-	 * @param target the second sequence of the pair
-	 * @param sx lists whether the query sequence aligns a {@link Compound} or gap at each index of the alignment
-	 * @param xb number of {@link Compound}s skipped in the query sequence before the aligned region
-	 * @param xa number of {@link Compound}s skipped in the query sequence after the aligned region
-	 * @param sy lists whether the target sequence aligns a {@link Compound} or gap at each index of the alignment
-	 * @param yb number of {@link Compound}s skipped in the target sequence before the aligned region
-	 * @param ya number of {@link Compound}s skipped in the target sequence after the aligned region
-	 * @throws IllegalArgumentException if alignments differ in size or given sequences do not fit in alignments
-	 */
-	protected SimpleProfile(S query, S target, List<Step> sx, int xb, int xa, List<Step> sy, int yb, int ya) {
-		if (sx.size() != sy.size()) {
-			throw new IllegalArgumentException("Alignments differ in size");
-		}
-		list = new ArrayList<AlignedSequence<S, C>>();
-		list.add(new SimpleAlignedSequence<S, C>(query, sx, xb, xa));
-		list.add(new SimpleAlignedSequence<S, C>(target, sy, yb, ya));
-		list = Collections.unmodifiableList(list);
-		originals = new ArrayList<S>();
-		originals.add(query);
-		originals.add(target);
-		originals = Collections.unmodifiableList(originals);
-		length = sx.size();
-	}
-
-	/**
-	 * Creates a pair profile for the given profiles.
-	 *
-	 * @param query the first profile of the pair
-	 * @param target the second profile of the pair
-	 * @param sx lists whether the query profile aligns a {@link Compound} or gap at each index of the alignment
-	 * @param sy lists whether the target profile aligns a {@link Compound} or gap at each index of the alignment
-	 * @throws IllegalArgumentException if alignments differ in size or given profiles do not fit in alignments
-	 */
-	protected SimpleProfile(Profile<S, C> query, Profile<S, C> target, List<Step> sx, List<Step> sy) {
-		if (sx.size() != sy.size()) {
-			throw new IllegalArgumentException("Alignments differ in size");
-		}
-		list = new ArrayList<AlignedSequence<S, C>>();
-		for (AlignedSequence<S, C> s : query) {
-			list.add(new SimpleAlignedSequence<S, C>(s, sx));
-		}
-		for (AlignedSequence<S, C> s : target) {
-			list.add(new SimpleAlignedSequence<S, C>(s, sy));
-		}
-		list = Collections.unmodifiableList(list);
-		originals = new ArrayList<S>();
-		originals.addAll(query.getOriginalSequences());
-		originals.addAll(target.getOriginalSequences());
-		originals = Collections.unmodifiableList(originals);
-		length = sx.size();
-	}
-
-	 /**
 	 * Creates a profile for the already aligned sequences.
+	 * 
 	 * @param alignedSequences the already aligned sequences
-	 * @throws IllegalArgument if aligned sequences differ in length or
-	 * collection is empty.
+	 * @throws IllegalArgument if aligned sequences differ in length or collection
+	 *                         is empty.
 	 */
-	public SimpleProfile(Collection<AlignedSequence<S,C>> alignedSequences) {
-		list = new ArrayList<AlignedSequence<S,C>>();
-		originals = new ArrayList<S>();
+	public SimpleProfile(Collection<AlignedSequence<S, C>> alignedSequences) {
+		list = new ArrayList<>();
+		originals = new ArrayList<>();
 
-		Iterator<AlignedSequence<S,C>> itr = alignedSequences.iterator();
-		if(!itr.hasNext()) {
+		Iterator<AlignedSequence<S, C>> itr = alignedSequences.iterator();
+		if (!itr.hasNext()) {
 			throw new IllegalArgumentException("alignedSequences must not be empty");
 		}
 
@@ -188,6 +115,93 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		originals = Collections.unmodifiableList(originals);
 	}
 
+	/**
+	 * Creates a pair profile for the given already aligned sequences.
+	 *
+	 * @param query  the first sequence of the pair
+	 * @param target the second sequence of the pair
+	 * @throws IllegalArgumentException if sequences differ in size
+	 */
+	protected SimpleProfile(AlignedSequence<S, C> query, AlignedSequence<S, C> target) {
+		if (query.getLength() != target.getLength()) {
+			throw new IllegalArgumentException("Aligned sequences differ in size");
+		}
+		list = new ArrayList<>();
+		list.add(query);
+		list.add(target);
+		list = Collections.unmodifiableList(list);
+		originals = new ArrayList<>();
+		originals.add(query.getOriginalSequence());
+		originals.add(target.getOriginalSequence());
+		originals = Collections.unmodifiableList(originals);
+		length = query.getLength();
+	}
+
+	/**
+	 * Creates a pair profile for the given sequences.
+	 *
+	 * @param query  the first sequence of the pair
+	 * @param target the second sequence of the pair
+	 * @param sx     lists whether the query sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param xb     number of {@link Compound}s skipped in the query sequence
+	 *               before the aligned region
+	 * @param xa     number of {@link Compound}s skipped in the query sequence after
+	 *               the aligned region
+	 * @param sy     lists whether the target sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param yb     number of {@link Compound}s skipped in the target sequence
+	 *               before the aligned region
+	 * @param ya     number of {@link Compound}s skipped in the target sequence
+	 *               after the aligned region
+	 * @throws IllegalArgumentException if alignments differ in size or given
+	 *                                  sequences do not fit in alignments
+	 */
+	protected SimpleProfile(S query, S target, List<Step> sx, int xb, int xa, List<Step> sy, int yb, int ya) {
+		if (sx.size() != sy.size()) {
+			throw new IllegalArgumentException("Alignments differ in size");
+		}
+		list = new ArrayList<>();
+		list.add(new SimpleAlignedSequence<S, C>(query, sx, xb, xa));
+		list.add(new SimpleAlignedSequence<S, C>(target, sy, yb, ya));
+		list = Collections.unmodifiableList(list);
+		originals = new ArrayList<>();
+		originals.add(query);
+		originals.add(target);
+		originals = Collections.unmodifiableList(originals);
+		length = sx.size();
+	}
+
+	/**
+	 * Creates a pair profile for the given profiles.
+	 *
+	 * @param query  the first profile of the pair
+	 * @param target the second profile of the pair
+	 * @param sx     lists whether the query profile aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param sy     lists whether the target profile aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @throws IllegalArgumentException if alignments differ in size or given
+	 *                                  profiles do not fit in alignments
+	 */
+	protected SimpleProfile(Profile<S, C> query, Profile<S, C> target, List<Step> sx, List<Step> sy) {
+		if (sx.size() != sy.size()) {
+			throw new IllegalArgumentException("Alignments differ in size");
+		}
+		list = new ArrayList<>();
+		for (AlignedSequence<S, C> s : query) {
+			list.add(new SimpleAlignedSequence<S, C>(s, sx));
+		}
+		for (AlignedSequence<S, C> s : target) {
+			list.add(new SimpleAlignedSequence<S, C>(s, sy));
+		}
+		list = Collections.unmodifiableList(list);
+		originals = new ArrayList<>();
+		originals.addAll(query.getOriginalSequences());
+		originals.addAll(target.getOriginalSequences());
+		originals = Collections.unmodifiableList(originals);
+		length = sx.size();
+	}
 
 	// methods for Profile
 
@@ -198,12 +212,8 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 
 	@Override
 	public AlignedSequence<S, C> getAlignedSequence(S sequence) {
-		for (AlignedSequence<S, C> s : list) {
-			if (s.equals(sequence) || s.getOriginalSequence().equals(sequence)) {
-				return s;
-			}
-		}
-		return null;
+		return list.stream().filter(s -> s.equals(sequence) || s.getOriginalSequence().equals(sequence)).findFirst()
+				.orElse(null);
 	}
 
 	@Override
@@ -213,7 +223,7 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 
 	@Override
 	public List<AlignedSequence<S, C>> getAlignedSequences(int... listIndices) {
-		List<AlignedSequence<S, C>> tempList = new ArrayList<AlignedSequence<S, C>>();
+		List<AlignedSequence<S, C>> tempList = new ArrayList<>();
 		for (int i : listIndices) {
 			tempList.add(getAlignedSequence(i));
 		}
@@ -222,7 +232,7 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 
 	@Override
 	public List<AlignedSequence<S, C>> getAlignedSequences(S... sequences) {
-		List<AlignedSequence<S, C>> tempList = new ArrayList<AlignedSequence<S, C>>();
+		List<AlignedSequence<S, C>> tempList = new ArrayList<>();
 		for (S s : sequences) {
 			tempList.add(getAlignedSequence(s));
 		}
@@ -250,22 +260,20 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		int[] counts = new int[compounds.size()];
 		C gap = getCompoundSet().getCompoundForString("-");
 		int igap = compounds.indexOf(gap);
-		for (C compound : getCompoundsAt(alignmentIndex)) {
+		getCompoundsAt(alignmentIndex).forEach(compound -> {
 			int i = compounds.indexOf(compound);
 			if (i >= 0 && i != igap && !getCompoundSet().compoundsEquivalent(compound, gap)) {
 				counts[i]++;
 			}
-		}
+		});
 		return counts;
 	}
 
 	@Override
 	public List<C> getCompoundsAt(int alignmentIndex) {
 		// TODO handle circular alignments
-		List<C> column = new ArrayList<C>();
-		for (AlignedSequence<S, C> s : list) {
-			column.add(s.getCompoundAt(alignmentIndex));
-		}
+		List<C> column = new ArrayList<>();
+		list.forEach(s -> column.add(s.getCompoundAt(alignmentIndex)));
 		return Collections.unmodifiableList(column);
 	}
 
@@ -289,7 +297,7 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		}
 		if (total > 0.0f) {
 			for (int i = 0; i < weights.length; i++) {
-				weights[i] = counts[i]/total;
+				weights[i] = counts[i] / total;
 			}
 		}
 		return weights;
@@ -352,22 +360,13 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 	@Override
 	public boolean hasGap(int alignmentIndex) {
 		C gap = getCompoundSet().getCompoundForString("-");
-		for (C compound : getCompoundsAt(alignmentIndex)) {
-			if (getCompoundSet().compoundsEquivalent(compound, gap)) {
-				return true;
-			}
-		}
-		return false;
+		return getCompoundsAt(alignmentIndex).stream()
+				.anyMatch(compound -> getCompoundSet().compoundsEquivalent(compound, gap));
 	}
 
 	@Override
 	public boolean isCircular() {
-		for (AlignedSequence<S, C> s : list) {
-			if (s.isCircular()) {
-				return true;
-			}
-		}
-		return false;
+		return list.stream().anyMatch(AlignedSequence::isCircular);
 	}
 
 	@Override
@@ -387,8 +386,8 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 			return toString(60, null, ">%s%n", false, false, false, false, false, false);
 		case GCG:
 		case MSF:
-			return toString(50, IOUtils.getGCGHeader(list), IOUtils.getIDFormat(list), false, false, true, false,
-					false, false);
+			return toString(50, IOUtils.getGCGHeader(list), IOUtils.getIDFormat(list), false, false, true, false, false,
+					false);
 		case PDBWEB:
 			return toString(60, null, "%10s", true, true, true, false, true, true);
 		}
@@ -417,32 +416,35 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		// TODO handle circular alignments
 		StringBuilder s = (header == null) ? new StringBuilder() : new StringBuilder(header);
 
-		if ( webDisplay && list.size() == 2){
+		if (webDisplay && list.size() == 2) {
 			s.append("<div><pre>");
 		}
 
 		width = Math.max(1, width);
 		int seqIndexPad = (int) (Math.floor(Math.log10(getLength())) + 2);
-		String seqIndexFormatPre = "%" + seqIndexPad + "d ", seqIndexFormatPost = "%" + seqIndexPad + "d";
+		String seqIndexFormatPre = new StringBuilder().append("%").append(seqIndexPad).append("d ").toString();
+		String seqIndexFormatPost = new StringBuilder().append("%").append(seqIndexPad).append("d").toString();
 		if (interlaced) {
-			String aligIndFormat = "%-" + Math.max(1, width / 2) + "d %" + Math.max(1, width - (width / 2) - 1) +
-			"d%n";
+			String aligIndFormat = new StringBuilder().append("%-").append(Math.max(1, width / 2)).append("d %")
+					.append(Math.max(1, width - (width / 2) - 1)).append("d%n").toString();
 			for (int i = 0; i < getLength(); i += width) {
-				int start = i + 1, end = Math.min(getLength(), i + width);
+				int start = i + 1;
+				int end = Math.min(getLength(), i + width);
 				if (i > 0) {
 					s.append(String.format("%n"));
 				}
 				if (aligIndices) {
 					if (end < i + width) {
 						int line = end - start + 1;
-						aligIndFormat = "%-" + Math.max(1, line / 2) + "d %" + Math.max(1, line - (line / 2) - 1) +
-						"d%n";
+						aligIndFormat = new StringBuilder().append("%-").append(Math.max(1, line / 2)).append("d %")
+								.append(Math.max(1, line - (line / 2) - 1)).append("d%n").toString();
 					}
 					if (idFormat != null) {
 						s.append(String.format(idFormat, ""));
 					}
 					if (seqIndexPre) {
-						s.append(String.format("%" + (seqIndexPad + 1) + "s", ""));
+						s.append(String.format(
+								new StringBuilder().append("%").append(seqIndexPad + 1).append("s").toString(), ""));
 					}
 					s.append(String.format(aligIndFormat, start, end));
 				}
@@ -451,7 +453,7 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 				for (AlignedSequence<S, C> as : list) {
 					counter++;
 
-					if ( webDisplay && list.size() == 2){
+					if (webDisplay && list.size() == 2) {
 						printSequenceAlignmentWeb(s, counter, idFormat, seqIndexPre, seqIndexFormatPre, seqIndexPost,
 								seqIndexFormatPost, start, end);
 					} else {
@@ -482,7 +484,8 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 					s.append(String.format(idFormat, as.getAccession()));
 				}
 				for (int i = 0; i < getLength(); i += width) {
-					int start = i + 1, end = Math.min(getLength(), i + width);
+					int start = i + 1;
+					int end = Math.min(getLength(), i + width);
 					if (seqIndexPre) {
 						s.append(String.format(seqIndexFormatPre, as.getSequenceIndexAt(start)));
 					}
@@ -503,7 +506,9 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 
 	private void printSequenceAlignmentWeb(StringBuilder s, int counter, String idFormat, boolean seqIndexPre,
 			String seqIndexFormatPre, boolean seqIndexPost, String seqIndexFormatPost, int start, int end) {
-		AlignedSequence<S,C> as1 = list.get(0), as2 = list.get(1), as = list.get(counter - 1);
+		AlignedSequence<S, C> as1 = list.get(0);
+		AlignedSequence<S, C> as2 = list.get(1);
+		AlignedSequence<S, C> as = list.get(counter - 1);
 
 		if (idFormat != null) {
 			s.append(String.format(idFormat, as.getAccession()));
@@ -517,8 +522,9 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		String s2 = as2.getSubSequence(start, end).getSequenceAsString();
 
 		for (int i = 0; i < s1.length(); i++) {
-			if (i >= s2.length() || i >= mySeq.length())
+			if (i >= s2.length() || i >= mySeq.length()) {
 				break;
+			}
 
 			char c1 = s1.charAt(i);
 			char c2 = s2.charAt(i);
@@ -535,7 +541,8 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 
 	private void printConservation(StringBuilder s, String idFormat, int seqIndexPad, boolean seqIndexPre, int start,
 			int end, boolean webDisplay) {
-		AlignedSequence<S,C> as1 = list.get(0), as2 = list.get(1);
+		AlignedSequence<S, C> as1 = list.get(0);
+		AlignedSequence<S, C> as2 = list.get(1);
 
 		if (idFormat != null) {
 			AccessionID ac1 = as1.getAccession();
@@ -545,15 +552,16 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		}
 
 		if (seqIndexPre) {
-			s.append(String.format("%" + (seqIndexPad + 1) + "s", ""));
+			s.append(String.format(new StringBuilder().append("%").append(seqIndexPad + 1).append("s").toString(), ""));
 		}
 
 		String subseq1 = as1.getSubSequence(start, end).getSequenceAsString();
 		String subseq2 = as2.getSubSequence(start, end).getSequenceAsString();
 
-		for ( int ii =0 ; ii < subseq1.length() ; ii++){
-			if ( ii >= subseq2.length())
+		for (int ii = 0; ii < subseq1.length(); ii++) {
+			if (ii >= subseq2.length()) {
 				break;
+			}
 			char c1 = subseq1.charAt(ii);
 			char c2 = subseq2.charAt(ii);
 			s.append(IOUtils.getPDBConservation(webDisplay, c1, c2, isSimilar(c1, c2)));
@@ -562,15 +570,13 @@ public class SimpleProfile<S extends Sequence<C>, C extends Compound> implements
 		s.append(String.format("%n"));
 	}
 
-	protected static final SubstitutionMatrix<AminoAcidCompound> matrix = SubstitutionMatrixHelper.getBlosum65();
-
 	private boolean isSimilar(char c1, char c2) {
 		AminoAcidCompoundSet set = AminoAcidCompoundSet.getAminoAcidCompoundSet();
 
 		AminoAcidCompound aa1 = set.getCompoundForString(String.valueOf(c1));
 		AminoAcidCompound aa2 = set.getCompoundForString(String.valueOf(c2));
 
-		short val = matrix.getValue(aa1,aa2);
+		short val = matrix.getValue(aa1, aa2);
 		return val > 0;
 	}
 

@@ -29,23 +29,25 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-
-
-/** A JTextField that can make suggestions for auto-complete.
+/**
+ * A JTextField that can make suggestions for auto-complete.
  *
  * @author Andreas Prlic
  *
  */
-public class JAutoSuggest extends JTextField{
+public class JAutoSuggest extends JTextField {
+
+	private static final Logger logger = LoggerFactory.getLogger(JAutoSuggest.class);
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 8591734727984365156L;
 
-	private static final String DEFAULT_TEXT= "Please enter text ...";
+	private static final String DEFAULT_TEXT = "Please enter text ...";
 
 	String defaultText;
 	private JDialog dialog;
@@ -55,7 +57,7 @@ public class JAutoSuggest extends JTextField{
 	private Vector<String> suggestions;
 
 	/** last word that was entered by user */
-	private String lastWord ;
+	private String lastWord;
 
 	AutoSuggestProvider autoSuggestProvider;
 
@@ -64,18 +66,16 @@ public class JAutoSuggest extends JTextField{
 
 	SuggestionFetcher matcher;
 
-	public JAutoSuggest(){
-		super();
-
+	public JAutoSuggest() {
 		init();
 	}
 
-	public JAutoSuggest(int size){
+	public JAutoSuggest(int size) {
 		super(size);
 		init();
 	}
 
-	public JAutoSuggest(Frame owner){
+	public JAutoSuggest(Frame owner) {
 		owner.addComponentListener(new ComponentListener() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -132,21 +132,22 @@ public class JAutoSuggest extends JTextField{
 		addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				System.out.println("Lost Focus");
+				logger.info("Lost Focus");
 				dialog.setVisible(false);
 
-				if (getText().trim().equals("") && e.getOppositeComponent() != null && e.getOppositeComponent().getName() != null) {
-					if (!e.getOppositeComponent().getName().equals("suggestFieldDropdownButton")) {
+				if ("".equals(getText().trim()) && e.getOppositeComponent() != null
+						&& e.getOppositeComponent().getName() != null) {
+					if (!"suggestFieldDropdownButton".equals(e.getOppositeComponent().getName())) {
 						setText(defaultText);
 					}
-				} else if (getText().trim().equals("")) {
+				} else if ("".equals(getText().trim())) {
 					setText(defaultText);
 				}
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				System.out.println("Lost Gained");
+				logger.info("Lost Gained");
 				if (getText().trim().equals(defaultText)) {
 					setText("");
 				}
@@ -155,16 +156,12 @@ public class JAutoSuggest extends JTextField{
 			}
 		});
 
-
-
-
 		init();
 
 		// set dialog owner...
-		//dialog.setD
+		// dialog.setD
 
 	}
-
 
 	private void initSuggestionList() {
 		list = new JList();
@@ -228,10 +225,9 @@ public class JAutoSuggest extends JTextField{
 					list.setSelectedIndex(list.getSelectedIndex() - 1);
 					list.ensureIndexIsVisible(list.getSelectedIndex() - 1);
 					return;
-				} else if (e.getKeyCode() == KeyEvent.VK_ENTER
-						&& list.getSelectedIndex() != -1 && suggestions.size() > 0) {
+				} else if (e.getKeyCode() == KeyEvent.VK_ENTER && list.getSelectedIndex() != -1
+						&& suggestions.size() > 0) {
 					setText((String) list.getSelectedValue());
-
 
 					dialog.setVisible(false);
 					return;
@@ -242,14 +238,13 @@ public class JAutoSuggest extends JTextField{
 
 	}
 
-	private void init(){
-		autoSuggestProvider =  new DefaultAutoSuggestProvider();
+	private void init() {
+		autoSuggestProvider = new DefaultAutoSuggestProvider();
 		lastWord = "";
 		regular = getFont();
 		busy = new Font(getFont().getName(), Font.ITALIC, getFont().getSize());
-		suggestions = new Vector<String>();
+		suggestions = new Vector<>();
 		defaultText = DEFAULT_TEXT;
-
 
 		dialog = new JDialog();
 		dialog.setUndecorated(true);
@@ -276,16 +271,14 @@ public class JAutoSuggest extends JTextField{
 	}
 
 	/**
-	 * Force the suggestions to be displayed (Useful for buttons
-	 * e.g. for using JSuggestionField like a ComboBox)
+	 * Force the suggestions to be displayed (Useful for buttons e.g. for using
+	 * JSuggestionField like a ComboBox)
 	 */
 	public void showSuggest() {
 
-		assert(getText() != null);
+		assert (getText() != null);
 		lastWord = getText().trim();
-			//autoSuggestProvider.getSuggestion(lastWord);
-
-
+		// autoSuggestProvider.getSuggestion(lastWord);
 
 		if (!getText().toLowerCase().contains(lastWord.toLowerCase())) {
 			suggestions.clear();
@@ -296,7 +289,7 @@ public class JAutoSuggest extends JTextField{
 		}
 		matcher = new SuggestionFetcher();
 
-		//SwingUtilities.invokeLater(matcher);
+		// SwingUtilities.invokeLater(matcher);
 		matcher.execute();
 		lastWord = getText().trim();
 		updateLocation();
@@ -317,8 +310,6 @@ public class JAutoSuggest extends JTextField{
 		return dialog.isVisible();
 	}
 
-
-
 	/**
 	 * Place the suggestion window under the JTextField.
 	 */
@@ -328,36 +319,41 @@ public class JAutoSuggest extends JTextField{
 			location.y += getHeight();
 			dialog.setLocation(location);
 		} catch (IllegalComponentStateException e) {
+			logger.error(e.getMessage(), e);
 			return; // might happen on window creation
 		}
 	}
 
-
-	/** fetch suggestions from SuggestionProvider
+	/**
+	 * fetch suggestions from SuggestionProvider
 	 *
 	 *
 	 *
 	 */
 	private class SuggestionFetcher extends SwingWorker<String, Object> {
+		private final Logger logger1 = LoggerFactory.getLogger(SuggestionFetcher.class);
+
 		/** flag used to stop the thread */
 		private AtomicBoolean stop = new AtomicBoolean(false);
 
 		String previousWord;
+
 		/**
-		 * Standard run method used in threads
-		 * responsible for the actual search
+		 * Standard run method used in threads responsible for the actual search
 		 */
 		@Override
 		public String doInBackground() {
 			try {
 				setFont(busy);
 				String userInput = getText().trim();
-				if ( userInput == null || userInput.equals(""))
+				if (userInput == null || "".equals(userInput)) {
 					return "";
+				}
 
-				if ( previousWord != null){
-					if ( userInput.equals(previousWord))
+				if (previousWord != null) {
+					if (userInput.equals(previousWord)) {
 						return "";
+					}
 				}
 				previousWord = userInput;
 
@@ -374,17 +370,17 @@ public class JAutoSuggest extends JTextField{
 					dialog.setVisible(false);
 				}
 			} catch (Exception e) {
-				//e.printStackTrace();
+				logger1.error(e.getMessage(), e);
+				// e.printStackTrace();
 				// ignore...
 
 			}
 			return "Done.";
 		}
 
-		public void setStop(){
+		public void setStop() {
 			stop.set(true);
 		}
-
 
 	}
 }

@@ -19,16 +19,14 @@
  *
  */
 
-
 package org.biojava.nbio.ontology.utils;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
 /**
- * Subclass of WeakReference which includes and extra field (the key)
- * which can be used to help cleanup once this reference has been
- * enqueued.
+ * Subclass of WeakReference which includes and extra field (the key) which can
+ * be used to help cleanup once this reference has been enqueued.
  *
  * @author Thomas Down
  * @since 1.3

@@ -28,8 +28,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/** A class that provides all that is necessary to create a Serializable Cache
+/**
+ * A class that provides all that is necessary to create a Serializable Cache
  *
  * @author Andreas Prlic
  *
@@ -38,128 +38,121 @@ import java.util.Map;
  *
  * @since 3.0.3
  */
-public class SerializableCache <K,V>{
+public class SerializableCache<K, V> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SerializableCache.class);
 
 	protected String cacheFileName;
-	protected Map<K,V> serializedCache ;
+	protected Map<K, V> serializedCache;
 
-
-	/** set cacheFileName to null to disable caching
+	/**
+	 * set cacheFileName to null to disable caching
 	 *
 	 * @param cacheFileName
 	 */
-	public SerializableCache(String cacheFileName ) {
+	public SerializableCache(String cacheFileName) {
 		this.cacheFileName = cacheFileName;
 
-		if ( cacheFileName != null) {
+		if (cacheFileName != null) {
 			reloadFromFile();
 		}
 
 	}
 
-	public boolean isCacheEnabled(){
-		return ( serializedCache != null );
+	public boolean isCacheEnabled() {
+		return (serializedCache != null);
 	}
 
-	/** This will not cache null values.
-	 *  Null means not cached yet.
-	 *  If you want to cache "no data exists" use e.g. empty collections to represent this.
+	/**
+	 * This will not cache null values. Null means not cached yet. If you want to
+	 * cache "no data exists" use e.g. empty collections to represent this.
 	 *
 	 * @param name
 	 * @param data
 	 */
 	public void cache(K name, V data) {
 
-		if ( data == null){
+		if (data == null) {
 			return;
 		}
-		if ( serializedCache != null){
+		if (serializedCache == null) {
+			return;
+		}
+		logger.debug("Caching {}  {}", name, data);
+		serializedCache.put(name, data);
+		// every 1000 objects we are writing to disk
+		if (serializedCache.keySet().size() % 1000 == 0) {
 
-
-			logger.debug("Caching {}  {}", name, data);
-
-			serializedCache.put(name,data);
-
-
-			// every 1000 objects we are writing to disk
-			if ( serializedCache.keySet().size() % 1000 == 0 ) {
-
-				flushCache();
-
-			}
+			flushCache();
 
 		}
-
 
 	}
 
 	public V get(K name) {
-		if ( serializedCache == null)
+		if (serializedCache == null) {
 			return null;
+		}
 		return (serializedCache.get(name));
 	}
 
-	public void disableCache(){
-		//flushCache();
+	public void disableCache() {
+		// flushCache();
 		serializedCache = null;
 	}
 
-	public void enableCache(){
+	public void enableCache() {
 		reloadFromFile();
 	}
 
-
-
 	@SuppressWarnings("unchecked")
-	public Map<K,V> reloadFromFile() {
+	public Map<K, V> reloadFromFile() {
 
 		File f = getCacheFile();
 
-		serializedCache = new HashMap<K,V>();
+		serializedCache = new HashMap<>();
 
 		// has never been cached here before
-		if( ! f.exists()) {
+		if (!f.exists()) {
 			logger.info("Creating new cache " + f.getAbsolutePath());
 			return serializedCache;
 		}
 
-		try{
+		try {
 
 			logger.debug("Reloading from cache " + f.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(f);
 			ObjectInputStream ois = new ObjectInputStream(fis);
-			serializedCache = (HashMap<K,V>) ois.readObject();
+			serializedCache = (HashMap<K, V>) ois.readObject();
 			ois.close();
-		} catch (IOException e){
+		} catch (ClassNotFoundException | IOException e) {
 			// TODO shouldn't this be thrown forward?
-			logger.error("Exception caught while reading serialized file",e);
-			return null;
-		} catch (ClassNotFoundException e) {
-			logger.error("Exception caught while reading serialized file",e);
+			logger.error("Exception caught while reading serialized file", e);
 			return null;
 		}
 
-		//if ( debug )
-		logger.info("Reloaded from cache: " + f.getName()+ " size: " + serializedCache.keySet().size() + " cached records.");
+		// if ( debug )
+		logger.info(new StringBuilder().append("Reloaded from cache: ").append(f.getName()).append(" size: ")
+				.append(serializedCache.keySet().size()).append(" cached records.").toString());
 		return serializedCache;
 	}
 
 	private File getCacheFile() {
-		AtomCache cache =new AtomCache();
+		AtomCache cache = new AtomCache();
 		String path = cache.getCachePath();
-		File f = new File(path + System.getProperty("file.separator") + cacheFileName);
+		File f = new File(new StringBuilder().append(path).append(System.getProperty("file.separator"))
+				.append(cacheFileName).toString());
 
 		logger.debug(f.getAbsolutePath());
 		return f;
 	}
 
-	public void flushCache(){
-		if ( serializedCache == null)
+	public void flushCache() {
+		if (serializedCache == null) {
 			return;
-		synchronized(serializedCache){
+		}
+		synchronized (serializedCache) {
 
 			File f = getCacheFile();
 
@@ -169,7 +162,7 @@ public class SerializableCache <K,V>{
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				oos.writeObject(serializedCache);
 				oos.close();
-			} catch (IOException e){
+			} catch (IOException e) {
 				logger.error("Exception caught", e);
 			}
 		}

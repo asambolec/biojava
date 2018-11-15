@@ -40,11 +40,10 @@ public class CalcPoint {
 	}
 
 	/**
-	 * Center a cloud of points. This means subtracting the {@lin
-	 * #centroid(Point3d[])} of the cloud to each point.
+	 * Center a cloud of points. This means subtracting the
+	 * {@lin #centroid(Point3d[])} of the cloud to each point.
 	 * 
-	 * @param x
-	 *            array of points. Point objects will be modified
+	 * @param x array of points. Point objects will be modified
 	 */
 	public static void center(Point3d[] x) {
 		Point3d center = centroid(x);
@@ -55,8 +54,7 @@ public class CalcPoint {
 	/**
 	 * Calculate the centroid of the point cloud.
 	 * 
-	 * @param x
-	 *            array of points. Point objects will not be modified
+	 * @param x array of points. Point objects will not be modified
 	 * @return centroid as Point3d
 	 */
 	public static Point3d centroid(Point3d[] x) {
@@ -71,10 +69,8 @@ public class CalcPoint {
 	/**
 	 * Transform all points with a 4x4 transformation matrix.
 	 * 
-	 * @param rotTrans
-	 *            4x4 transformation matrix
-	 * @param x
-	 *            array of points. Point objects will be modified
+	 * @param rotTrans 4x4 transformation matrix
+	 * @param x        array of points. Point objects will be modified
 	 */
 	public static void transform(Matrix4d rotTrans, Point3d[] x) {
 		for (Point3d p : x) {
@@ -85,10 +81,8 @@ public class CalcPoint {
 	/**
 	 * Translate all points with a translation vector.
 	 * 
-	 * @param trans
-	 *            the translation vector to apply
-	 * @param x
-	 *            array of points. Point objects will be modified
+	 * @param trans the translation vector to apply
+	 * @param x     array of points. Point objects will be modified
 	 */
 	public static void translate(Vector3d trans, Point3d[] x) {
 		for (Point3d p : x) {
@@ -99,8 +93,7 @@ public class CalcPoint {
 	/**
 	 * Clone an array of points.
 	 * 
-	 * @param x
-	 *            original array of points. Point objects will not be modified
+	 * @param x original array of points. Point objects will not be modified
 	 * @return new array of points, identical clone of x
 	 */
 	public static Point3d[] clonePoint3dArray(Point3d[] x) {
@@ -115,13 +108,21 @@ public class CalcPoint {
 	 * Peter can you document this method? TODO
 	 * 
 	 * @param moved
+	 * 
 	 * @param fixed
+	 * 
 	 * @return
 	 */
 	public static Matrix formMatrix(Point3d[] a, Point3d[] b) {
-		double xx = 0.0, xy = 0.0, xz = 0.0;
-		double yx = 0.0, yy = 0.0, yz = 0.0;
-		double zx = 0.0, zy = 0.0, zz = 0.0;
+		double xx = 0.0;
+		double xy = 0.0;
+		double xz = 0.0;
+		double yx = 0.0;
+		double yy = 0.0;
+		double yz = 0.0;
+		double zx = 0.0;
+		double zy = 0.0;
+		double zz = 0.0;
 
 		for (int i = 0; i < a.length; i++) {
 			xx += a[i].x * b[i].x;
@@ -157,25 +158,21 @@ public class CalcPoint {
 	}
 
 	/**
-	 * Returns the TM-Score for two superimposed sets of coordinates Yang Zhang
-	 * and Jeffrey Skolnick, PROTEINS: Structure, Function, and Bioinformatics
+	 * Returns the TM-Score for two superimposed sets of coordinates Yang Zhang and
+	 * Jeffrey Skolnick, PROTEINS: Structure, Function, and Bioinformatics
 	 * 57:702–710 (2004)
 	 * 
-	 * @param x
-	 *            coordinate set 1
-	 * @param y
-	 *            coordinate set 2
-	 * @param lengthNative
-	 *            total length of native sequence
+	 * @param x            coordinate set 1
+	 * @param y            coordinate set 2
+	 * @param lengthNative total length of native sequence
 	 * @return
 	 */
 	public static double TMScore(Point3d[] x, Point3d[] y, int lengthNative) {
-		
+
 		if (x.length != y.length) {
-			throw new IllegalArgumentException(
-					"Point arrays are not of the same length.");
+			throw new IllegalArgumentException("Point arrays are not of the same length.");
 		}
-		
+
 		double d0 = 1.24 * Math.cbrt(x.length - 15.0) - 1.8;
 		double d0Sq = d0 * d0;
 
@@ -197,12 +194,11 @@ public class CalcPoint {
 	 * @return
 	 */
 	public static double GTSlikeScore(Point3d[] x, Point3d[] y) {
-		
+
 		if (x.length != y.length) {
-			throw new IllegalArgumentException(
-					"Point arrays are not of the same length.");
+			throw new IllegalArgumentException("Point arrays are not of the same length.");
 		}
-		
+
 		int contacts = 0;
 
 		for (Point3d px : x) {
@@ -212,20 +208,24 @@ public class CalcPoint {
 				minDist = Math.min(minDist, px.distanceSquared(py));
 			}
 
-			if (minDist > 64)
+			if (minDist > 64) {
 				continue;
+			}
 			contacts++;
 
-			if (minDist > 16)
+			if (minDist > 16) {
 				continue;
+			}
 			contacts++;
 
-			if (minDist > 4)
+			if (minDist > 4) {
 				continue;
+			}
 			contacts++;
 
-			if (minDist > 1)
+			if (minDist > 1) {
 				continue;
+			}
 			contacts++;
 		}
 
@@ -235,19 +235,16 @@ public class CalcPoint {
 	/**
 	 * Calculate the RMSD of two point arrays, already superposed.
 	 * 
-	 * @param x
-	 *            array of points superposed to y
-	 * @param y
-	 *            array of points superposed to x
+	 * @param x array of points superposed to y
+	 * @param y array of points superposed to x
 	 * @return RMSD
 	 */
 	public static double rmsd(Point3d[] x, Point3d[] y) {
-		
+
 		if (x.length != y.length) {
-			throw new IllegalArgumentException(
-					"Point arrays are not of the same length.");
+			throw new IllegalArgumentException("Point arrays are not of the same length.");
 		}
-		
+
 		double sum = 0.0;
 		for (int i = 0; i < x.length; i++) {
 			sum += x[i].distanceSquared(y[i]);
@@ -265,17 +262,16 @@ public class CalcPoint {
 	 * @return
 	 */
 	public static double rmsdMin(Point3d[] x, Point3d[] y) {
-		
+
 		if (x.length != y.length) {
-			throw new IllegalArgumentException(
-					"Point arrays are not of the same length.");
+			throw new IllegalArgumentException("Point arrays are not of the same length.");
 		}
-		
+
 		double sum = 0.0;
-		for (int i = 0; i < x.length; i++) {
+		for (Point3d aX : x) {
 			double minDist = Double.MAX_VALUE;
-			for (int j = 0; j < y.length; j++) {
-				minDist = Math.min(minDist, x[i].distanceSquared(y[j]));
+			for (Point3d anY : y) {
+				minDist = Math.min(minDist, aX.distanceSquared(anY));
 			}
 			sum += minDist;
 		}
@@ -295,10 +291,10 @@ public class CalcPoint {
 	 */
 	public static int contacts(Point3d[] x, Point3d[] y, double maxDistance) {
 		int contacts = 0;
-		for (int i = 0; i < x.length; i++) {
+		for (Point3d aX : x) {
 			double minDist = Double.MAX_VALUE;
-			for (int j = 0; j < y.length; j++) {
-				minDist = Math.min(minDist, x[i].distanceSquared(y[j]));
+			for (Point3d anY : y) {
+				minDist = Math.min(minDist, aX.distanceSquared(anY));
 			}
 			if (minDist < maxDistance * maxDistance) {
 				contacts++;

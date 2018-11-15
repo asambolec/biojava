@@ -27,75 +27,94 @@ package org.biojava.nbio.structure.io.mmcif.model;
  * @since 5.0
  */
 public class PdbxDatabaseStatus extends AbstractBean {
-	private String status_code;
-	private String entry_id;
-	private String recvd_initial_deposition_date;
-	private String deposit_site;
-	private String process_site;
-	private String SG_entry;
-	private String pdb_format_compatible;
-	private String status_code_mr;
-	private String status_code_sf;
-	private String status_code_cs;
-	
+	private String statusCode;
+	private String entryId;
+	private String recvdInitialDepositionDate;
+	private String depositSite;
+	private String processSite;
+	private String sgEntry;
+	private String pdbFormatCompatible;
+	private String statusCodeMr;
+	private String statusCodeSf;
+	private String statusCodeCs;
+
 	public String getStatus_code() {
-		return status_code;
+		return statusCode;
 	}
+
 	public void setStatus_code(String status_code) {
-		this.status_code = status_code;
+		this.statusCode = status_code;
 	}
+
 	public String getEntry_id() {
-		return entry_id;
+		return entryId;
 	}
+
 	public void setEntry_id(String entry_id) {
-		this.entry_id = entry_id;
+		this.entryId = entry_id;
 	}
+
 	public String getRecvd_initial_deposition_date() {
-		return recvd_initial_deposition_date;
+		return recvdInitialDepositionDate;
 	}
+
 	public void setRecvd_initial_deposition_date(String recvd_initial_deposition_date) {
-		this.recvd_initial_deposition_date = recvd_initial_deposition_date;
+		this.recvdInitialDepositionDate = recvd_initial_deposition_date;
 	}
+
 	public String getDeposit_site() {
-		return deposit_site;
+		return depositSite;
 	}
+
 	public void setDeposit_site(String deposit_site) {
-		this.deposit_site = deposit_site;
+		this.depositSite = deposit_site;
 	}
+
 	public String getProcess_site() {
-		return process_site;
+		return processSite;
 	}
+
 	public void setProcess_site(String process_site) {
-		this.process_site = process_site;
+		this.processSite = process_site;
 	}
+
 	public String getSG_entry() {
-		return SG_entry;
+		return sgEntry;
 	}
+
 	public void setSG_entry(String sG_entry) {
-		SG_entry = sG_entry;
+		sgEntry = sG_entry;
 	}
+
 	public String getPdb_format_compatible() {
-		return pdb_format_compatible;
+		return pdbFormatCompatible;
 	}
+
 	public void setPdb_format_compatible(String pdb_format_compatible) {
-		this.pdb_format_compatible = pdb_format_compatible;
+		this.pdbFormatCompatible = pdb_format_compatible;
 	}
+
 	public String getStatus_code_mr() {
-		return status_code_mr;
+		return statusCodeMr;
 	}
+
 	public void setStatus_code_mr(String status_code_mr) {
-		this.status_code_mr = status_code_mr;
+		this.statusCodeMr = status_code_mr;
 	}
+
 	public String getStatus_code_sf() {
-		return status_code_sf;
+		return statusCodeSf;
 	}
+
 	public void setStatus_code_sf(String status_code_sf) {
-		this.status_code_sf = status_code_sf;
+		this.statusCodeSf = status_code_sf;
 	}
+
 	public String getStatus_code_cs() {
-		return status_code_cs;
+		return statusCodeCs;
 	}
+
 	public void setStatus_code_cs(String status_code_cs) {
-		this.status_code_cs = status_code_cs;
-	}  
+		this.statusCodeCs = status_code_cs;
+	}
 }

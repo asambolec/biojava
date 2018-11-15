@@ -52,8 +52,8 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public MultipleAlignmentEnsemble clone();
 
 	/**
-	 * Returns the name of the multiple structure alignment algorithm that
-	 * created the MultipleAlignment objects.
+	 * Returns the name of the multiple structure alignment algorithm that created
+	 * the MultipleAlignment objects.
 	 *
 	 * @return String name of the algorithm.
 	 * @see #setAlgorithmName(String)
@@ -61,8 +61,8 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public String getAlgorithmName();
 
 	/**
-	 * Set the name of the multiple structure alignment algorithm that created
-	 * the MultipleAlignment objects.
+	 * Set the name of the multiple structure alignment algorithm that created the
+	 * MultipleAlignment objects.
 	 *
 	 * @param algorithmName name of the algorithm.
 	 * @see #getAlgorithmName()
@@ -70,8 +70,8 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public void setAlgorithmName(String algorithmName);
 
 	/**
-	 * Returns the version of the algorithm used to generate the
-	 * MultipleAlignment objects.
+	 * Returns the version of the algorithm used to generate the MultipleAlignment
+	 * objects.
 	 *
 	 * @return String version of the algorithm.
 	 * @see #setVersion(String)
@@ -88,11 +88,11 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public void setVersion(String version);
 
 	/**
-	 * Returns a List containing the names of the structures aligned
-	 * (i.e.: PDB code, SCOP domain, etc.).<p>
-	 * The names are structure identifiers of the structures.
-	 * They are in the same order as in the alignment Blocks (same index number
-	 * for same structure).
+	 * Returns a List containing the names of the structures aligned (i.e.: PDB
+	 * code, SCOP domain, etc.).
+	 * <p>
+	 * The names are structure identifiers of the structures. They are in the same
+	 * order as in the alignment Blocks (same index number for same structure).
 	 *
 	 * @return List of String names of the structures
 	 * @see #setStructureIdentifiers(List)
@@ -101,8 +101,9 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public List<StructureIdentifier> getStructureIdentifiers();
 
 	/**
-	 * Set the List containing the names of the structures aligned
-	 * (i.e.: PDB code, SCOP domain, etc.).<p>
+	 * Set the List containing the names of the structures aligned (i.e.: PDB code,
+	 * SCOP domain, etc.).
+	 * <p>
 	 * The names are structure identifiers of the structures.
 	 *
 	 * @param structureIdentifiers names of the structures, structure identifiers
@@ -113,15 +114,16 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 
 	/**
 	 * Get an array of representative atoms for each structure (CA atoms for
-	 * proteins).<p>
-	 * Atoms should be unrotated. Thus, to obtain a superimposed set of
-	 * structures, each atom array should be cloned and then rotated according
-	 * to the transformation matrix.<p>
-	 * If atoms have not previously been set using
-	 * {@link #setAtomArrays(List)}, attempts to load representative atoms
-	 * based on {@link #getStructureIdentifiers()}.
-	 * If it fails to load the Atoms it gives a NullPointerException before
-	 * returning null.
+	 * proteins).
+	 * <p>
+	 * Atoms should be unrotated. Thus, to obtain a superimposed set of structures,
+	 * each atom array should be cloned and then rotated according to the
+	 * transformation matrix.
+	 * <p>
+	 * If atoms have not previously been set using {@link #setAtomArrays(List)},
+	 * attempts to load representative atoms based on
+	 * {@link #getStructureIdentifiers()}. If it fails to load the Atoms it gives a
+	 * NullPointerException before returning null.
 	 *
 	 * @return List of Atom[].
 	 * @see #setAtomArrays(List)
@@ -129,9 +131,10 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public List<Atom[]> getAtomArrays();
 
 	/**
-	 * Sets the List of Atom arrays. Every structure has an Atom array
-	 * associated. Note that this should be called in conjunction with
-	 * {@link #setStructureIdentifiers(List)}.<p>
+	 * Sets the List of Atom arrays. Every structure has an Atom array associated.
+	 * Note that this should be called in conjunction with
+	 * {@link #setStructureIdentifiers(List)}.
+	 * <p>
 	 * Setting the atom arrays to null will cause them to be automatically
 	 * regenerated based on {@link #getStructureIdentifiers()} during the next call
 	 * to {@link #getAtomArrays()}.
@@ -160,9 +163,8 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public List<MultipleAlignment> getMultipleAlignments();
 
 	/**
-	 * Returns the MultipleAlignments at the specified index
-	 * in the ensemble. Throws an exception equivalently to
-	 * accessing an index of a List
+	 * Returns the MultipleAlignments at the specified index in the ensemble. Throws
+	 * an exception equivalently to accessing an index of a List
 	 *
 	 * @return MultipleAlignment at the index in the ensemble.
 	 * @see #setMultipleAlignments()
@@ -172,15 +174,14 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	/**
 	 * Set the List of MultipleAlignments in the ensemble.
 	 *
-	 * @param alignments List of MultipleAlignments that are part of the
-	 * ensemble.
+	 * @param alignments List of MultipleAlignments that are part of the ensemble.
 	 * @see #addMultipleAlignment(MultipleAlignment)
 	 */
 	public void setMultipleAlignments(List<MultipleAlignment> alignments);
 
 	/**
-	 * Add a new MultipleAlignment to the end of the ensemble and set its
-	 * parent ensemble to this.
+	 * Add a new MultipleAlignment to the end of the ensemble and set its parent
+	 * ensemble to this.
 	 *
 	 * @param alignment
 	 */
@@ -197,12 +198,14 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 
 	/**
 	 * Returns the io time for this object, in milliseconds.
+	 * 
 	 * @return long creation time, or null if unset
 	 */
 	public Long getIoTime();
 
 	/**
 	 * Set the IO time to load this object
+	 * 
 	 * @param millis
 	 */
 	public void setIoTime(Long millis);
@@ -224,9 +227,9 @@ public interface MultipleAlignmentEnsemble extends ScoresCache {
 	public void setCalculationTime(Long millis);
 
 	/**
-	 * Clear scores and other properties which depend on the specific
-	 * alignment. This frees memory and ensures consistency of the cached
-	 * variables.<p>
+	 * Clear scores and other properties which depend on the specific alignment.
+	 * This frees memory and ensures consistency of the cached variables.
+	 * <p>
 	 * Recursively clears the member MultipleAlignments.
 	 */
 	public void clear();

@@ -20,35 +20,40 @@
  */
 package org.biojava.nbio.structure.align.util;
 
-
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SynchronizedOutFile {
+
+	private static final Logger logger = LoggerFactory.getLogger(SynchronizedOutFile.class);
 
 	File file;
 
 	String[] tmp;
 
-	int ARR_SIZE=100;
+	int ARR_SIZE = 100;
 	Integer counter;
 
 	boolean useGzipCompression = false;
 
-
-	/** Create a thread safe wrapper for writing to this file, the file will be gzip compressed.
+	/**
+	 * Create a thread safe wrapper for writing to this file, the file will be gzip
+	 * compressed.
 	 *
-	 * @param f file to write to
+	 * @param f            file to write to
 	 * @param gzipCompress flag if file should be gzip compressed
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public SynchronizedOutFile(File f, boolean gzipCompress) throws FileNotFoundException, IOException{
-		if ( f.isDirectory())
+	public SynchronizedOutFile(File f, boolean gzipCompress) throws IOException {
+		if (f.isDirectory()) {
 			throw new FileNotFoundException("please provide a file and not a directory");
+		}
 
-		if ( ! f.exists()){
-			System.out.println("creating output file: " + f.getAbsolutePath());
+		if (!f.exists()) {
+			logger.info("creating output file: " + f.getAbsolutePath());
 			f.createNewFile();
 		}
 		file = f;
@@ -58,62 +63,62 @@ public class SynchronizedOutFile {
 
 	}
 
-	/** create a thread safe wrapper for working with this file
+	/**
+	 * create a thread safe wrapper for working with this file
 	 *
 	 * @param f
 	 */
-	public SynchronizedOutFile(File f) throws FileNotFoundException, IOException{
+	public SynchronizedOutFile(File f) throws IOException {
 
-		this(f,false);
+		this(f, false);
 
 	}
 
-	public synchronized void write(String message) throws IOException{
+	public synchronized void write(String message) throws IOException {
 
-		synchronized (counter){
+		synchronized (counter) {
 			counter++;
 			tmp[counter] = message;
-			if (counter >= ARR_SIZE - 1 ) {
+			if (counter >= ARR_SIZE - 1) {
 				writeArr();
 				counter = -1;
 			}
 		}
 
-
 	}
 
 	public synchronized void flush() throws IOException {
-		synchronized (counter){
+		synchronized (counter) {
 			writeArr();
 			counter = -1;
 		}
 	}
 
-	public void close() throws IOException{
+	public void close() throws IOException {
 		writeArr();
 		tmp = new String[ARR_SIZE];
 	}
 
-	private void writeArr() throws IOException{
-
+	private void writeArr() throws IOException {
 
 		OutputStream out = null;
-		FileOutputStream fileOutputStream=null;
+		FileOutputStream fileOutputStream = null;
 		try {
-			//This is less code-redundant
+			// This is less code-redundant
 			fileOutputStream = new FileOutputStream(file, true);
-			OutputStream outputstream = useGzipCompression? new GZIPOutputStream(fileOutputStream) : fileOutputStream;
+			OutputStream outputstream = useGzipCompression ? new GZIPOutputStream(fileOutputStream) : fileOutputStream;
 			out = new BufferedOutputStream(outputstream);
 
-			for ( int i = 0 ; i <= counter ; i++){
-				if ( tmp[i] == null )
+			for (int i = 0; i <= counter; i++) {
+				if (tmp[i] == null) {
 					continue;
+				}
 				byte[] data = tmp[i].getBytes();
 				out.write(data, 0, data.length);
 			}
 
 		} catch (Exception x) {
-			System.err.println(x);
+			logger.error(String.valueOf(x), x);
 		} finally {
 			if (out != null) {
 				out.flush();
@@ -121,6 +126,5 @@ public class SynchronizedOutFile {
 			}
 		}
 	}
-
 
 }

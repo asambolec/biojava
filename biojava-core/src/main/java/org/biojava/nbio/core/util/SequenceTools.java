@@ -30,9 +30,13 @@ public class SequenceTools {
 	protected static final String NUCLEOTIDE_LETTERS = "GCTAUXN";
 
 	/**
-	 * Cyclically permute the characters in {@code string} <em>forward</em> by {@code n} elements.
+	 * Cyclically permute the characters in {@code string} <em>forward</em> by
+	 * {@code n} elements.
+	 * 
 	 * @param string The string to permute
-	 * @param n The number of characters to permute by; can be positive or negative; values greater than the length of the array are acceptable
+	 * @param n      The number of characters to permute by; can be positive or
+	 *               negative; values greater than the length of the array are
+	 *               acceptable
 	 */
 	public static String permuteCyclic(String string, int n) {
 		// single letters are char[]; full names are Character[]
@@ -52,13 +56,20 @@ public class SequenceTools {
 
 	/**
 	 * Cyclically permute {@code array} <em>forward</em> by {@code n} elements.
+	 * 
 	 * @param array The original result; will not be changed
-	 * @param fill The permuted result will be filled into this array
-	 * @param n The number of elements to permute by; can be positive or negative; values greater than the length of the array are acceptable
+	 * @param fill  The permuted result will be filled into this array
+	 * @param n     The number of elements to permute by; can be positive or
+	 *              negative; values greater than the length of the array are
+	 *              acceptable
 	 */
 	public static <T> void permuteCyclic(T[] array, T[] fill, int n) {
-		if (array.length != fill.length) throw new IllegalArgumentException("Lengths do not match");
-		if (n < 0) n = array.length + n;
+		if (array.length != fill.length) {
+			throw new IllegalArgumentException("Lengths do not match");
+		}
+		if (n < 0) {
+			n += array.length;
+		}
 		while (n > array.length) {
 			n -= array.length;
 		}
@@ -71,65 +82,69 @@ public class SequenceTools {
 		}
 	}
 
-	public static int percentNucleotideSequence(String sequence)
-	{
-			if (sequence == null || sequence.length() == 0) return 0;
+	public static int percentNucleotideSequence(String sequence) {
+		if (sequence == null || sequence.isEmpty()) {
+			return 0;
+		}
 
-			int l = sequence.length();
-			int n =0;
+		int l = sequence.length();
+		int n = 0;
 
-			for (int i = 0; i < l; i++)
-			{
-					if (NUCLEOTIDE_LETTERS.indexOf(sequence.charAt(i)) < 0)
-					{
-							continue;
-					}
-					n++;
+		for (int i = 0; i < l; i++) {
+			if (NUCLEOTIDE_LETTERS.indexOf(sequence.charAt(i)) < 0) {
+				continue;
 			}
-			return (100 * n) / l;
+			n++;
+		}
+		return (100 * n) / l;
 	}
 
-	public static boolean isNucleotideSequence(String sequence)
-	{
-			if (sequence == null || sequence.length() == 0) return false;
+	public static boolean isNucleotideSequence(String sequence) {
+		if (sequence == null || sequence.isEmpty()) {
+			return false;
+		}
 
-			int l = sequence.length();
-			for (int i = 0; i < l; i++)
-			{
-					if (NUCLEOTIDE_LETTERS.indexOf(sequence.charAt(i)) < 0)
-					{
-							return false;
-					}
+		int l = sequence.length();
+		for (int i = 0; i < l; i++) {
+			if (NUCLEOTIDE_LETTERS.indexOf(sequence.charAt(i)) < 0) {
+				return false;
 			}
-			return true;
+		}
+		return true;
 	}
 
 	public Sequence<?> getSequenceFromString(String sequence) throws CompoundNotFoundException {
 
-
-		if( isNucleotideSequence(sequence)) {
-			return  new DNASequence(sequence);
+		if (isNucleotideSequence(sequence)) {
+			return new DNASequence(sequence);
 		} else {
 			return new ProteinSequence(sequence);
 		}
 
 	}
 
-	/** A method to check whether an array of sequences contains at least two sequences having an equal length.
+	/**
+	 * A method to check whether an array of sequences contains at least two
+	 * sequences having an equal length.
 	 *
-	 * @param sequences the array of {@link org.biojava.nbio.core.sequence.ProteinSequence} sequences
+	 * @param sequences the array of
+	 *                  {@link org.biojava.nbio.core.sequence.ProteinSequence}
+	 *                  sequences
 	 * @return true if any two sequences are of an equal length
 	 */
 	public static boolean equalLengthSequences(ProteinSequence[] sequences) {
 
-		for (int i=0; i<sequences.length-1; i++) {
-			if (sequences[i]==null)
+		for (int i = 0; i < sequences.length - 1; i++) {
+			if (sequences[i] == null) {
 				continue;
-			for (int j=i+1; j<sequences.length; j++) {
-				if (sequences[j]==null)
+			}
+			for (int j = i + 1; j < sequences.length; j++) {
+				if (sequences[j] == null) {
 					continue;
-				if (sequences[i].getLength() == sequences[j].getLength())
+				}
+				if (sequences[i].getLength() == sequences[j].getLength()) {
 					return true;
+				}
 			}
 		}
 		return false;

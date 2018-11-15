@@ -28,9 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Corresponds to the wrapper element "ligandInfo" in an RCSB {@code ligandInfo} XML file.
+ * Corresponds to the wrapper element "ligandInfo" in an RCSB {@code ligandInfo}
+ * XML file.
  *
- * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB RESTful</a>
+ * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB
+ *      RESTful</a>
  *
  * @author dmyerstu
  * @since 3.0.6
@@ -42,7 +44,7 @@ public class RCSBLigands {
 	private List<RCSBLigand> ligands;
 
 	public RCSBLigands() {
-		ligands = new ArrayList<RCSBLigand>();
+		ligands = new ArrayList<>();
 	}
 
 	public void addLigand(RCSBLigand ligand) {

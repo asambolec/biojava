@@ -20,15 +20,13 @@
  */
 package org.biojava.nbio.core.search.io.blast;
 
-
 import org.biojava.nbio.core.search.io.Hsp;
 import java.util.List;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Designed by Paolo Pavan.
- * You may want to find my contacts on Github and LinkedIn for code info
- * or discuss major changes.
+ * Designed by Paolo Pavan. You may want to find my contacts on Github and
+ * LinkedIn for code info or discuss major changes.
  * https://github.com/paolopavan
  *
  * @author Paolo Pavan

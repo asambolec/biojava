@@ -25,13 +25,10 @@ package org.biojava.nbio.genome.io.fastq;
  *
  * @since 3.0.3
  */
-public final class SangerFastqWriter
-	extends AbstractFastqWriter
-{
+public final class SangerFastqWriter extends AbstractFastqWriter {
 
 	@Override
-	protected Fastq convert(final Fastq fastq)
-	{
+	protected Fastq convert(final Fastq fastq) {
 		return fastq.convertTo(FastqVariant.FASTQ_SANGER);
 	}
 }

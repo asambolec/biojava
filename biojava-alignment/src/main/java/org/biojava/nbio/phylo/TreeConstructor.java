@@ -36,14 +36,13 @@ import org.slf4j.LoggerFactory;
  */
 public class TreeConstructor {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TreeConstructor.class);
+	private static final Logger logger = LoggerFactory.getLogger(TreeConstructor.class);
 
 	/** Prevent instantiation */
-	private TreeConstructor() {}
+	private TreeConstructor() {
+	}
 
-	public static Phylogeny distanceTree(BasicSymmetricalDistanceMatrix distM,
-			TreeConstructorType constructor) {
+	public static Phylogeny distanceTree(BasicSymmetricalDistanceMatrix distM, TreeConstructorType constructor) {
 
 		Phylogeny p = null;
 		switch (constructor) {

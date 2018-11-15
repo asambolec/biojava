@@ -27,7 +27,6 @@ import java.io.Serializable;
 
 public class DatabasePdbrevRecord implements Serializable {
 
-
 	private static final long serialVersionUID = 1L;
 
 	String rev_num;
@@ -60,10 +59,8 @@ public class DatabasePdbrevRecord implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DatabasePdbrevRecord{" +
-				"rev_num='" + rev_num + '\'' +
-				", type='" + type + '\'' +
-				", details='" + details + '\'' +
-				'}';
+		return new StringBuilder().append("DatabasePdbrevRecord{").append("rev_num='").append(rev_num).append('\'')
+				.append(", type='").append(type).append('\'').append(", details='").append(details).append('\'')
+				.append('}').toString();
 	}
 }

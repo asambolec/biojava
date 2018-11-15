@@ -29,40 +29,40 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MyExportListener implements ActionListener{
+public class MyExportListener implements ActionListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(MyExportListener.class);
 	AbstractAlignmentJmol parent;
-	MyExportListener(AbstractAlignmentJmol parent){
+
+	MyExportListener(AbstractAlignmentJmol parent) {
 		this.parent = parent;
 	}
+
 	@Override
-public void actionPerformed(ActionEvent arg0)
-	{
+	public void actionPerformed(ActionEvent arg0) {
 		final JFileChooser fc = new JFileChooser();
 
 		int returnVal = fc.showSaveDialog(null);
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
-			//This is where a real application would open the file.
-			System.out.println("Exporting PDB file to: " + file.getName());
+			// This is where a real application would open the file.
+			logger.info("Exporting PDB file to: " + file.getName());
 
 			Structure s = parent.getStructure();
 
-			try {
-				PrintWriter pw = new PrintWriter(new FileWriter(file));
+			try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
 				pw.println(s.toPDB());
-				pw.close();
-			} catch (IOException e){
-			 JOptionPane.showMessageDialog(null,"Could not export file. Exception: " + e.getMessage());
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "Could not export file. Exception: " + e.getMessage());
 			}
 
-
 		} else {
-			System.out.println("Export command cancelled by user.");
+			logger.info("Export command cancelled by user.");
 		}
-
 
 	}
 }

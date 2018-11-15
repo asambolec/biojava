@@ -30,49 +30,53 @@ import java.io.IOException;
 
 public class StructureGroupXMLConverter {
 
-	public static void toXML(StructureGroup group, PrettyXMLWriter xml) throws IOException{
+	public static void toXML(StructureGroup group, PrettyXMLWriter xml) throws IOException {
 
 		xml.openTag("structureGroup");
 		xml.attribute("chainID", group.getChainId());
 		xml.attribute("pdbName", group.getPDBName());
-		if ( group.getInsCode() != null)
-			xml.attribute("insCode",group.getInsCode()+"");
-		xml.attribute("residueNr", group.getResidueNumber()+"");
+		if (group.getInsCode() != null) {
+			xml.attribute("insCode", group.getInsCode() + "");
+		}
+		xml.attribute("residueNr", Integer.toString(group.getResidueNumber()));
 		xml.attribute("isAminoAcid", Boolean.toString(group.isAminoAcid()));
 		xml.closeTag("structureGroup");
 	}
 
 	public static StructureGroup fromXML(Node n) {
 
-
 		String chainID = getAttribute(n, "chainID");
 		String pdbName = getAttribute(n, "pdbName");
 		String insCode = getAttribute(n, "insCode");
-		String resN  = getAttribute(n, "residueNr");
-		String isAminoAcid = getAttribute(n,"isAminoAcid");
+		String resN = getAttribute(n, "residueNr");
+		String isAminoAcid = getAttribute(n, "isAminoAcid");
 
 		ResidueNumber resNum = new ResidueNumber();
 		resNum.setChainName(chainID);
-		if ( ( insCode != null) && (! insCode.equals("null")) && insCode.length() == 1)
-		resNum.setInsCode(insCode.charAt(0));
+		if ((insCode != null) && (!"null".equals(insCode)) && insCode.length() == 1) {
+			resNum.setInsCode(insCode.charAt(0));
+		}
 		resNum.setSeqNum(Integer.parseInt(resN));
 
 		StructureGroup g = new StructureGroup(resNum, pdbName, Boolean.valueOf(isAminoAcid));
 		return g;
 	}
 
-	private static String getAttribute(Node node, String attr){
-		if( ! node.hasAttributes())
+	private static String getAttribute(Node node, String attr) {
+		if (!node.hasAttributes()) {
 			return null;
+		}
 
 		NamedNodeMap atts = node.getAttributes();
 
-		if ( atts == null)
+		if (atts == null) {
 			return null;
+		}
 
 		Node att = atts.getNamedItem(attr);
-		if ( att == null)
+		if (att == null) {
 			return null;
+		}
 
 		String value = att.getTextContent();
 

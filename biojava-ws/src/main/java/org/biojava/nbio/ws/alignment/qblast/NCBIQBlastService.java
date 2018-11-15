@@ -37,17 +37,22 @@ import java.util.Map;
 
 import static org.biojava.nbio.ws.alignment.qblast.BlastAlignmentParameterEnum.*;
 import static org.biojava.nbio.ws.alignment.qblast.BlastOutputParameterEnum.RID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Provides a simple way of submitting BLAST request to the QBlast service at NCBI.
+ * Provides a simple way of submitting BLAST request to the QBlast service at
+ * NCBI.
  * <p>
- * NCBI provides a Blast server through a CGI-BIN interface. This service simply encapsulates an access to it by giving
- * users access to get/set methods to fix sequence, program and database as well as advanced options.
+ * NCBI provides a Blast server through a CGI-BIN interface. This service simply
+ * encapsulates an access to it by giving users access to get/set methods to fix
+ * sequence, program and database as well as advanced options.
  * </p>
  * <p>
- * The philosophy behind this service is to disconnect submission of Blast requests from collection of Blast results.
- * This is done so to allow a user to submit multiple Blast requests while allowing recovery of the reports at a later
- * time.
+ * The philosophy behind this service is to disconnect submission of Blast
+ * requests from collection of Blast results. This is done so to allow a user to
+ * submit multiple Blast requests while allowing recovery of the reports at a
+ * later time.
  * </p>
  * <p>
  * Presently, only blastall programs are accessible.
@@ -57,9 +62,12 @@ import static org.biojava.nbio.ws.alignment.qblast.BlastOutputParameterEnum.RID;
  * @author Gediminas Rimsa
  */
 public class NCBIQBlastService implements RemotePairwiseAlignmentService {
+	private static final Logger logger = LoggerFactory.getLogger(NCBIQBlastService.class);
+
 	/**
-	 * Number of milliseconds by which expected job execution time is incremented if it is not finished yet. Subsequent
-	 * calls to {@link #isReady(String, long)} method will return false until at least this much time passes.
+	 * Number of milliseconds by which expected job execution time is incremented if
+	 * it is not finished yet. Subsequent calls to {@link #isReady(String, long)}
+	 * method will return false until at least this much time passes.
 	 */
 	public static final long WAIT_INCREMENT = 3000;
 
@@ -72,41 +80,51 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 	private String email = DEFAULT_EMAIL;
 	private String tool = DEFAULT_TOOL;
 
-	private Map<String, BlastJob> jobs = new HashMap<String, BlastJob>();
+	private Map<String, BlastJob> jobs = new HashMap<>();
 
-    /** Constructs a service object that targets the public NCBI BLAST network
-     * service. 
-     */
+	/**
+	 * Constructs a service object that targets the public NCBI BLAST network
+	 * service.
+	 */
 	public NCBIQBlastService() {
-        init(SERVICE_URL);
+		init(SERVICE_URL);
 	}
 
-    /** Constructs a service object which targets a custom NCBI BLAST network
-     * service (e.g.: an instance of BLAST in the cloud).
-     *
+	/**
+	 * Constructs a service object which targets a custom NCBI BLAST network service
+	 * (e.g.: an instance of BLAST in the cloud).
+	 *
 	 * @param svcUrl : a {@code String} containing the base URL to send requests to,
-     *                 e.g.: http://host.my.cloud.service.provider.com/cgi-bin/blast.cgi
-     *
-     * @see <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=CloudBlast">BLAST on the cloud documentation</a>
-     */
+	 *               e.g.:
+	 *               http://host.my.cloud.service.provider.com/cgi-bin/blast.cgi
+	 *
+	 * @see <a href=
+	 *      "https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=CloudBlast">BLAST
+	 *      on the cloud documentation</a>
+	 */
 	public NCBIQBlastService(String svcUrl) {
-        init(svcUrl);
+		init(svcUrl);
 	}
 
-    /** Initialize the serviceUrl data member 
-     * @throws MalformedURLException on invalid URL
-     */
-    private void init(String svcUrl) {
+	/**
+	 * Initialize the serviceUrl data member
+	 * 
+	 * @throws MalformedURLException on invalid URL
+	 */
+	private void init(String svcUrl) {
 		try {
 			serviceUrl = new URL(svcUrl);
 		} catch (MalformedURLException e) {
-            throw new RuntimeException("It looks like the URL for remote NCBI BLAST service (" 
-                                       + svcUrl + ") is wrong. Cause: " + e.getMessage(), e);
+			throw new RuntimeException(
+					new StringBuilder().append("It looks like the URL for remote NCBI BLAST service (").append(svcUrl)
+							.append(") is wrong. Cause: ").append(e.getMessage()).toString(),
+					e);
 		}
-    }
+	}
 
 	/**
-	 * A simple method to check the availability of the QBlast service. Sends {@code Info} command to QBlast
+	 * A simple method to check the availability of the QBlast service. Sends
+	 * {@code Info} command to QBlast
 	 *
 	 * @return QBlast info output concatenated to String
 	 * @throws Exception if unable to connect to the NCBI QBlast service
@@ -153,18 +171,24 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 	}
 
 	/**
-	 * Sends the Blast request via the Put command of the CGI-BIN interface. Uses all of the parameters specified in
-	 * {@code alignmentProperties} (parameters PROGRAM and DATABASE are required).
+	 * Sends the Blast request via the Put command of the CGI-BIN interface. Uses
+	 * all of the parameters specified in {@code alignmentProperties} (parameters
+	 * PROGRAM and DATABASE are required).
 	 *
-	 * @param query : a {@code String} representing a sequence or Genbank ID
-	 * @param alignmentProperties : a {@code RemotePairwiseAlignmentProperties} object representing alignment properties
-	 * @return the request id for this sequence, necessary to fetch results after completion
-	 * @throws Exception if unable to connect to the NCBI QBlast service or if no sequence or required parameters
-	 *             PROGRAM and DATABASE are not set
+	 * @param query               : a {@code String} representing a sequence or
+	 *                            Genbank ID
+	 * @param alignmentProperties : a {@code RemotePairwiseAlignmentProperties}
+	 *                            object representing alignment properties
+	 * @return the request id for this sequence, necessary to fetch results after
+	 *         completion
+	 * @throws Exception if unable to connect to the NCBI QBlast service or if no
+	 *                   sequence or required parameters PROGRAM and DATABASE are
+	 *                   not set
 	 */
 	@Override
-	public String sendAlignmentRequest(String query, RemotePairwiseAlignmentProperties alignmentProperties) throws Exception {
-		Map<String, String> params = new HashMap<String, String>();
+	public String sendAlignmentRequest(String query, RemotePairwiseAlignmentProperties alignmentProperties)
+			throws Exception {
+		Map<String, String> params = new HashMap<>();
 		for (String key : alignmentProperties.getAlignmentOptions()) {
 			params.put(key, alignmentProperties.getAlignmentOption(key));
 		}
@@ -173,10 +197,12 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 			throw new IllegalArgumentException("Impossible to execute QBlast request. The sequence has not been set.");
 		}
 		if (!params.containsKey(PROGRAM.name())) {
-			throw new IllegalArgumentException("Impossible to execute QBlast request. Parameter PROGRAM has not been set.");
+			throw new IllegalArgumentException(
+					"Impossible to execute QBlast request. Parameter PROGRAM has not been set.");
 		}
 		if (!params.containsKey(DATABASE.name())) {
-			throw new IllegalArgumentException("Impossible to execute QBlast request. Parameter DATABASE has not been set.");
+			throw new IllegalArgumentException(
+					"Impossible to execute QBlast request. Parameter DATABASE has not been set.");
 		}
 
 		params.put(CMD.name(), "Put");
@@ -238,7 +264,8 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 	}
 
 	/**
-	 * Wrapper method for {@link #isReady(String, long)}, omitting unnecessary {@code present} property.
+	 * Wrapper method for {@link #isReady(String, long)}, omitting unnecessary
+	 * {@code present} property.
 	 *
 	 * @see #isReady(String, long)
 	 */
@@ -249,10 +276,12 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 	/**
 	 * Checks for completion of request.
 	 * <p/>
-	 * If expected execution time (RTOE) is available for request, this method will always return false until that time
-	 * passes. This is done to prevent sending unnecessary requests to the server.
+	 * If expected execution time (RTOE) is available for request, this method will
+	 * always return false until that time passes. This is done to prevent sending
+	 * unnecessary requests to the server.
 	 *
-	 * @param id : request id, which was returned by {@code sendAlignmentRequest} method
+	 * @param id      : request id, which was returned by
+	 *                {@code sendAlignmentRequest} method
 	 * @param present : is not used, can be any value
 	 * @return a boolean value telling if the request has been completed
 	 */
@@ -275,7 +304,8 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 		OutputStreamWriter writer = null;
 		BufferedReader reader = null;
 		try {
-			String checkRequest = "CMD=Get&RID=" + job.getId() + "&FORMAT_OBJECT=SearchInfo";
+			String checkRequest = new StringBuilder().append("CMD=Get&RID=").append(job.getId())
+					.append("&FORMAT_OBJECT=SearchInfo").toString();
 			URLConnection serviceConnection = setQBlastServiceProperties(serviceUrl.openConnection());
 			writer = new OutputStreamWriter(serviceConnection.getOutputStream());
 			writer.write(checkRequest);
@@ -292,12 +322,14 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 					jobs.put(job.getId(), job);
 					return false;
 				} else if (line.contains("UNKNOWN")) {
-					throw new IllegalArgumentException("Unknown request id - no results exist for it. Given id = " + id);
+					throw new IllegalArgumentException(
+							"Unknown request id - no results exist for it. Given id = " + id);
 				}
 			}
 			return false;
 		} catch (IOException ioe) {
-			throw new Exception("It is not possible to fetch Blast report from NCBI at this time. Cause: " + ioe.getMessage(), ioe);
+			throw new Exception(
+					"It is not possible to fetch Blast report from NCBI at this time. Cause: " + ioe.getMessage(), ioe);
 		} finally {
 			IOUtils.close(reader);
 			IOUtils.close(writer);
@@ -305,20 +337,22 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 	}
 
 	/**
-	 * Extracts the actual Blast report for given request id according to options provided in {@code outputProperties}
-	 * argument.
+	 * Extracts the actual Blast report for given request id according to options
+	 * provided in {@code outputProperties} argument.
 	 * <p/>
-	 * If the results are not ready yet, sleeps until they are available. If sleeping is not desired, call this method
-	 * after {@code isReady} returns true
+	 * If the results are not ready yet, sleeps until they are available. If
+	 * sleeping is not desired, call this method after {@code isReady} returns true
 	 *
-	 * @param id : request id, which was returned by {@code sendAlignmentRequest} method
+	 * @param id               : request id, which was returned by
+	 *                         {@code sendAlignmentRequest} method
 	 * @param outputProperties : an object specifying output formatting options
 	 * @return an {@code InputStream} of results
 	 * @throws Exception if it is not possible to recover the results
 	 */
 	@Override
-	public InputStream getAlignmentResults(String id, RemotePairwiseAlignmentOutputProperties outputProperties) throws Exception {
-		Map<String, String> params = new HashMap<String, String>();
+	public InputStream getAlignmentResults(String id, RemotePairwiseAlignmentOutputProperties outputProperties)
+			throws Exception {
+		Map<String, String> params = new HashMap<>();
 		for (String key : outputProperties.getOutputOptions()) {
 			params.put(key, outputProperties.getOutputOption(key));
 		}
@@ -341,15 +375,18 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 			writer.flush();
 			return serviceConnection.getInputStream();
 		} catch (IOException ioe) {
-			throw new Exception("It is not possible to fetch Blast report from NCBI at this time. Cause: " + ioe.getMessage(), ioe);
+			throw new Exception(
+					"It is not possible to fetch Blast report from NCBI at this time. Cause: " + ioe.getMessage(), ioe);
 		} finally {
 			IOUtils.close(writer);
 		}
 	}
 
 	/**
-	 * Sends a delete request for given request id. Optional operation, ignores IOExceptions.<br/>
-	 * Can be used after results of given search are no longer needed to be kept on Blast server
+	 * Sends a delete request for given request id. Optional operation, ignores
+	 * IOExceptions.<br/>
+	 * Can be used after results of given search are no longer needed to be kept on
+	 * Blast server
 	 *
 	 * @param id request id, as returned by {@code sendAlignmentRequest} method
 	 */
@@ -362,6 +399,7 @@ public class NCBIQBlastService implements RemotePairwiseAlignmentService {
 			writer.write(deleteRequest);
 			writer.flush();
 		} catch (IOException ignore) {
+			logger.error(ignore.getMessage(), ignore);
 			// ignore it this is an optional operation
 		} finally {
 			IOUtils.close(writer);

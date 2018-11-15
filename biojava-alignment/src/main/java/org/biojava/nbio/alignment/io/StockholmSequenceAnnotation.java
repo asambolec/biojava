@@ -45,19 +45,20 @@ class StockholmSequenceAnnotation {
 	private String organismClassification;
 	private String look;
 
-
 	public String getDescription() {
 		return description.toString();
 	}
+
 	public void setDescription(CharSequence description) {
 		this.description = description;
 	}
+
 	public void addToDescription(CharSequence description) {
 		if (this.description == null) {
 			this.description = new StringBuffer(description);
-		} else if (this.description instanceof StringBuffer){
+		} else if (this.description instanceof StringBuffer) {
 			((StringBuffer) this.description).append(description);
-		}else {
+		} else {
 			this.description = new StringBuffer(this.description).append(description);
 		}
 	}
@@ -69,40 +70,46 @@ class StockholmSequenceAnnotation {
 	public void setDbReferences(Set<DatabaseReference> dbReferences) {
 		this.dbReferences = dbReferences;
 	}
+
 	/**
-	 * @param dbReference the string without the initial annotation identifier ( #=GS DR )
+	 * @param dbReference the string without the initial annotation identifier (
+	 *                    #=GS DR )
 	 */
 	public void addDBReference(String dbReferenceRepresentingString) {
 		if (this.dbReferences == null) {
-			this.dbReferences = new HashSet<DatabaseReference>();
+			this.dbReferences = new HashSet<>();
 		}
 		dbReferences.add(new DatabaseReference(dbReferenceRepresentingString));
 	}
 
-
-
-
 	public String getAccessionNumber() {
 		return accessionNumber;
 	}
+
 	public void setAccessionNumber(String accessionNumber) {
 		this.accessionNumber = accessionNumber;
 	}
+
 	public String getOrganism() {
 		return organism;
 	}
+
 	public void setOrganism(String organism) {
 		this.organism = organism;
 	}
+
 	public String getOrganismClassification() {
 		return organismClassification;
 	}
+
 	public void setOrganismClassification(String organismClassification) {
 		this.organismClassification = organismClassification;
 	}
+
 	public String getLook() {
 		return look;
 	}
+
 	public void setLook(String look) {
 		this.look = look;
 	}

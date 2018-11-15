@@ -30,56 +30,32 @@ import java.util.List;
  */
 public class CECPParameters extends CeParameters {
 
-	public static final int DEFAULT_MIN_CP_LENGTH = 5; //The minimum block length for CPs. Blocks shorter than this will be ignored.
-
-	public static enum DuplicationHint {
-		SHORTER("Shorter of the two"),
-		LEFT("Left"),
-		RIGHT("Right");
-
-
-		private String name;
-		private DuplicationHint(String name) {
-			this.name = name;
-		}
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-
+	public static final int DEFAULT_MIN_CP_LENGTH = 5; // The minimum block length for CPs. Blocks shorter than this
+														// will be ignored.
 	protected DuplicationHint duplicationHint;
 	protected Integer minCPLength;
 
 	public CECPParameters() {
-		super();
 		// super calls reset();
 	}
 
 	@Override
 	public String toString() {
-		return "CECPParameters [scoringStrategy=" + scoringStrategy
-		+ ", maxGapSize=" + maxGapSize
-		+ ", rmsdThr=" + rmsdThr
-		+ ", rmsdThrJoin="+ rmsdThrJoin
-		+ ", winSize=" + winSize
-		+ ", showAFPRanges=" + showAFPRanges
-		+ ", maxOptRMSD=" + maxOptRMSD
-		+ ", seqWeight=" + seqWeight
-		+ ", duplicationHint=" + duplicationHint
-		+ ", minCPLength=" + minCPLength
-		+ "]";
+		return new StringBuilder().append("CECPParameters [scoringStrategy=").append(scoringStrategy)
+				.append(", maxGapSize=").append(maxGapSize).append(", rmsdThr=").append(rmsdThr)
+				.append(", rmsdThrJoin=").append(rmsdThrJoin).append(", winSize=").append(winSize)
+				.append(", showAFPRanges=").append(showAFPRanges).append(", maxOptRMSD=").append(maxOptRMSD)
+				.append(", seqWeight=").append(seqWeight).append(", duplicationHint=").append(duplicationHint)
+				.append(", minCPLength=").append(minCPLength).append("]").toString();
 	}
 
-
 	@Override
-	public void reset(){
+	public void reset() {
 		super.reset();
 		duplicationHint = DuplicationHint.SHORTER;
 		minCPLength = DEFAULT_MIN_CP_LENGTH;
 		setMaxGapSize(0);
 	}
-
 
 	@Override
 	public List<String> getUserConfigHelp() {
@@ -98,7 +74,7 @@ public class CECPParameters extends CeParameters {
 	}
 
 	@Override
-	public List<String> getUserConfigParameterNames(){
+	public List<String> getUserConfigParameterNames() {
 		List<String> params = super.getUserConfigParameterNames();
 
 		params.add("Which to duplicate");
@@ -123,13 +99,26 @@ public class CECPParameters extends CeParameters {
 		this.duplicationHint = duplicationHint;
 	}
 
-
 	public Integer getMinCPLength() {
 		return minCPLength;
 	}
 
-
 	public void setMinCPLength(Integer minCPLength) {
 		this.minCPLength = minCPLength;
+	}
+
+	public static enum DuplicationHint {
+		SHORTER("Shorter of the two"), LEFT("Left"), RIGHT("Right");
+
+		private String name;
+
+		private DuplicationHint(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 }

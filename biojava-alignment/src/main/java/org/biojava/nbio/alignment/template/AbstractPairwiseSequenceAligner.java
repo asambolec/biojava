@@ -33,24 +33,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements common code for an {@link Aligner} for a pair of {@link Sequence}s.
+ * Implements common code for an {@link Aligner} for a pair of
+ * {@link Sequence}s.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public abstract class AbstractPairwiseSequenceAligner<S extends Sequence<C>, C extends Compound>
 		extends AbstractMatrixAligner<S, C> implements PairwiseSequenceAligner<S, C> {
 
 	// additional input fields
-	private S query, target;
+	private S query;
+
+	private S target;
 
 	// additional output field
 	protected SequencePair<S, C> pair;
 
 	/**
-	 * Before running a pairwise global sequence alignment, data must be sent in via calls to
-	 * {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * Before running a pairwise global sequence alignment, data must be sent in via
+	 * calls to {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	protected AbstractPairwiseSequenceAligner() {
@@ -59,10 +64,10 @@ public abstract class AbstractPairwiseSequenceAligner<S extends Sequence<C>, C e
 	/**
 	 * Prepares for a pairwise global sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
+	 * @param query      the first {@link Sequence} of the pair to align
+	 * @param target     the second {@link Sequence} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	protected AbstractPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty,
 			SubstitutionMatrix<C> subMatrix) {
@@ -72,14 +77,15 @@ public abstract class AbstractPairwiseSequenceAligner<S extends Sequence<C>, C e
 	/**
 	 * Prepares for a pairwise sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
+	 * @param query      the first {@link Sequence} of the pair to align
+	 * @param target     the second {@link Sequence} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
-	 * @param local if true, find a region of similarity rather than aligning every compound
+	 * @param subMatrix  the set of substitution scores used during alignment
+	 * @param local      if true, find a region of similarity rather than aligning
+	 *                   every compound
 	 */
-	protected AbstractPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty,
-			SubstitutionMatrix<C> subMatrix, boolean local) {
+	protected AbstractPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix,
+			boolean local) {
 		super(gapPenalty, subMatrix, local);
 		this.query = query;
 		this.target = target;
@@ -158,27 +164,30 @@ public abstract class AbstractPairwiseSequenceAligner<S extends Sequence<C>, C e
 
 	@Override
 	protected boolean isReady() {
-		return query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null &&
-				query.getCompoundSet().equals(target.getCompoundSet());
+		return query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null
+				&& query.getCompoundSet().equals(target.getCompoundSet());
 	}
 
 	@Override
 	protected void reset() {
 		super.reset();
 		pair = null;
-		if (query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null &&
-				query.getCompoundSet().equals(target.getCompoundSet())) {
-			int maxq = 0, maxt = 0;
-			for (C c : query) {
-				maxq += getSubstitutionMatrix().getValue(c, c);
-			}
-			for (C c : target) {
-				maxt += getSubstitutionMatrix().getValue(c, c);
-			}
-			max = Math.max(maxq, maxt);
-			score = min = isLocal() ? 0 : (int) (2 * getGapPenalty().getOpenPenalty() + (query.getLength() +
-					target.getLength()) * getGapPenalty().getExtensionPenalty());
+		if (!(query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null
+				&& query.getCompoundSet().equals(target.getCompoundSet()))) {
+			return;
 		}
+		int maxq = 0;
+		int maxt = 0;
+		for (C c : query) {
+			maxq += getSubstitutionMatrix().getValue(c, c);
+		}
+		for (C c : target) {
+			maxt += getSubstitutionMatrix().getValue(c, c);
+		}
+		max = Math.max(maxq, maxt);
+		score = min = isLocal() ? 0
+				: (int) (2 * getGapPenalty().getOpenPenalty()
+						+ (query.getLength() + target.getLength()) * getGapPenalty().getExtensionPenalty());
 	}
 
 }

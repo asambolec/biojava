@@ -30,7 +30,7 @@ import java.util.Comparator;
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class SurvivalInfoValueComparator implements Comparator<SurvivalInfo>, Serializable {
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
 	String variable = "";
 
@@ -38,7 +38,7 @@ public class SurvivalInfoValueComparator implements Comparator<SurvivalInfo>, Se
 	 *
 	 * @param variable
 	 */
-	public SurvivalInfoValueComparator(String variable){
+	public SurvivalInfoValueComparator(String variable) {
 		this.variable = variable;
 	}
 
@@ -46,12 +46,13 @@ public class SurvivalInfoValueComparator implements Comparator<SurvivalInfo>, Se
 	public int compare(SurvivalInfo t, SurvivalInfo t1) {
 		double v = t.getContinuousVariable(variable);
 		double v1 = t1.getContinuousVariable(variable);
-		if(v < v1)
+		if (v < v1) {
 			return -1;
-		else if(v > v1)
+		} else if (v > v1) {
 			return 1;
-		else
+		} else {
 			return 0;
+		}
 	}
 
 }

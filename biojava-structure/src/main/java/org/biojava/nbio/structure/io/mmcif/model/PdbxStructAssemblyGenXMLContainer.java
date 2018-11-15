@@ -29,34 +29,38 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@XmlRootElement(name="PdbxStructAssemblyGenXMLContainer")
+@XmlRootElement(name = "PdbxStructAssemblyGenXMLContainer")
 public class PdbxStructAssemblyGenXMLContainer {
 
-	private List<PdbxStructAssemblyGen> data ;
+	private static final Logger logger = LoggerFactory.getLogger(PdbxStructAssemblyGenXMLContainer.class);
 
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(PdbxStructAssemblyGenXMLContainer.class);
-		} catch (Exception e){
-			e.printStackTrace();
+			jaxbContext = JAXBContext.newInstance(PdbxStructAssemblyGenXMLContainer.class);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
+	private List<PdbxStructAssemblyGen> data;
+
 	@XmlElementWrapper
-	public List<PdbxStructAssemblyGen> getPdbxStructAssemblyGens(){
+	public List<PdbxStructAssemblyGen> getPdbxStructAssemblyGens() {
 		return data;
 
 	}
 
-	public void setPdbxStructAssemblies(List<PdbxStructAssemblyGen> d){
+	public void setPdbxStructAssemblies(List<PdbxStructAssemblyGen> d) {
 		data = d;
 	}
 
-	public  String toXML(){
+	public String toXML() {
 
-		System.out.println("converting to XML: " + data);
+		logger.info("converting to XML: " + data);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -68,18 +72,17 @@ public class PdbxStructAssemblyGenXMLContainer {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static PdbxStructAssemblyGenXMLContainer fromXML(String xml){
+	public static PdbxStructAssemblyGenXMLContainer fromXML(String xml) {
 
 		PdbxStructAssemblyGenXMLContainer job = null;
 
@@ -91,8 +94,8 @@ public class PdbxStructAssemblyGenXMLContainer {
 
 			job = (PdbxStructAssemblyGenXMLContainer) un.unmarshal(bais);
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return job;

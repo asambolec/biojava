@@ -27,15 +27,15 @@ public class Refine {
 	String pdbx_ls_sigma_I;
 	String pdbx_ls_sigma_F;
 	String pdbx_data_cutoff_high_absF;
-	String pdbx_data_cutoff_low_absF  ;
+	String pdbx_data_cutoff_low_absF;
 	String pdbx_data_cutoff_high_rms_absF;
-	String ls_d_res_low  ;
-	String ls_d_res_high  ;
+	String ls_d_res_low;
+	String ls_d_res_high;
 	String ls_percent_reflns_obs;
-	String ls_R_factor_obs ;
-	String ls_R_factor_all  ;
+	String ls_R_factor_obs;
+	String ls_R_factor_all;
 	String ls_R_factor_R_work;
-	String ls_R_factor_R_free ;
+	String ls_R_factor_R_free;
 	String ls_R_factor_R_free_error;
 	String ls_R_factor_R_free_error_details;
 	String ls_percent_reflns_R_free;
@@ -45,19 +45,19 @@ public class Refine {
 	String occupancy_min;
 	String occupancy_max;
 	String B_iso_mean;
-	@CIFLabel(label="aniso_B[1][1]")
+	@CIFLabel(label = "aniso_B[1][1]")
 	String aniso_B11;
-	@CIFLabel(label="aniso_B[2][2]")
+	@CIFLabel(label = "aniso_B[2][2]")
 	String aniso_B22;
-	@CIFLabel(label="aniso_B[3][3]")
+	@CIFLabel(label = "aniso_B[3][3]")
 	String aniso_B33;
-	@CIFLabel(label="aniso_B[1][2]")
+	@CIFLabel(label = "aniso_B[1][2]")
 	String aniso_B12;
-	@CIFLabel(label="aniso_B[1][3]")
+	@CIFLabel(label = "aniso_B[1][3]")
 	String aniso_B13;
-	@CIFLabel(label="aniso_B[2][3]")
+	@CIFLabel(label = "aniso_B[2][3]")
 	String aniso_B23;
-	String solvent_model_details ;
+	String solvent_model_details;
 	String solvent_model_param_ksol;
 	String solvent_model_param_bsol;
 	String pdbx_ls_cross_valid_method;
@@ -73,7 +73,7 @@ public class Refine {
 	String overall_SU_ML;
 	String overall_SU_B;
 	String ls_redundancy_reflns_obs;
-	String pdbx_overall_phase_error   ;
+	String pdbx_overall_phase_error;
 	String B_iso_min;
 	String B_iso_max;
 	String correlation_coeff_Fo_to_Fc;
@@ -93,12 +93,13 @@ public class Refine {
 	String pdbx_overall_SU_R_free_Cruickshank_DPI;
 	String pdbx_overall_SU_R_Blow_DPI;
 	String pdbx_overall_SU_R_free_Blow_DPI;
-	// these 2 fields are present only in some files (e.g. 4lnc, a hybrid X-RAY/NEUTRON DIFFRACTION)
+	// these 2 fields are present only in some files (e.g. 4lnc, a hybrid
+	// X-RAY/NEUTRON DIFFRACTION)
 	String ls_matrix_type;
 	String ls_number_reflns_R_work;
 
-	public Refine(){
-		//aniso_B = new String[3][3];
+	public Refine() {
+		// aniso_B = new String[3][3];
 	}
 
 	public String getEntry_id() {
@@ -161,8 +162,7 @@ public class Refine {
 		return pdbx_data_cutoff_high_rms_absF;
 	}
 
-	public void setPdbx_data_cutoff_high_rms_absF(
-			String pdbx_data_cutoff_high_rms_absF) {
+	public void setPdbx_data_cutoff_high_rms_absF(String pdbx_data_cutoff_high_rms_absF) {
 		this.pdbx_data_cutoff_high_rms_absF = pdbx_data_cutoff_high_rms_absF;
 	}
 
@@ -234,8 +234,7 @@ public class Refine {
 		return ls_R_factor_R_free_error_details;
 	}
 
-	public void setLs_R_factor_R_free_error_details(
-			String ls_R_factor_R_free_error_details) {
+	public void setLs_R_factor_R_free_error_details(String ls_R_factor_R_free_error_details) {
 		this.ls_R_factor_R_free_error_details = ls_R_factor_R_free_error_details;
 	}
 
@@ -347,8 +346,7 @@ public class Refine {
 		return pdbx_method_to_determine_struct;
 	}
 
-	public void setPdbx_method_to_determine_struct(
-			String pdbx_method_to_determine_struct) {
+	public void setPdbx_method_to_determine_struct(String pdbx_method_to_determine_struct) {
 		this.pdbx_method_to_determine_struct = pdbx_method_to_determine_struct;
 	}
 
@@ -364,8 +362,7 @@ public class Refine {
 		return pdbx_stereochemistry_target_values;
 	}
 
-	public void setPdbx_stereochemistry_target_values(
-			String pdbx_stereochemistry_target_values) {
+	public void setPdbx_stereochemistry_target_values(String pdbx_stereochemistry_target_values) {
 		this.pdbx_stereochemistry_target_values = pdbx_stereochemistry_target_values;
 	}
 
@@ -373,8 +370,7 @@ public class Refine {
 		return pdbx_stereochem_target_val_spec_case;
 	}
 
-	public void setPdbx_stereochem_target_val_spec_case(
-			String pdbx_stereochem_target_val_spec_case) {
+	public void setPdbx_stereochem_target_val_spec_case(String pdbx_stereochem_target_val_spec_case) {
 		this.pdbx_stereochem_target_val_spec_case = pdbx_stereochem_target_val_spec_case;
 	}
 
@@ -382,8 +378,7 @@ public class Refine {
 		return pdbx_R_Free_selection_details;
 	}
 
-	public void setPdbx_R_Free_selection_details(
-			String pdbx_R_Free_selection_details) {
+	public void setPdbx_R_Free_selection_details(String pdbx_R_Free_selection_details) {
 		this.pdbx_R_Free_selection_details = pdbx_R_Free_selection_details;
 	}
 
@@ -471,8 +466,7 @@ public class Refine {
 		return correlation_coeff_Fo_to_Fc_free;
 	}
 
-	public void setCorrelation_coeff_Fo_to_Fc_free(
-			String correlation_coeff_Fo_to_Fc_free) {
+	public void setCorrelation_coeff_Fo_to_Fc_free(String correlation_coeff_Fo_to_Fc_free) {
 		this.correlation_coeff_Fo_to_Fc_free = correlation_coeff_Fo_to_Fc_free;
 	}
 
@@ -568,8 +562,7 @@ public class Refine {
 		return pdbx_overall_SU_R_free_Cruickshank_DPI;
 	}
 
-	public void setPdbx_overall_SU_R_free_Cruickshank_DPI(
-			String pdbx_overall_SU_R_free_Cruickshank_DPI) {
+	public void setPdbx_overall_SU_R_free_Cruickshank_DPI(String pdbx_overall_SU_R_free_Cruickshank_DPI) {
 		this.pdbx_overall_SU_R_free_Cruickshank_DPI = pdbx_overall_SU_R_free_Cruickshank_DPI;
 	}
 
@@ -585,8 +578,7 @@ public class Refine {
 		return pdbx_overall_SU_R_free_Blow_DPI;
 	}
 
-	public void setPdbx_overall_SU_R_free_Blow_DPI(
-			String pdbx_overall_SU_R_free_Blow_DPI) {
+	public void setPdbx_overall_SU_R_free_Blow_DPI(String pdbx_overall_SU_R_free_Blow_DPI) {
 		this.pdbx_overall_SU_R_free_Blow_DPI = pdbx_overall_SU_R_free_Blow_DPI;
 	}
 
@@ -653,6 +645,5 @@ public class Refine {
 	public void setAniso_B23(String aniso_B23) {
 		this.aniso_B23 = aniso_B23;
 	}
-
 
 }

@@ -29,24 +29,23 @@ import org.biojava.nbio.structure.align.webstart.WebStartMain;
 import org.biojava.nbio.structure.scop.ScopDatabase;
 import org.biojava.nbio.structure.scop.ScopInstallation;
 
-public class ScopInstallationInstance
-{
-
+public class ScopInstallationInstance {
 
 	static ScopInstallationInstance me = new ScopInstallationInstance();
 	ScopDatabase install;
-	private ScopInstallationInstance(){
+
+	private ScopInstallationInstance() {
 		UserConfiguration config = WebStartMain.getWebStartConfig();
 		String cacheLocation = config.getPdbFilePath();
 
-		 install = new ScopInstallation(cacheLocation);
+		install = new ScopInstallation(cacheLocation);
 	}
 
-
-	public static ScopInstallationInstance getInstance(){
+	public static ScopInstallationInstance getInstance() {
 		return me;
 	}
-	public  ScopDatabase getSCOP(){
+
+	public ScopDatabase getSCOP() {
 		return install;
 	}
 }

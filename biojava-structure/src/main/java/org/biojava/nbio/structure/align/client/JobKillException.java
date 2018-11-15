@@ -31,7 +31,7 @@ public class JobKillException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public JobKillException(String message){
+	public JobKillException(String message) {
 		super(message);
 	}
 }

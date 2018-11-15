@@ -25,7 +25,6 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
@@ -34,11 +33,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -79,9 +80,7 @@ public class SymmClash {
 	/**
 	 * Gets the value of the atom property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAtom() {
@@ -91,9 +90,7 @@ public class SymmClash {
 	/**
 	 * Sets the value of the atom property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAtom(String value) {
@@ -103,9 +100,7 @@ public class SymmClash {
 	/**
 	 * Gets the value of the clashmag property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getClashmag() {
@@ -115,9 +110,7 @@ public class SymmClash {
 	/**
 	 * Sets the value of the clashmag property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setClashmag(BigDecimal value) {
@@ -127,9 +120,7 @@ public class SymmClash {
 	/**
 	 * Gets the value of the dist property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getDist() {
@@ -139,9 +130,7 @@ public class SymmClash {
 	/**
 	 * Sets the value of the dist property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setDist(BigDecimal value) {
@@ -151,9 +140,7 @@ public class SymmClash {
 	/**
 	 * Gets the value of the scid property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getScid() {
@@ -163,9 +150,7 @@ public class SymmClash {
 	/**
 	 * Sets the value of the scid property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setScid(BigInteger value) {
@@ -175,9 +160,7 @@ public class SymmClash {
 	/**
 	 * Gets the value of the symop property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getSymop() {
@@ -187,9 +170,7 @@ public class SymmClash {
 	/**
 	 * Sets the value of the symop property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setSymop(String value) {

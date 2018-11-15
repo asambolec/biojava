@@ -59,33 +59,27 @@ public class GraphComponentRefiner implements SymmetryRefiner {
 			throws StructureException, RefinerFailedException {
 
 		// Construct the alignment graph with jgrapht
-		Graph<Integer, DefaultEdge> graph = SymmetryTools
-				.buildSymmetryGraph(selfAlignment);
+		Graph<Integer, DefaultEdge> graph = SymmetryTools.buildSymmetryGraph(selfAlignment);
 
 		// Find the maximally connected components of the graph
-		ConnectivityInspector<Integer, DefaultEdge> inspector = new ConnectivityInspector<Integer, DefaultEdge>(
-				graph);
+		ConnectivityInspector<Integer, DefaultEdge> inspector = new ConnectivityInspector<>(graph);
 		List<Set<Integer>> components = inspector.connectedSets();
 
 		// Filter components with size != order, and transform to ResidueGroups
-		List<ResidueGroup> groups = new ArrayList<ResidueGroup>();
-		for (Set<Integer> comp : components) {
-			if (comp.size() == order) {
-				ResidueGroup group = new ResidueGroup(comp);
-				groups.add(group);
-			}
-		}
+		List<ResidueGroup> groups = new ArrayList<>();
+		components.stream().filter(comp -> comp.size() == order).map(ResidueGroup::new).forEach(groups::add);
 		int size = groups.size();
-		if (size == 0)
-			throw new RefinerFailedException("Could not find any components "
-					+ "in the alignment Graph of size != order.");
+		if (size == 0) {
+			throw new RefinerFailedException(
+					"Could not find any components " + "in the alignment Graph of size != order.");
+		}
 
 		// Create a square matrix of component compatibility
 		GMatrix matrix = new GMatrix(size, size);
 		for (int i = 0; i < size; i++) {
 			for (int j = i; j < size; j++) {
 				// The diagonal is always 0
-				if (i == j){
+				if (i == j) {
 					matrix.setElement(i, j, 0);
 					continue;
 				}
@@ -103,7 +97,7 @@ public class GraphComponentRefiner implements SymmetryRefiner {
 		}
 
 		// The compatibility score is the sum of rows of the matrix
-		List<Integer> rowScores = new ArrayList<Integer>(size);
+		List<Integer> rowScores = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			GVector row = new GVector(size);
 			matrix.getRow(i, row);
@@ -113,9 +107,10 @@ public class GraphComponentRefiner implements SymmetryRefiner {
 		}
 
 		// Refined multiple alignment Block as a result
-		List<List<Integer>> alignRes = new ArrayList<List<Integer>>(order);
-		for (int i = 0; i < order; i++)
+		List<List<Integer>> alignRes = new ArrayList<>(order);
+		for (int i = 0; i < order; i++) {
 			alignRes.add(new ArrayList<Integer>());
+		}
 
 		// Iterate until no more groups left to add (all groups score 0)
 		while (true) {
@@ -128,22 +123,26 @@ public class GraphComponentRefiner implements SymmetryRefiner {
 
 			// Zero all the scores of incompatible groups
 			boolean allZero = true;
-			for (int i=0; i<size; i++){
-				if (matrix.getElement(index, i) < 1.0)
+			for (int i = 0; i < size; i++) {
+				if (matrix.getElement(index, i) < 1.0) {
 					rowScores.set(i, 0);
-				else if (rowScores.get(i) != 0)
+				} else if (rowScores.get(i) != 0) {
 					allZero = false;
+				}
 			}
-			if (allZero)
+			if (allZero) {
 				break;
+			}
 		}
 
-		for (int i = 0; i < order; i++)
+		for (int i = 0; i < order; i++) {
 			Collections.sort(alignRes.get(i));
+		}
 
 		int length = alignRes.get(0).size();
-		if (length == 0)
+		if (length == 0) {
 			throw new RefinerFailedException("Empty alignment");
+		}
 
 		int[][][] optAln = new int[order][2][length];
 		for (int bk = 0; bk < order; bk++) {

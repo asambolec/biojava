@@ -22,48 +22,41 @@
  */
 package org.biojava.nbio.structure.align.helper;
 
-public class AligMatEl
-extends IndexPair{
+public class AligMatEl extends IndexPair {
 
-
-
-		/**
-	 *
-	 */
+	/**
+	*
+	*/
 	private static final long serialVersionUID = -4040926588803887471L;
-		int value;
-		int contig;
+	int value;
+	int contig;
 
-
-		public AligMatEl(){
-			super();
-			value  = -1;
-			contig = -1;
-		}
-
-		public int getContig() {
-			return contig;
-		}
-		public void setContig(int contig) {
-			this.contig = contig;
-		}
-
-		public int getValue() {
-			return value;
-		}
-		public void setValue(int value) {
-			this.value = value;
-		}
-
-		@Override
-		public String toString(){
-			String ret = "AligMatEl val:" + value + " contig:" + contig +
-			" trackrow:" + getRow() + " trackcol:" + getCol();
-			return ret;
-		}
-
+	public AligMatEl() {
+		value = -1;
+		contig = -1;
 	}
 
+	public int getContig() {
+		return contig;
+	}
 
+	public void setContig(int contig) {
+		this.contig = contig;
+	}
 
+	public int getValue() {
+		return value;
+	}
 
+	public void setValue(int value) {
+		this.value = value;
+	}
+
+	@Override
+	public String toString() {
+		String ret = new StringBuilder().append("AligMatEl val:").append(value).append(" contig:").append(contig)
+				.append(" trackrow:").append(getRow()).append(" trackcol:").append(getCol()).toString();
+		return ret;
+	}
+
+}

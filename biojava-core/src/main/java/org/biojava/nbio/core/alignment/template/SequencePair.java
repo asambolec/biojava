@@ -32,25 +32,30 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public interface SequencePair<S extends Sequence<C>, C extends Compound> extends Profile<S, C> {
 
 	/**
-	 * Returns the {@link Compound} in query sequence at given column index in alignment.
+	 * Returns the {@link Compound} in query sequence at given column index in
+	 * alignment.
 	 *
 	 * @param alignmentIndex column index in alignment
 	 * @return the query sequence element
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	C getCompoundInQueryAt(int alignmentIndex);
 
 	/**
-	 * Returns the {@link Compound} in target sequence at given column index in alignment.
+	 * Returns the {@link Compound} in target sequence at given column index in
+	 * alignment.
 	 *
 	 * @param alignmentIndex column index in alignment
 	 * @return the target sequence element
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	C getCompoundInTargetAt(int alignmentIndex);
 
@@ -59,7 +64,8 @@ public interface SequencePair<S extends Sequence<C>, C extends Compound> extends
 	 *
 	 * @param alignmentIndex column index in alignment
 	 * @return index in query {@link Sequence}
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	int getIndexInQueryAt(int alignmentIndex);
 
@@ -68,7 +74,8 @@ public interface SequencePair<S extends Sequence<C>, C extends Compound> extends
 	 *
 	 * @param targetIndex index in target {@link Sequence}
 	 * @return index in query {@link Sequence}
-	 * @throws IndexOutOfBoundsException if targetIndex < 1 or targetIndex > {@link #getTarget()}.getLength()
+	 * @throws IndexOutOfBoundsException if targetIndex < 1 or targetIndex >
+	 *                                   {@link #getTarget()}.getLength()
 	 */
 	int getIndexInQueryForTargetAt(int targetIndex);
 
@@ -77,7 +84,8 @@ public interface SequencePair<S extends Sequence<C>, C extends Compound> extends
 	 *
 	 * @param alignmentIndex column index in alignment
 	 * @return index in target {@link Sequence}
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	int getIndexInTargetAt(int alignmentIndex);
 
@@ -86,30 +94,36 @@ public interface SequencePair<S extends Sequence<C>, C extends Compound> extends
 	 *
 	 * @param queryIndex index in query {@link Sequence}
 	 * @return index in target {@link Sequence}
-	 * @throws IndexOutOfBoundsException if queryIndex < 1 or queryIndex > {@link #getQuery()}.getLength()
+	 * @throws IndexOutOfBoundsException if queryIndex < 1 or queryIndex >
+	 *                                   {@link #getQuery()}.getLength()
 	 */
 	int getIndexInTargetForQueryAt(int queryIndex);
 
 	/**
-	 * Returns the number of indices for which both the query and target sequences have an identical {@link Compound}.
+	 * Returns the number of indices for which both the query and target sequences
+	 * have an identical {@link Compound}.
 	 *
 	 * @return the number of identical indices
 	 */
 	int getNumIdenticals();
-	
+
 	/**
-	 * Returns the percentage of identity between the two sequences in the alignment as a fraction between 0 and 1.
+	 * Returns the percentage of identity between the two sequences in the alignment
+	 * as a fraction between 0 and 1.
 	 *
-	 * @param countGaps
-	 * 		If true, gap positions are counted as mismatches, i.e., the percentage is normalized by the alignment length.
-	 * 		If false, gap positions are not counted, i.e. the percentage is normalized by the number of aligned residue pairs.
-	 *      See May (2004). "Percent sequence identity: the need to be explicit."
+	 * @param countGaps If true, gap positions are counted as mismatches, i.e., the
+	 *                  percentage is normalized by the alignment length. If false,
+	 *                  gap positions are not counted, i.e. the percentage is
+	 *                  normalized by the number of aligned residue pairs. See May
+	 *                  (2004). "Percent sequence identity: the need to be
+	 *                  explicit."
 	 * @return the percentage of sequence identity as a fraction in [0,1]
 	 */
 	double getPercentageOfIdentity(boolean countGaps);
 
 	/**
-	 * Returns the number of indices for which both the query and target sequences have a similar {@link Compound}.
+	 * Returns the number of indices for which both the query and target sequences
+	 * have a similar {@link Compound}.
 	 *
 	 * @return the number of similar indices
 	 */

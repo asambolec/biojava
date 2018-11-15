@@ -29,17 +29,14 @@ import javax.swing.table.TableRowSorter;
 import java.io.Serializable;
 import java.util.Comparator;
 
-public class MyTableRowSorter extends TableRowSorter<TableModel>
-{
+public class MyTableRowSorter extends TableRowSorter<TableModel> {
 
-	public MyTableRowSorter(TableModel tm)
-	{
+	public MyTableRowSorter(TableModel tm) {
 		super(tm);
 	}
 
 	@Override
-	public Comparator<?> getComparator(int column)
-	{
+	public Comparator<?> getComparator(int column) {
 
 		return new MyComparator(column);
 
@@ -48,28 +45,30 @@ public class MyTableRowSorter extends TableRowSorter<TableModel>
 }
 
 class MyComparator implements Comparator<String>, Serializable {
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
 	int column;
-	public MyComparator(int column){
+
+	public MyComparator(int column) {
 		this.column = column;
 	}
 
 	@Override
-	public int compare(String s1, String s2){
-		if (( column >= 2 && column <= 4)|| (column==9)){
+	public int compare(String s1, String s2) {
+		if ((column >= 2 && column <= 4) || (column == 9)) {
 			return compare(Float.parseFloat(s1), Float.parseFloat(s2));
-		} else if  (  column > 4 && column < 10) {
+		} else if (column > 4 && column < 10) {
 			return compare(Integer.parseInt(s1), Integer.parseInt(s2));
-		} else
+		} else {
 			return s1.compareTo(s2);
+		}
 	}
 
-	public int compare(Float f1, Float f2){
+	public int compare(Float f1, Float f2) {
 		return f1.compareTo(f2);
 	}
-	public int compare(Integer o1, Integer o2)
-	{
+
+	public int compare(Integer o1, Integer o2) {
 		return o1.compareTo(o2);
 	}
 }

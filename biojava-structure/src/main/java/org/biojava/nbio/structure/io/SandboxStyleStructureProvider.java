@@ -31,12 +31,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/** The "Sandbox" style of organizing files is  to have a directory structure like below, i.e. the files are organized into
+/**
+ * The "Sandbox" style of organizing files is to have a directory structure like
+ * below, i.e. the files are organized into
  * <ul>
- * 	<li>directory with two characters, based on the two middle characters of a PDB ID</li>
- * 	<li>directory of PDB ID</li>
- * 	<li>several files that are available for this PDB ID</li>
+ * <li>directory with two characters, based on the two middle characters of a
+ * PDB ID</li>
+ * <li>directory of PDB ID</li>
+ * <li>several files that are available for this PDB ID</li>
  * </ul>
  *
  * <pre>
@@ -101,19 +103,20 @@ a1/2a1w/r2a1wsf.ent.gz
 a1/2a1x/2a1x-deriv.cif.gz
 a1/2a1x/2a1x-extatom.xml.gz
 a1/2a1x/2a1x-noatom.xml.gz
-</pre>
+ * </pre>
  *
  *
  * @author Andreas Prlic
  *
  *
- *@ since3.2
+ * @ since3.2
  */
 public class SandboxStyleStructureProvider implements StructureProvider {
-	FileParsingParameters params ;
+	public static final String fileSeparator = System.getProperty("file.separator");
+
+	FileParsingParameters params;
 
 	String path;
-	public static final String fileSeparator = System.getProperty("file.separator");
 
 	public SandboxStyleStructureProvider() {
 		params = new FileParsingParameters();
@@ -124,32 +127,34 @@ public class SandboxStyleStructureProvider implements StructureProvider {
 	}
 
 	/** directory where to find PDB files */
-	public void setPath(String p){
+	public void setPath(String p) {
 
-		path = p ;
+		path = p;
 
-		if ( ! (path.endsWith(fileSeparator) ) )
+		if (!(path.endsWith(fileSeparator))) {
 			path = path + fileSeparator;
+		}
 
 	}
 
 	@Override
-	public Structure getStructureById(String pdbId) throws IOException,StructureException {
+	public Structure getStructureById(String pdbId) throws IOException, StructureException {
 
-
-		if (pdbId == null || pdbId.length()< 4)
-			throw new StructureException("This does not look like a valid PDB ID! (" + pdbId + ")");
+		if (pdbId == null || pdbId.length() < 4) {
+			throw new StructureException(new StringBuilder().append("This does not look like a valid PDB ID! (")
+					.append(pdbId).append(")").toString());
+		}
 
 		pdbId = pdbId.toLowerCase();
 
-		String middle = pdbId.substring(1,3).toLowerCase();
+		String middle = pdbId.substring(1, 3).toLowerCase();
 
-		File f = new File(path + fileSeparator + middle + fileSeparator + pdbId  + fileSeparator + "pdb" + pdbId + ".ent.gz");
+		File f = new File(new StringBuilder().append(path).append(fileSeparator).append(middle).append(fileSeparator)
+				.append(pdbId).append(fileSeparator).append("pdb").append(pdbId).append(".ent.gz").toString());
 
-		if (! f.exists()){
+		if (!f.exists()) {
 
 		}
-
 
 		InputStreamProvider isp = new InputStreamProvider();
 
@@ -157,8 +162,8 @@ public class SandboxStyleStructureProvider implements StructureProvider {
 		PDBFileParser pdbpars = new PDBFileParser();
 		pdbpars.setFileParsingParameters(params);
 
-		Structure struc = pdbpars.parsePDBFile(inputStream) ;
-		return struc ;
+		Structure struc = pdbpars.parsePDBFile(inputStream);
+		return struc;
 
 		// something is wrong with the file!
 		// it probably should be downloaded again...
@@ -175,28 +180,33 @@ public class SandboxStyleStructureProvider implements StructureProvider {
 		return params;
 	}
 
-	/** Returns a list of all PDB IDs that are available in this installation
+	/**
+	 * Returns a list of all PDB IDs that are available in this installation
 	 *
 	 * @return a list of PDB IDs
 	 */
-	public List<String> getAllPDBIDs() throws IOException{
+	public List<String> getAllPDBIDs() throws IOException {
 
 		File f = new File(path);
-		if ( ! f.isDirectory())
-			throw new IOException("Path " + path + " is not a directory!");
+		if (!f.isDirectory()) {
+			throw new IOException(
+					new StringBuilder().append("Path ").append(path).append(" is not a directory!").toString());
+		}
 
 		String[] dirName = f.list();
 
-		List<String>pdbIds = new ArrayList<String>();
+		List<String> pdbIds = new ArrayList<>();
 		for (String dir : dirName) {
-			File d2= new File(f,dir);
-			if ( ! d2.isDirectory())
+			File d2 = new File(f, dir);
+			if (!d2.isDirectory()) {
 				continue;
+			}
 
 			String[] pdbDirs = d2.list();
 			for (String pdbId : pdbDirs) {
-				if ( ! pdbIds.contains(pdbId))
+				if (!pdbIds.contains(pdbId)) {
 					pdbIds.add(pdbId);
+				}
 
 			}
 		}

@@ -30,8 +30,7 @@ import java.net.URL;
  *
  * @since 3.0.3
  */
-public interface FastqReader
-{
+public interface FastqReader {
 
 	/**
 	 * Parse the specified readable.
@@ -73,7 +72,8 @@ public interface FastqReader
 	 * Read zero or more FASTQ formatted sequences from the specified input stream.
 	 *
 	 * @param inputStream input stream to read from, must not be null
-	 * @return zero or more FASTQ formatted sequences read from the specified input stream
+	 * @return zero or more FASTQ formatted sequences read from the specified input
+	 *         stream
 	 * @throws IOException if an I/O error occurs
 	 */
 	Iterable<Fastq> read(InputStream inputStream) throws IOException;

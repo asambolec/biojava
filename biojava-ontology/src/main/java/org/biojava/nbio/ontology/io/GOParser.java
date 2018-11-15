@@ -29,6 +29,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple parser for the Gene Ontology (GO) flatfile format.
@@ -38,17 +40,15 @@ import java.util.StringTokenizer;
  */
 
 public class GOParser {
-	public Ontology parseGO(BufferedReader goFile,
-							String ontoName,
-							String ontoDescription,
-							OntologyFactory factory)
-		throws ParseException, IOException
-	{
+	private static final Logger logger = LoggerFactory.getLogger(GOParser.class);
+
+	public Ontology parseGO(BufferedReader goFile, String ontoName, String ontoDescription, OntologyFactory factory)
+			throws ParseException, IOException {
 		try {
 			Ontology onto = factory.createOntology(ontoName, ontoDescription);
 			Term isa = onto.importTerm(OntoTools.IS_A, null);
 			Term partof = null; // fixme: onto.importTerm(OntoTools.PART_OF, null);
-			List<Term> termStack = new ArrayList<Term>();
+			List<Term> termStack = new ArrayList<>();
 			String line;
 			while ((line = goFile.readLine()) != null) {
 				int leadSpaces = 0;
@@ -63,17 +63,17 @@ public class GOParser {
 				StringTokenizer toke = new StringTokenizer(line, "%<$", true);
 				String parentRel = toke.nextToken();
 				Term term = parseTerm(onto, toke.nextToken());
-				if (parentRel.equals("%")) {
+				if ("%".equals(parentRel)) {
 					safeAddTriple(onto, term, termStack.get(leadSpaces - 1), isa);
-				} else if (parentRel.equals("<")) {
+				} else if ("<".equals(parentRel)) {
 					safeAddTriple(onto, term, termStack.get(leadSpaces - 1), partof);
 				}
 				while (toke.hasMoreTokens()) {
 					String altRel = toke.nextToken();
 					Term altTerm = parseTerm(onto, toke.nextToken());
-					if (altRel.equals("%")) {
+					if ("%".equals(altRel)) {
 						safeAddTriple(onto, term, altTerm, isa);
-					} else if (altRel.equals("<")) {
+					} else if ("<".equals(altRel)) {
 						safeAddTriple(onto, term, altTerm, partof);
 					}
 				}
@@ -86,23 +86,20 @@ public class GOParser {
 			}
 			return onto;
 		} catch (AlreadyExistsException ex) {
-			throw new RuntimeException( "Duplication in ontology");
+			logger.error(ex.getMessage(), ex);
+			throw new RuntimeException("Duplication in ontology");
 		} catch (OntologyException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	private void safeAddTriple(Ontology onto, Term s, Term o, Term p)
-		throws AlreadyExistsException
-	{
+	private void safeAddTriple(Ontology onto, Term s, Term o, Term p) throws AlreadyExistsException {
 		if (!onto.containsTriple(s, o, p)) {
 			onto.createTriple(s, o, p, null, null);
 		}
 	}
 
-	private Term parseTerm(Ontology onto, String s)
-		throws ParseException, AlreadyExistsException
-	{
+	private Term parseTerm(Ontology onto, String s) throws ParseException, AlreadyExistsException {
 		int semi = s.indexOf(';');
 		int semi2 = s.indexOf(';', semi + 1);
 		if (semi < 0) {
@@ -122,7 +119,7 @@ public class GOParser {
 		} else {
 			Term t = onto.createTerm(termName, termDesc);
 			if (toke.hasMoreTokens()) {
-				List<String> secondaries = new ArrayList<String>();
+				List<String> secondaries = new ArrayList<>();
 				while (toke.hasMoreTokens()) {
 					secondaries.add(toke.nextToken());
 				}
@@ -132,5 +129,3 @@ public class GOParser {
 		}
 	}
 }
-
-

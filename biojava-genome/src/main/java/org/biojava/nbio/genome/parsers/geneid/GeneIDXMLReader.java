@@ -51,13 +51,14 @@ public class GeneIDXMLReader {
 	}
 
 	public LinkedHashMap<String, ProteinSequence> getProteinSequences() throws Exception {
-		LinkedHashMap<String, ProteinSequence> proteinSequenceList = new LinkedHashMap<String, ProteinSequence>();
-		ArrayList<Element> elementList = XMLHelper.selectElements(geneidDoc.getDocumentElement(), "prediction/gene/protein");
+		LinkedHashMap<String, ProteinSequence> proteinSequenceList = new LinkedHashMap<>();
+		ArrayList<Element> elementList = XMLHelper.selectElements(geneidDoc.getDocumentElement(),
+				"prediction/gene/protein");
 		logger.info("{} hits", elementList.size());
 
 		for (Element proteinElement : elementList) {
 			Element geneElement = (Element) proteinElement.getParentNode();
-			String sequence = proteinElement.getTextContent().replaceAll("\\W","");
+			String sequence = proteinElement.getTextContent().replaceAll("\\W", "");
 			ProteinSequence proteinSequence = new ProteinSequence(sequence);
 			String idGene = geneElement.getAttribute("idGene");
 			proteinSequence.setAccession(new AccessionID(idGene));
@@ -68,13 +69,14 @@ public class GeneIDXMLReader {
 	}
 
 	public LinkedHashMap<String, DNASequence> getDNACodingSequences() throws Exception {
-		LinkedHashMap<String, DNASequence> dnaSequenceList = new LinkedHashMap<String, DNASequence>();
-		ArrayList<Element> elementList = XMLHelper.selectElements(geneidDoc.getDocumentElement(), "prediction/gene/cDNA");
+		LinkedHashMap<String, DNASequence> dnaSequenceList = new LinkedHashMap<>();
+		ArrayList<Element> elementList = XMLHelper.selectElements(geneidDoc.getDocumentElement(),
+				"prediction/gene/cDNA");
 		logger.info("{} hits", elementList.size());
 
 		for (Element dnaElement : elementList) {
 			Element geneElement = (Element) dnaElement.getParentNode();
-			String sequence = dnaElement.getTextContent().replaceAll("\\W","");
+			String sequence = dnaElement.getTextContent().replaceAll("\\W", "");
 			DNASequence dnaSequence = new DNASequence(sequence);
 			String idGene = geneElement.getAttribute("idGene");
 			dnaSequence.setAccession(new AccessionID(idGene));
@@ -86,12 +88,16 @@ public class GeneIDXMLReader {
 
 	public static void main(String[] args) {
 		try {
-			GeneIDXMLReader geneIDXMLReader = new GeneIDXMLReader("/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.xml");
+			GeneIDXMLReader geneIDXMLReader = new GeneIDXMLReader(
+					"/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.xml");
 			LinkedHashMap<String, ProteinSequence> proteinSequenceHashMap = geneIDXMLReader.getProteinSequences();
-			FastaWriterHelper.writeProteinSequence(new File("/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.faa"), proteinSequenceHashMap.values());
+			FastaWriterHelper.writeProteinSequence(
+					new File("/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.faa"),
+					proteinSequenceHashMap.values());
 
 			LinkedHashMap<String, DNASequence> dnaSequenceHashMap = geneIDXMLReader.getDNACodingSequences();
-			FastaWriterHelper.writeNucleotideSequence(new File("/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.fna"), dnaSequenceHashMap.values());
+			FastaWriterHelper.writeNucleotideSequence(
+					new File("/Users/Scooter/scripps/dyadic/geneid/geneid/c1_geneid.fna"), dnaSequenceHashMap.values());
 
 		} catch (Exception e) {
 			logger.error("Exception: ", e);

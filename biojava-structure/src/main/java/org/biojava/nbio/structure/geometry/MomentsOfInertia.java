@@ -46,8 +46,8 @@ import java.util.List;
  */
 public class MomentsOfInertia {
 
-	private List<Point3d> points = new ArrayList<Point3d>();
-	private List<Double> masses = new ArrayList<Double>();
+	private List<Point3d> points = new ArrayList<>();
+	private List<Double> masses = new ArrayList<>();
 
 	private boolean modified = true;
 
@@ -55,10 +55,6 @@ public class MomentsOfInertia {
 	private Vector3d[] principalAxes = new Vector3d[3];
 
 	private Matrix3d orientation = new Matrix3d();
-
-	public enum SymmetryClass {
-		LINEAR, PROLATE, OBLATE, SYMMETRIC, ASYMMETRIC
-	};
 
 	/** Creates a new empty instance of MomentsOfInertia */
 	public MomentsOfInertia() {
@@ -73,8 +69,7 @@ public class MomentsOfInertia {
 	public Point3d getCenterOfMass() {
 
 		if (points.size() == 0) {
-			throw new IllegalStateException(
-					"MomentsOfInertia: no points defined");
+			throw new IllegalStateException("MomentsOfInertia: no points defined");
 		}
 
 		Point3d center = new Point3d();
@@ -113,13 +108,13 @@ public class MomentsOfInertia {
 	}
 
 	/**
-	 * The orientation Matrix is a 3x3 Matrix with a column for each principal
-	 * axis. It represents the orientation (rotation) of the principal axes with
-	 * respect to the axes of the coordinate system (unit vectors [1,0,0],
-	 * [0,1,0] and [0,0,1]).
+	 * The orientation Matrix is a 3x3 Matrix with a column for each principal axis.
+	 * It represents the orientation (rotation) of the principal axes with respect
+	 * to the axes of the coordinate system (unit vectors [1,0,0], [0,1,0] and
+	 * [0,0,1]).
 	 * <p>
-	 * The orientation matrix indicates the rotation to bring the coordinate
-	 * axes to the principal axes, in this direction.
+	 * The orientation matrix indicates the rotation to bring the coordinate axes to
+	 * the principal axes, in this direction.
 	 * 
 	 * @return the orientation Matrix as a Matrix3d object
 	 */
@@ -134,8 +129,8 @@ public class MomentsOfInertia {
 
 	/**
 	 * The effective value of this distance for a certain body is known as its
-	 * radius of / gyration with respect to the given axis. The radius of
-	 * gyration corresponding to Ijj / is defined as /
+	 * radius of / gyration with respect to the given axis. The radius of gyration
+	 * corresponding to Ijj / is defined as /
 	 * http://www.eng.auburn.edu/~marghitu/MECH2110/C_4.pdf / radius of gyration
 	 * k(j) = sqrt(I(j)/m)
 	 */
@@ -208,7 +203,7 @@ public class MomentsOfInertia {
 			diagonalizeTensor();
 			modified = false;
 		}
-		if (getSymmetryClass(threshold).equals(SymmetryClass.SYMMETRIC)) {
+		if (getSymmetryClass(threshold) == SymmetryClass.SYMMETRIC) {
 			return 0.0;
 		}
 		double a = 1.0 / principalMomentsOfInertia[0];
@@ -254,17 +249,19 @@ public class MomentsOfInertia {
 		double[][] eigenVectors = eig.getV().getArray();
 
 		// Get the principal axes from the eigenVectors
-		principalAxes[0] = new Vector3d(eigenVectors[0][0], eigenVectors[1][0],
-				eigenVectors[2][0]);
-		principalAxes[1] = new Vector3d(eigenVectors[0][1], eigenVectors[1][1],
-				eigenVectors[2][1]);
-		principalAxes[2] = new Vector3d(eigenVectors[0][2], eigenVectors[1][2],
-				eigenVectors[2][2]);
+		principalAxes[0] = new Vector3d(eigenVectors[0][0], eigenVectors[1][0], eigenVectors[2][0]);
+		principalAxes[1] = new Vector3d(eigenVectors[0][1], eigenVectors[1][1], eigenVectors[2][1]);
+		principalAxes[2] = new Vector3d(eigenVectors[0][2], eigenVectors[1][2], eigenVectors[2][2]);
 
 		// Convert the principal axes into a rotation matrix
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++) {
 			orientation.setColumn(i, principalAxes[i]);
+		}
 		orientation.negate();
 
+	}
+
+	public enum SymmetryClass {
+		LINEAR, PROLATE, OBLATE, SYMMETRIC, ASYMMETRIC
 	}
 }

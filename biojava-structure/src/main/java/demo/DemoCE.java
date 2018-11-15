@@ -22,7 +22,6 @@
  */
 package demo;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureTools;
@@ -34,24 +33,26 @@ import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.util.AFPChainScorer;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.align.xml.AFPChainXMLConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** Example of how to run a structure alignment using the CE algorithm.
+/**
+ * Example of how to run a structure alignment using the CE algorithm.
  *
  * @author Andreas Prlic
  *
  */
 public class DemoCE {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoCE.class);
 
-		//String name1 = "4hhb.A";
-		//String name2 = "4hhb.B";
+	public static void main(String[] args) {
+
+		// String name1 = "4hhb.A";
+		// String name2 = "4hhb.B";
 
 		String name1 = "1cdg.A";
 		String name2 = "1tim.B";
-
-
 
 		AtomCache cache = new AtomCache();
 
@@ -60,7 +61,7 @@ public class DemoCE {
 
 		try {
 
-		   StructureAlignment algorithm  = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
+			StructureAlignment algorithm = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
 
 			structure1 = cache.getStructure(name1);
 			structure2 = cache.getStructure(name2);
@@ -77,51 +78,60 @@ public class DemoCE {
 			// set the maximum gap size to unlimited
 			params.setMaxGapSize(-1);
 
-			AFPChain afpChain = algorithm.align(ca1,ca2,params);
+			AFPChain afpChain = algorithm.align(ca1, ca2, params);
 
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
 			// flexible original results:
-			System.out.println(afpChain.toFatcat(ca1,ca2));
+			logger.info(afpChain.toFatcat(ca1, ca2));
 
-			System.out.println(afpChain.toRotMat());
-			//System.out.println(afpChain.toCE(ca1, ca2));
+			logger.info(afpChain.toRotMat());
+			// System.out.println(afpChain.toCE(ca1, ca2));
 
-			System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
+			logger.info(AFPChainXMLConverter.toXML(afpChain, ca1, ca2));
 
 			double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2);
 			afpChain.setTMScore(tmScore);
 
-			//System.out.println(AfpChainWriter.toWebSiteDisplay(afpChain, ca1, ca2));
+			// System.out.println(AfpChainWriter.toWebSiteDisplay(afpChain, ca1, ca2));
 
 			printScores(afpChain);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 	}
 
 	private static void printScores(AFPChain afpChain) {
-		System.out.println("=====================");
-		System.out.println("The main scores for the alignment:");
+		logger.info("=====================");
+		logger.info("The main scores for the alignment:");
 
-		System.out.println("EQR       :\t" + afpChain.getNrEQR() + "\t The number of residues on structurally equivalent positions.")  ;
-		System.out.println("RMSD      :\t" + String.format("%.2f",afpChain.getTotalRmsdOpt() )+ "\t The RMSD of the alignment");
-		System.out.println("Z-score   :\t" + afpChain.getProbability() + "\t The Z-score of the alignment (CE)");
-		System.out.println("TM-score  :\t" + String.format("%.2f",afpChain.getTMScore()) + "\t The TM-score of the alignment.");
-		System.out.println("");
-		System.out.println("Other scores:");
-		System.out.println("Identity  :\t" + String.format("%.2f",afpChain.getIdentity())   + "\t The percent of residues that are sequence-identical in the alignment.");
-		System.out.println("Similarity:\t" + String.format("%.2f",afpChain.getSimilarity()) + "\t The percent of residues in the alignment that are sequence-similar.");
-		System.out.println("Coverage1 :\t" + afpChain.getCoverage1() + " %\t Percent of protein 1 that is covered with the alignment.");
-		System.out.println("Coverage2 :\t" + afpChain.getCoverage2() + " %\t Percent of protein 2 that is covered with the alignment.");
-		int dab = afpChain.getCa1Length()+afpChain.getCa2Length() - 2 * afpChain.getNrEQR();
-		System.out.println("Distance  :\t" + dab + "\t Distance between folds a,b ");
-		double sab = 2 * afpChain.getNrEQR() / (double)( afpChain.getCa1Length() + afpChain.getCa2Length());
-		System.out.println("Rel. Sim. :\t" + String.format("%.2f",sab) + "\t Relative similarity");
-
-
+		logger.info(new StringBuilder().append("EQR       :\t").append(afpChain.getNrEQR())
+				.append("\t The number of residues on structurally equivalent positions.").toString());
+		logger.info(
+				new StringBuilder().append("RMSD      :\t").append(String.format("%.2f", afpChain.getTotalRmsdOpt()))
+						.append("\t The RMSD of the alignment").toString());
+		logger.info(new StringBuilder().append("Z-score   :\t").append(afpChain.getProbability())
+				.append("\t The Z-score of the alignment (CE)").toString());
+		logger.info(new StringBuilder().append("TM-score  :\t").append(String.format("%.2f", afpChain.getTMScore()))
+				.append("\t The TM-score of the alignment.").toString());
+		logger.info("");
+		logger.info("Other scores:");
+		logger.info(new StringBuilder().append("Identity  :\t").append(String.format("%.2f", afpChain.getIdentity()))
+				.append("\t The percent of residues that are sequence-identical in the alignment.").toString());
+		logger.info(new StringBuilder().append("Similarity:\t").append(String.format("%.2f", afpChain.getSimilarity()))
+				.append("\t The percent of residues in the alignment that are sequence-similar.").toString());
+		logger.info(new StringBuilder().append("Coverage1 :\t").append(afpChain.getCoverage1())
+				.append(" %\t Percent of protein 1 that is covered with the alignment.").toString());
+		logger.info(new StringBuilder().append("Coverage2 :\t").append(afpChain.getCoverage2())
+				.append(" %\t Percent of protein 2 that is covered with the alignment.").toString());
+		int dab = afpChain.getCa1Length() + afpChain.getCa2Length() - 2 * afpChain.getNrEQR();
+		logger.info(new StringBuilder().append("Distance  :\t").append(dab).append("\t Distance between folds a,b ")
+				.toString());
+		double sab = 2 * afpChain.getNrEQR() / (double) (afpChain.getCa1Length() + afpChain.getCa2Length());
+		logger.info(new StringBuilder().append("Rel. Sim. :\t").append(String.format("%.2f", sab))
+				.append("\t Relative similarity").toString());
 
 	}
 }

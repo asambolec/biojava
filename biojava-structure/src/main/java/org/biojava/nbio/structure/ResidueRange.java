@@ -29,13 +29,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A chainName, a start residue, and an end residue. The chainName is matched
- * to {@link Chain#getName()}, so for mmCIF files it indicates the authorId
- * rather than the asymId.
+ * A chainName, a start residue, and an end residue. The chainName is matched to
+ * {@link Chain#getName()}, so for mmCIF files it indicates the authorId rather
+ * than the asymId.
  *
- * Chain may be null when referencing a single-chainName structure; for multi-chainName
- * structures omitting the chainName is an error. Start and/or end may also be null,
- * which is interpreted as the first and last residues in the chainName, respectively.
+ * Chain may be null when referencing a single-chainName structure; for
+ * multi-chainName structures omitting the chainName is an error. Start and/or
+ * end may also be null, which is interpreted as the first and last residues in
+ * the chainName, respectively.
  *
  * @author dmyerstu
  * @see ResidueNumber
@@ -43,106 +44,14 @@ import java.util.regex.Pattern;
  */
 public class ResidueRange {
 
+	public static final Pattern RANGE_REGEX = Pattern.compile(new StringBuilder().append("^\\s*([a-zA-Z0-9]+|_)")
+			.append("(?:").append("(?::|_|:$|_$|$)").append("(?:").append("([-+]?[0-9]+[A-Za-z]?|\\^)?").append("(?:")
+			.append("\\s*(-)\\s*").append("([-+]?[0-9]+[A-Za-z]?|\\$)?").append(")?+").append(")?+").append(")?")
+			.append("\\s*").toString());
+	public static final Pattern CHAIN_REGEX = Pattern.compile("^\\s*([a-zA-Z0-9]+|_)$");
 	private final String chainName;
 	private final ResidueNumber end;
 	private final ResidueNumber start;
-
-	public static final Pattern RANGE_REGEX = Pattern.compile(
-			"^\\s*([a-zA-Z0-9]+|_)" + //chainName ID. Be flexible here, rather than restricting to 4-char IDs
-			"(?:" + //begin range, this is a "non-capturing group"
-				"(?::|_|:$|_$|$)" + //colon or underscore, could be at the end of a line, another non-capt. group.
-				"(?:"+ // another non capturing group for the residue range
-					"([-+]?[0-9]+[A-Za-z]?|\\^)?" + // first residue
-					"(?:" +
-						"\\s*(-)\\s*" + // hyphen indicates a range was intended
-						"([-+]?[0-9]+[A-Za-z]?|\\$)?" + // second residue
-					")?+"+
-				")?+"+
-			")?" + //end range
-			"\\s*");
-
-	public static final Pattern CHAIN_REGEX = Pattern.compile("^\\s*([a-zA-Z0-9]+|_)$");
-
-	/**
-	 * Parse the residue range from a string. Several formats are accepted:
-	 * <ul>
-	 *   <li> chainName.start-end
-	 *   <li> chainName.residue
-	 *   <li> chain_start-end (for better filename compatibility)
-	 * </ul>
-	 *
-	 * <p>Residues can be positive or negative and may include insertion codes.
-	 * See {@link ResidueNumber#fromString(String)}.
-	 *
-	 * <p>Examples:
-	 * <ul>
-	 * <li><code>A:5-100</code>
-	 * <li><code>A_5-100</code>
-	 * <li><code>A_-5</code>
-	 * <li><code>A:-12I-+12I</code>
-	 * <li><code>A:^-$</code>
-	 * </ul>
-	 *
-	 * @param s   residue string to parse
-	 * @return The unique ResidueRange corresponding to {@code s}
-	 */
-	public static ResidueRange parse(String s) {
-		Matcher matcher = RANGE_REGEX.matcher(s);
-		if (matcher.matches()) {
-			ResidueNumber start = null, end = null;
-			String chain = null;
-			try {
-				chain = matcher.group(1);
-				if (matcher.group(2) != null) {
-					// ^ indicates first res (start==null)
-					if(!"^".equals(matcher.group(2)) ) {
-						start = ResidueNumber.fromString(matcher.group(2));
-						start.setChainName(chain);
-					}
-				}
-				if(matcher.group(3) == null) {
-					// single-residue range
-					end = start;
-				} else
-					// $ indicates last res (end==null)
-					if( matcher.group(4) != null && !"$".equals(matcher.group(4)) ){
-						end = ResidueNumber.fromString(matcher.group(4));
-						end.setChainName(chain);
-					}
-
-				return new ResidueRange(chain, start, end);
-			} catch (IllegalStateException e) {
-				throw new IllegalArgumentException("Range " + s + " was not valid", e);
-			}
-		} else if (CHAIN_REGEX.matcher(s).matches()) {
-			return new ResidueRange(s, (ResidueNumber)null, null);
-		}
-		throw new IllegalArgumentException("Illegal ResidueRange format:" + s);
-	}
-
-	/**
-	 * @param s
-	 *            A string of the form chain_start-end,chain_start-end, ... For example:
-	 *            <code>A.5-100,R_110-190,Z_200-250</code>.
-	 * @return The unique ResidueRange corresponding to {@code s}.
-	 * @see #parse(String)
-	 */
-	public static List<ResidueRange> parseMultiple(String s) {
-		s = s.trim();
-		// trim parentheses, for backwards compatibility
-		if ( s.startsWith("("))
-			s = s.substring(1);
-		if ( s.endsWith(")")) {
-			s = s.substring(0,s.length()-1);
-		}
-
-		String[] parts = s.split(",");
-		List<ResidueRange> list = new ArrayList<ResidueRange>(parts.length);
-		for (String part : parts) {
-			list.add(parse(part));
-		}
-		return list;
-	}
 
 	public ResidueRange(String chainName, String start, String end) {
 		this.chainName = chainName;
@@ -158,21 +67,124 @@ public class ResidueRange {
 		this.end = end;
 	}
 
+	/**
+	 * Parse the residue range from a string. Several formats are accepted:
+	 * <ul>
+	 * <li>chainName.start-end
+	 * <li>chainName.residue
+	 * <li>chain_start-end (for better filename compatibility)
+	 * </ul>
+	 *
+	 * <p>
+	 * Residues can be positive or negative and may include insertion codes. See
+	 * {@link ResidueNumber#fromString(String)}.
+	 *
+	 * <p>
+	 * Examples:
+	 * <ul>
+	 * <li><code>A:5-100</code>
+	 * <li><code>A_5-100</code>
+	 * <li><code>A_-5</code>
+	 * <li><code>A:-12I-+12I</code>
+	 * <li><code>A:^-$</code>
+	 * </ul>
+	 *
+	 * @param s residue string to parse
+	 * @return The unique ResidueRange corresponding to {@code s}
+	 */
+	public static ResidueRange parse(String s) {
+		Matcher matcher = RANGE_REGEX.matcher(s);
+		if (matcher.matches()) {
+			ResidueNumber start = null;
+			ResidueNumber end = null;
+			String chain = null;
+			try {
+				chain = matcher.group(1);
+				if (matcher.group(2) != null) {
+					// ^ indicates first res (start==null)
+					if (!"^".equals(matcher.group(2))) {
+						start = ResidueNumber.fromString(matcher.group(2));
+						start.setChainName(chain);
+					}
+				}
+				if (matcher.group(3) == null) {
+					// single-residue range
+					end = start;
+				} else
+				// $ indicates last res (end==null)
+				if (matcher.group(4) != null && !"$".equals(matcher.group(4))) {
+					end = ResidueNumber.fromString(matcher.group(4));
+					end.setChainName(chain);
+				}
+
+				return new ResidueRange(chain, start, end);
+			} catch (IllegalStateException e) {
+				throw new IllegalArgumentException(
+						new StringBuilder().append("Range ").append(s).append(" was not valid").toString(), e);
+			}
+		} else if (CHAIN_REGEX.matcher(s).matches()) {
+			return new ResidueRange(s, (ResidueNumber) null, null);
+		}
+		throw new IllegalArgumentException("Illegal ResidueRange format:" + s);
+	}
+
+	/**
+	 * @param s A string of the form chain_start-end,chain_start-end, ... For
+	 *          example: <code>A.5-100,R_110-190,Z_200-250</code>.
+	 * @return The unique ResidueRange corresponding to {@code s}.
+	 * @see #parse(String)
+	 */
+	public static List<ResidueRange> parseMultiple(String s) {
+		s = s.trim();
+		// trim parentheses, for backwards compatibility
+		if (s.startsWith("(")) {
+			s = s.substring(1);
+		}
+		if (s.endsWith(")")) {
+			s = s.substring(0, s.length() - 1);
+		}
+
+		String[] parts = s.split(",");
+		List<ResidueRange> list = new ArrayList<>(parts.length);
+		for (String part : parts) {
+			list.add(parse(part));
+		}
+		return list;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 		ResidueRange other = (ResidueRange) obj;
 		if (chainName == null) {
-			if (other.chainName != null) return false;
-		} else if (!chainName.equals(other.chainName)) return false;
+			if (other.chainName != null) {
+				return false;
+			}
+		} else if (!chainName.equals(other.chainName)) {
+			return false;
+		}
 		if (end == null) {
-			if (other.end != null) return false;
-		} else if (!end.equals(other.end)) return false;
+			if (other.end != null) {
+				return false;
+			}
+		} else if (!end.equals(other.end)) {
+			return false;
+		}
 		if (start == null) {
-			if (other.start != null) return false;
-		} else if (!start.equals(other.start)) return false;
+			if (other.start != null) {
+				return false;
+			}
+		} else if (!start.equals(other.start)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -200,23 +212,29 @@ public class ResidueRange {
 
 	@Override
 	public String toString() {
-		if( start == null && end == null) {
+		if (start == null && end == null) {
 			// Indicates the full chainName
 			return chainName;
 		}
-		return chainName + "_" + start + "-" + end;
+		return new StringBuilder().append(chainName).append("_").append(start).append("-").append(end).toString();
 	}
 
 	/**
 	 * Returns the ResidueNumber that is at position {@code positionInRange} in
 	 * <em>this</em> ResidueRange.
-	 * @return The ResidueNumber, or false if it does not exist or is not within this ResidueRange
+	 * 
+	 * @return The ResidueNumber, or false if it does not exist or is not within
+	 *         this ResidueRange
 	 */
 	public ResidueNumber getResidue(int positionInRange, AtomPositionMap map) {
-		if (map == null) throw new NullPointerException("The AtomPositionMap must be non-null");
+		if (map == null) {
+			throw new NullPointerException("The AtomPositionMap must be non-null");
+		}
 		int i = 0;
 		for (Map.Entry<ResidueNumber, Integer> entry : map.getNavMap().entrySet()) {
-			if (i == positionInRange) return entry.getKey();
+			if (i == positionInRange) {
+				return entry.getKey();
+			}
 			if (contains(entry.getKey(), map)) {
 				i++;
 			}
@@ -229,47 +247,56 @@ public class ResidueRange {
 	 */
 	public boolean contains(ResidueNumber residueNumber, AtomPositionMap map) {
 
-		if (residueNumber == null)
+		if (residueNumber == null) {
 			throw new NullPointerException("Can't find the ResidueNumber because it is null");
+		}
 
-		if (map == null)
+		if (map == null) {
 			throw new NullPointerException("The AtomPositionMap must be non-null");
+		}
 
 		Integer pos = map.getPosition(residueNumber);
-		if (pos == null) throw new IllegalArgumentException("Couldn't find residue " + residueNumber.printFull());
+		if (pos == null) {
+			throw new IllegalArgumentException("Couldn't find residue " + residueNumber.printFull());
+		}
 
-		ResidueNumber startResidue = getStart()==null? map.getFirst(getChainName()) : getStart();
+		ResidueNumber startResidue = getStart() == null ? map.getFirst(getChainName()) : getStart();
 		Integer startPos = map.getPosition(startResidue);
-		if (startPos == null) throw new IllegalArgumentException("Couldn't find the start position");
+		if (startPos == null) {
+			throw new IllegalArgumentException("Couldn't find the start position");
+		}
 
-		ResidueNumber endResidue = getEnd()==null? map.getLast(getChainName()) : getEnd();
+		ResidueNumber endResidue = getEnd() == null ? map.getLast(getChainName()) : getEnd();
 		Integer endPos = map.getPosition(endResidue);
-		if (endPos == null) throw new IllegalArgumentException("Couldn't find the end position");
+		if (endPos == null) {
+			throw new IllegalArgumentException("Couldn't find the end position");
+		}
 		return pos >= startPos && pos <= endPos;
 	}
 
 	/**
 	 * Returns a new Iterator over every {@link ResidueNumber} in this ResidueRange.
-	 * Stores the contents of {@code map} until the iterator is finished, so calling code should set the iterator to {@code null} if it did not finish.
+	 * Stores the contents of {@code map} until the iterator is finished, so calling
+	 * code should set the iterator to {@code null} if it did not finish.
 	 */
 	public Iterator<ResidueNumber> iterator(final AtomPositionMap map) {
-		//Use Entries to guarentee not null
+		// Use Entries to guarentee not null
 		final Iterator<Entry<ResidueNumber, Integer>> entryIt = map.getNavMap().entrySet().iterator();
-		if(! entryIt.hasNext()) {
+		if (!entryIt.hasNext()) {
 			// empty iterator
 			return Arrays.asList(new ResidueNumber[0]).iterator();
 		}
 		// Peek at upcoming entry
 
 		return new Iterator<ResidueNumber>() {
-			Entry<ResidueNumber,Integer> next = loadNext();
+			Entry<ResidueNumber, Integer> next = loadNext();
 
-			private Entry<ResidueNumber,Integer> loadNext() {
+			private Entry<ResidueNumber, Integer> loadNext() {
 
-				while( entryIt.hasNext() ) {
+				while (entryIt.hasNext()) {
 					next = entryIt.next();
 					ResidueNumber nextPos = next.getKey();
-					if( contains(nextPos, map)) {
+					if (contains(nextPos, map)) {
 						// loaded a valid next value
 						return next;
 					}
@@ -285,10 +312,10 @@ public class ResidueRange {
 
 			@Override
 			public ResidueNumber next() {
-                if(!hasNext()){
-                    throw new NoSuchElementException();
-                }
-                ResidueNumber pos = next.getKey();
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				ResidueNumber pos = next.getKey();
 				loadNext();
 				return pos;
 			}
@@ -301,37 +328,47 @@ public class ResidueRange {
 	}
 
 	/**
-	 * Returns a new Iterator over every {@link ResidueNumber} in the list of ResidueRanges.
-	 * Stores the contents of {@code map} until the iterator is finished, so calling code should set the iterator to {@code null} if it did not finish.
+	 * Returns a new Iterator over every {@link ResidueNumber} in the list of
+	 * ResidueRanges. Stores the contents of {@code map} until the iterator is
+	 * finished, so calling code should set the iterator to {@code null} if it did
+	 * not finish.
 	 */
 	public static Iterator<ResidueNumber> multiIterator(final AtomPositionMap map, final ResidueRange... rrs) {
 		return new Iterator<ResidueNumber>() {
 			private int r = 0;
 			private Iterator<ResidueNumber> internal;
+
 			@Override
 			public boolean hasNext() {
-				if (r == rrs.length - 1) {
-					init();
-					return internal.hasNext();
+				if (!(r == rrs.length - 1)) {
+					return true;
 				}
-				return true;
+				init();
+				return internal.hasNext();
 			}
+
 			private void init() {
 				if (internal == null) {
 					internal = rrs[r].iterator(map);
 				}
 			}
+
 			@Override
 			public ResidueNumber next() {
-				if (rrs.length == 0) throw new NoSuchElementException();
+				if (rrs.length == 0) {
+					throw new NoSuchElementException();
+				}
 				init();
-				if (!hasNext()) throw new NoSuchElementException();
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
 				if (!internal.hasNext()) {
 					r++;
 					internal = rrs[r].iterator(map);
 				}
 				return internal.next();
 			}
+
 			@Override
 			public void remove() {
 				throw new UnsupportedOperationException("Not modifiable");
@@ -340,8 +377,10 @@ public class ResidueRange {
 	}
 
 	/**
-	 * Returns a new Iterator over every {@link ResidueNumber} in the list of ResidueRanges.
-	 * Stores the contents of {@code map} until the iterator is finished, so calling code should set the iterator to {@code null} if it did not finish.
+	 * Returns a new Iterator over every {@link ResidueNumber} in the list of
+	 * ResidueRanges. Stores the contents of {@code map} until the iterator is
+	 * finished, so calling code should set the iterator to {@code null} if it did
+	 * not finish.
 	 */
 	public static Iterator<ResidueNumber> multiIterator(AtomPositionMap map, List<? extends ResidueRange> rrs) {
 		ResidueRange[] ranges = new ResidueRange[rrs.size()];
@@ -352,19 +391,18 @@ public class ResidueRange {
 	}
 
 	public static List<ResidueRange> parseMultiple(List<String> ranges) {
-		List<ResidueRange> rrs = new ArrayList<ResidueRange>(ranges.size());
-		for (String range : ranges) {
-			ResidueRange rr = ResidueRange.parse(range);
-			if (rr != null) rrs.add(rr);
-		}
+		List<ResidueRange> rrs = new ArrayList<>(ranges.size());
+		ranges.stream().map(ResidueRange::parse).forEach(rr -> {
+			if (rr != null) {
+				rrs.add(rr);
+			}
+		});
 		return rrs;
 	}
 
 	public static List<String> toStrings(List<? extends ResidueRange> ranges) {
-		List<String> list = new ArrayList<String>(ranges.size());
-		for (ResidueRange range : ranges) {
-			list.add(range.toString());
-		}
+		List<String> list = new ArrayList<>(ranges.size());
+		ranges.forEach(range -> list.add(range.toString()));
 		return list;
 	}
 
@@ -372,7 +410,9 @@ public class ResidueRange {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < ranges.size(); i++) {
 			sb.append(ranges.get(i));
-			if (i < ranges.size() - 1) sb.append(",");
+			if (i < ranges.size() - 1) {
+				sb.append(",");
+			}
 		}
 		return sb.toString();
 	}

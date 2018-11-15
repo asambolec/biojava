@@ -35,8 +35,9 @@ import java.util.*;
 
 /**
  *
- * Generic Implementation of a Group interface.
- * AminoAcidImpl and NucleotideImpl are closely related classes.
+ * Generic Implementation of a Group interface. AminoAcidImpl and NucleotideImpl
+ * are closely related classes.
+ * 
  * @see AminoAcidImpl
  * @see NucleotideImpl
  * @author Andreas Prlic
@@ -53,73 +54,58 @@ public class HetatomImpl implements Group {
 	/**
 	 * The GroupType is HETATM
 	 */
-	public static final GroupType type = GroupType.HETATM ;
+	public static final GroupType type = GroupType.HETATM;
 
-	private Map<String, Object> properties ;
+	public static PerformanceBehavior performanceBehavior = PerformanceBehavior.LESS_MEMORY_SLOWER_PERFORMANCE;
+
+	private Map<String, Object> properties;
 
 	private long id;
 
 	/** stores if 3d coordinates are available. */
-	protected boolean pdb_flag ;
+	protected boolean pdb_flag;
 
 	/** 3 letter name of amino acid in pdb file. */
-	protected String pdb_name ;
+	protected String pdb_name;
 
 	protected ResidueNumber residueNumber;
 
-	protected List<Atom> atoms ;
+	protected List<Atom> atoms;
 
 	private Chain parent;
-	
+
 	private boolean isHetAtomInFile;
 
-	/**
-	 * Behaviors for how to balance memory vs. performance.
-	 * @author Andreas Prlic
-	 */
-	public static enum PerformanceBehavior {
+	private Map<String, Atom> atomNameLookup;
 
-		/** use a built-in HashMap for faster access to memory, at the price of more memory consumption */
-		BETTER_PERFORMANCE_MORE_MEMORY,
-
-		/** Try to minimize memory consumption, at the price of slower speed when accessing atoms by name */
-		LESS_MEMORY_SLOWER_PERFORMANCE
-
-	}
-
-	public static PerformanceBehavior performanceBehavior=PerformanceBehavior.LESS_MEMORY_SLOWER_PERFORMANCE;
-
-	private Map<String,Atom> atomNameLookup;
-
-	protected ChemComp chemComp ;
+	protected ChemComp chemComp;
 
 	private List<Group> altLocs;
 
 	/**
-	 *  Construct a Hetatom instance.
+	 * Construct a Hetatom instance.
 	 */
 	public HetatomImpl() {
-		super();
-
 		pdb_flag = false;
-		pdb_name = null ;
+		pdb_name = null;
 
 		residueNumber = null;
-		atoms    = new ArrayList<Atom>();
-		properties = new HashMap<String,Object>();
+		atoms = new ArrayList<>();
+		properties = new HashMap<>();
 		parent = null;
 		chemComp = null;
 		altLocs = null;
 
-		if ( performanceBehavior == PerformanceBehavior.BETTER_PERFORMANCE_MORE_MEMORY)
-			atomNameLookup = new HashMap<String,Atom>();
-		else
+		if (performanceBehavior == PerformanceBehavior.BETTER_PERFORMANCE_MORE_MEMORY) {
+			atomNameLookup = new HashMap<>();
+		} else {
 			atomNameLookup = null;
+		}
 	}
 
-
 	/**
-	 *  returns true or false, depending if this group has 3D coordinates or not.
+	 * returns true or false, depending if this group has 3D coordinates or not.
+	 * 
 	 * @return true if Group has 3D coordinates
 	 */
 	@Override
@@ -127,28 +113,32 @@ public class HetatomImpl implements Group {
 		return pdb_flag;
 	}
 
-	/** flag if group has 3D data.
+	/**
+	 * flag if group has 3D data.
 	 *
-	 * @param flag  true to set flag that this Group has 3D coordinates
+	 * @param flag true to set flag that this Group has 3D coordinates
 	 */
 	@Override
-	public void setPDBFlag(boolean flag){
-		pdb_flag = flag ;
+	public void setPDBFlag(boolean flag) {
+		pdb_flag = flag;
 	}
 
-	/** Set three character name of Group .
+	/**
+	 * Set three character name of Group .
 	 *
-	 * @param s  a String specifying the PDBName value
+	 * @param s a String specifying the PDBName value
 	 * @see #getPDBName
 	 */
 	@Override
 	public void setPDBName(String s) {
 		// hetatoms can have pdb_name length < 3. e.g. CU (see 1a4a position 1200 )
-		//if (s.length() != 3) {
-		//throw new PDBParseException("amino acid name is not of length 3!");
-		//}
-		if (s != null && s.equals("?")) logger.info("invalid pdbname: ?");
-		pdb_name =s ;
+		// if (s.length() != 3) {
+		// throw new PDBParseException("amino acid name is not of length 3!");
+		// }
+		if (s != null && "?".equals(s)) {
+			logger.info("invalid pdbname: ?");
+		}
+		pdb_name = s;
 
 	}
 
@@ -159,60 +149,72 @@ public class HetatomImpl implements Group {
 	 * @see #setPDBName
 	 */
 	@Override
-	public String getPDBName() { return pdb_name;}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void addAtom(Atom atom){
-		atom.setGroup(this);
-		atoms.add(atom);
-		// TODO this check is useless, coords are always !=null since they are initialized to 0,0,0 in AtomImpl constructor. We need to review this - JD 2016-09-14
-		if (atom.getCoordsAsPoint3d() != null){
-			// we have got coordinates!
-			setPDBFlag(true);
-		}
-
-		if (atomNameLookup != null){
-
-			Atom existingAtom = atomNameLookup.put(atom.getName(), atom);
-
-			// if an atom with same name is added to the group that has to be some kind of problem,
-			// we need to warn properly
-			if (existingAtom != null) {
-				String altLocStr = "";
-				char altLoc = atom.getAltLoc();
-				if (altLoc != ' ') altLocStr = "(alt loc '" + altLoc + "')";
-				logger.warn("An atom with name " + atom.getName() + " " + altLocStr + " is already present in group: " + this.toString() + ". The atom with serial " + atom.getPDBserial() + " will be ignored in look-ups.");
-			}
-		}
-	};
-
-
-	/** remove all atoms
-	 *
-	 */
-	@Override
-	public void clearAtoms() {
-		atoms.clear();
-		setPDBFlag(false);
-		if ( atomNameLookup != null)
-			atomNameLookup.clear();
+	public String getPDBName() {
+		return pdb_name;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int size(){ return atoms.size();   }
+	public void addAtom(Atom atom) {
+		atom.setGroup(this);
+		atoms.add(atom);
+		// TODO this check is useless, coords are always !=null since they are
+		// initialized to 0,0,0 in AtomImpl constructor. We need to review this - JD
+		// 2016-09-14
+		if (atom.getCoordsAsPoint3d() != null) {
+			// we have got coordinates!
+			setPDBFlag(true);
+		}
+
+		if (atomNameLookup == null) {
+			return;
+		}
+		Atom existingAtom = atomNameLookup.put(atom.getName(), atom);
+		// if an atom with same name is added to the group that has to be some kind of
+		// problem,
+		// we need to warn properly
+		if (existingAtom != null) {
+			String altLocStr = "";
+			char altLoc = atom.getAltLoc();
+			if (altLoc != ' ') {
+				altLocStr = new StringBuilder().append("(alt loc '").append(altLoc).append("')").toString();
+			}
+			logger.warn(new StringBuilder().append("An atom with name ").append(atom.getName()).append(" ")
+					.append(altLocStr).append(" is already present in group: ").append(this.toString())
+					.append(". The atom with serial ").append(atom.getPDBserial())
+					.append(" will be ignored in look-ups.").toString());
+		}
+	}
+
+	/**
+	 * remove all atoms
+	 *
+	 */
+	@Override
+	public void clearAtoms() {
+		atoms.clear();
+		setPDBFlag(false);
+		if (atomNameLookup != null) {
+			atomNameLookup.clear();
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Atom> getAtoms(){
-		return atoms ;
+	public int size() {
+		return atoms.size();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Atom> getAtoms() {
+		return atoms;
 	}
 
 	/**
@@ -221,15 +223,18 @@ public class HetatomImpl implements Group {
 	@Override
 	public void setAtoms(List<Atom> atoms) {
 
-		// important we are resetting atoms to a new list, we need to reset the lookup too!
-		if ( atomNameLookup != null)
+		// important we are resetting atoms to a new list, we need to reset the lookup
+		// too!
+		if (atomNameLookup != null) {
 			atomNameLookup.clear();
-
-		for (Atom a: atoms){
-			a.setGroup(this);
-			if ( atomNameLookup != null)
-				atomNameLookup.put(a.getName(),a);
 		}
+
+		atoms.forEach(a -> {
+			a.setGroup(this);
+			if (atomNameLookup != null) {
+				atomNameLookup.put(a.getName(), a);
+			}
+		});
 		this.atoms = atoms;
 		if (!atoms.isEmpty()) {
 			pdb_flag = true;
@@ -242,17 +247,14 @@ public class HetatomImpl implements Group {
 	 */
 	@Override
 	public Atom getAtom(String name) {
-		if ( atomNameLookup != null)
+		if (atomNameLookup != null) {
 			return atomNameLookup.get(name);
-		else {
-			/** This is the performance penalty we pay for NOT using the atomnameLookup in PerformanceBehaviour.LESS_MEMORY_SLOWER_PERFORMANCE
+		} else {
+			/**
+			 * This is the performance penalty we pay for NOT using the atomnameLookup in
+			 * PerformanceBehaviour.LESS_MEMORY_SLOWER_PERFORMANCE
 			 */
-			for (Atom a : atoms) {
-				if (a.getName().equals(name)) {
-					return a;
-				}
-			}
-			return null;
+			return atoms.stream().filter(a -> a.getName().equals(name)).findFirst().orElse(null);
 		}
 	}
 
@@ -262,8 +264,8 @@ public class HetatomImpl implements Group {
 	@Override
 	public Atom getAtom(int position) {
 
-		if ((position < 0)|| ( position >= atoms.size())) {
-			//throw new StructureException("No atom found at position "+position);
+		if ((position < 0) || (position >= atoms.size())) {
+			// throw new StructureException("No atom found at position "+position);
 			return null;
 		}
 		return atoms.get(position);
@@ -275,19 +277,15 @@ public class HetatomImpl implements Group {
 	@Override
 	public boolean hasAtom(String fullName) {
 
-		if ( atomNameLookup != null) {
+		if (atomNameLookup != null) {
 			Atom a = atomNameLookup.get(fullName.trim());
 			return a != null;
 		} else {
-			/** This is the performance penalty we pay for NOT using the atomnameLookup in PerformanceBehaviour.LESS_MEMORY_SLOWER_PERFORMANCE
+			/**
+			 * This is the performance penalty we pay for NOT using the atomnameLookup in
+			 * PerformanceBehaviour.LESS_MEMORY_SLOWER_PERFORMANCE
 			 */
-			for (Atom a : atoms) {
-				if (a.getName().equals(fullName)) {
-					return true;
-				}
-			}
-			return false;
-
+			return atoms.stream().anyMatch(a -> a.getName().equals(fullName));
 
 		}
 
@@ -297,20 +295,23 @@ public class HetatomImpl implements Group {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GroupType getType(){ return type;}
+	public GroupType getType() {
+		return type;
+	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 
-		String str = "Hetatom "+ residueNumber + " " + pdb_name +  " "+ pdb_flag;
+		String str = new StringBuilder().append("Hetatom ").append(residueNumber).append(" ").append(pdb_name)
+				.append(" ").append(pdb_flag).toString();
 		if (pdb_flag) {
-			str = str + " atoms: "+atoms.size();
+			str = new StringBuilder().append(str).append(" atoms: ").append(atoms.size()).toString();
 		}
-		if ( altLocs != null)
+		if (altLocs != null) {
 			str += " has altLocs :" + altLocs.size();
+		}
 
-
-		return str ;
+		return str;
 
 	}
 
@@ -318,14 +319,12 @@ public class HetatomImpl implements Group {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasAminoAtoms(){
+	public boolean hasAminoAtoms() {
 		// if this method call is performed too often, it should become a
 		// private method and provide a flag for Group object ...
 
-		return hasAtom(StructureTools.CA_ATOM_NAME) &&
-				hasAtom(StructureTools.C_ATOM_NAME) &&
-				hasAtom(StructureTools.N_ATOM_NAME) &&
-				hasAtom(StructureTools.O_ATOM_NAME);
+		return hasAtom(StructureTools.CA_ATOM_NAME) && hasAtom(StructureTools.C_ATOM_NAME)
+				&& hasAtom(StructureTools.N_ATOM_NAME) && hasAtom(StructureTools.O_ATOM_NAME);
 
 	}
 
@@ -334,20 +333,20 @@ public class HetatomImpl implements Group {
 
 		ChemComp cc = getChemComp();
 
-		if ( cc == null)
-			return getType().equals(GroupType.AMINOACID) || getType().equals(GroupType.NUCLEOTIDE);
+		if (cc == null) {
+			return getType() == GroupType.AMINOACID || getType() == GroupType.NUCLEOTIDE;
+		}
 
 		ResidueType rt = cc.getResidueType();
 
-		if ( rt.equals(ResidueType.nonPolymer))
+		if (rt == ResidueType.nonPolymer) {
 			return false;
+		}
 
 		PolymerType pt = rt.getPolymerType();
 
-		return PolymerType.PROTEIN_ONLY.contains(pt) ||
-				PolymerType.POLYNUCLEOTIDE_ONLY.contains(pt) ||
-				ResidueType.lPeptideLinking.equals(rt);
-
+		return PolymerType.PROTEIN_ONLY.contains(pt) || PolymerType.POLYNUCLEOTIDE_ONLY.contains(pt)
+				|| ResidueType.lPeptideLinking == rt;
 
 	}
 
@@ -356,14 +355,15 @@ public class HetatomImpl implements Group {
 
 		ChemComp cc = getChemComp();
 
-		if ( cc == null)
-			return getType().equals(GroupType.AMINOACID);
-
+		if (cc == null) {
+			return getType() == GroupType.AMINOACID;
+		}
 
 		ResidueType rt = cc.getResidueType();
 
-		if ( rt.equals(ResidueType.nonPolymer))
+		if (rt == ResidueType.nonPolymer) {
 			return false;
+		}
 
 		PolymerType pt = rt.getPolymerType();
 
@@ -376,63 +376,67 @@ public class HetatomImpl implements Group {
 
 		ChemComp cc = getChemComp();
 
-		if ( cc == null)
-			return  getType().equals(GroupType.NUCLEOTIDE);
+		if (cc == null) {
+			return getType() == GroupType.NUCLEOTIDE;
+		}
 
 		ResidueType rt = cc.getResidueType();
 
-		if ( rt.equals(ResidueType.nonPolymer))
+		if (rt == ResidueType.nonPolymer) {
 			return false;
+		}
 
 		PolymerType pt = rt.getPolymerType();
 
 		return PolymerType.POLYNUCLEOTIDE_ONLY.contains(pt);
 
-
 	}
-
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setProperties(Map<String,Object> props) {
-		properties =  props ;
+	public void setProperties(Map<String, Object> props) {
+		properties = props;
 	}
 
-	/** return properties.
+	/**
+	 * return properties.
 	 *
 	 * @return a HashMap object representing the properties value
 	 * @see #setProperties
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
-		return properties ;
+		return properties;
 	}
 
-	/** set a single property .
+	/**
+	 * set a single property .
 	 *
 	 * @see #getProperties
 	 * @see #getProperty
 	 */
 	@Override
-	public void setProperty(String key, Object value){
-		properties.put(key,value);
+	public void setProperty(String key, Object value) {
+		properties.put(key, value);
 	}
 
-	/** get a single property .
-	 * @param key  a String
+	/**
+	 * get a single property .
+	 * 
+	 * @param key a String
 	 * @return an Object
 	 * @see #setProperty
 	 * @see #setProperties
 	 */
 	@Override
-	public Object getProperty(String key){
+	public Object getProperty(String key) {
 		return properties.get(key);
 	}
 
-
-	/** return an AtomIterator.
+	/**
+	 * return an AtomIterator.
 	 *
 	 * @return an Iterator object
 	 */
@@ -441,8 +445,10 @@ public class HetatomImpl implements Group {
 		return new AtomIterator(this);
 	}
 
-	/** returns and identical copy of this Group object .
-	 * @return  and identical copy of this Group object
+	/**
+	 * returns and identical copy of this Group object .
+	 * 
+	 * @return and identical copy of this Group object
 	 */
 	@Override
 	public Object clone() {
@@ -453,48 +459,47 @@ public class HetatomImpl implements Group {
 
 		n.setPDBName(getPDBName());
 
-		//clone atoms and bonds.
+		// clone atoms and bonds.
 		cloneAtomsAndBonds(n);
-		
+
 		// copying the alt loc groups if present, otherwise they stay null
-		if (altLocs!=null) {
-			for (Group altLocGroup:this.altLocs) {
-				Group nAltLocGroup = (Group)altLocGroup.clone();
-				n.addAltLoc(nAltLocGroup);
-			}
+		if (altLocs != null) {
+			this.altLocs.stream().map(altLocGroup -> (Group) altLocGroup.clone()).forEach(n::addAltLoc);
 		}
-		
-		if (chemComp!=null)
+
+		if (chemComp != null) {
 			n.setChemComp(chemComp);
+		}
 
 		return n;
 	}
 
-
 	protected void cloneAtomsAndBonds(Group newGroup) {
 		// copy the atoms
-		for (Atom atom1 : atoms) {
-			Atom atom = (Atom) atom1.clone();
+		atoms.stream().map(atom1 -> (Atom) atom1.clone()).forEach(atom -> {
 			newGroup.addAtom(atom);
 			atom.setGroup(newGroup);
-		}
+		});
 		// copy the bonds
-		for (int i=0;i<atoms.size();i++) {
+		for (int i = 0; i < atoms.size(); i++) {
 			Atom atom1 = atoms.get(i);
 			List<Bond> bonds1 = atom1.getBonds();
 			if (bonds1 != null) {
 				for (Bond b : bonds1) {
 					int atomAIndex = atoms.indexOf(b.getAtomA());
 					int atomBIndex = atoms.indexOf(b.getAtomB());
-					// The order of the atoms are the same on the original and the cloned object, which we use here.
-					Bond newBond = new BondImpl(newGroup.getAtom(atomAIndex), newGroup.getAtom(atomBIndex), b.getBondOrder(), false);
+					// The order of the atoms are the same on the original and the cloned object,
+					// which we use here.
+					Bond newBond = new BondImpl(newGroup.getAtom(atomAIndex), newGroup.getAtom(atomBIndex),
+							b.getBondOrder(), false);
 					newGroup.getAtom(i).addBond(newBond);
 				}
 			}
 		}
 	}
 
-	/** the Hibernate database ID
+	/**
+	 * the Hibernate database ID
 	 *
 	 * @return the id
 	 */
@@ -502,7 +507,8 @@ public class HetatomImpl implements Group {
 		return id;
 	}
 
-	/** the Hibernate database ID
+	/**
+	 * the Hibernate database ID
 	 *
 	 * @param id the hibernate id
 	 */
@@ -512,9 +518,11 @@ public class HetatomImpl implements Group {
 
 	@Override
 	public ChemComp getChemComp() {
-		if  ( chemComp == null ) {
+		if (chemComp == null) {
 			chemComp = ChemCompGroupFactory.getChemComp(pdb_name);
-			if (chemComp == null) logger.info("getChemComp: " + pdb_name);
+			if (chemComp == null) {
+				logger.info("getChemComp: " + pdb_name);
+			}
 		}
 		return chemComp;
 	}
@@ -531,8 +539,8 @@ public class HetatomImpl implements Group {
 	@Override
 	public void setChain(Chain chain) {
 		this.parent = chain;
-		//TODO: setChain(), getChainName() and ResidueNumber.set/getChainName() are
-		//duplicating functionality at present and could give different values.
+		// TODO: setChain(), getChainName() and ResidueNumber.set/getChainName() are
+		// duplicating functionality at present and could give different values.
 		if (residueNumber != null) {
 			residueNumber.setChainName(chain.getName());
 		}
@@ -567,7 +575,6 @@ public class HetatomImpl implements Group {
 		return residueNumber;
 	}
 
-
 	@Override
 	public void setResidueNumber(ResidueNumber residueNumber) {
 		this.residueNumber = residueNumber;
@@ -580,15 +587,17 @@ public class HetatomImpl implements Group {
 
 	@Override
 	public boolean hasAltLoc() {
-		if ( altLocs == null)
+		if (altLocs == null) {
 			return false;
+		}
 		return !altLocs.isEmpty();
 	}
 
 	@Override
 	public List<Group> getAltLocs() {
-		if ( altLocs == null)
-			return new ArrayList<Group>();
+		if (altLocs == null) {
+			return new ArrayList<>();
+		}
 		return altLocs;
 	}
 
@@ -596,7 +605,7 @@ public class HetatomImpl implements Group {
 	public Group getAltLocGroup(Character altLoc) {
 
 		Atom a = getAtom(0);
-		if ( a == null) {
+		if (a == null) {
 			return null;
 		}
 
@@ -605,18 +614,21 @@ public class HetatomImpl implements Group {
 			return this;
 		}
 
-		if (altLocs == null || altLocs.isEmpty())
+		if (altLocs == null || altLocs.isEmpty()) {
 			return null;
+		}
 
 		for (Group group : altLocs) {
-			if (group.getAtoms().isEmpty())
+			if (group.getAtoms().isEmpty()) {
 				continue;
+			}
 
 			// determine this group's alt-loc character code by looking
 			// at its first atom's alt-loc character
 			Atom b = group.getAtom(0);
-			if ( b == null)
+			if (b == null) {
 				continue;
+			}
 
 			if (b.getAltLoc().equals(altLoc)) {
 				return group;
@@ -628,8 +640,8 @@ public class HetatomImpl implements Group {
 
 	@Override
 	public void addAltLoc(Group group) {
-		if ( altLocs == null) {
-			altLocs = new ArrayList<Group>();
+		if (altLocs == null) {
+			altLocs = new ArrayList<>();
 		}
 		altLocs.add(group);
 
@@ -640,36 +652,35 @@ public class HetatomImpl implements Group {
 		return GroupType.WATERNAMES.contains(pdb_name);
 	}
 
-	/** attempts to reduce the memory imprint of this group by trimming
-	 * all internal Collection objects to the required size.
+	/**
+	 * attempts to reduce the memory imprint of this group by trimming all internal
+	 * Collection objects to the required size.
 	 *
 	 */
 	@Override
-	public void trimToSize(){
+	public void trimToSize() {
 
-		if ( atoms instanceof ArrayList<?>) {
+		if (atoms instanceof ArrayList<?>) {
 			ArrayList<Atom> myatoms = (ArrayList<Atom>) atoms;
 			myatoms.trimToSize();
 		}
-		if ( altLocs instanceof ArrayList<?>){
+		if (altLocs instanceof ArrayList<?>) {
 			ArrayList<Group> myAltLocs = (ArrayList<Group>) altLocs;
 			myAltLocs.trimToSize();
 		}
 
-		if ( hasAltLoc()) {
-			for (Group alt : getAltLocs()){
-				alt.trimToSize();
-			}
+		if (hasAltLoc()) {
+			getAltLocs().forEach(Group::trimToSize);
 		}
 
 		// now let's fit the hashmaps to size
-		properties = new HashMap<String, Object>(properties);
+		properties = new HashMap<>(properties);
 
-		if ( atomNameLookup != null)
-			atomNameLookup = new HashMap<String,Atom>(atomNameLookup);
+		if (atomNameLookup != null) {
+			atomNameLookup = new HashMap<>(atomNameLookup);
+		}
 
 	}
-
 
 	@Override
 	public String toSDF() {
@@ -682,13 +693,31 @@ public class HetatomImpl implements Group {
 	public boolean isHetAtomInFile() {
 		return isHetAtomInFile;
 	}
-	
+
 	@Override
 	public void setHetAtomInFile(boolean isHetAtomInFile) {
 		this.isHetAtomInFile = isHetAtomInFile;
 	}
 
+	/**
+	 * Behaviors for how to balance memory vs. performance.
+	 * 
+	 * @author Andreas Prlic
+	 */
+	public static enum PerformanceBehavior {
 
+		/**
+		 * use a built-in HashMap for faster access to memory, at the price of more
+		 * memory consumption
+		 */
+		BETTER_PERFORMANCE_MORE_MEMORY,
 
+		/**
+		 * Try to minimize memory consumption, at the price of slower speed when
+		 * accessing atoms by name
+		 */
+		LESS_MEMORY_SLOWER_PERFORMANCE
+
+	}
 
 }

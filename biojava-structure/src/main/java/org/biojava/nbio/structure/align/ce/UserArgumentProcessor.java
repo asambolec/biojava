@@ -24,8 +24,8 @@ import org.biojava.nbio.structure.align.util.ConfigurationException;
 
 public interface UserArgumentProcessor {
 
-
-	/** Process user arguments that have been provided from the command line
+	/**
+	 * Process user arguments that have been provided from the command line
 	 *
 	 * @param argv
 	 */
@@ -33,6 +33,7 @@ public interface UserArgumentProcessor {
 
 	/**
 	 * Print help about the arguments
+	 * 
 	 * @return
 	 */
 	public String printHelp();

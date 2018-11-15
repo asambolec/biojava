@@ -31,24 +31,32 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.biojava.nbio.ws.alignment.qblast.BlastAlignmentParameterEnum.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This class wraps a QBlast search request parameter {@code Map} by adding several convenient parameter addition
- * methods. Other QBlast URL API parameters should be added using
+ * This class wraps a QBlast search request parameter {@code Map} by adding
+ * several convenient parameter addition methods. Other QBlast URL API
+ * parameters should be added using
  * {@link #setAlignmentOption(BlastAlignmentParameterEnum, String)}
  * <p/>
- * Required parameters are {@code PROGRAM} and {@code DATABASE}, other parameters are optional
+ * Required parameters are {@code PROGRAM} and {@code DATABASE}, other
+ * parameters are optional
  *
  * @author Sylvain Foisy, Diploide BioIT
  * @author Gediminas Rimsa
  */
 public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentProperties {
+	private static final Logger logger = LoggerFactory.getLogger(NCBIQBlastAlignmentProperties.class);
+
 	private static final long serialVersionUID = 7158270364392309841L;
 
-	private Map<BlastAlignmentParameterEnum, String> param = new HashMap<BlastAlignmentParameterEnum, String>();
+	private Map<BlastAlignmentParameterEnum, String> param = new HashMap<>();
 
 	/**
-	 * This method forwards to {@link #getAlignmentOption(BlastAlignmentParameterEnum)}. Consider using it instead.
+	 * This method forwards to
+	 * {@link #getAlignmentOption(BlastAlignmentParameterEnum)}. Consider using it
+	 * instead.
 	 */
 	@Override
 	public String getAlignmentOption(String key) {
@@ -56,8 +64,9 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	}
 
 	/**
-	 * This method forwards to {@link #setAlignmentOption(BlastAlignmentParameterEnum, String)}. Consider using it
-	 * instead.
+	 * This method forwards to
+	 * {@link #setAlignmentOption(BlastAlignmentParameterEnum, String)}. Consider
+	 * using it instead.
 	 */
 	@Override
 	public void setAlignementOption(String key, String val) {
@@ -69,10 +78,8 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	 */
 	@Override
 	public Set<String> getAlignmentOptions() {
-		Set<String> result = new HashSet<String>();
-		for (BlastAlignmentParameterEnum parameter : param.keySet()) {
-			result.add(parameter.name());
-		}
+		Set<String> result = new HashSet<>();
+		param.keySet().forEach(parameter -> result.add(parameter.name()));
 		return result;
 	}
 
@@ -102,7 +109,7 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	 */
 	public BlastProgramEnum getBlastProgram() {
 		BlastProgramEnum program = BlastProgramEnum.valueOf(getAlignmentOption(PROGRAM));
-		boolean isMegablast = BlastProgramEnum.blastn == program && getAlignmentOption(MEGABLAST).equals("on");
+		boolean isMegablast = BlastProgramEnum.blastn == program && "on".equals(getAlignmentOption(MEGABLAST));
 		return !isMegablast ? program : BlastProgramEnum.megablast;
 	}
 
@@ -129,15 +136,16 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	}
 
 	/*
-	 * TODO: update comment when URL is available:
-	 * A quite exhaustive list of the databases available for QBlast
-	 * requests can be found here: <p> http://&lt to_be_completed &gt <p> Blastall equivalent: -d
+	 * TODO: update comment when URL is available: A quite exhaustive list of the
+	 * databases available for QBlast requests can be found here: <p> http://&lt
+	 * to_be_completed &gt <p> Blastall equivalent: -d
 	 */
 
 	/**
 	 * Sets the database to be used with blastall
 	 * <p>
-	 * A list of available databases can be acquired by calling {@link NCBIQBlastService#printRemoteBlastInfo()}
+	 * A list of available databases can be acquired by calling
+	 * {@link NCBIQBlastService#printRemoteBlastInfo()}
 	 * <p>
 	 * Blastall equivalent: -d
 	 *
@@ -160,7 +168,8 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	/**
 	 * Sets the EXPECT parameter to be use with blastall
 	 * <p>
-	 * Example: if you want a EXPECT of 1e-10, pass {@code Double.parseDouble("1e-10")} as a parameter
+	 * Example: if you want a EXPECT of 1e-10, pass
+	 * {@code Double.parseDouble("1e-10")} as a parameter
 	 * <p>
 	 * Blastall equivalent: -e
 	 *
@@ -174,7 +183,8 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	 * Returns the value of the WORD_SIZE parameter used for this blast run
 	 *
 	 * @return int value of WORD_SIZE used by this search
-	 * @throws IllegalArgumentException when program type is not set and program type is not supported
+	 * @throws IllegalArgumentException when program type is not set and program
+	 *                                  type is not supported
 	 */
 	public int getBlastWordSize() {
 		if (param.containsKey(WORD_SIZE)) {
@@ -195,18 +205,21 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 			case tblastx:
 				return 3;
 			default:
-				throw new UnsupportedOperationException("Blast program " + programType.name() + " is not supported.");
+				throw new UnsupportedOperationException(new StringBuilder().append("Blast program ")
+						.append(programType.name()).append(" is not supported.").toString());
 			}
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Blast program " + getBlastProgram() + " is not supported.", e);
+			throw new IllegalArgumentException(new StringBuilder().append("Blast program ").append(getBlastProgram())
+					.append(" is not supported.").toString(), e);
 		}
 	}
 
 	/**
 	 * Sets the WORD_SIZE parameter to be use with blastall
 	 * <p>
-	 * <b>WARNING!!</b> At this point, the method does not verify the validity of your choice; for example, word size of
-	 * greater than 5 with blastp returns error messages from QBlast. Word size range depends on the algorithm chosen.
+	 * <b>WARNING!!</b> At this point, the method does not verify the validity of
+	 * your choice; for example, word size of greater than 5 with blastp returns
+	 * error messages from QBlast. Word size range depends on the algorithm chosen.
 	 * <p>
 	 * More at https://www.ncbi.nlm.nih.gov/staff/tao/URLAPI/new/node74.html
 	 * <p>
@@ -219,9 +232,11 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	}
 
 	/**
-	 * Returns the value for the GAP_CREATION parameter (first half of GAPCOSTS parameter)
+	 * Returns the value for the GAP_CREATION parameter (first half of GAPCOSTS
+	 * parameter)
 	 *
-	 * @return an integer value for gap creation used by this search, -1 if not set or not a number
+	 * @return an integer value for gap creation used by this search, -1 if not set
+	 *         or not a number
 	 */
 	public int getBlastGapCreation() {
 		String gapCosts = getAlignmentOption(GAPCOSTS);
@@ -229,14 +244,17 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 			String gapCreation = gapCosts.split("\\+")[0];
 			return Integer.parseInt(gapCreation);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return -1;
 		}
 	}
 
 	/**
-	 * Returns the value for the gap extension parameter (second half of GAPCOSTS parameter)
+	 * Returns the value for the gap extension parameter (second half of GAPCOSTS
+	 * parameter)
 	 *
-	 * @return an integer for the value for gap extension used by this search, -1 if not set or not a number
+	 * @return an integer for the value for gap extension used by this search, -1 if
+	 *         not set or not a number
 	 */
 	public int getBlastGapExtension() {
 		String gapCosts = getAlignmentOption(GAPCOSTS);
@@ -244,14 +262,17 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 			String gapExtension = gapCosts.split("\\+")[1];
 			return Integer.parseInt(gapExtension);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return -1;
 		}
 	}
 
 	/**
-	 * Returns the actual string for the GAPCOSTS parameter which is used to build the URL
+	 * Returns the actual string for the GAPCOSTS parameter which is used to build
+	 * the URL
 	 *
-	 * @return the string representation of the GAPCOSTS parameter formatted for the URL
+	 * @return the string representation of the GAPCOSTS parameter formatted for the
+	 *         URL
 	 */
 	public String getBlastGapCosts() {
 		return getAlignmentOption(GAPCOSTS);
@@ -260,13 +281,13 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	/**
 	 * Sets the GAPCOSTS parameter
 	 *
-	 * @param gapCreation integer to use as gap creation value
+	 * @param gapCreation  integer to use as gap creation value
 	 * @param gapExtension integer to use as gap extension value
 	 */
 	public void setBlastGapCosts(int gapCreation, int gapExtension) {
 		String gc = Integer.toString(gapCreation);
 		String ge = Integer.toString(gapExtension);
-		setAlignmentOption(GAPCOSTS, gc + "+" + ge);
+		setAlignmentOption(GAPCOSTS, new StringBuilder().append(gc).append("+").append(ge).toString());
 	}
 
 	/**
@@ -293,9 +314,10 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 
 		if (!gapCostsSet) {
 			/*
-			 * Setting default values for -G/-E if no other values have been set is necessary because, since BLOSUM62 is
-			 * default, the expected values are -G 11 -E 1. If your matrix choice is different, the request will fail,
-			 * implicitly expecting GAPCOSTS=11+1
+			 * Setting default values for -G/-E if no other values have been set is
+			 * necessary because, since BLOSUM62 is default, the expected values are -G 11
+			 * -E 1. If your matrix choice is different, the request will fail, implicitly
+			 * expecting GAPCOSTS=11+1
 			 */
 			switch (matrix) {
 			case PAM30:
@@ -326,11 +348,12 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	}
 
 	/**
-	 * Sets the QUERY_FROM and QUERY_TO parameters to be use by blast. Do not use if you want to use the whole sequence.<br/>
+	 * Sets the QUERY_FROM and QUERY_TO parameters to be use by blast. Do not use if
+	 * you want to use the whole sequence.<br/>
 	 * Blastall equivalent: -L
 	 *
 	 * @param start QUERY_FROM parameter
-	 * @param end QUERY_TO parameter
+	 * @param end   QUERY_TO parameter
 	 */
 	public void setBlastFromToPosition(int start, int end) {
 		if (start >= end) {
@@ -357,32 +380,43 @@ public class NCBIQBlastAlignmentProperties implements RemotePairwiseAlignmentPro
 	}
 
 	/**
-	 * This method is to be used if a request is to use non-default values at submission. Useful for the following
-	 * blastall parameters:
+	 * This method is to be used if a request is to use non-default values at
+	 * submission. Useful for the following blastall parameters:
 	 * <ul>
 	 * <li>-r: integer to reward for match. Default = 1</li>
 	 * <li>-q: negative integer for penalty to allow mismatch. Default = -3</li>
-	 * <li>-y: dropoff for blast extensions in bits, using default if not specified. Default = 20 for blastn, 7 for all
-	 * others (except megablast for which it is not applicable).</li>
-	 * <li>-X: X dropoff value for gapped alignment, in bits. Default = 30 for blastn/megablast, 15 for all others.</li>
-	 * <li>-Z: final X dropoff value for gapped alignement, in bits. Default = 50 for blastn, 25 for all others (except
-	 * megablast for which it is not applicable)</li>
-	 * <li>-P: equals 0 for multiple hits 1-pass, 1 for single hit 1-pass. Does not apply to blastn ou megablast.</li>
-	 * <li>-A: multiple hits window size. Default = 0 (for single hit algorithm)</li>
+	 * <li>-y: dropoff for blast extensions in bits, using default if not specified.
+	 * Default = 20 for blastn, 7 for all others (except megablast for which it is
+	 * not applicable).</li>
+	 * <li>-X: X dropoff value for gapped alignment, in bits. Default = 30 for
+	 * blastn/megablast, 15 for all others.</li>
+	 * <li>-Z: final X dropoff value for gapped alignement, in bits. Default = 50
+	 * for blastn, 25 for all others (except megablast for which it is not
+	 * applicable)</li>
+	 * <li>-P: equals 0 for multiple hits 1-pass, 1 for single hit 1-pass. Does not
+	 * apply to blastn ou megablast.</li>
+	 * <li>-A: multiple hits window size. Default = 0 (for single hit
+	 * algorithm)</li>
 	 * <li>-I: number of database sequences to save hits for. Default = 500</li>
-	 * <li>-Y: effective length of the search space. Default = 0 (0 represents using the whole space)</li>
-	 * <li>-z: a real specifying the effective length of the database to use. Default = 0 (0 represents the real size)</li>
-	 * <li>-c: an integer representing pseudocount constant for PSI-BLAST. Default = 7</li>
+	 * <li>-Y: effective length of the search space. Default = 0 (0 represents using
+	 * the whole space)</li>
+	 * <li>-z: a real specifying the effective length of the database to use.
+	 * Default = 0 (0 represents the real size)</li>
+	 * <li>-c: an integer representing pseudocount constant for PSI-BLAST. Default =
+	 * 7</li>
 	 * <li>-F: any filtering directive</li>
 	 * </ul>
 	 * <p>
-	 * WARNING!! This method is still very much in flux and might not work as expected...
+	 * WARNING!! This method is still very much in flux and might not work as
+	 * expected...
 	 * </p>
 	 * <p>
-	 * You have to be aware that at no moment is there any error checking on the use of these parameters by this class.
+	 * You have to be aware that at no moment is there any error checking on the use
+	 * of these parameters by this class.
 	 * </p>
 	 *
-	 * @param advancedOptions : a String with any number of optional parameters with an associated value.
+	 * @param advancedOptions : a String with any number of optional parameters with
+	 *                        an associated value.
 	 */
 	public void setBlastAdvancedOptions(String advancedOptions) {
 		// Escaping white spaces with + char to comply with QBlast specifications

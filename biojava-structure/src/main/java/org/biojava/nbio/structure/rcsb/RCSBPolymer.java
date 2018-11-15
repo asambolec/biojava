@@ -30,7 +30,8 @@ import java.util.List;
 /**
  * Corresponds to a polymer in a {@code describeMol} XML file.
  *
- * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB RESTful</a>
+ * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB
+ *      RESTful</a>
  *
  * @author dmyerstu
  * @since 3.0.6
@@ -58,8 +59,8 @@ public class RCSBPolymer {
 	private Double weight;
 
 	public RCSBPolymer() {
-		chains = new ArrayList<Character>();
-		synonyms = new ArrayList<String>();
+		chains = new ArrayList<>();
+		synonyms = new ArrayList<>();
 	}
 
 	public List<Character> getChains() {

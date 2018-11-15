@@ -33,32 +33,35 @@ public class IndexPair implements Serializable {
 	short row;
 	short col;
 
-	public IndexPair(){
+	public IndexPair() {
 		row = -1;
 		col = -1;
 	}
 
-	public IndexPair(short row, short col){
+	public IndexPair(short row, short col) {
 		this.row = row;
-		this.col=col;
+		this.col = col;
 
 	}
+
 	public short getCol() {
 		return col;
 	}
+
 	public void setCol(short col) {
 		this.col = col;
 	}
+
 	public short getRow() {
 		return row;
 	}
+
 	public void setRow(short row) {
 		this.row = row;
 	}
 
 	@Override
-public String toString(){
-		return "["+row + " " + col+"]";
+	public String toString() {
+		return new StringBuilder().append("[").append(row).append(" ").append(col).append("]").toString();
 	}
 }
-

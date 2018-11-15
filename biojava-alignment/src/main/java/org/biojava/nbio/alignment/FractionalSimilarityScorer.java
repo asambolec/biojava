@@ -29,25 +29,30 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Implements an algorithm which computes a score for a sequence alignment pair.  The reported score is the number of
- * alignment columns which have similar {@link Compound}s.
+ * Implements an algorithm which computes a score for a sequence alignment pair.
+ * The reported score is the number of alignment columns which have similar
+ * {@link Compound}s.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class FractionalSimilarityScorer<S extends Sequence<C>, C extends Compound> extends AbstractScorer
 		implements PairwiseSequenceScorer<S, C> {
 
 	// always stored
-	private S query, target;
-	private int max, score;
+	private S query;
+	private S target;
+	private int max;
+	private int score;
 
 	// optional cached input field
 	private PairwiseSequenceAligner<S, C> aligner;
 
 	/**
-	 * Creates a fractional similarity scorer for a pair of sequences aligned by the given pairwise sequence aligner.
+	 * Creates a fractional similarity scorer for a pair of sequences aligned by the
+	 * given pairwise sequence aligner.
 	 *
 	 * @param aligner a pairwise sequence aligner
 	 */

@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.survival.cox;
 
-
 import java.text.DecimalFormat;
 
 /**
@@ -30,11 +29,11 @@ import java.text.DecimalFormat;
 public class CoxCoefficient {
 
 	String name;
-	double coeff; //beta
-	double stdError; //se
-	double robustStdError; //nse
+	double coeff; // beta
+	double stdError; // se
+	double robustStdError; // nse
 	double z;
-	double hazardRatio; //exp(beta)
+	double hazardRatio; // exp(beta)
 	double hazardRatioLoCI;
 	double hazardRatioHiCI;
 	double pvalue;
@@ -49,7 +48,8 @@ public class CoxCoefficient {
 
 	@Override
 	public String toString() {
-		return name + " " + coeff + " " + pvalue + " " + hazardRatio + " " + hazardRatioLoCI + " " + hazardRatioHiCI;
+		return new StringBuilder().append(name).append(" ").append(coeff).append(" ").append(pvalue).append(" ")
+				.append(hazardRatio).append(" ").append(hazardRatioLoCI).append(" ").append(hazardRatioHiCI).toString();
 	}
 
 	/**
@@ -57,7 +57,8 @@ public class CoxCoefficient {
 	 * @return
 	 */
 	public String getHRText() {
-		return fmt(hazardRatio, 2, 0) + " CI(" + fmt(hazardRatioLoCI, 2, 0) + "-" + fmt(hazardRatioHiCI, 2, 0) + ")";
+		return new StringBuilder().append(fmt(hazardRatio, 2, 0)).append(" CI(").append(fmt(hazardRatioLoCI, 2, 0))
+				.append("-").append(fmt(hazardRatioHiCI, 2, 0)).append(")").toString();
 	}
 
 	/**
@@ -214,7 +215,7 @@ public class CoxCoefficient {
 		this.standardDeviation = standardDeviation;
 	}
 
-		/**
+	/**
 	 *
 	 * @param d
 	 * @param precision
@@ -228,7 +229,7 @@ public class CoxCoefficient {
 		double p = 1.0;
 		for (int i = 0; i < (precision); i++) {
 			dpad = dpad + "0";
-			p = p / 10.0;
+			p /= 10.0;
 		}
 		DecimalFormat df = new DecimalFormat(dpad);
 		if (Math.abs(d) >= p) {

@@ -20,7 +20,6 @@
  */
 package demo;
 
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -31,58 +30,57 @@ import org.biojava.nbio.core.sequence.io.FastaReader;
 import org.biojava.nbio.core.sequence.io.GenericFastaHeaderParser;
 import org.biojava.nbio.core.sequence.io.ProteinSequenceCreator;
 import org.biojava.nbio.core.util.InputStreamProvider;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by andreas on 6/17/15.
  */
 public class ParseFastaFileDemo {
 
+	private static final Logger logger = LoggerFactory.getLogger(ParseFastaFileDemo.class);
 
-	public ParseFastaFileDemo(){
-
+	public ParseFastaFileDemo() {
 
 	}
 
-	/** 
-	 * e.g. download ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.fasta.gz
+	/**
+	 * e.g. download
+	 * ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.fasta.gz
 	 * and pass in path to local location of file
 	 *
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
 
-		int mb = 1024*1024;
+		int mb = 1024 * 1024;
 
-		//Getting the runtime reference from system
+		// Getting the runtime reference from system
 		Runtime runtime = Runtime.getRuntime();
 
-		System.out.println("##### Heap utilization statistics [MB] #####");
+		logger.info("##### Heap utilization statistics [MB] #####");
 
-		//Print used memory
-		System.out.println("Used Memory:"
-				+ (runtime.totalMemory() - runtime.freeMemory()) / mb);
+		// Print used memory
+		logger.info("Used Memory:" + (runtime.totalMemory() - runtime.freeMemory()) / mb);
 
-		//Print free memory
-		System.out.println("Free Memory:"
-				+ runtime.freeMemory() / mb);
+		// Print free memory
+		logger.info("Free Memory:" + runtime.freeMemory() / mb);
 
-		//Print total available memory
-		System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+		// Print total available memory
+		logger.info("Total Memory:" + runtime.totalMemory() / mb);
 
-		//Print Maximum available memory
-		System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+		// Print Maximum available memory
+		logger.info("Max Memory:" + runtime.maxMemory() / mb);
 
-
-		if ( args.length < 1) {
-			System.err.println("First argument needs to be path to fasta file");
+		if (args.length < 1) {
+			logger.error("First argument needs to be path to fasta file");
 			return;
 		}
 
 		File f = new File(args[0]);
 
-		if ( ! f.exists()) {
-			System.err.println("File does not exist " + args[0]);
+		if (!f.exists()) {
+			logger.error("File does not exist " + args[0]);
 			return;
 		}
 
@@ -93,9 +91,7 @@ public class ParseFastaFileDemo {
 
 		InputStream inStream = isp.getInputStream(f);
 
-
-		FastaReader<ProteinSequence, AminoAcidCompound> fastaReader = new FastaReader<ProteinSequence, AminoAcidCompound>(
-				inStream,
+		FastaReader<ProteinSequence, AminoAcidCompound> fastaReader = new FastaReader<>(inStream,
 				new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>(),
 				new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet()));
 
@@ -106,13 +102,16 @@ public class ParseFastaFileDemo {
 		while ((b = fastaReader.process(100)) != null) {
 			for (String key : b.keySet()) {
 				nrSeq++;
-				System.out.println(nrSeq + " : " + key + " " + b.get(key));
-				if ( nrSeq % 100000 == 0)
-					System.out.println(nrSeq );
+				logger.info(new StringBuilder().append(nrSeq).append(" : ").append(key).append(" ").append(b.get(key))
+						.toString());
+				if (nrSeq % 100000 == 0) {
+					logger.info(String.valueOf(nrSeq));
+				}
 			}
 
 		}
 		long timeE = System.currentTimeMillis();
-		System.out.println("parsed a total of " + nrSeq + " TREMBL sequences! in " + (timeE - timeS));
+		logger.info(new StringBuilder().append("parsed a total of ").append(nrSeq).append(" TREMBL sequences! in ")
+				.append(timeE - timeS).toString());
 	}
 }

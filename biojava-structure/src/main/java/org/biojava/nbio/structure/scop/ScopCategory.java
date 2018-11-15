@@ -26,60 +26,60 @@ package org.biojava.nbio.structure.scop;
 
 import java.io.Serializable;
 
-/** The various categories provided by SCOP.
+/**
+ * The various categories provided by SCOP.
  *
- * The SCOP node types are 'cl' (Class),
- * 'cf' (Fold), 'sf' (Superfamily), 'fa' (Family), 'dm' (Domain),
- *  'sp' (Species), 'px' (protein).
+ * The SCOP node types are 'cl' (Class), 'cf' (Fold), 'sf' (Superfamily), 'fa'
+ * (Family), 'dm' (Domain), 'sp' (Species), 'px' (protein).
  *
  * @author Andreas Prlic
  *
  */
-public enum ScopCategory implements Serializable
-{
+public enum ScopCategory implements Serializable {
 
-	Class,Fold, Superfamily,  Family, Domain, Species, Px;
+	Class, Fold, Superfamily, Family, Domain, Species, Px;
 
-	public static ScopCategory fromString(String type){
-		if ( type.equals("cl"))
+	public static ScopCategory fromString(String type) {
+		if ("cl".equals(type)) {
 			return Class;
-		else if ( type.equals("cf"))
+		} else if ("cf".equals(type)) {
 			return Fold;
-		else if ( type.equals("sf"))
+		} else if ("sf".equals(type)) {
 			return Superfamily;
-		else if ( type.equals("fa"))
+		} else if ("fa".equals(type)) {
 			return Family;
-		else if ( type.equals("dm"))
+		} else if ("dm".equals(type)) {
 			return Domain;
-		else if ( type.equals("sp"))
+		} else if ("sp".equals(type)) {
 			return Species;
-		else
+		} else {
 			return Px;
+		}
 	}
 
 	@Override
-public String toString(){
+	public String toString() {
 		switch (this) {
-			case Class:
-				return "cl";
+		case Class:
+			return "cl";
 
-			case Fold:
-				return "cf";
+		case Fold:
+			return "cf";
 
-			case Superfamily:
-				return "sf";
+		case Superfamily:
+			return "sf";
 
-			case Family:
-				return "fa";
+		case Family:
+			return "fa";
 
-			case Domain:
-				return "dm";
+		case Domain:
+			return "dm";
 
-			case Species:
-				return "sp";
+		case Species:
+			return "sp";
 
-			 default:
-				 return "px";
+		default:
+			return "px";
 		}
 	}
 }

@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.structure.align.util;
 
-
 public class ConfigurationException extends Exception {
 
 	/**
@@ -31,10 +30,10 @@ public class ConfigurationException extends Exception {
 	/**
 	 * Constructs a ConfigurationException object.
 	 *
-	 * @param s  a String ...
+	 * @param s a String ...
 	 */
 	public ConfigurationException(String s) {
-	super(s);
+		super(s);
 	}
 
 	public ConfigurationException(String message, Throwable cause) {
@@ -44,13 +43,12 @@ public class ConfigurationException extends Exception {
 	/**
 	 * Constructs a ConfigurationException object.
 	 *
-	 * @param t  a Throwable object
+	 * @param t a Throwable object
 	 */
-	public ConfigurationException (Throwable t) {
-	super(t);
+	public ConfigurationException(Throwable t) {
+		super(t);
 	}
 
 	public ConfigurationException() {
 	}
 }
-

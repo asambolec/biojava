@@ -30,32 +30,30 @@ import java.util.Map;
 /**
  * SCOPe:
  *
- * The Structural Classification of Proteins (extended) at Berkeley Lab and UC Berkeley
- * (<a href="http://scop.berkeley.edu/">http://scop.berkeley.edu/</a>).
+ * The Structural Classification of Proteins (extended) at Berkeley Lab and UC
+ * Berkeley (<a href="http://scop.berkeley.edu/">http://scop.berkeley.edu/</a>).
  *
- * <p>This provides updates to the MRC SCOP hierarchical classification.
+ * <p>
+ * This provides updates to the MRC SCOP hierarchical classification.
  */
 public class BerkeleyScopInstallation extends ScopInstallation {
 
-
-	String defaultBerkeleyDownloadURL = "http://scop.berkeley.edu/downloads/parse/";
-	String defaultBerkeleyScopVersion=ScopFactory.LATEST_VERSION;
-
 	/**
-	 * A map from SCOP version names which the Berkeley server offers as a
-	 * download to an array of equivalent deprecated SCOP version names.
+	 * A map from SCOP version names which the Berkeley server offers as a download
+	 * to an array of equivalent deprecated SCOP version names.
 	 */
-	public static final Map<String,String[]> EQUIVALENT_VERSIONS = new HashMap<String,String[]>();
+	public static final Map<String, String[]> EQUIVALENT_VERSIONS = new HashMap<>();
 
 	static {
-		EQUIVALENT_VERSIONS.put("2.01", new String[] {"1.75A"});
-		EQUIVALENT_VERSIONS.put("2.02", new String[] {"1.75B"});
-		EQUIVALENT_VERSIONS.put("2.03", new String[] {"1.75C"});
+		EQUIVALENT_VERSIONS.put("2.01", new String[] { "1.75A" });
+		EQUIVALENT_VERSIONS.put("2.02", new String[] { "1.75B" });
+		EQUIVALENT_VERSIONS.put("2.03", new String[] { "1.75C" });
 	}
 
+	String defaultBerkeleyDownloadURL = "http://scop.berkeley.edu/downloads/parse/";
+	String defaultBerkeleyScopVersion = ScopFactory.LATEST_VERSION;
 
 	public BerkeleyScopInstallation() {
-		super();
 		setScopVersion(defaultBerkeleyScopVersion);
 		addMirror(new BerkeleyScopMirror(defaultBerkeleyDownloadURL));
 		addMirror(new ScopMirror());
@@ -63,6 +61,7 @@ public class BerkeleyScopInstallation extends ScopInstallation {
 
 	private static class BerkeleyScopMirror extends ScopMirror {
 		private String rootURL;
+
 		public BerkeleyScopMirror(String url) {
 			super(url);
 			rootURL = url;
@@ -70,22 +69,22 @@ public class BerkeleyScopInstallation extends ScopInstallation {
 
 		@Override
 		public String getClaURL(String scopVersion) {
-			return rootURL+getFilename("cla",scopVersion);
+			return rootURL + getFilename("cla", scopVersion);
 		}
 
 		@Override
 		public String getDesURL(String scopVersion) {
-			return rootURL+getFilename("des",scopVersion);
+			return rootURL + getFilename("des", scopVersion);
 		}
 
 		@Override
 		public String getHieURL(String scopVersion) {
-			return rootURL+getFilename("hie",scopVersion);
+			return rootURL + getFilename("hie", scopVersion);
 		}
 
 		@Override
 		public String getComURL(String scopVersion) {
-			return rootURL+getFilename("com",scopVersion);
+			return rootURL + getFilename("com", scopVersion);
 		}
 
 		private String getFilename(String fileType, String version) {
@@ -101,15 +100,17 @@ public class BerkeleyScopInstallation extends ScopInstallation {
 			String[] parts = version.split("\\.");
 			// they changed the filename schemes!
 			if (Integer.parseInt(parts[0]) == 1) {
-				return "dir." + fileType + ".scop." + version + ".txt";
+				return new StringBuilder().append("dir.").append(fileType).append(".scop.").append(version)
+						.append(".txt").toString();
 			} else {
-				return "dir." + fileType + ".scope." + version + "-stable.txt";
+				return new StringBuilder().append("dir.").append(fileType).append(".scope.").append(version)
+						.append("-stable.txt").toString();
 			}
 		}
 
 		@Override
 		public String toString() {
-			return "BerkeleyScopMirror[ \"" + rootURL + " ]";
+			return new StringBuilder().append("BerkeleyScopMirror[ \"").append(rootURL).append(" ]").toString();
 		}
 	}
 

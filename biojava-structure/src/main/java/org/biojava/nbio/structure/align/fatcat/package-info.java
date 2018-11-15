@@ -1,7 +1,9 @@
 /**
- * Classes related to the implementation of the FATCAT alignment algorithm, here called jFATCAT.
+ * Classes related to the implementation of the FATCAT alignment algorithm, here
+ * called jFATCAT.
  *
  * FATCAT reference:
+ * 
  * <pre>
  * Yuzhen Ye &amp; Adam Godzik (2003)
  * Flexible structure alignment by chaining aligned fragment pairs allowing twists.
@@ -9,6 +11,7 @@
  * </pre>
  *
  * see also:
+ * 
  * <pre>
  * Andreas Prlic; Spencer Bliven; Peter W. Rose; Wolfgang F. Bluhm; Chris Bizon; Adam Godzik; Philip E. Bourne (2010)
  * Pre-calculated protein structure alignments at the RCSB PDB website

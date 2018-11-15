@@ -32,9 +32,9 @@ import java.util.Map;
 
 /**
  *
- * This is the data structure for a single Group of atoms.  A protein
- * sequence ({@link Chain} in PDB file) is represented as a list of Groups.
- * There are 3 types of Groups:
+ * This is the data structure for a single Group of atoms. A protein sequence
+ * ({@link Chain} in PDB file) is represented as a list of Groups. There are 3
+ * types of Groups:
  *
  * <ul>
  * <li>{@link AminoAcid}</li>
@@ -59,6 +59,7 @@ public interface Group extends Serializable {
 
 	/**
 	 * Get number of atoms.
+	 * 
 	 * @return number of atoms of this Group
 	 */
 	public int size();
@@ -68,18 +69,18 @@ public interface Group extends Serializable {
 	 *
 	 * @return true if Group has 3D coordinates
 	 */
-	public boolean has3D ();
+	public boolean has3D();
 
 	/**
 	 * Flag if group has 3D data .
 	 *
-	 * @param flag  true to set flag that this Group has 3D coordinates
+	 * @param flag true to set flag that this Group has 3D coordinates
 	 */
 	public void setPDBFlag(boolean flag);
 
 	/**
-	 * Get Type of group, one of {@link GroupType#AMINOACID}, {@link GroupType#HETATM}
-	 * or {@link GroupType#NUCLEOTIDE}
+	 * Get Type of group, one of {@link GroupType#AMINOACID},
+	 * {@link GroupType#HETATM} or {@link GroupType#NUCLEOTIDE}
 	 *
 	 * @return a String representing the type value
 	 */
@@ -88,7 +89,7 @@ public interface Group extends Serializable {
 	/**
 	 * Add an atom to this group.
 	 *
-	 * @param atom  an Atom object
+	 * @param atom an Atom object
 	 */
 	public void addAtom(Atom atom);
 
@@ -98,47 +99,48 @@ public interface Group extends Serializable {
 	 * @return a List object representing the atoms
 	 * @see #setAtoms(List)
 	 */
-	public List<Atom> getAtoms() ;
-
+	public List<Atom> getAtoms();
 
 	/**
 	 * Set the atoms of this group.
+	 * 
 	 * @see {@link Atom}
 	 * @param atoms a list of atoms
 	 */
 	public void setAtoms(List<Atom> atoms);
 
-	/** Remove all atoms from this group.
+	/**
+	 * Remove all atoms from this group.
 	 *
 	 */
 	public void clearAtoms();
 
 	/**
-	 * Get an atom given its PDB name.
-	 * Beware that some PDB atom names are ambiguous (e.g. CA, which means C-alpha or Calcium),
-	 * ambiguities should not occur within the same group though. To solve these ambiguities
-	 * one would need to check the atom returned for the required element with {@link Atom#getElement()}
+	 * Get an atom given its PDB name. Beware that some PDB atom names are ambiguous
+	 * (e.g. CA, which means C-alpha or Calcium), ambiguities should not occur
+	 * within the same group though. To solve these ambiguities one would need to
+	 * check the atom returned for the required element with
+	 * {@link Atom#getElement()}
 	 *
-	 * @param name  a trimmed String representing the atom's PDB name, e.g. "CA"
+	 * @param name a trimmed String representing the atom's PDB name, e.g. "CA"
 	 * @return an Atom object or null if no such atom exists within this group
 	 */
-	public Atom getAtom(String name) ;
-
+	public Atom getAtom(String name);
 
 	/**
 	 * Get at atom by position.
 	 *
-	 * @param position  an int
+	 * @param position an int
 	 * @return an Atom object or null if no Atom exists for given position
 	 */
-	public Atom getAtom(int position) ;
+	public Atom getAtom(int position);
 
 	/**
-	 * Tell whether a particular atom exists within this group.
-	 * Beware that some PDB atom names are ambiguous (e.g. CA, which means C-alpha or Calcium),
+	 * Tell whether a particular atom exists within this group. Beware that some PDB
+	 * atom names are ambiguous (e.g. CA, which means C-alpha or Calcium),
 	 * ambiguities should not occur within the same group though.
 	 *
-	 * @param name  a trimmed String representing the atom's PDB name, e.g. "CA"
+	 * @param name a trimmed String representing the atom's PDB name, e.g. "CA"
 	 * @return true if Atom with name exists within this group
 	 */
 	public boolean hasAtom(String name);
@@ -154,22 +156,23 @@ public interface Group extends Serializable {
 	/**
 	 * Set the PDB 3-letter name for this group. (e.g. ALA)
 	 *
-	 * @param s  a String specifying the PDBName value
+	 * @param s a String specifying the PDBName value
 	 * @see #getPDBName
 	 */
-	public void setPDBName(String s) ;
-
+	public void setPDBName(String s);
 
 	/**
 	 * Calculate if this group has all atoms required for an amino acid backbone.
-	 * This allows to include chemically modified amino acids that
-	 * are labeled hetatoms into some computations, the usual way
-	 * to identify if a group is an amino acid is {@link #getType()}
+	 * This allows to include chemically modified amino acids that are labeled
+	 * hetatoms into some computations, the usual way to identify if a group is an
+	 * amino acid is {@link #getType()}
 	 * <p>
 	 * amino atoms are : N, CA, C, O
 	 * </p>
 	 *
-	 * Example: 1DW9 chain A first group is a Selenomethionine, provided as HETATM, but here returns true.
+	 * Example: 1DW9 chain A first group is a Selenomethionine, provided as HETATM,
+	 * but here returns true.
+	 * 
 	 * <pre>
 	 * HETATM    1  N   MSE A   1      11.720  20.973   1.584  0.00  0.00           N
 	 * HETATM    2  CA  MSE A   1      10.381  20.548   1.139  0.00  0.00           C
@@ -178,90 +181,89 @@ public interface Group extends Serializable {
 	 * HETATM    5  CB  MSE A   1      10.407  19.441   0.088  0.00  0.00           C
 	 * </pre>
 	 *
-	 * @return true if all Atoms required for an AminoAcid are available (N, CA, C, O)
+	 * @return true if all Atoms required for an AminoAcid are available (N, CA, C,
+	 *         O)
 	 * @see #getType
 	 */
-	public boolean hasAminoAtoms() ;
-
+	public boolean hasAminoAtoms();
 
 	/**
-	 * Check if this group is a polymeric group, from the definition in Chemical Component Dictionary
+	 * Check if this group is a polymeric group, from the definition in Chemical
+	 * Component Dictionary
 	 *
 	 * @return true if a polymeric group
 	 */
 	public boolean isPolymeric();
 
-
 	/**
-	 * Check if this group is an aminoacid group, from the definition in Chemical Component Dictionary
+	 * Check if this group is an aminoacid group, from the definition in Chemical
+	 * Component Dictionary
 	 *
 	 * @return true if an amino acid
-     */
+	 */
 	public boolean isAminoAcid();
 
-
 	/**
-	 * Check if this group is a nucleotide group, from the definition in Chemical Component Dictionary
+	 * Check if this group is a nucleotide group, from the definition in Chemical
+	 * Component Dictionary
 	 *
 	 * @return true if a nucleotide
-     */
+	 */
 	public boolean isNucleotide();
 
-
-
 	/**
-	 * Properties of this amino acid. Currently available properties are:
-	 * phi
-	 * psi
+	 * Properties of this amino acid. Currently available properties are: phi psi
 	 * secstruc
 	 *
-	 * @param properties  a Map object specifying the properties value
+	 * @param properties a Map object specifying the properties value
 	 * @see #getProperties
 	 */
-	public void setProperties(Map<String,Object> properties) ;
+	public void setProperties(Map<String, Object> properties);
 
 	/**
 	 * Return properties.
+	 * 
 	 * @see #setProperties
 	 *
 	 * @return a HashMap object representing the properties value
 	 */
-	public Map<String,Object> getProperties() ;
+	public Map<String, Object> getProperties();
 
 	/**
 	 * Set a single property .
 	 *
-	 * @param key    a String
-	 * @param value  an Object
+	 * @param key   a String
+	 * @param value an Object
 	 * @see #getProperty
 	 */
-	public void setProperty(String key, Object value) ;
+	public void setProperty(String key, Object value);
 
 	/**
 	 * Get a single property .
 	 *
-	 * @param key  a String
+	 * @param key a String
 	 * @return an Object
 	 * @see #setProperty
 	 */
-	public Object getProperty(String key) ;
+	public Object getProperty(String key);
 
 	/**
 	 * Get an Atom Iterator.
 	 *
 	 * @return an Iterator object
 	 */
-	public Iterator<Atom> iterator() ;
-
+	public Iterator<Atom> iterator();
 
 	/**
 	 * Returns and identical copy of this Group object .
-	 * @return  and identical copy of this Group object
+	 * 
+	 * @return and identical copy of this Group object
 	 */
 	public Object clone();
 
 	/**
 	 * Sets the back-reference to its parent Chain.
+	 * 
 	 * @param chain the parent Chain
 	 * @see #getChain()
 	 * @since 3.0
@@ -275,17 +277,17 @@ public interface Group extends Serializable {
 	 * @see #setChain(Chain)
 	 * @since 3.0
 	 */
-	public Chain getChain() ;
+	public Chain getChain();
 
 	/**
-	 * Returns a dynamically created ResidueNumber for the group - this
-	 * contains the chainId, resNum and insCode of the group.
+	 * Returns a dynamically created ResidueNumber for the group - this contains the
+	 * chainId, resNum and insCode of the group.
+	 * 
 	 * @see ResidueNumber
 	 * @return ResidueNumber for the group.
 	 * @since 3.0
 	 */
 	public ResidueNumber getResidueNumber();
-
 
 	/**
 	 * Sets the ResidueNumber for this Group
@@ -295,8 +297,9 @@ public interface Group extends Serializable {
 	public void setResidueNumber(ResidueNumber residueNumber);
 
 	/**
-	 * Utility method to temporarily set a chainID for a group, if a parent chain object does not exist yet.
-	 * Not recommended for general use other than parsing.
+	 * Utility method to temporarily set a chainID for a group, if a parent chain
+	 * object does not exist yet. Not recommended for general use other than
+	 * parsing.
 	 *
 	 * @param chainId
 	 * @param residueNumber
@@ -305,12 +308,13 @@ public interface Group extends Serializable {
 	public void setResidueNumber(String chainId, Integer residueNumber, Character iCode);
 
 	/**
-	 * Utility method for returning the chainId of the Group or null if no
-	 * Chain has been set. This is equivalent to calling getChain().getId()
+	 * Utility method for returning the chainId of the Group or null if no Chain has
+	 * been set. This is equivalent to calling getChain().getId()
 	 * 
 	 * Prior to version 5.0 this method returned the chain name.
+	 * 
 	 * @since 3.0
-	 * @return  the ID of the chain
+	 * @return the ID of the chain
 	 */
 	public String getChainId();
 
@@ -322,12 +326,12 @@ public interface Group extends Serializable {
 	public void setChemComp(ChemComp cc);
 
 	/**
-	 * Get the chemical component that closer describes this group. If the information does not exist yet, fetches the information from PDB web site.
+	 * Get the chemical component that closer describes this group. If the
+	 * information does not exist yet, fetches the information from PDB web site.
 	 *
 	 * @return the Chemical Component definition for this Group.
 	 */
 	public ChemComp getChemComp();
-
 
 	/**
 	 * Check if this group has alternate location groups.
@@ -337,27 +341,28 @@ public interface Group extends Serializable {
 	 */
 	public boolean hasAltLoc();
 
-
 	/**
 	 * Get the list of other alternate location groups.
 	 * <p>
-	 * The main group (this group) will contain the first altloc (be it the default '.' or 'A' or a mix of '.' and 'A').
+	 * The main group (this group) will contain the first altloc (be it the default
+	 * '.' or 'A' or a mix of '.' and 'A').
 	 * <p>
 	 * This method will return the altloc groups that are not the main group, e.g.:
 	 *
-	 * <li> if '.' (default), 'A' and 'B' altlocs are present in file, the main group will contain
-	 * the default '.' and this method will return 2 altloc groups
-	 * </li>
+	 * <li>if '.' (default), 'A' and 'B' altlocs are present in file, the main group
+	 * will contain the default '.' and this method will return 2 altloc groups</li>
 	 *
-	 * <li> if 'A' and 'B' are present in file without a default '.' group, then the main group will contain the 'A'
-	 * location whilst this method will return only 1 altloc group with the 'B' location
-	 * </li>
+	 * <li>if 'A' and 'B' are present in file without a default '.' group, then the
+	 * main group will contain the 'A' location whilst this method will return only
+	 * 1 altloc group with the 'B' location</li>
 	 *
 	 * <p>
-	 * Note that atoms with the default altloc (.) are included in all groups. Atoms with other altlocs (typically A, B, etc)
-	 * will be sorted into groups by altloc.
+	 * Note that atoms with the default altloc (.) are included in all groups. Atoms
+	 * with other altlocs (typically A, B, etc) will be sorted into groups by
+	 * altloc.
 	 * <p>
-	 * Thus it can happen that an altloc group duplicate the contents of the main group.
+	 * Thus it can happen that an altloc group duplicate the contents of the main
+	 * group.
 	 *
 	 * @return List of other groups that are on alternate locations
 	 */
@@ -379,39 +384,41 @@ public interface Group extends Serializable {
 	public boolean isWater();
 
 	/**
-	 * Gets the alternate location group to this group that has the alt-loc character code passed.
+	 * Gets the alternate location group to this group that has the alt-loc
+	 * character code passed.
 	 *
 	 * @param altLoc the alternate location code of the group desired
 	 * @return the alternate location group if found, or null otherwise
 	 */
 	public Group getAltLocGroup(Character altLoc);
 
-
 	/**
-	 * Attempts to reduce the memory imprint of this group by trimming
-	 * all internal Collection objects to the required size.
+	 * Attempts to reduce the memory imprint of this group by trimming all internal
+	 * Collection objects to the required size.
 	 *
 	 */
 	public void trimToSize();
 
 	/**
 	 * Function to get the Group as an MDL molblock
+	 * 
 	 * @return the string of the MDL molblock
 	 */
 	public String toSDF();
-	
+
 	/**
-	 * Tells whether the group is annotated as HETATM in the file.
-	 * To be used only at parsing time to be able to infer that a
-	 * polymeric group is in a ligand chain or not.
+	 * Tells whether the group is annotated as HETATM in the file. To be used only
+	 * at parsing time to be able to infer that a polymeric group is in a ligand
+	 * chain or not.
+	 * 
 	 * @return
 	 */
 	public boolean isHetAtomInFile();
-	
+
 	/**
-	 * Sets the field isHetAtomInFile which is intented only for 
-	 * helping in infering if a polymeric group is in a ligand chain
-	 * or in a polymeric chain.
+	 * Sets the field isHetAtomInFile which is intented only for helping in infering
+	 * if a polymeric group is in a ligand chain or in a polymeric chain.
+	 * 
 	 * @param isHetAtomInFile
 	 */
 	public void setHetAtomInFile(boolean isHetAtomInFile);

@@ -20,10 +20,9 @@
  */
 package org.biojava.nbio.core.sequence;
 
-
 /**
- * Provides a way of representing the strand of a sequence, location
- * hit or feature.
+ * Provides a way of representing the strand of a sequence, location hit or
+ * feature.
  *
  * @author ayates
  */
@@ -48,12 +47,12 @@ public enum Strand {
 
 	public Strand getReverse() {
 		switch (this) {
-			case POSITIVE:
-				return NEGATIVE;
-			case NEGATIVE:
-				return POSITIVE;
-			default:
-				return UNDEFINED;
+		case POSITIVE:
+			return NEGATIVE;
+		case NEGATIVE:
+			return POSITIVE;
+		default:
+			return UNDEFINED;
 		}
 	}
 }

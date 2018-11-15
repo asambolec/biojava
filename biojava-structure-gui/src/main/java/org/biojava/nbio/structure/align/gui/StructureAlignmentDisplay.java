@@ -32,7 +32,8 @@ import org.biojava.nbio.structure.align.util.AlignmentTools;
 
 public class StructureAlignmentDisplay {
 
-	/** Display an AFPChain alignment
+	/**
+	 * Display an AFPChain alignment
 	 *
 	 * @param afpChain
 	 * @param ca1
@@ -42,13 +43,14 @@ public class StructureAlignmentDisplay {
 	 */
 	public static StructureAlignmentJmol display(AFPChain afpChain, Atom[] ca1, Atom[] ca2) throws StructureException {
 
-		if ( ca1.length < 1 || ca2.length < 1){
-			throw new StructureException("length of atoms arrays is too short! " + ca1.length + "," + ca2.length);
+		if (ca1.length < 1 || ca2.length < 1) {
+			throw new StructureException(new StringBuilder().append("length of atoms arrays is too short! ")
+					.append(ca1.length).append(",").append(ca2.length).toString());
 		}
 
 		Group[] twistedGroups = AlignmentTools.prepareGroupsForDisplay(afpChain, ca1, ca2);
 
-		List<Group> hetatms  = StructureTools.getUnalignedGroups(ca1);
+		List<Group> hetatms = StructureTools.getUnalignedGroups(ca1);
 		List<Group> hetatms2 = StructureTools.getUnalignedGroups(ca2);
 
 		return DisplayAFP.display(afpChain, twistedGroups, ca1, ca2, hetatms, hetatms2);

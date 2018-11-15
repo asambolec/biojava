@@ -28,7 +28,6 @@ import javax.vecmath.Vector3d;
 import java.io.Serializable;
 import java.util.Arrays;
 
-
 /**
  * A bounding box for short cutting some geometrical calculations.
  *
@@ -41,7 +40,6 @@ public class BoundingBox implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(StructureInterfaceList.class);
-
 
 	public double xmin;
 	public double xmax;
@@ -69,12 +67,16 @@ public class BoundingBox implements Serializable {
 	}
 
 	/**
-	 * Constructs a BoundingBox by calculating maxs and mins of given array of atoms.
+	 * Constructs a BoundingBox by calculating maxs and mins of given array of
+	 * atoms.
+	 * 
 	 * @param atoms
 	 */
-	public BoundingBox (Point3d[] atoms) {
+	public BoundingBox(Point3d[] atoms) {
 
-		if (atoms.length==0) logger.error("Error! Empty list of atoms");
+		if (atoms.length == 0) {
+			logger.error("Error! Empty list of atoms");
+		}
 
 		xmax = atoms[0].x;
 		xmin = xmax;
@@ -83,43 +85,38 @@ public class BoundingBox implements Serializable {
 		zmax = atoms[0].z;
 		zmin = zmax;
 
-		for(int i=1;i<atoms.length;i++) {
-			if(atoms[i].x > xmax) xmax = atoms[i].x;
-			else if(atoms[i].x < xmin) xmin = atoms[i].x;
+		for (int i = 1; i < atoms.length; i++) {
+			if (atoms[i].x > xmax) {
+				xmax = atoms[i].x;
+			} else if (atoms[i].x < xmin) {
+				xmin = atoms[i].x;
+			}
 
-			if(atoms[i].y > ymax) ymax = atoms[i].y;
-			else if(atoms[i].y < ymin) ymin = atoms[i].y;
+			if (atoms[i].y > ymax) {
+				ymax = atoms[i].y;
+			} else if (atoms[i].y < ymin) {
+				ymin = atoms[i].y;
+			}
 
-			if(atoms[i].z > zmax) zmax = atoms[i].z;
-			else if(atoms[i].z < zmin) zmin = atoms[i].z;
+			if (atoms[i].z > zmax) {
+				zmax = atoms[i].z;
+			} else if (atoms[i].z < zmin) {
+				zmin = atoms[i].z;
+			}
 		}
-
-	}
-
-
-	/** Returns the dimensions of this bounding box.
-	 *
-	 * @return a double array (x,y,z) with the dimensions of the box.
-	 */
-	public double[] getDimensions(){
-
-		double[] dim = new double[3];
-
-		dim[0] = xmax-xmin;
-		dim[1] = ymax-ymin;
-		dim[2] = zmax-zmin;
-
-		return dim;
 
 	}
 
 	/**
 	 * Given a set of bounding boxes returns a bounding box that bounds all of them.
+	 * 
 	 * @param boxes
 	 */
 	public BoundingBox(BoundingBox[] boxes) {
 
-		if (boxes.length==0) logger.error("Error! Empty list of bounding boxes");
+		if (boxes.length == 0) {
+			logger.error("Error! Empty list of bounding boxes");
+		}
 
 		xmax = boxes[0].xmax;
 		xmin = boxes[0].xmin;
@@ -128,52 +125,64 @@ public class BoundingBox implements Serializable {
 		zmax = boxes[0].zmax;
 		zmin = boxes[0].zmin;
 
-		for (int i=1;i<boxes.length;i++) {
-			if(boxes[i].xmax > xmax) xmax = boxes[i].xmax;
-			else if(boxes[i].xmin < xmin) xmin = boxes[i].xmin;
-			if(boxes[i].ymax > ymax) ymax = boxes[i].ymax;
-			else if(boxes[i].ymin < ymin) ymin = boxes[i].ymin;
-			if(boxes[i].zmax > zmax) zmax = boxes[i].zmax;
-			else if(boxes[i].zmin < zmin) zmin = boxes[i].zmin;
+		for (int i = 1; i < boxes.length; i++) {
+			if (boxes[i].xmax > xmax) {
+				xmax = boxes[i].xmax;
+			} else if (boxes[i].xmin < xmin) {
+				xmin = boxes[i].xmin;
+			}
+			if (boxes[i].ymax > ymax) {
+				ymax = boxes[i].ymax;
+			} else if (boxes[i].ymin < ymin) {
+				ymin = boxes[i].ymin;
+			}
+			if (boxes[i].zmax > zmax) {
+				zmax = boxes[i].zmax;
+			} else if (boxes[i].zmin < zmin) {
+				zmin = boxes[i].zmin;
+			}
 		}
 
 	}
 
-	private class Bound implements Comparable<Bound> {
-		int cardinal;
-		double value;
-		public Bound(int cardinal,double value) {
-			this.cardinal = cardinal;
-			this.value = value;
-		}
-		@Override
-		public int compareTo(Bound o) {
-			return Double.compare(this.value,o.value);
-		}
-		@Override
-		public String toString() {
-			return "["+cardinal+","+value+"]";
-		}
+	/**
+	 * Returns the dimensions of this bounding box.
+	 *
+	 * @return a double array (x,y,z) with the dimensions of the box.
+	 */
+	public double[] getDimensions() {
+
+		double[] dim = new double[3];
+
+		dim[0] = xmax - xmin;
+		dim[1] = ymax - ymin;
+		dim[2] = zmax - zmin;
+
+		return dim;
+
 	}
 
 	/**
 	 * Returns true if this bounding box overlaps given one, i.e. they are within
 	 * one cutoff distance in one of their 3 dimensions.
+	 * 
 	 * @param cutoff
 	 * @return
 	 */
 	public boolean overlaps(BoundingBox o, double cutoff) {
-		if (this==o) return true;
+		if (this == o) {
+			return true;
+		}
 		// x dimension
-		if (!areOverlapping(xmin,xmax,o.xmin,o.xmax,cutoff)) {
+		if (!areOverlapping(xmin, xmax, o.xmin, o.xmax, cutoff)) {
 			return false;
 		}
 		// y dimension
-		if (!areOverlapping(ymin,ymax,o.ymin,o.ymax,cutoff)) {
+		if (!areOverlapping(ymin, ymax, o.ymin, o.ymax, cutoff)) {
 			return false;
 		}
 		// z dimension
-		if (!areOverlapping(zmin,zmax,o.zmin,o.zmax,cutoff)) {
+		if (!areOverlapping(zmin, zmax, o.zmin, o.zmax, cutoff)) {
 			return false;
 		}
 		return true;
@@ -181,17 +190,16 @@ public class BoundingBox implements Serializable {
 
 	private boolean areOverlapping(double imin, double imax, double jmin, double jmax, double cutoff) {
 
-		Bound[] bounds = {new Bound(0,imin), new Bound(1,imax),
-				new Bound(2,jmin), new Bound(3,jmax)};
+		Bound[] bounds = { new Bound(0, imin), new Bound(1, imax), new Bound(2, jmin), new Bound(3, jmax) };
 
 		Arrays.sort(bounds);
 
-		if ((bounds[0].cardinal==0 && bounds[1].cardinal==1)) {
-			if ((bounds[2].value-bounds[1].value)>cutoff) {
+		if ((bounds[0].cardinal == 0 && bounds[1].cardinal == 1)) {
+			if ((bounds[2].value - bounds[1].value) > cutoff) {
 				return false;
 			}
-		} else if (bounds[0].cardinal==2 && bounds[1].cardinal==3) {
-			if ((bounds[2].value-bounds[1].value)>cutoff) {
+		} else if (bounds[0].cardinal == 2 && bounds[1].cardinal == 3) {
+			if ((bounds[2].value - bounds[1].value) > cutoff) {
 				return false;
 			}
 		}
@@ -199,9 +207,10 @@ public class BoundingBox implements Serializable {
 		return true;
 
 	}
-	
+
 	/**
 	 * Check if a given point falls within this box
+	 * 
 	 * @param atom
 	 * @return
 	 */
@@ -209,22 +218,21 @@ public class BoundingBox implements Serializable {
 		double x = atom.x;
 		double y = atom.y;
 		double z = atom.z;
-		return xmin <= x && x <= xmax
-				&& ymin <= y && y <= ymax
-				&& zmin <= z && z <= zmax;
+		return xmin <= x && x <= xmax && ymin <= y && y <= ymax && zmin <= z && z <= zmax;
 	}
 
 	public void translate(Vector3d translation) {
-		xmin+=translation.x;
-		xmax+=translation.x;
-		ymin+=translation.y;
-		ymax+=translation.y;
-		zmin+=translation.z;
-		zmax+=translation.z;
+		xmin += translation.x;
+		xmax += translation.x;
+		ymin += translation.y;
+		ymax += translation.y;
+		zmin += translation.z;
+		zmax += translation.z;
 	}
 
 	/**
 	 * Returns an array of size 2 with min and max values of given double array
+	 * 
 	 * @param array
 	 * @return
 	 */
@@ -234,9 +242,13 @@ public class BoundingBox implements Serializable {
 		double max = Double.MIN_VALUE;
 		double min = Double.MAX_VALUE;
 
-		for(double value : array) {
-			if(value > max) max = value;
-			if(value < min) min = value;
+		for (double value : array) {
+			if (value > max) {
+				max = value;
+			}
+			if (value < min) {
+				min = value;
+			}
 		}
 
 		minmax[0] = min;
@@ -246,6 +258,26 @@ public class BoundingBox implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("[(%7.2f,%7.2f),(%7.2f,%7.2f),(%7.2f,%7.2f)]", xmin,xmax,ymin,ymax,zmin,zmax);
+		return String.format("[(%7.2f,%7.2f),(%7.2f,%7.2f),(%7.2f,%7.2f)]", xmin, xmax, ymin, ymax, zmin, zmax);
+	}
+
+	private class Bound implements Comparable<Bound> {
+		int cardinal;
+		double value;
+
+		public Bound(int cardinal, double value) {
+			this.cardinal = cardinal;
+			this.value = value;
+		}
+
+		@Override
+		public int compareTo(Bound o) {
+			return Double.compare(this.value, o.value);
+		}
+
+		@Override
+		public String toString() {
+			return new StringBuilder().append("[").append(cardinal).append(",").append(value).append("]").toString();
+		}
 	}
 }

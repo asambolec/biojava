@@ -42,7 +42,8 @@ public class WaldTestInfo {
 
 	@Override
 	public String toString() {
-		return "Wald test=" + getTest() + "df=" + df + " p-value=" + getPvalue(); //To change body of generated methods, choose Tools | Templates.
+		return new StringBuilder().append("Wald test=").append(getTest()).append("df=").append(df).append(" p-value=")
+				.append(getPvalue()).toString(); // To change body of generated methods, choose Tools | Templates.
 	}
 
 	/**

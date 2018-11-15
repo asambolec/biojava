@@ -44,9 +44,11 @@ import java.util.*;
 import java.util.concurrent.Future;
 
 /**
- * Implements a data structure for a guide tree used during progressive multiple sequence alignment.  Leaf
- * {@link Node}s correspond to single {@link Sequence}s.  Internal {@link Node}s correspond to multiple sequence
- * alignments.  The root {@link Node} corresponds to the full multiple sequence alignment.
+ * Implements a data structure for a guide tree used during progressive multiple
+ * sequence alignment. Leaf {@link Node}s correspond to single
+ * {@link Sequence}s. Internal {@link Node}s correspond to multiple sequence
+ * alignments. The root {@link Node} corresponds to the full multiple sequence
+ * alignment.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} in the tree is of type S
@@ -64,7 +66,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	 * Creates a guide tree for use during progressive multiple sequence alignment.
 	 *
 	 * @param sequences the {@link List} of {@link Sequence}s to align
-	 * @param scorers list of sequence pair scorers, one for each pair of sequences given
+	 * @param scorers   list of sequence pair scorers, one for each pair of
+	 *                  sequences given
 	 */
 	public GuideTree(List<S> sequences, List<PairwiseSequenceScorer<S, C>> scorers) {
 		this.sequences = Collections.unmodifiableList(sequences);
@@ -74,7 +77,7 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 			AccessionID id = sequences.get(i).getAccession();
 			String str = (id == null) ? Integer.toString(i + 1) : id.getID();
 			distances.setIdentifier(i, str);
-			for (int j = i+1; j < sequences.size(); j++) {
+			for (int j = i + 1; j < sequences.size(); j++) {
 				double dist = scorers.get(n++).getDistance();
 				distances.setValue(i, j, dist);
 			}
@@ -86,7 +89,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	}
 
 	/**
-	 * Returns a sequence pair score for all {@link Sequence} pairs in the given {@link List}.
+	 * Returns a sequence pair score for all {@link Sequence} pairs in the given
+	 * {@link List}.
 	 *
 	 * @return list of sequence pair scores
 	 */
@@ -100,14 +104,15 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	}
 
 	/**
-	 * Returns the distance matrix used to construct this guide tree.  The scores have been normalized.
+	 * Returns the distance matrix used to construct this guide tree. The scores
+	 * have been normalized.
 	 *
 	 * @return the distance matrix used to construct this guide tree
 	 */
 	public double[][] getDistanceMatrix() {
 		double[][] matrix = new double[distances.getSize()][distances.getSize()];
 		for (int i = 0; i < matrix.length; i++) {
-			for (int j = i+1; j < matrix.length; j++) {
+			for (int j = i + 1; j < matrix.length; j++) {
 				matrix[i][j] = matrix[j][i] = distances.getValue(i, j);
 			}
 		}
@@ -115,7 +120,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	}
 
 	/**
-	 * Returns the root {@link Node} which corresponds to the full multiple sequence alignment.
+	 * Returns the root {@link Node} which corresponds to the full multiple sequence
+	 * alignment.
 	 *
 	 * @return the root node
 	 */
@@ -124,7 +130,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	}
 
 	/**
-	 * Returns the similarity matrix used to construct this guide tree.  The scores have not been normalized.
+	 * Returns the similarity matrix used to construct this guide tree. The scores
+	 * have not been normalized.
 	 *
 	 * @return the similarity matrix used to construct this guide tree
 	 */
@@ -132,7 +139,7 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 		double[][] matrix = new double[sequences.size()][sequences.size()];
 		for (int i = 0, n = 0; i < matrix.length; i++) {
 			matrix[i][i] = scorers.get(i).getMaxScore();
-			for (int j = i+1; j < matrix.length; j++) {
+			for (int j = i + 1; j < matrix.length; j++) {
 				matrix[i][j] = matrix[j][i] = scorers.get(n++).getScore();
 			}
 		}
@@ -151,7 +158,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	// method for Iterable
 
 	/**
-	 * Returns a post-order {@link Iterator} that traverses the tree from leaves to root.
+	 * Returns a post-order {@link Iterator} that traverses the tree from leaves to
+	 * root.
 	 */
 	@Override
 	public Iterator<GuideTreeNode<S, C>> iterator() {
@@ -166,14 +174,18 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 	}
 
 	/**
-	 * Implements a data structure for the node in a guide tree used during progressive multiple sequence alignment.
+	 * Implements a data structure for the node in a guide tree used during
+	 * progressive multiple sequence alignment.
 	 */
 	public class Node implements GuideTreeNode<S, C> {
 
-		private GuideTreeNode<S, C> parent, child1, child2;
+		private GuideTreeNode<S, C> parent;
+		private GuideTreeNode<S, C> child1;
+		private GuideTreeNode<S, C> child2;
 		private double distance;
 		private String name;
-		private boolean isLeaf, isVisited;
+		private boolean isLeaf;
+		private boolean isVisited;
 		private Profile<S, C> profile;
 		private Future<ProfilePair<S, C>> profileFuture;
 
@@ -181,8 +193,8 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 			this.parent = parent;
 			distance = node.getDistanceToParent();
 			name = node.getName();
-			if(isLeaf = node.isExternal()) {
-				profile = new SimpleProfile<S, C>(sequences.get(distances.getIndex(name)));
+			if (isLeaf = node.isExternal()) {
+				profile = new SimpleProfile<>(sequences.get(distances.getIndex(name)));
 			} else {
 				child1 = new Node(node.getChildNode1(), this);
 				child2 = new Node(node.getChildNode2(), this);
@@ -237,7 +249,7 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 
 		@Override
 		public Enumeration<GuideTreeNode<S, C>> children() {
-			Vector<GuideTreeNode<S, C>> children = new Vector<GuideTreeNode<S, C>>();
+			Vector<GuideTreeNode<S, C>> children = new Vector<>();
 			children.add(getChild1());
 			children.add(getChild2());
 			return children.elements();
@@ -282,10 +294,11 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 
 		private void clearVisited() {
 			isVisited = false;
-			if (!isLeaf()) {
-				((Node) getChild1()).clearVisited();
-				((Node) getChild2()).clearVisited();
+			if (isLeaf()) {
+				return;
 			}
+			((Node) getChild1()).clearVisited();
+			((Node) getChild2()).clearVisited();
 		}
 
 		private boolean isVisited() {
@@ -305,7 +318,7 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 
 		private PostOrderIterator() {
 			getRoot().clearVisited();
-			nodes = new Stack<Node>();
+			nodes = new Stack<>();
 			nodes.push(getRoot());
 		}
 
@@ -318,12 +331,14 @@ public class GuideTree<S extends Sequence<C>, C extends Compound> implements Ite
 
 		@Override
 		public GuideTreeNode<S, C> next() {
-            if(!hasNext()){
-                throw new NoSuchElementException();
-            }
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
 
-            while (hasNext()) {
-				Node next = nodes.peek(), child1 = (Node) next.getChild1(), child2 = (Node) next.getChild2();
+			while (hasNext()) {
+				Node next = nodes.peek();
+				Node child1 = (Node) next.getChild1();
+				Node child2 = (Node) next.getChild2();
 				if (child1 != null && !child1.isVisited()) {
 					nodes.push(child1);
 				} else if (child2 != null && !child2.isVisited()) {

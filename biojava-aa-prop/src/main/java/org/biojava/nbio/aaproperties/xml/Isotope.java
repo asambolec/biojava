@@ -25,8 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
-
-@XmlType(name = "Iostope", propOrder = {"name","neutronsNum","mass"})
+@XmlType(name = "Iostope", propOrder = { "name", "neutronsNum", "mass" })
 @XmlAccessorType(XmlAccessType.NONE)
 public class Isotope {
 	/**
@@ -45,13 +44,14 @@ public class Isotope {
 	@XmlAttribute(name = "mass", required = true)
 	private double mass;
 
-	public Isotope(){}
+	public Isotope() {
+	}
 
-	public Isotope(String name, int neutronsNum, double mass){
-		if(neutronsNum <= 0){
+	public Isotope(String name, int neutronsNum, double mass) {
+		if (neutronsNum <= 0) {
 			throw new Error("Neutrons number of Isotopes must be > 0.");
 		}
-		if(mass <= 0){
+		if (mass <= 0) {
 			throw new Error("Mass of Isotopes must be > 0.");
 		}
 		this.setName(name);
@@ -59,7 +59,7 @@ public class Isotope {
 		this.setMass(mass);
 	}
 
-	public String getName(){
+	public String getName() {
 		return this.name;
 	}
 

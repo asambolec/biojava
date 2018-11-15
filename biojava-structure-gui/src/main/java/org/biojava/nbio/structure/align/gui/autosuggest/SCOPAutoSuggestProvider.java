@@ -33,8 +33,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
+public class SCOPAutoSuggestProvider implements AutoSuggestProvider {
+
+	private static final Logger logger = LoggerFactory.getLogger(SCOPAutoSuggestProvider.class);
 
 	boolean DEBUG = false;
 
@@ -47,50 +51,48 @@ public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
 
 		long timeS = System.currentTimeMillis();
 
-		List<ScopDomain> domains = new ArrayList<ScopDomain>();
+		List<ScopDomain> domains = new ArrayList<>();
 
 		domains = getPossibleScopDomains(userInput);
 
-
-
 		// convert domains to Strings
 
-		Vector<String> v=new Vector<String>();
+		Vector<String> v = new Vector<>();
 
 		int counter = 0;
-		for ( ScopDomain d : domains){
-			counter ++;
+		for (ScopDomain d : domains) {
+			counter++;
 
 			String scopId = d.getScopId();
 			v.add(scopId);
 
-
-			if ( counter > maxResults)
+			if (counter > maxResults) {
 				break;
+			}
 		}
 
 		long timeE = System.currentTimeMillis();
 
-		if ( DEBUG)
-			System.out.println("ScopAutoSuggestProvider took " + (timeE - timeS) + " ms. to get " + v.size() + " suggestions");
+		if (DEBUG) {
+			logger.info(new StringBuilder().append("ScopAutoSuggestProvider took ").append(timeE - timeS)
+					.append(" ms. to get ").append(v.size()).append(" suggestions").toString());
+		}
 
 		return v;
 
 	}
 
-
-
 	private List<ScopDomain> getPossibleScopDomains(String userInput) {
 
-		List<ScopDomain> domains = new ArrayList<ScopDomain>();
+		List<ScopDomain> domains = new ArrayList<>();
 
 		ScopDatabase scop = ScopFactory.getSCOP();
 
-		if (userInput.length() ==5 && userInput.startsWith("d") && (! userInput.contains("."))) {
+		if (userInput.length() == 5 && userInput.startsWith("d") && (!userInput.contains("."))) {
 			userInput = userInput.substring(1);
 		}
 
-		if ( userInput.length() ==4){
+		if (userInput.length() == 4) {
 			domains = scop.getDomainsForPDB(userInput);
 
 		} else {
@@ -98,22 +100,26 @@ public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
 
 			try {
 				suni = Integer.parseInt(userInput);
-			} catch (NumberFormatException e){
-				//supress
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+				// supress
 			}
 
-			if ( stop.get())
+			if (stop.get()) {
 				return domains;
+			}
 
-			if ( suni != -1)
+			if (suni != -1) {
 				domains = scop.getScopDomainsBySunid(suni);
+			}
 
-			if ( stop.get())
+			if (stop.get()) {
 				return domains;
+			}
 
-			if ( domains == null || domains.size() < 1){
+			if (domains == null || domains.size() < 1) {
 
-				if ( userInput.length() > 5){
+				if (userInput.length() > 5) {
 					// e.g. d4hhba
 
 					domains.addAll(scop.filterByDomainName(userInput));
@@ -121,29 +127,31 @@ public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
 				}
 			}
 
-			if ( stop.get())
+			if (stop.get()) {
 				return domains;
+			}
 
-			if (DEBUG)
-				System.out.println("domains: " + domains);
+			if (DEBUG) {
+				logger.info("domains: " + domains);
+			}
 
-			if ( domains == null || domains.size() < 1) {
-				if ( userInput.length() > 0 ){
+			if (domains == null || domains.size() < 1) {
+				if (userInput.length() > 0) {
 					List<ScopDescription> descs = scop.filterByClassificationId(userInput);
 
-					if ( descs == null || descs.size() < 1){
+					if (descs == null || descs.size() < 1) {
 						descs = scop.filterByDescription(userInput);
 					}
 
-
-					for (ScopDescription d : descs){
+					for (ScopDescription d : descs) {
 						domains.addAll(scop.getScopDomainsBySunid(d.getSunID()));
-						if ( domains.size()> maxResults){
+						if (domains.size() > maxResults) {
 							break;
 						}
 
-						if ( stop.get())
+						if (stop.get()) {
 							return domains;
+						}
 					}
 				}
 
@@ -153,10 +161,6 @@ public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
 
 		return domains;
 	}
-
-
-
-
 
 	@Override
 	public void setMaxNrSuggestions(int maxNrSuggestions) {
@@ -178,11 +182,10 @@ public class SCOPAutoSuggestProvider implements AutoSuggestProvider{
 	@Override
 	public void stop() {
 		stop.set(true);
-		if (DEBUG)
-			System.out.println("ScopAutoSuggestProvider got signal stop");
+		if (DEBUG) {
+			logger.info("ScopAutoSuggestProvider got signal stop");
+		}
 
 	}
-
-
 
 }

@@ -41,37 +41,32 @@ import java.util.Set;
  */
 public class DistanceTreeEvaluator {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DistanceTreeEvaluator.class);
+	private static final Logger logger = LoggerFactory.getLogger(DistanceTreeEvaluator.class);
 
 	/** Prevent instantiation */
 	private DistanceTreeEvaluator() {
 	}
 
 	/**
-	 * Evaluate the goodness of fit of a given tree to the original distance
-	 * matrix. The returned value is the coefficient of variation, i.e. the
-	 * square root of the LS error normalized by the mean.
+	 * Evaluate the goodness of fit of a given tree to the original distance matrix.
+	 * The returned value is the coefficient of variation, i.e. the square root of
+	 * the LS error normalized by the mean.
 	 * <p>
-	 * This measure can also give an estimate of the quality of the distance
-	 * matrix, because a bad fit may mean that the distance is non-additive.
+	 * This measure can also give an estimate of the quality of the distance matrix,
+	 * because a bad fit may mean that the distance is non-additive.
 	 *
-	 * @param tree
-	 *            Phylogenetic Distance Tree to evaluate
-	 * @param matrix
-	 *            Distance Matrix with the original distances
+	 * @param tree   Phylogenetic Distance Tree to evaluate
+	 * @param matrix Distance Matrix with the original distances
 	 * @return the square root of the average tree LS error normalized by the
 	 *         average tree distance (coefficient of variation, CV).
 	 */
 	public static double evaluate(Phylogeny tree, DistanceMatrix matrix) {
 		int numSequences = matrix.getSize();
 		List<PhylogenyNode> externalNodes = tree.getExternalNodes();
-		HashMap<String, PhylogenyNode> externalNodesHashMap = new HashMap<String, PhylogenyNode>();
-		Set<PhylogenyNode> path = new HashSet<PhylogenyNode>();
+		HashMap<String, PhylogenyNode> externalNodesHashMap = new HashMap<>();
+		Set<PhylogenyNode> path = new HashSet<>();
 
-		for (PhylogenyNode node : externalNodes) {
-			externalNodesHashMap.put(node.getName(), node);
-		}
+		externalNodes.forEach(node -> externalNodesHashMap.put(node.getName(), node));
 		int count = 0;
 		double averageMatrixDistance = 0.0;
 		double averageTreeDistance = 0.0;
@@ -85,21 +80,17 @@ public class DistanceTreeEvaluator {
 				String nodeName2 = matrix.getIdentifier(col);
 				PhylogenyNode node2 = externalNodesHashMap.get(nodeName2);
 				double distance = matrix.getValue(col, row);
-				averageMatrixDistance = averageMatrixDistance + distance;
+				averageMatrixDistance += distance;
 				PhylogenyNode commonParent = findCommonParent(node2, path);
 				if (commonParent != null) {
-					double treeDistance = getNodeDistance(commonParent, node1)
-							+ getNodeDistance(commonParent, node2);
+					double treeDistance = getNodeDistance(commonParent, node1) + getNodeDistance(commonParent, node2);
 
 					averageTreeDistance += treeDistance;
-					averageTreeErrorDistance += (distance - treeDistance)
-							* (distance - treeDistance);
-					logger.info("{} {} Distance: {}Tree: {} difference: {}",
-							nodeName1, nodeName2, distance, treeDistance,
-							Math.abs(distance - treeDistance));
+					averageTreeErrorDistance += (distance - treeDistance) * (distance - treeDistance);
+					logger.info("{} {} Distance: {}Tree: {} difference: {}", nodeName1, nodeName2, distance,
+							treeDistance, Math.abs(distance - treeDistance));
 				} else {
-					logger.warn("Unable to find common parent with {} {}",
-							node1, node2);
+					logger.warn("Unable to find common parent with {} {}", node1, node2);
 				}
 			}
 			path.clear();
@@ -115,27 +106,24 @@ public class DistanceTreeEvaluator {
 		return Math.sqrt(averageTreeErrorDistance) / averageMatrixDistance;
 	}
 
-	private static double getNodeDistance(PhylogenyNode parentNode,
-			PhylogenyNode childNode) {
+	private static double getNodeDistance(PhylogenyNode parentNode, PhylogenyNode childNode) {
 		double distance = 0.0;
 		while (childNode != parentNode) {
-			distance = distance + childNode.getDistanceToParent();
+			distance += childNode.getDistanceToParent();
 			childNode = childNode.getParent();
 		}
 
 		return distance;
 	}
 
-	private static PhylogenyNode findCommonParent(PhylogenyNode node,
-			Set<PhylogenyNode> path) {
+	private static PhylogenyNode findCommonParent(PhylogenyNode node, Set<PhylogenyNode> path) {
 		while (!path.contains(node)) {
 			node = node.getParent();
 		}
 		return node;
 	}
 
-	private static void markPathToRoot(PhylogenyNode node,
-			Set<PhylogenyNode> path) {
+	private static void markPathToRoot(PhylogenyNode node, Set<PhylogenyNode> path) {
 		path.add(node);
 		while (!node.isRoot()) {
 			node = node.getParent();

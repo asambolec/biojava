@@ -29,6 +29,8 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.secstruc.SecStrucElement;
 import org.biojava.nbio.structure.secstruc.SecStrucCalc;
 import org.biojava.nbio.structure.secstruc.SecStrucTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demonstration on how to use the Secondary Structure Prediction (DSSP)
@@ -40,8 +42,9 @@ import org.biojava.nbio.structure.secstruc.SecStrucTools;
  */
 public class DemoSecStrucCalc {
 
-	public static void main(String[] args) throws IOException,
-			StructureException {
+	private static final Logger logger = LoggerFactory.getLogger(DemoSecStrucCalc.class);
+
+	public static void main(String[] args) throws IOException, StructureException {
 
 		String pdbID = "5pti";
 
@@ -55,22 +58,21 @@ public class DemoSecStrucCalc {
 		ssp.calculate(s, true);
 
 		// Print the DSSP output
-		System.out.println("******DSSP output: ");
-		System.out.println(ssp.printDSSP());
+		logger.info("******DSSP output: ");
+		logger.info(ssp.printDSSP());
 
 		// Print the FASTA sequence of SS
-		System.out.println("\n******FASTA output: ");
-		System.out.println(ssp.printFASTA());
+		logger.info("\n******FASTA output: ");
+		logger.info(ssp.printFASTA());
 
 		// Print the Helix Summary
-		System.out.println("\n******Helix Summary: ");
-		System.out.println(ssp.printHelixSummary());
+		logger.info("\n******Helix Summary: ");
+		logger.info(ssp.printHelixSummary());
 
 		// Obtain and print the SS elements of the Structure
 		List<SecStrucElement> sse = SecStrucTools.getSecStrucElements(s);
-		System.out.println("\n******SecStrucElements: ");
-		for (SecStrucElement e : sse)
-			System.out.println(e);
+		logger.info("\n******SecStrucElements: ");
+		sse.forEach(e -> logger.info(String.valueOf(e)));
 
 	}
 }

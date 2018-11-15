@@ -32,8 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Stores all the content of a Stockholm file. <i><b>N.B.: This structure will undergo several enhancements later on.
- * Don't depend on it in a final code, otherwise it will be hard to maintain.</b></i>
+ * Stores all the content of a Stockholm file. <i><b>N.B.: This structure will
+ * undergo several enhancements later on. Don't depend on it in a final code,
+ * otherwise it will be hard to maintain.</b></i>
  *
  * In general, Stockholm File contains the alignment mark-up lines.<br>
  * <br>
@@ -53,8 +54,10 @@ import java.util.Map;
  * </tr>
  * </table>
  *
- * Sequence letters may include any characters except whitespace. Gaps may be indicated by "." or "-".<br>
- * Mark-up lines may include any characters except whitespace. Use underscore ("_") instead of space.<br>
+ * Sequence letters may include any characters except whitespace. Gaps may be
+ * indicated by "." or "-".<br>
+ * Mark-up lines may include any characters except whitespace. Use underscore
+ * ("_") instead of space.<br>
  *
  * <Table border="1">
  * <th>section field</th>
@@ -63,13 +66,16 @@ import java.util.Map;
  * <td>#=GF &lt;feature&gt; &lt;Generic per-File annotation, free text&gt;</td>
  * <td>Above the alignment</td>
  * <tr>
- * <td>#=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char per column&gt;</td>
+ * <td>#=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char
+ * per column&gt;</td>
  * <td>Below the alignment</td>
  * <tr>
- * <td>#=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation, free text&gt;</td>
+ * <td>#=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation,
+ * free text&gt;</td>
  * <td>Above the alignment or just below the corresponding sequence</td>
  * <tr>
- * <td>#=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation, exactly 1 char per residue&gt;</td>
+ * <td>#=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation,
+ * exactly 1 char per residue&gt;</td>
  * <td>Just below the corresponding sequence</td>
  * </tr>
  * </table>
@@ -94,9 +100,9 @@ public class StockholmStructure {
 	public StockholmStructure() {
 		fileAnnotation = new StockholmFileAnnotation();
 		consAnnotation = new StockholmConsensusAnnotation();
-		sequences = new HashMap<String, StringBuffer>();
-		seqsAnnotation = new HashMap<String, StockholmSequenceAnnotation>();
-		resAnnotation = new HashMap<String, StockholmResidueAnnotation>();
+		sequences = new HashMap<>();
+		seqsAnnotation = new HashMap<>();
+		resAnnotation = new HashMap<>();
 	}
 
 	public StockholmFileAnnotation getFileAnnotation() {
@@ -127,9 +133,7 @@ public class StockholmStructure {
 	}
 
 	private StockholmSequenceAnnotation getSequenceAnnotation(String seqName) {
-		if (!seqsAnnotation.containsKey(seqName)) {
-			seqsAnnotation.put(seqName, new StockholmSequenceAnnotation());
-		}
+		seqsAnnotation.putIfAbsent(seqName, new StockholmSequenceAnnotation());
 		return seqsAnnotation.get(seqName);
 	}
 
@@ -166,9 +170,7 @@ public class StockholmStructure {
 	}
 
 	private StockholmResidueAnnotation getResidueAnnotation(String seqName) {
-		if (!resAnnotation.containsKey(seqName)) {
-			resAnnotation.put(seqName, new StockholmResidueAnnotation());
-		}
+		resAnnotation.putIfAbsent(seqName, new StockholmResidueAnnotation());
 		return resAnnotation.get(seqName);
 	}
 
@@ -220,12 +222,13 @@ public class StockholmStructure {
 	}
 
 	/**
-	 * This function tolerates mixed case letters, and allows for forcing the output biosequence type (PFAM/RFAM).
+	 * This function tolerates mixed case letters, and allows for forcing the output
+	 * biosequence type (PFAM/RFAM).
 	 *
-	 * @param ignoreCase
-	 *            if <code>true</code>, the function will deal with small letters as if they are capital ones
-	 * @param forcedSequenceType
-	 *            either <code>null</code>, {@link #PFAM}, or {@link #RFAM}.
+	 * @param ignoreCase         if <code>true</code>, the function will deal with
+	 *                           small letters as if they are capital ones
+	 * @param forcedSequenceType either <code>null</code>, {@link #PFAM}, or
+	 *                           {@link #RFAM}.
 	 * @return Biosequences according to the criteria specified
 	 * @see #getBioSequences()
 	 * @see #getBioSequences(boolean)
@@ -235,7 +238,7 @@ public class StockholmStructure {
 		if (forcedSequenceType != null && !(forcedSequenceType.equals(PFAM) || forcedSequenceType.equals(RFAM))) {
 			throw new IllegalArgumentException("Illegal Argument " + forcedSequenceType);
 		}
-		List<AbstractSequence<? extends AbstractCompound>> seqs = new ArrayList<AbstractSequence<? extends AbstractCompound>>();
+		List<AbstractSequence<? extends AbstractCompound>> seqs = new ArrayList<>();
 		for (String sequencename : sequences.keySet()) {
 			AbstractSequence<? extends AbstractCompound> seq = null;
 			String sequence = sequences.get(sequencename).toString();
@@ -244,21 +247,24 @@ public class StockholmStructure {
 			}
 
 			try {
-			if (forcedSequenceType == null)
-				seq = fileAnnotation.isPFam() ? new ProteinSequence(sequence) : new RNASequence(sequence);
-			else if (forcedSequenceType.equals(PFAM))
-				seq = new ProteinSequence(sequence);
-			else
-				seq = new RNASequence(sequence);
+				if (forcedSequenceType == null) {
+					seq = fileAnnotation.isPFam() ? new ProteinSequence(sequence) : new RNASequence(sequence);
+				} else if (forcedSequenceType.equals(PFAM)) {
+					seq = new ProteinSequence(sequence);
+				} else {
+					seq = new RNASequence(sequence);
+				}
 			} catch (CompoundNotFoundException e) {
-				logger.warn("Could not create sequence because of unknown compounds ({}). Sequence {} will be ignored.",e.getMessage(),sequencename);
+				logger.warn("Could not create sequence because of unknown compounds ({}). Sequence {} will be ignored.",
+						e.getMessage(), sequencename);
 				continue;
 			}
 			String[] seqDetails = splitSeqName(sequencename);
 			seq.setDescription(seqDetails[0]);
-			seq.setBioBegin((seqDetails[1] == null || seqDetails[1].trim().equals("") ? null : new Integer(
-					seqDetails[1])));
-			seq.setBioEnd((seqDetails[2] == null || seqDetails[2].trim().equals("") ? null : new Integer(seqDetails[2])));
+			seq.setBioBegin(
+					(seqDetails[1] == null || "".equals(seqDetails[1].trim()) ? null : Integer.valueOf(seqDetails[1])));
+			seq.setBioEnd(
+					(seqDetails[2] == null || "".equals(seqDetails[2].trim()) ? null : Integer.valueOf(seqDetails[2])));
 
 			seqs.add(seq);
 		}
@@ -266,8 +272,9 @@ public class StockholmStructure {
 	}
 
 	/**
-	 * Because some database files have incorrectly small letters (e.g. Pfam23 structure PF00389.22 sequence
-	 * TKRA_BACSU/6-322), this function is used to ignore the small letters case.
+	 * Because some database files have incorrectly small letters (e.g. Pfam23
+	 * structure PF00389.22 sequence TKRA_BACSU/6-322), this function is used to
+	 * ignore the small letters case.
 	 *
 	 * @param ignoreCase
 	 * @return
@@ -279,11 +286,12 @@ public class StockholmStructure {
 	}
 
 	/**
-	 * Returns an array with the following sequence related content: name, start, end.
+	 * Returns an array with the following sequence related content: name, start,
+	 * end.
 	 *
-	 * @param sequenceName
-	 *            the sequence from where to extract the content. It is supposed that it follows the following
-	 *            convention name/start-end (e.g.: COATB_BPIKE/30-81)
+	 * @param sequenceName the sequence from where to extract the content. It is
+	 *                     supposed that it follows the following convention
+	 *                     name/start-end (e.g.: COATB_BPIKE/30-81)
 	 * @return array with the following sequence related content: name, start, end.
 	 */
 	private String[] splitSeqName(String sequenceName) {
@@ -308,7 +316,7 @@ public class StockholmStructure {
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		List<AbstractSequence<? extends AbstractCompound>> bioSeqs = getBioSequences(false);
 		int sequenceLength = -1;
 		for (AbstractSequence<? extends AbstractCompound> sequence : bioSeqs) {
@@ -321,9 +329,10 @@ public class StockholmStructure {
 			} else {
 				result.append(sequenceAsString);
 			}
-			result.append(" " + sequence.getDescription() + "\n");
+			result.append(new StringBuilder().append(" ").append(sequence.getDescription()).append("\n").toString());
 		}
-		result.append("Alignment with " + bioSeqs.size() + " rows and " + sequenceLength + " columns");
+		result.append(new StringBuilder().append("Alignment with ").append(bioSeqs.size()).append(" rows and ")
+				.append(sequenceLength).append(" columns").toString());
 
 		return result.toString();
 	}
@@ -344,7 +353,10 @@ public class StockholmStructure {
 		public static final String INTERPRO = "INTERPRO";
 
 		private final String database;
-		/** TODO this field should be subdivided into smaller fields if the database is SCOP or PDB. */
+		/**
+		 * TODO this field should be subdivided into smaller fields if the database is
+		 * SCOP or PDB.
+		 */
 		private final String reference;
 
 		public DatabaseReference(String database, String reference) {
@@ -355,8 +367,8 @@ public class StockholmStructure {
 		public DatabaseReference(String representativeAnnotationString) {
 			int semiColonIndex = representativeAnnotationString.indexOf(';');
 			this.database = representativeAnnotationString.substring(0, semiColonIndex);
-			this.reference = representativeAnnotationString.substring(semiColonIndex + 1,
-					representativeAnnotationString.lastIndexOf(';')).trim();
+			this.reference = representativeAnnotationString
+					.substring(semiColonIndex + 1, representativeAnnotationString.lastIndexOf(';')).trim();
 		}
 
 		@Override

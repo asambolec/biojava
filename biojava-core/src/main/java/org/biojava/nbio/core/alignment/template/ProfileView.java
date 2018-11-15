@@ -32,19 +32,22 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public interface ProfileView<S extends Sequence<C>, C extends Compound> extends Profile<S, C> {
 
 	/**
-	 * Returns the column index of the viewed {@link Profile} corresponding to the final element in this view
+	 * Returns the column index of the viewed {@link Profile} corresponding to the
+	 * final element in this view
 	 *
 	 * @return column index of this view's final element
 	 */
 	int getEnd();
 
 	/**
-	 * Returns the column index of the viewed {@link Profile} corresponding to the first element in this view
+	 * Returns the column index of the viewed {@link Profile} corresponding to the
+	 * first element in this view
 	 *
 	 * @return column index of this view's first element
 	 */

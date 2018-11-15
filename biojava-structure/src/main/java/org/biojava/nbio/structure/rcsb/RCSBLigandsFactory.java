@@ -31,13 +31,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fetches information from <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB's RESTful Web Service
- * Interface</a>. A factory for {@link RCSBLigands RCSBLigands} from {@code ligandInfo} XML files. The factory methods
- * will return null if the data was not found (rather than throwing an exception); client code should test for this.
- * This is for consistency: if the factory could not read some part (corresponding to a field in a class in
- * {@code rcsb.descriptions}) of the XML file, either because it was blank or contained an error that could not be
- * safely ignored, that field will simply be null. This holds even for numerical values. On some parse errors, the error
- * will additionally be printed to standard error.
+ * Fetches information from
+ * <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB's RESTful Web
+ * Service Interface</a>. A factory for {@link RCSBLigands RCSBLigands} from
+ * {@code ligandInfo} XML files. The factory methods will return null if the
+ * data was not found (rather than throwing an exception); client code should
+ * test for this. This is for consistency: if the factory could not read some
+ * part (corresponding to a field in a class in {@code rcsb.descriptions}) of
+ * the XML file, either because it was blank or contained an error that could
+ * not be safely ignored, that field will simply be null. This holds even for
+ * numerical values. On some parse errors, the error will additionally be
+ * printed to standard error.
  *
  * Example usage:
  *
@@ -48,7 +52,8 @@ import java.util.List;
  * System.out.println(list.get(1).getFormula()); // prints &quot;C11 H19 N O9&quot;
  * </pre>
  *
- * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB RESTful</a>
+ * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB
+ *      RESTful</a>
  *
  * @author dmyerstu
  * @since 3.0.6
@@ -63,8 +68,9 @@ public class RCSBLigandsFactory {
 	private static final String PDB_URL_STUB = "http://www.rcsb.org/pdb/rest/ligandInfo?structureId=";
 
 	/**
-	 * @return A list of {@link RCSBLigand RCSBLigands} from the XML file loaded as {@code stream}. Prefer calling
-	 *         {@link #getFromHeteroAtomId(String)} if you want data directly from RCSB's RESTful service.
+	 * @return A list of {@link RCSBLigand RCSBLigands} from the XML file loaded as
+	 *         {@code stream}. Prefer calling {@link #getFromHeteroAtomId(String)}
+	 *         if you want data directly from RCSB's RESTful service.
 	 * @see RCSBDescriptionFactory#get(String)
 	 */
 	public static RCSBLigand getFromHeteroAtomId(InputStream stream) {
@@ -73,8 +79,9 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}. This is the preferred factory method,
-	 *         unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static RCSBLigand getFromHeteroAtomId(String heteroAtomId) {
@@ -82,8 +89,9 @@ public class RCSBLigandsFactory {
 	}
 
 	/**
-	 * @return A list of {@link RCSBLigand RCSBLigands} from the XML file loaded as {@code stream}. Prefer calling
-	 *         {@link #getFromHeteroAtomId(String)} if you want data directly from RCSB's RESTful service.
+	 * @return A list of {@link RCSBLigand RCSBLigands} from the XML file loaded as
+	 *         {@code stream}. Prefer calling {@link #getFromHeteroAtomId(String)}
+	 *         if you want data directly from RCSB's RESTful service.
 	 * @see RCSBDescriptionFactory#get(String)
 	 */
 	public static List<RCSBLigand> getFromHeteroAtomIds(InputStream stream) {
@@ -96,14 +104,16 @@ public class RCSBLigandsFactory {
 			return null;
 		}
 
-		List<RCSBLigand> ligands = new ArrayList<RCSBLigand>();
+		List<RCSBLigand> ligands = new ArrayList<>();
 
 		// first get the ligandInfo
 		Element structureIdE = null;
 		for (int i = 0; i < data.getLength(); i++) {
-			if (data.item(i).getNodeType() != 1) continue;
+			if (data.item(i).getNodeType() != 1) {
+				continue;
+			}
 			structureIdE = (Element) data.item(i);
-			if (structureIdE.getNodeName().equals("ligandInfo")) {
+			if ("ligandInfo".equals(structureIdE.getNodeName())) {
 				break;
 			}
 		}
@@ -112,9 +122,11 @@ public class RCSBLigandsFactory {
 		data = structureIdE.getChildNodes();
 		Element ligandE = null;
 		for (int i = 0; i < data.getLength(); i++) {
-			if (data.item(i).getNodeType() != 1) continue;
+			if (data.item(i).getNodeType() != 1) {
+				continue;
+			}
 			ligandE = (Element) data.item(i);
-			if (ligandE.getNodeName().equals("ligand")) {
+			if ("ligand".equals(ligandE.getNodeName())) {
 				RCSBLigand ligand = makeLigand(ligandE);
 				ligands.add(ligand);
 			}
@@ -126,8 +138,9 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}. This is the preferred factory method,
-	 *         unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static List<RCSBLigand> getFromHeteroAtomIds(List<String> heteroAtomIds) {
@@ -138,14 +151,17 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}. This is the preferred factory method,
-	 *         unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeHet?chemicalID=hetid"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static List<RCSBLigand> getFromHeteroAtomIds(String... heteroAtomIds) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < heteroAtomIds.length; i++) {
-			if (i > 0) sb.append(",");
+			if (i > 0) {
+				sb.append(",");
+			}
 			sb.append(heteroAtomIds[i]);
 		}
 		InputStream is;
@@ -160,8 +176,9 @@ public class RCSBLigandsFactory {
 	}
 
 	/**
-	 * @return An {@link RCSBLigands} from the XML file loaded as {@code stream}. Prefer calling
-	 *         {@link #getFromPdbId(String)} if you want data directly from RCSB's RESTful service.
+	 * @return An {@link RCSBLigands} from the XML file loaded as {@code stream}.
+	 *         Prefer calling {@link #getFromPdbId(String)} if you want data
+	 *         directly from RCSB's RESTful service.
 	 * @see RCSBDescriptionFactory#get(String)
 	 */
 	public static RCSBLigands getFromPdbId(InputStream stream) {
@@ -178,9 +195,11 @@ public class RCSBLigandsFactory {
 		RCSBLigands ligands = new RCSBLigands();
 		Element structureIdE = null;
 		for (int i = 0; i < data.getLength(); i++) {
-			if (data.item(i).getNodeType() != 1) continue;
+			if (data.item(i).getNodeType() != 1) {
+				continue;
+			}
 			structureIdE = (Element) data.item(i);
-			if (structureIdE.getNodeName().equals("ligandInfo")) {
+			if ("ligandInfo".equals(structureIdE.getNodeName())) {
 				break;
 			}
 		}
@@ -189,9 +208,11 @@ public class RCSBLigandsFactory {
 		data = structureIdE.getChildNodes();
 		Element ligandE = null;
 		for (int i = 0; i < data.getLength(); i++) {
-			if (data.item(i).getNodeType() != 1) continue;
+			if (data.item(i).getNodeType() != 1) {
+				continue;
+			}
 			ligandE = (Element) data.item(i);
-			if (ligandE.getNodeName().equals("ligand")) {
+			if ("ligand".equals(ligandE.getNodeName())) {
 				if (ligands.getPdbId() == null) {
 					ligands.setPdbId(ligandE.getAttribute("structureId"));
 				}
@@ -206,8 +227,9 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}. This is the preferred factory
-	 *         method, unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static RCSBLigands getFromPdbId(String pdbId) {
@@ -223,8 +245,9 @@ public class RCSBLigandsFactory {
 	}
 
 	/**
-	 * @return An {@link RCSBLigands} from the XML file loaded as {@code stream}. Prefer calling
-	 *         {@link #getFromPdbId(String)} if you want data directly from RCSB's RESTful service.
+	 * @return An {@link RCSBLigands} from the XML file loaded as {@code stream}.
+	 *         Prefer calling {@link #getFromPdbId(String)} if you want data
+	 *         directly from RCSB's RESTful service.
 	 * @see RCSBDescriptionFactory#get(String)
 	 */
 	public static List<RCSBLigands> getFromPdbIds(InputStream stream) {
@@ -237,26 +260,31 @@ public class RCSBLigandsFactory {
 			return null;
 		}
 
-		// first we have to handle the element "ligandsInEntry", which is not present if we have only 1 structure
+		// first we have to handle the element "ligandsInEntry", which is not present if
+		// we have only 1 structure
 
-		List<RCSBLigands> ligandsList = new ArrayList<RCSBLigands>();
+		List<RCSBLigands> ligandsList = new ArrayList<>();
 
 		Element structureIdE = null;
 
 		for (int k = 0; k < dataaa.getLength(); k++) {
 
-			if (dataaa.item(k).getNodeType() != 1) continue;
+			if (dataaa.item(k).getNodeType() != 1) {
+				continue;
+			}
 			structureIdE = (Element) dataaa.item(k);
-			if (structureIdE.getNodeName().equals("structureId")) {
+			if ("structureId".equals(structureIdE.getNodeName())) {
 
 				// now get the ligandInfo
 				NodeList data = structureIdE.getChildNodes();
 				RCSBLigands ligands = new RCSBLigands();
 				Element ligandIdE = null;
 				for (int i = 0; i < data.getLength(); i++) {
-					if (data.item(i).getNodeType() != 1) continue;
+					if (data.item(i).getNodeType() != 1) {
+						continue;
+					}
 					ligandIdE = (Element) data.item(i);
-					if (ligandIdE.getNodeName().equals("ligandInfo")) {
+					if ("ligandInfo".equals(ligandIdE.getNodeName())) {
 						break;
 					}
 				}
@@ -265,9 +293,11 @@ public class RCSBLigandsFactory {
 				data = ligandIdE.getChildNodes();
 				Element ligandE = null;
 				for (int i = 0; i < data.getLength(); i++) {
-					if (data.item(i).getNodeType() != 1) continue;
+					if (data.item(i).getNodeType() != 1) {
+						continue;
+					}
 					ligandE = (Element) data.item(i);
-					if (ligandE.getNodeName().equals("ligand")) {
+					if ("ligand".equals(ligandE.getNodeName())) {
 						if (ligands.getPdbId() == null) {
 							ligands.setPdbId(ligandE.getAttribute("structureId"));
 						}
@@ -287,8 +317,9 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}. This is the preferred factory
-	 *         method, unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static List<RCSBLigands> getFromPdbIds(List<String> pdbIds) {
@@ -299,8 +330,9 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}. This is the preferred factory
-	 *         method, unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static RCSBLigands getFromPdbIds(String pdbId) {
@@ -317,15 +349,18 @@ public class RCSBLigandsFactory {
 
 	/**
 	 * @return An {@link RCSBLigands} from the XML file at
-	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}. This is the preferred factory
-	 *         method, unless a different URL or input source is required.
+	 *         {@code "http://www.pdb.org/pdb/rest/describeMol?structureId=pdbId"}.
+	 *         This is the preferred factory method, unless a different URL or input
+	 *         source is required.
 	 * @see RCSBDescriptionFactory#get(InputStream)
 	 */
 	public static List<RCSBLigands> getFromPdbIds(String... pdbIds) {
 		InputStream is;
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < pdbIds.length; i++) {
-			if (i > 0) sb.append(",");
+			if (i > 0) {
+				sb.append(",");
+			}
 			sb.append(pdbIds[i]);
 		}
 		try {
@@ -346,17 +381,19 @@ public class RCSBLigandsFactory {
 		Element element = null;
 		NodeList data = ligandE.getChildNodes();
 		for (int i = 0; i < data.getLength(); i++) {
-			if (data.item(i).getNodeType() != 1) continue;
+			if (data.item(i).getNodeType() != 1) {
+				continue;
+			}
 			element = (Element) data.item(i);
-			if (element.getNodeName().equals("chemicalName")) {
+			if ("chemicalName".equals(element.getNodeName())) {
 				ligand.setName(element.getTextContent());
-			} else if (element.getNodeName().equals("formula")) {
+			} else if ("formula".equals(element.getNodeName())) {
 				ligand.setFormula(element.getTextContent());
-			} else if (element.getNodeName().equals("InChIKey")) {
+			} else if ("InChIKey".equals(element.getNodeName())) {
 				ligand.setInChIKey(element.getTextContent());
-			} else if (element.getNodeName().equals("InChI")) {
+			} else if ("InChI".equals(element.getNodeName())) {
 				ligand.setInChI(element.getTextContent());
-			} else if (element.getNodeName().equals("smiles")) {
+			} else if ("smiles".equals(element.getNodeName())) {
 				ligand.setSmiles(element.getTextContent());
 			}
 		}

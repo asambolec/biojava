@@ -26,8 +26,7 @@ import org.biojava.nbio.core.util.Equals;
 import org.biojava.nbio.core.util.Hashcoder;
 
 /**
- * Implementation for resolving fuzzy locations. Caches the calculated
- * value.
+ * Implementation for resolving fuzzy locations. Caches the calculated value.
  *
  * @author ayates
  */
@@ -36,32 +35,18 @@ public class FuzzyPoint extends SimplePoint {
 	/**
 	 * Always uses the min point to resolve a location
 	 */
-	public static final Resolver<FuzzyPoint> MIN_RESOLVER = new Resolver<FuzzyPoint>() {
-		@Override
-		public int resolve(FuzzyPoint point) {
-			return point.getMin();
-		}
-	};
+	public static final Resolver<FuzzyPoint> MIN_RESOLVER = FuzzyPoint::getMin;
 
 	/**
 	 * Always uses the max point to resolve a location
 	 */
-	public static final Resolver<FuzzyPoint> MAX_RESOLVER = new Resolver<FuzzyPoint>() {
-		@Override
-		public int resolve(FuzzyPoint point) {
-			return point.getMax();
-		}
-	};
+	public static final Resolver<FuzzyPoint> MAX_RESOLVER = FuzzyPoint::getMax;
 
 	/**
 	 * Combines min and max and then gets the mean of it
 	 */
-	public static final Resolver<FuzzyPoint> MEAN_RESOLVER = new Resolver<FuzzyPoint>() {
-		@Override
-		public int resolve(FuzzyPoint point) {
-			return (point.getMin() + point.getMax()) / 2;
-		}
-	};
+	public static final Resolver<FuzzyPoint> MEAN_RESOLVER = (FuzzyPoint point) -> (point.getMin() + point.getMax())
+			/ 2;
 
 	private final int min;
 	private final int max;
@@ -81,12 +66,12 @@ public class FuzzyPoint extends SimplePoint {
 		this.resolver = resolver;
 		setUncertain(uncertain);
 		setUnknown(unknown);
-		setPosition(-1); //Means we have not resolved this position yet
+		setPosition(-1); // Means we have not resolved this position yet
 	}
 
 	@Override
 	public Integer getPosition() {
-		if(super.getPosition() == -1) {
+		if (super.getPosition() == -1) {
 			super.setPosition(getResolver().resolve(this));
 		}
 		return super.getPosition();
@@ -118,17 +103,13 @@ public class FuzzyPoint extends SimplePoint {
 		return new FuzzyPoint(offMin, offMax, getResolver(), isUnknown(), isUncertain());
 	}
 
-
 	@Override
 	public boolean equals(Object obj) {
 		boolean equals = false;
 		if (Equals.classEqual(this, obj)) {
 			FuzzyPoint p = (FuzzyPoint) obj;
-			equals = (Equals.equal(getMin(), p.getMin())
-					&& Equals.equal(getMax(), p.getMax())
-					&& Equals.equal(isUnknown(), p.isUnknown())
-					&& Equals.equal(isUncertain(), p.isUncertain())
-					);
+			equals = (Equals.equal(getMin(), p.getMin()) && Equals.equal(getMax(), p.getMax())
+					&& Equals.equal(isUnknown(), p.isUnknown()) && Equals.equal(isUncertain(), p.isUncertain()));
 		}
 		return equals;
 	}
@@ -145,15 +126,16 @@ public class FuzzyPoint extends SimplePoint {
 
 	@Override
 	public int compareTo(Point point) {
-		//If we can assign this to a FuzzyPoint then work with a bit more info
-		if(FuzzyPoint.class.isAssignableFrom(point.getClass())) {
-			FuzzyPoint fuzzy = (FuzzyPoint)point;
-			int minComparison = getMin().compareTo(fuzzy.getMin());
-			if(minComparison != 0)
-				return minComparison;
-			return getMax().compareTo(fuzzy.getMax());
+		// If we can assign this to a FuzzyPoint then work with a bit more info
+		if (!FuzzyPoint.class.isAssignableFrom(point.getClass())) {
+			// If not fuzzy then compare on position as normal
+			return super.compareTo(point);
 		}
-		//If not fuzzy then compare on position as normal
-		return super.compareTo(point);
+		FuzzyPoint fuzzy = (FuzzyPoint) point;
+		int minComparison = getMin().compareTo(fuzzy.getMin());
+		if (minComparison != 0) {
+			return minComparison;
+		}
+		return getMax().compareTo(fuzzy.getMax());
 	}
 }

@@ -27,14 +27,16 @@ import org.biojava.nbio.core.sequence.template.AbstractSequence;
 import org.biojava.nbio.core.sequence.template.Compound;
 
 /**
- * We store the original header if the sequence is parsed from a fasta file and will use that exact
- * sequence if we write out the sequences to a fasta file. If we don't have an orginal header then
- * use the accession id. This allows the implementation by the user to write out complex header
- * with id notes etc without rewriting the fasta writer
+ * We store the original header if the sequence is parsed from a fasta file and
+ * will use that exact sequence if we write out the sequences to a fasta file.
+ * If we don't have an orginal header then use the accession id. This allows the
+ * implementation by the user to write out complex header with id notes etc
+ * without rewriting the fasta writer
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
-public class GenericFastaHeaderFormat<S extends AbstractSequence<?>, C extends Compound> implements FastaHeaderFormatInterface<S, C> {
+public class GenericFastaHeaderFormat<S extends AbstractSequence<?>, C extends Compound>
+		implements FastaHeaderFormatInterface<S, C> {
 
 	@Override
 	public String getHeader(S sequence) {

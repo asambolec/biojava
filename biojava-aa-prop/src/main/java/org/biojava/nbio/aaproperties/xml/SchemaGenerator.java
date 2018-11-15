@@ -26,10 +26,10 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 
-public class SchemaGenerator extends SchemaOutputResolver{
+public class SchemaGenerator extends SchemaOutputResolver {
 	private String fileName;
 
-	public SchemaGenerator(String filename){
+	public SchemaGenerator(String filename) {
 		this.fileName = filename;
 	}
 
@@ -40,5 +40,3 @@ public class SchemaGenerator extends SchemaOutputResolver{
 		return new StreamResult(f);
 	}
 }
-
-

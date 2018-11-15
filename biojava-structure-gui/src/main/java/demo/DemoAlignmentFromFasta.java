@@ -43,6 +43,8 @@ import org.biojava.nbio.structure.align.util.AlignmentTools;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FastaStructureParser;
 import org.biojava.nbio.structure.io.StructureSequenceMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demo of how to use the {@link FastaStructureParser} class to read protein
@@ -53,35 +55,37 @@ import org.biojava.nbio.structure.io.StructureSequenceMatcher;
  */
 public class DemoAlignmentFromFasta {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoAlignmentFromFasta.class);
+
 	public static void getAlignmentFromFasta() throws StructureException {
 
 		// Load a test sequence
 		// Normally this would come from a file, eg
 		// File fasta = new File("/path/to/file.fa");
-		String fastaStr =
-			"> 1KQ1.A\n" +
-			"mianeniqdkalenfkanqtevtvfflngFQ.MKGVIEEYDK.....YVVSLNsqgkQHLIYKh......\n" +
-			".......................AISTYTVetegqastesee\n" +
-			"> 1C4Q.D\n" +
-			"............................tPDcVTGKVEYTKYndddtFTVKVG....DKELATnranlqs\n" +
-			"lllsaqitgmtvtiktnachnggGFSEVIFr...........\n";
-
+		String fastaStr = new StringBuilder().append("> 1KQ1.A\n")
+				.append("mianeniqdkalenfkanqtevtvfflngFQ.MKGVIEEYDK.....YVVSLNsqgkQHLIYKh......\n")
+				.append(".......................AISTYTVetegqastesee\n").append("> 1C4Q.D\n")
+				.append("............................tPDcVTGKVEYTKYndddtFTVKVG....DKELATnranlqs\n")
+				.append("lllsaqitgmtvtiktnachnggGFSEVIFr...........\n").toString();
 
 		InputStream fasta;
 		try {
 			fasta = new ByteArrayInputStream(fastaStr.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 
-		// Create a header parser to parse the header lines into valid structure accessions.
-		// The resulting accession can be anything interpretable by AtomCache.getStructure.
+		// Create a header parser to parse the header lines into valid structure
+		// accessions.
+		// The resulting accession can be anything interpretable by
+		// AtomCache.getStructure.
 		// Possible Examples: "4HHB" (whole structure), "d4hhba_" (SCOP domain),
-		//   "4HHB.A:1-15" (residue range)
-		// For this example, the built-in fasta parser will extract the correct accession.
+		// "4HHB.A:1-15" (residue range)
+		// For this example, the built-in fasta parser will extract the correct
+		// accession.
 		SequenceHeaderParserInterface<ProteinSequence, AminoAcidCompound> headerParser;
-		headerParser = new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>();
+		headerParser = new GenericFastaHeaderParser<>();
 
 		// Create AtomCache to fetch structures from the PDB
 		AtomCache cache = new AtomCache();
@@ -92,15 +96,11 @@ public class DemoAlignmentFromFasta {
 		creator = new CasePreservingProteinSequenceCreator(aaSet);
 
 		// parse file
-		FastaStructureParser parser = new FastaStructureParser(
-				fasta, headerParser, creator, cache);
+		FastaStructureParser parser = new FastaStructureParser(fasta, headerParser, creator, cache);
 		try {
 			parser.process();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		} catch (StructureException e) {
-			e.printStackTrace();
+		} catch (StructureException | IOException e) {
+			logger.error(e.getMessage(), e);
 			return;
 		}
 
@@ -109,29 +109,25 @@ public class DemoAlignmentFromFasta {
 		Structure[] structures = parser.getStructures();
 
 		// Set lowercase residues to null too
-		for(int structNum = 0; structNum<sequences.length;structNum++) {
-			CasePreservingProteinSequenceCreator.setLowercaseToNull(
-					sequences[structNum],residues[structNum]);
+		for (int structNum = 0; structNum < sequences.length; structNum++) {
+			CasePreservingProteinSequenceCreator.setLowercaseToNull(sequences[structNum], residues[structNum]);
 		}
 
 		// Remove alignment columns with a gap
 		residues = StructureSequenceMatcher.removeGaps(residues);
-
 
 		// Create AFPChain from the alignment
 		Atom[] ca1 = StructureTools.getAtomCAArray(structures[0]);
 		Atom[] ca2 = StructureTools.getAtomCAArray(structures[1]);
 		AFPChain afp = AlignmentTools.createAFPChain(ca1, ca2, residues[0], residues[1]);
 
-
 		try {
 			StructureAlignmentDisplay.display(afp, ca1, ca2);
 		} catch (StructureException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 	}
-
 
 	public static void main(String[] args) throws StructureException {
 		getAlignmentFromFasta();

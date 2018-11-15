@@ -48,13 +48,14 @@ public class NucleotideCompound extends AbstractCompound implements ComplementCo
 	private final Set<NucleotideCompound> constituents;
 
 	public NucleotideCompound(String base, CompoundSet<NucleotideCompound> compoundSet, String complementStr) {
-	  super(base);
-	  this.compoundSet = compoundSet;
-	  this.complementStr = complementStr;
-	  this.constituents = unmodifiableSet(new HashSet<NucleotideCompound>(asList(this)));
+		super(base);
+		this.compoundSet = compoundSet;
+		this.complementStr = complementStr;
+		this.constituents = unmodifiableSet(new HashSet<NucleotideCompound>(asList(this)));
 	}
 
-	public NucleotideCompound(String base, CompoundSet<NucleotideCompound> compoundSet, String complementStr, NucleotideCompound[] constituents) {
+	public NucleotideCompound(String base, CompoundSet<NucleotideCompound> compoundSet, String complementStr,
+			NucleotideCompound[] constituents) {
 		super(base);
 		this.compoundSet = compoundSet;
 		this.complementStr = complementStr;
@@ -63,7 +64,7 @@ public class NucleotideCompound extends AbstractCompound implements ComplementCo
 
 	@Override
 	public String getShortName() {
-	  return getBase();
+		return getBase();
 	}
 
 	@Override
@@ -101,10 +102,10 @@ public class NucleotideCompound extends AbstractCompound implements ComplementCo
 	}
 
 	public Set<NucleotideCompound> getConstituents() {
-	  return constituents;
+		return constituents;
 	}
 
 	public boolean isAmbiguous() {
-	  return !constituents.isEmpty();
+		return !constituents.isEmpty();
 	}
 }

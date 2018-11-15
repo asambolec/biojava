@@ -27,8 +27,8 @@ import org.biojava.nbio.core.sequence.template.*;
 
 /**
  * Bare bones version of the Sequence object to be used sparingly. You should
- * really use a specialized version of {@link Sequence} which describes
- * your domain.
+ * really use a specialized version of {@link Sequence} which describes your
+ * domain.
  */
 public class BasicSequence<C extends Compound> extends AbstractSequence<C> {
 

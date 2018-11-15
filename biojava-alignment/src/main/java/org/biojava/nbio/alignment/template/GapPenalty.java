@@ -24,22 +24,12 @@
 package org.biojava.nbio.alignment.template;
 
 /**
- * Defines a data structure for the gap penalties used during a sequence alignment routine.
+ * Defines a data structure for the gap penalties used during a sequence
+ * alignment routine.
  *
  * @author Mark Chapman
  */
 public interface GapPenalty {
-
-	/**
-	 * Defines the possible types of gap penalties.  This is:
-	 * <ul>
-	 *  <li>CONSTANT, if static and the extension penalty is 0
-	 *  <li>LINEAR, if static and the open penalty is 0
-	 *  <li>AFFINE, if static but neither CONSTANT nor LINEAR
-	 *  <li>DYNAMIC, if penalty values change during alignment
-	 * </ul>
-	 */
-	enum Type {CONSTANT, LINEAR, AFFINE, DYNAMIC};
 
 	/**
 	 * Returns penalty given when an already open gap elongates by a single element
@@ -75,5 +65,18 @@ public interface GapPenalty {
 	 * @param gop gap open penalty
 	 */
 	void setOpenPenalty(int gop);
+
+	/**
+	 * Defines the possible types of gap penalties. This is:
+	 * <ul>
+	 * <li>CONSTANT, if static and the extension penalty is 0
+	 * <li>LINEAR, if static and the open penalty is 0
+	 * <li>AFFINE, if static but neither CONSTANT nor LINEAR
+	 * <li>DYNAMIC, if penalty values change during alignment
+	 * </ul>
+	 */
+	enum Type {
+		CONSTANT, LINEAR, AFFINE, DYNAMIC
+	}
 
 }

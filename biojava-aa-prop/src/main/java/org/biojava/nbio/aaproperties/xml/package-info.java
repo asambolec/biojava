@@ -27,4 +27,3 @@
  * @since 3.0.2
  */
 package org.biojava.nbio.aaproperties.xml;
-

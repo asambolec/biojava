@@ -27,39 +27,38 @@ import org.biojava.nbio.structure.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Converts full atom representations to Calpha only ones.
+/**
+ * Converts full atom representations to Calpha only ones.
  *
  * @author Andreas Prlic
  * @version %I% %G%
  */
 public class CAConverter {
 
-
-	/** Convert a List of chain objects to another List of chains, containing Representative atoms only.
+	/**
+	 * Convert a List of chain objects to another List of chains, containing
+	 * Representative atoms only.
 	 *
 	 * @param chains list of chains
 	 * @return a list of chains
 	 * @since Biojava 4.1.0
 	 */
-	public static List<Chain> getRepresentativeAtomsOnly(List<Chain> chains){
-		List<Chain> newChains = new ArrayList<Chain>();
+	public static List<Chain> getRepresentativeAtomsOnly(List<Chain> chains) {
+		List<Chain> newChains = new ArrayList<>();
 
-		for (Chain chain : chains){
-			Chain newChain = getRepresentativeAtomsOnly(chain);
-			newChains.add(newChain);
-		}
+		chains.stream().map(CAConverter::getRepresentativeAtomsOnly).forEach(newChains::add);
 
 		return newChains;
 	}
 
-	/** 
+	/**
 	 * Convert a Chain to a new Chain containing C-alpha atoms only.
 	 *
 	 * @param chain to convert
 	 * @return a new chain containing Amino acids with C-alpha only.
 	 * @since Biojava 4.1.0
 	 */
-	public static Chain getRepresentativeAtomsOnly(Chain chain){
+	public static Chain getRepresentativeAtomsOnly(Chain chain) {
 
 		Chain newChain = new ChainImpl();
 		newChain.setId(chain.getId());
@@ -69,28 +68,28 @@ public class CAConverter {
 
 		List<Group> groups = chain.getAtomGroups();
 
-		grouploop:
-			for (Group g: groups){
-				List<Atom> atoms = g.getAtoms();
+		grouploop: for (Group g : groups) {
+			List<Atom> atoms = g.getAtoms();
 
-				if ( ! (g instanceof AminoAcid))
-					continue;
-
-				for (Atom a : atoms){
-
-					if ( a.getName().equals(StructureTools.CA_ATOM_NAME) && a.getElement()==Element.C){
-						// we got a CA atom in this group!
-						AminoAcid n = new AminoAcidImpl();
-						n.setPDBName(g.getPDBName());
-						n.setResidueNumber(g.getResidueNumber());
-						n.addAtom(a);
-						newChain.addGroup(n);
-						continue grouploop;
-
-					}
-				}
-
+			if (!(g instanceof AminoAcid)) {
+				continue;
 			}
+
+			for (Atom a : atoms) {
+
+				if (a.getName().equals(StructureTools.CA_ATOM_NAME) && a.getElement() == Element.C) {
+					// we got a CA atom in this group!
+					AminoAcid n = new AminoAcidImpl();
+					n.setPDBName(g.getPDBName());
+					n.setResidueNumber(g.getResidueNumber());
+					n.addAtom(a);
+					newChain.addGroup(n);
+					continue grouploop;
+
+				}
+			}
+
+		}
 		return newChain;
 	}
 }

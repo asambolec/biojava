@@ -27,59 +27,61 @@ package org.biojava.nbio.protmod;
 import java.util.*;
 
 /**
- * contains information about a certain Component.
- * The Component class uses the extensible enum pattern.
- * You can't instantiate Component directly, instead
+ * contains information about a certain Component. The Component class uses the
+ * extensible enum pattern. You can't instantiate Component directly, instead
  * you have to use one of the {@link register} and {@link of} methods.
  *
  * @author Jianjiong Gao
  * @since 3.0
  */
 public final class Component {
-	private final Set<String> pdbccIds;
-	private final boolean isNTerminal;
-	private final boolean isCTerminal;
-
 	private static Set<Component> components = null;
 	private static Map<Set<String>, Component> nonTerminalComps = null;
 	private static Map<Set<String>, Component> nTerminalAminoAcids = null;
 	private static Map<Set<String>, Component> cTerminalAminoAcids = null;
-
-	/**
-	 * Lazy initialization of the static variables.
-	 */
-	private static void lazyInit() {
-		if (components==null) {
-			components = new HashSet<Component>();
-			nonTerminalComps = new HashMap<Set<String>, Component>();
-			nTerminalAminoAcids = new HashMap<Set<String>, Component>();
-			cTerminalAminoAcids = new HashMap<Set<String>, Component>();
-		}
-	}
+	private final Set<String> pdbccIds;
+	private final boolean isNTerminal;
+	private final boolean isCTerminal;
 
 	/**
 	 * Create a ComponentImpl.
-	 * @param pdbccIds a set of possible Protein Data Bank ID. Cannot be null or empty.
+	 * 
+	 * @param pdbccIds    a set of possible Protein Data Bank ID. Cannot be null or
+	 *                    empty.
 	 * @param isNTerminal true if occurring at N-terminal. false, otherwise.
 	 * @param isCTerminal true if occurring at C-terminal. false, otherwise.
-	 * @throws IllegalArgumentException if pdbccId or type is null,
-	 *  or terminal condition is indicated for non-amino-acid component,
-	 *  or both N-terminal and C-terminal are true.
+	 * @throws IllegalArgumentException if pdbccId or type is null, or terminal
+	 *                                  condition is indicated for non-amino-acid
+	 *                                  component, or both N-terminal and C-terminal
+	 *                                  are true.
 	 */
-	private Component(final Set<String> pdbccIds,
-			final boolean isNTerminal, final boolean isCTerminal) {
-		if (pdbccIds==null || pdbccIds.isEmpty()) {
+	private Component(final Set<String> pdbccIds, final boolean isNTerminal, final boolean isCTerminal) {
+		if (pdbccIds == null || pdbccIds.isEmpty()) {
 			throw new IllegalArgumentException("pdbccId or type cannot be null.");
 		}
 
-		if (isNTerminal&&isCTerminal) {
-			throw new IllegalArgumentException("An amino acid can be specified at" +
-					"N-terminal or C-terminal but not both."); //TODO: is this true?
+		if (isNTerminal && isCTerminal) {
+			throw new IllegalArgumentException(
+					"An amino acid can be specified at" + "N-terminal or C-terminal but not both."); // TODO: is this
+																										// true?
 		}
 
 		this.pdbccIds = pdbccIds;
 		this.isNTerminal = isNTerminal;
 		this.isCTerminal = isCTerminal;
+	}
+
+	/**
+	 * Lazy initialization of the static variables.
+	 */
+	private static void lazyInit() {
+		if (components != null) {
+			return;
+		}
+		components = new HashSet<>();
+		nonTerminalComps = new HashMap<>();
+		nTerminalAminoAcids = new HashMap<>();
+		cTerminalAminoAcids = new HashMap<>();
 	}
 
 	/**
@@ -109,10 +111,11 @@ public final class Component {
 	/**
 	 * Get a Component that does not have to occur at terminals. If the
 	 * corresponding component has already been registered, return that one.
+	 * 
 	 * @param pdbccIds possible Protein Data Bank ID.
 	 * @return a component.
-	 * @throws IllegalArgumentException if pdbccId or type is null,
-	 *  or the pdbccId has been registered as a different type.
+	 * @throws IllegalArgumentException if pdbccId or type is null, or the pdbccId
+	 *                                  has been registered as a different type.
 	 */
 	public static Component of(final String pdbccId) {
 		return of(pdbccId, false, false);
@@ -120,27 +123,29 @@ public final class Component {
 
 	/**
 	 * Get or create a Component.
-	 * @param pdbccId Protein Data Bank ID.
+	 * 
+	 * @param pdbccId     Protein Data Bank ID.
 	 * @param isNTerminal true if occurring at N-terminal. false, otherwise.
 	 * @param isCTerminal true if occurring at C-terminal. false, otherwise.
 	 * @return a component.
-	 * @throws IllegalArgumentException if pdbccId or type is null,
-	 *  or the pdbccId has been registered as a different type,
-	 *  or terminal condition is indicated for non-amino-acid component,
-	 *  or both N-terminal and C-terminal are true.
+	 * @throws IllegalArgumentException if pdbccId or type is null, or the pdbccId
+	 *                                  has been registered as a different type, or
+	 *                                  terminal condition is indicated for
+	 *                                  non-amino-acid component, or both N-terminal
+	 *                                  and C-terminal are true.
 	 */
-	public static Component of(final String pdbccId,
-			final boolean isNTerminal, final boolean isCTerminal) {
-		return of (Collections.singleton(pdbccId), isNTerminal, isCTerminal);
+	public static Component of(final String pdbccId, final boolean isNTerminal, final boolean isCTerminal) {
+		return of(Collections.singleton(pdbccId), isNTerminal, isCTerminal);
 	}
 
 	/**
 	 * Get a Component that does not have to occur at terminals. If the
 	 * corresponding component has already been registered, return that one.
+	 * 
 	 * @param pdbccIds a set of possible Protein Data Bank ID.
 	 * @return a component.
-	 * @throws IllegalArgumentException if pdbccId or type is null,
-	 *  or the pdbccId has been registered as a different type.
+	 * @throws IllegalArgumentException if pdbccId or type is null, or the pdbccId
+	 *                                  has been registered as a different type.
 	 */
 	public static Component of(final Set<String> pdbccIds) {
 		return of(pdbccIds, false, false);
@@ -148,20 +153,23 @@ public final class Component {
 
 	/**
 	 * Get or create a Component.
-	 * @param pdbccIds a set of possible Protein Data Bank ID.
+	 * 
+	 * @param pdbccIds    a set of possible Protein Data Bank ID.
 	 * @param isNTerminal true if occurring at N-terminal. false, otherwise.
 	 * @param isCTerminal true if occurring at C-terminal. false, otherwise.
 	 * @return a component.
-	 * @throws IllegalArgumentException if pdbccId or type is null,
-	 *  or the pdbccId has been registered as a different type,
-	 *  or terminal condition is indicated for non-amino-acid component,
-	 *  or both N-terminal and C-terminal are true.
+	 * @throws IllegalArgumentException if pdbccId or type is null, or the pdbccId
+	 *                                  has been registered as a different type, or
+	 *                                  terminal condition is indicated for
+	 *                                  non-amino-acid component, or both N-terminal
+	 *                                  and C-terminal are true.
 	 */
-	public static Component of(final Set<String> pdbccIds,
-			final boolean isNTerminal, final boolean isCTerminal) {
+	public static Component of(final Set<String> pdbccIds, final boolean isNTerminal, final boolean isCTerminal) {
 		if (isNTerminal && isCTerminal) {
-			throw new IllegalArgumentException("An amino acid can be at" +
-			"N-terminal or C-terminal but not both."); //TODO: is this true?
+			throw new IllegalArgumentException("An amino acid can be at" + "N-terminal or C-terminal but not both."); // TODO:
+																														// is
+																														// this
+																														// true?
 		}
 
 		lazyInit();

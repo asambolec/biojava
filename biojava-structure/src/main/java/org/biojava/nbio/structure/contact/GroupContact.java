@@ -25,14 +25,15 @@ import org.biojava.nbio.structure.Group;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A pair of residues that are in contact
+ * 
  * @author duarte_j
  *
  */
 public class GroupContact implements Serializable {
-
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,7 +42,7 @@ public class GroupContact implements Serializable {
 	private List<AtomContact> atomContacts;
 
 	public GroupContact() {
-		atomContacts = new ArrayList<AtomContact>();
+		atomContacts = new ArrayList<>();
 	}
 
 	public void addAtomContact(AtomContact atomContact) {
@@ -57,12 +58,15 @@ public class GroupContact implements Serializable {
 	}
 
 	public double getMinDistance() {
-		if (atomContacts.size()==0) return 0;
+		if (atomContacts.size() == 0) {
+			return 0;
+		}
 
 		double minDistance = Double.MAX_VALUE;
-		for (AtomContact atomContact:atomContacts) {
-			if (atomContact.getDistance()<minDistance)
+		for (AtomContact atomContact : atomContacts) {
+			if (atomContact.getDistance() < minDistance) {
 				minDistance = atomContact.getDistance();
+			}
 		}
 		return minDistance;
 	}
@@ -76,23 +80,23 @@ public class GroupContact implements Serializable {
 	}
 
 	/**
-	 * Returns the list of atom contacts in this GroupContact that are within the given distance.
+	 * Returns the list of atom contacts in this GroupContact that are within the
+	 * given distance.
+	 * 
 	 * @param distance
 	 * @return
 	 */
 	public List<AtomContact> getContactsWithinDistance(double distance) {
 
-		List<AtomContact> list = new ArrayList<AtomContact>();
-		for (AtomContact contact:this.atomContacts) {
-			if (contact.getDistance()<distance) {
-				list.add(contact);
-			}
-		}
+		List<AtomContact> list = new ArrayList<>();
+		list.addAll(this.atomContacts.stream().filter(contact -> contact.getDistance() < distance)
+				.collect(Collectors.toList()));
 		return list;
 	}
 
 	@Override
 	public String toString() {
-		return pair.getFirst().getResidueNumber()+","+pair.getSecond().getResidueNumber();
+		return new StringBuilder().append(pair.getFirst().getResidueNumber()).append(",")
+				.append(pair.getSecond().getResidueNumber()).toString();
 	}
 }

@@ -27,11 +27,12 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that a specific field of a bean should be ignored
+ * 
  * @author Spencer Bliven
  *
  */
-@Target(value=ElementType.FIELD)
-@Retention(value=RetentionPolicy.RUNTIME)
+@Target(value = ElementType.FIELD)
+@Retention(value = RetentionPolicy.RUNTIME)
 public @interface IgnoreField {
 
 }

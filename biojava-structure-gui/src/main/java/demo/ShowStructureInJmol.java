@@ -23,15 +23,19 @@ package demo;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.gui.jmol.StructureAlignmentJmol;
 import org.biojava.nbio.structure.StructureIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** Demo how to load and display a structure in Jmol
+/**
+ * Demo how to load and display a structure in Jmol
  *
  * @author Andreas Prlic
  *
  */
 public class ShowStructureInJmol {
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(ShowStructureInJmol.class);
+
+	public static void main(String[] args) {
 		try {
 
 			Structure struc = StructureIO.getStructure("1aoi");
@@ -44,8 +48,8 @@ public class ShowStructureInJmol {
 			jmolPanel.evalString("select * ; color chain;");
 			jmolPanel.evalString("select nucleic; cartoon on;");
 			jmolPanel.evalString("select *; spacefill off; wireframe off; cartoon on;  ");
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

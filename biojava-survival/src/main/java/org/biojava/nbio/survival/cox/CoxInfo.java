@@ -27,41 +27,46 @@ import org.biojava.nbio.survival.kaplanmeier.figure.KaplanMeierFigure;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import org.biojava.nbio.survival.cox.comparators.SurvivalInfoComparator;
 
 /**
- * Holds the results of a cox analysis where calling dump(), toString() will give an output similar to R
+ * Holds the results of a cox analysis where calling dump(), toString() will
+ * give an output similar to R
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class CoxInfo {
 
+	private static final Logger logger = LoggerFactory.getLogger(CoxInfo.class);
 	private WaldTestInfo waldTestInfo = null;
 	String message = "";
 	Integer maxIterations = null;
 	Double eps = null;
 	Double toler = null;
 	CoxMethod method;
-	private double[][] imat = null; //:the variance matrix at beta=final
-	private double[][] naive_imat = null; //the original variance matrix used in residuals
-	double[] u = new double[0]; //:score vector
-	int iterations = 0; //:actual number of iterations used
-	int flag = 0; // success flag  1000  did not converge 1 to nvar: rank of the solution
+	private double[][] imat = null; // :the variance matrix at beta=final
+	private double[][] naiveImat = null; // the original variance matrix used in residuals
+	double[] u = new double[0]; // :score vector
+	int iterations = 0; // :actual number of iterations used
+	int flag = 0; // success flag 1000 did not converge 1 to nvar: rank of the solution
 	double logTest = 0;
 	double logTestpval = 0;
-	double loglikInit = 0; //loglik at beta=initial values, at beta=final
+	double loglikInit = 0; // loglik at beta=initial values, at beta=final
 	double loglikFinal = 0;
 	Double scoreLogrankTest;
-	private Double rscore = null; //robust score
+	private Double rscore = null; // robust score
 	private Double rscoreLogrankTestpvalue = null;
 	private double degreeFreedom;
 	private Double scoreLogrankTestpvalue;
 	int numSamples = 0;
 	int numEvents = 0;
 	private LinkedHashMap<String, String> metaDataFilter = null;
-	private LinkedHashMap<String, CoxCoefficient> coefficientsList = new LinkedHashMap<String, CoxCoefficient>();
-	LinkedHashMap<Double, Double> baselineSurvivorFunction = new LinkedHashMap<Double, Double>();
-	ArrayList<SurvivalInfo> survivalInfoList = new ArrayList<SurvivalInfo>();
+	private LinkedHashMap<String, CoxCoefficient> coefficientsList = new LinkedHashMap<>();
+	LinkedHashMap<Double, Double> baselineSurvivorFunction = new LinkedHashMap<>();
+	ArrayList<SurvivalInfo> survivalInfoList = new ArrayList<>();
 	/**
 	 *
 	 */
@@ -86,9 +91,10 @@ public class CoxInfo {
 	 */
 	public void setVariance(double[][] var) throws Exception {
 
-		//   if (Math.abs(var[0][1] - var[1][0]) > .0000000000001) { //in the CoxCC correction looks like a precision error keeps these from being equal 10-19
-		//       throw new Exception("Expecting diagonal to be equal");
-		//   }
+		// if (Math.abs(var[0][1] - var[1][0]) > .0000000000001) { //in the CoxCC
+		// correction looks like a precision error keeps these from being equal 10-19
+		// throw new Exception("Expecting diagonal to be equal");
+		// }
 		imat = new double[var.length][var[0].length];
 		for (int i = 0; i < var.length; i++) {
 			for (int j = 0; j < var[0].length; j++) {
@@ -119,15 +125,14 @@ public class CoxInfo {
 	 * @throws Exception
 	 */
 	public void setNaiveVariance(double[][] var) throws Exception {
-//        if (var[0][1] != var[1][0]) {
-//            throw new Exception("Expecting diagonal to be equal");
-//        }
+		// if (var[0][1] != var[1][0]) {
+		// throw new Exception("Expecting diagonal to be equal");
+		// }
 
-
-		naive_imat = new double[var.length][var[0].length];
+		naiveImat = new double[var.length][var[0].length];
 		for (int i = 0; i < var.length; i++) {
 			for (int j = 0; j < var[0].length; j++) {
-				naive_imat[i][j] = var[i][j];
+				naiveImat[i][j] = var[i][j];
 			}
 		}
 
@@ -142,7 +147,7 @@ public class CoxInfo {
 		double[][] var = new double[imat.length][imat[0].length];
 		for (int i = 0; i < var.length; i++) {
 			for (int j = 0; j < var[0].length; j++) {
-				var[i][j] = naive_imat[i][j];
+				var[i][j] = naiveImat[i][j];
 			}
 		}
 
@@ -158,11 +163,7 @@ public class CoxInfo {
 		survivalInfoList = data;
 		numSamples = data.size();
 
-		for (SurvivalInfo si : data) {
-			if (si.getStatus() == 1) {
-				numEvents++;
-			}
-		}
+		data.stream().filter(si -> si.getStatus() == 1).forEach(si -> numEvents++);
 	}
 
 	/**
@@ -184,7 +185,7 @@ public class CoxInfo {
 	 * @return
 	 */
 	public double[][] getVariableResiduals() {
-		ArrayList<String> variables = new ArrayList<String>(coefficientsList.keySet());
+		ArrayList<String> variables = new ArrayList<>(coefficientsList.keySet());
 		double[][] rr = new double[survivalInfoList.size()][variables.size()];
 		int p = 0;
 		for (SurvivalInfo si : this.survivalInfoList) {
@@ -204,7 +205,7 @@ public class CoxInfo {
 	 * @param rr
 	 */
 	public void setVariableResiduals(double[][] rr) {
-		ArrayList<String> variables = new ArrayList<String>(coefficientsList.keySet());
+		ArrayList<String> variables = new ArrayList<>(coefficientsList.keySet());
 
 		int p = 0;
 		for (SurvivalInfo si : this.survivalInfoList) {
@@ -253,26 +254,42 @@ public class CoxInfo {
 	 * @param endLine
 	 * @return
 	 */
-	public String getCoefficientText(boolean header, String beginLine, String beginCell, String endCell, String endLine) {
+	public String getCoefficientText(boolean header, String beginLine, String beginCell, String endCell,
+			String endLine) {
 		String o = "";
 		if (header) {
 			String robust = "";
-			if (naive_imat != null) {
-				robust = beginCell + "robust se" + endCell;
+			if (naiveImat != null) {
+				robust = new StringBuilder().append(beginCell).append("robust se").append(endCell).toString();
 			}
-			o = o + beginLine + beginCell + fmtpl("", 9) + endCell + beginCell + fmtpl("coef", 9) + endCell + beginCell + fmtpl("se(coef)", 9) + endCell + robust + beginCell + fmtpl("z", 9) + endCell + beginCell + fmtpl("p-value", 9) + endCell + beginCell + fmtpl("HR", 9) + endCell + beginCell + fmtpl("lower .95", 9) + endCell + beginCell + fmtpl("upper .95", 9) + endCell + endLine;
-		}//Coefficients,Coe,StdErr,HR,p-value,HR Lo 95%,HR Hi 95%
+			o = new StringBuilder().append(o).append(beginLine).append(beginCell).append(fmtpl("", 9)).append(endCell)
+					.append(beginCell).append(fmtpl("coef", 9)).append(endCell).append(beginCell)
+					.append(fmtpl("se(coef)", 9)).append(endCell).append(robust).append(beginCell).append(fmtpl("z", 9))
+					.append(endCell).append(beginCell).append(fmtpl("p-value", 9)).append(endCell).append(beginCell)
+					.append(fmtpl("HR", 9)).append(endCell).append(beginCell).append(fmtpl("lower .95", 9))
+					.append(endCell).append(beginCell).append(fmtpl("upper .95", 9)).append(endCell).append(endLine)
+					.toString();
+		} // Coefficients,Coe,StdErr,HR,p-value,HR Lo 95%,HR Hi 95%
 
 		for (CoxCoefficient coe : coefficientsList.values()) {
 			String robust = "";
 			String stderror = "";
-			if (naive_imat != null) {
-				stderror = beginCell + fmt(coe.getRobustStdError(), 5, 9) + endCell;
-				robust = beginCell + fmt(coe.getStdError(), 5, 9) + endCell;
+			if (naiveImat != null) {
+				stderror = new StringBuilder().append(beginCell).append(fmt(coe.getRobustStdError(), 5, 9))
+						.append(endCell).toString();
+				robust = new StringBuilder().append(beginCell).append(fmt(coe.getStdError(), 5, 9)).append(endCell)
+						.toString();
 			} else {
-				stderror = beginCell + fmt(coe.getStdError(), 5, 9) + endCell;
+				stderror = new StringBuilder().append(beginCell).append(fmt(coe.getStdError(), 5, 9)).append(endCell)
+						.toString();
 			}
-			o = o + beginLine + beginCell + fmtpr(coe.getName(), 9) + endCell + beginCell + fmt(coe.getCoeff(), 5, 9) + stderror + robust + endCell + beginCell + fmt(coe.getZ(), 5, 9) + endCell + beginCell + fmt(coe.getPvalue(), 6, 9) + endCell + beginCell + fmt(coe.getHazardRatio(), 3, 9) + endCell + beginCell + fmt(coe.getHazardRatioLoCI(), 3, 9) + endCell + beginCell + fmt(coe.getHazardRatioHiCI(), 3, 9) + endCell + endLine;
+			o = new StringBuilder().append(o).append(beginLine).append(beginCell).append(fmtpr(coe.getName(), 9))
+					.append(endCell).append(beginCell).append(fmt(coe.getCoeff(), 5, 9)).append(stderror).append(robust)
+					.append(endCell).append(beginCell).append(fmt(coe.getZ(), 5, 9)).append(endCell).append(beginCell)
+					.append(fmt(coe.getPvalue(), 6, 9)).append(endCell).append(beginCell)
+					.append(fmt(coe.getHazardRatio(), 3, 9)).append(endCell).append(beginCell)
+					.append(fmt(coe.getHazardRatioLoCI(), 3, 9)).append(endCell).append(beginCell)
+					.append(fmt(coe.getHazardRatioHiCI(), 3, 9)).append(endCell).append(endLine).toString();
 		}
 		return o;
 	}
@@ -285,17 +302,19 @@ public class CoxInfo {
 	 * @return
 	 */
 	public static String fmt(Double d, int precision, int pad) {
-		if(d == null)
+		if (d == null) {
 			return "";
-		if(Double.isNaN(d))
+		}
+		if (Double.isNaN(d)) {
 			return "";
+		}
 		String value = "";
 		DecimalFormat dfe = new DecimalFormat("0.00E0");
 		String dpad = "0.";
 		double p = 1.0;
 		for (int i = 0; i < (precision); i++) {
 			dpad = dpad + "0";
-			p = p / 10.0;
+			p /= 10.0;
 		}
 		DecimalFormat df = new DecimalFormat(dpad);
 		if (Math.abs(d) >= p) {
@@ -318,19 +337,19 @@ public class CoxInfo {
 	 */
 	private void calcSummaryValues() {
 
-		//beta
+		// beta
 
-		ArrayList<String> variables = new ArrayList<String>(coefficientsList.keySet());
+		ArrayList<String> variables = new ArrayList<>(coefficientsList.keySet());
 		for (int i = 0; i < variables.size(); i++) {
 			String variable = variables.get(i);
 			CoxCoefficient coe = coefficientsList.get(variable);
-			coe.setStdError(Math.sqrt(imat[i][i])); //values can be updated to reflect new error
-			if (naive_imat != null) {
-				coe.setRobustStdError(Math.sqrt(naive_imat[i][i]));
+			coe.setStdError(Math.sqrt(imat[i][i])); // values can be updated to reflect new error
+			if (naiveImat != null) {
+				coe.setRobustStdError(Math.sqrt(naiveImat[i][i]));
 			}
 			coe.setZ(coe.getCoeff() / coe.getStdError());
 			coe.setPvalue(ChiSq.norm(Math.abs(coe.getCoeff() / coe.getStdError())));
-			//z <- qnorm((1 + conf.int)/2, 0, 1)
+			// z <- qnorm((1 + conf.int)/2, 0, 1)
 			double z = 1.959964;
 			coe.setHazardRatioLoCI(Math.exp(coe.getCoeff() - z * coe.getStdError()));
 			coe.setHazardRatioHiCI(Math.exp(coe.getCoeff() + z * coe.getStdError()));
@@ -350,88 +369,86 @@ public class CoxInfo {
 	 */
 	public void dump() {
 
-		//need an ordered list for comparing to R dumps
+		// need an ordered list for comparing to R dumps
 
-//        ArrayList<SurvivalInfo> orderedSurvivalInfoList = new ArrayList<SurvivalInfo>(survivalInfoList);
-//        SurvivalInfoComparator sicSort = new SurvivalInfoComparator();
-		//       Collections.sort(orderedSurvivalInfoList,sicSort);
-
+		// ArrayList<SurvivalInfo> orderedSurvivalInfoList = new
+		// ArrayList<SurvivalInfo>(survivalInfoList);
+		// SurvivalInfoComparator sicSort = new SurvivalInfoComparator();
+		// Collections.sort(orderedSurvivalInfoList,sicSort);
 
 		System.out.println();
-		System.out.println("$coef");
-		for (CoxCoefficient coe : coefficientsList.values()) {
-			System.out.print(coe.getCoeff() + " ");
-		}
+		logger.info("$coef");
+		coefficientsList.values().forEach(coe -> logger.info(coe.getCoeff() + " "));
 		System.out.println();
-		System.out.println("$means");
+		logger.info("$means");
 
-		for (CoxCoefficient coe : coefficientsList.values()) {
-			System.out.print(coe.getMean() + " ");
-		}
+		coefficientsList.values().forEach(coe -> logger.info(coe.getMean() + " "));
 		System.out.println();
-		System.out.println("$u");
+		logger.info("$u");
 
 		for (double d : u) {
-			System.out.print(d + " ");
+			logger.info(d + " ");
 		}
 
 		System.out.println();
-		System.out.println("$imat");
-		for (int i = 0; i < imat.length; i++) {
+		logger.info("$imat");
+		for (double[] anImat : imat) {
 			for (int j = 0; j < imat[0].length; j++) {
-				System.out.print(imat[i][j] + " ");
+				logger.info(anImat[j] + " ");
 			}
 			System.out.println();
 		}
 
-		if (this.naive_imat != null) {
-			System.out.println("$naive_imat");
-			for (int i = 0; i < naive_imat.length; i++) {
-				for (int j = 0; j < naive_imat[0].length; j++) {
-					System.out.print(naive_imat[i][j] + " ");
+		if (this.naiveImat != null) {
+			logger.info("$naive_imat");
+			for (double[] aNaiveImat : naiveImat) {
+				for (int j = 0; j < naiveImat[0].length; j++) {
+					logger.info(aNaiveImat[j] + " ");
 				}
 				System.out.println();
 			}
 		}
 
 		System.out.println();
-		System.out.println("$loglik");
+		logger.info("$loglik");
 
-		System.out.println(loglikInit + " " + loglikFinal);
-
-		System.out.println();
-		System.out.println("$sctest");
-
-		System.out.println(this.scoreLogrankTest);
-
-		System.out.println("$iter");
-		System.out.println(this.iterations);
-
-		System.out.println("$flag");
-		System.out.println(flag);
+		logger.info(new StringBuilder().append(loglikInit).append(" ").append(loglikFinal).toString());
 
 		System.out.println();
-//        if (false) {
-//            System.out.println("ID      LP       Score      Residuals");
-//            for (SurvivalInfo si : orderedSurvivalInfoList) {
-//                System.out.println(si.getOrder() + " " + si.getLinearPredictor() + " " + si.getScore() + " " + si.getResidual());
-//
-//            }
-//            System.out.println();
-//            ArrayList<String> variables = new ArrayList<String>(coefficientsList.keySet());
-//            System.out.print("Sample");
-//            for (String v : variables) {
-//                System.out.print("    " + v);
-//            }
-//            System.out.println("rr");
-//            for (SurvivalInfo si : orderedSurvivalInfoList) {
-//                System.out.print(si.getOrder());
-//                for (String v : variables) {
-//                    System.out.print("   " + si.getResidualVariable(v));
-//                }
-//                System.out.println();
-//            }
-//        }
+		logger.info("$sctest");
+
+		logger.info(String.valueOf(this.scoreLogrankTest));
+
+		logger.info("$iter");
+		logger.info(String.valueOf(this.iterations));
+
+		logger.info("$flag");
+		logger.info(String.valueOf(flag));
+
+		System.out.println();
+		// if (false) {
+		// System.out.println("ID LP Score Residuals");
+		// for (SurvivalInfo si : orderedSurvivalInfoList) {
+		// System.out.println(si.getOrder() + " " + si.getLinearPredictor() + " " +
+		// si.getScore() + " " + si.getResidual());
+		//
+		// }
+		// System.out.println();
+		// ArrayList<String> variables = new
+		// ArrayList<String>(coefficientsList.keySet());
+		// System.out.print("Sample");
+		// for (String v : variables) {
+		// System.out.print(" " + v);
+		// }
+		// System.out.println("rr");
+		// for (SurvivalInfo si : orderedSurvivalInfoList) {
+		// System.out.print(si.getOrder());
+		// for (String v : variables) {
+		// System.out.print(" " + si.getResidualVariable(v));
+		// }
+		// System.out.println();
+		// }
+		// }
 
 	}
 
@@ -488,55 +505,62 @@ public class CoxInfo {
 	 */
 	public String toString(String beginLine, String del, String endLine) {
 
-
-
-		String o = beginLine + fmtpl("", 9) + fmtpl("Avg", 9) + fmtpl("SD", 9) + endLine;
+		String o = new StringBuilder().append(beginLine).append(fmtpl("", 9)).append(fmtpl("Avg", 9))
+				.append(fmtpl("SD", 9)).append(endLine).toString();
 		for (CoxCoefficient coe : coefficientsList.values()) {
-			o = o + beginLine + fmtpr(coe.getName(), 9) + fmt(coe.getMean(), 4, 9) + fmt(coe.getStandardDeviation(), 4, 9) + endLine;
+			o = new StringBuilder().append(o).append(beginLine).append(fmtpr(coe.getName(), 9))
+					.append(fmt(coe.getMean(), 4, 9)).append(fmt(coe.getStandardDeviation(), 4, 9)).append(endLine)
+					.toString();
 
 		}
 
-		o = o + beginLine + endLine;
+		o = new StringBuilder().append(o).append(beginLine).append(endLine).toString();
 
-
-
-		o = o + beginLine + "n= " + this.numSamples + ", number of events=" + this.numEvents + endLine;
+		o = new StringBuilder().append(o).append(beginLine).append("n= ").append(this.numSamples)
+				.append(", number of events=").append(this.numEvents).append(endLine).toString();
 		o = o + getCoefficientText(true, beginLine, del, "", endLine);
 
-		o = o + beginLine + endLine;
+		o = new StringBuilder().append(o).append(beginLine).append(endLine).toString();
 
 		if (baselineSurvivorFunction.size() > 0) {
-			o = o + beginLine + "Baseline Survivor Function (at predictor means)" + endLine;
+			o = new StringBuilder().append(o).append(beginLine)
+					.append("Baseline Survivor Function (at predictor means)").append(endLine).toString();
 			for (Double time : baselineSurvivorFunction.keySet()) {
 				Double mean = baselineSurvivorFunction.get(time);
-				o = o + beginLine + fmt(time, 4, 10) + fmt(mean, 4, 10) + endLine;
+				o = new StringBuilder().append(o).append(beginLine).append(fmt(time, 4, 10)).append(fmt(mean, 4, 10))
+						.append(endLine).toString();
 			}
 		}
 
-		o = o + beginLine + endLine;
-		o = o + beginLine + "Overall Model Fit" + endLine;
-		o = o + beginLine + "Iterations=" + iterations + endLine;
+		o = new StringBuilder().append(o).append(beginLine).append(endLine).toString();
+		o = new StringBuilder().append(o).append(beginLine).append("Overall Model Fit").append(endLine).toString();
+		o = new StringBuilder().append(o).append(beginLine).append("Iterations=").append(iterations).append(endLine)
+				.toString();
 
+		o = new StringBuilder().append(o).append(beginLine).append("Likelihood ratio test = ")
+				.append(fmt(this.logTest, 2, 0)).append(" df=").append(this.degreeFreedom).append(" p-value=")
+				.append(fmt(this.logTestpval, 7, 0)).append(endLine).toString();
 
-		o = o + beginLine + "Likelihood ratio test = " + fmt(this.logTest, 2, 0) + " df=" + this.degreeFreedom + " p-value=" + fmt(this.logTestpval, 7, 0) + endLine;
-
-		o = o + beginLine + "Wald test             = " + fmt(waldTestInfo.getTest(), 2, 0) + " df=" + waldTestInfo.getDf() + " p-value=" + fmt(waldTestInfo.getPvalue(), 7, 0) + endLine;
-		o = o + beginLine + "Score (logrank) test  = " + fmt(scoreLogrankTest, 2, 0) + " df=" + ((int) (this.degreeFreedom)) + " p-value=" + fmt(this.scoreLogrankTestpvalue, 7, 0);
+		o = new StringBuilder().append(o).append(beginLine).append("Wald test             = ")
+				.append(fmt(waldTestInfo.getTest(), 2, 0)).append(" df=").append(waldTestInfo.getDf())
+				.append(" p-value=").append(fmt(waldTestInfo.getPvalue(), 7, 0)).append(endLine).toString();
+		o = new StringBuilder().append(o).append(beginLine).append("Score (logrank) test  = ")
+				.append(fmt(scoreLogrankTest, 2, 0)).append(" df=").append((int) (this.degreeFreedom))
+				.append(" p-value=").append(fmt(this.scoreLogrankTestpvalue, 7, 0)).toString();
 
 		if (this.rscore != null) {
-			o = o + ",  Robust = " + fmt(rscore, 2, 0) + " p-value=" + fmt(rscoreLogrankTestpvalue, 7, 0);
+			o = new StringBuilder().append(o).append(",  Robust = ").append(fmt(rscore, 2, 0)).append(" p-value=")
+					.append(fmt(rscoreLogrankTestpvalue, 7, 0)).toString();
 
 		}
 
 		o = o + endLine;
 
-		//       o = o + "Rank of solution flag=" + flag + "\r\n";
-		//       o = o + "Log lik Initial=" + loglikInit + "\r\n";
-		//       o = o + "Log lik Final=" + loglikFinal + "\r\n";
-		o = o + beginLine + "Method=" + method.name() + endLine;
-
-
-
+		// o = o + "Rank of solution flag=" + flag + "\r\n";
+		// o = o + "Log lik Initial=" + loglikInit + "\r\n";
+		// o = o + "Log lik Final=" + loglikFinal + "\r\n";
+		o = new StringBuilder().append(o).append(beginLine).append("Method=").append(method.name()).append(endLine)
+				.toString();
 
 		return o;
 	}
@@ -660,7 +684,7 @@ public class CoxInfo {
 	 * @return the naive_imat
 	 */
 	public double[][] getNaive_imat() {
-		return naive_imat;
+		return naiveImat;
 	}
 
 	/**

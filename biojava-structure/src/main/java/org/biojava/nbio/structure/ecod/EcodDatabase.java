@@ -23,13 +23,15 @@ package org.biojava.nbio.structure.ecod;
 import java.io.IOException;
 import java.util.List;
 
-/** General API for interacting with ECOD.
+/**
+ * General API for interacting with ECOD.
  *
  * @author Spencer Bliven
  */
 public interface EcodDatabase {
 
-	/** Return the release version.
+	/**
+	 * Return the release version.
 	 *
 	 * @return version
 	 * @throws IOException
@@ -38,6 +40,7 @@ public interface EcodDatabase {
 
 	/**
 	 * Get a particular ECOD domain by the domain ID (e.g. "e4hhbA1")
+	 * 
 	 * @param ecodId
 	 * @return
 	 * @throws IOException
@@ -46,6 +49,7 @@ public interface EcodDatabase {
 
 	/**
 	 * Get a list of all ECOD domains for a particular PDB ID
+	 * 
 	 * @param pdbId
 	 * @return the list of domains, or null if no matching domains were found
 	 * @throws IOException
@@ -54,8 +58,10 @@ public interface EcodDatabase {
 
 	/**
 	 * Get a list of domains within a particular level of the hierarchy
+	 * 
 	 * @param hierarchy A dot-separated list giving the X-group, H-group, and/or
-	 *  T-group (e.g. "1.1" for all members of the RIFT-related H-group)
+	 *                  T-group (e.g. "1.1" for all members of the RIFT-related
+	 *                  H-group)
 	 * @return
 	 * @throws IOException
 	 */
@@ -63,6 +69,7 @@ public interface EcodDatabase {
 
 	/**
 	 * Get all ECOD domains
+	 * 
 	 * @return
 	 * @throws IOException
 	 */

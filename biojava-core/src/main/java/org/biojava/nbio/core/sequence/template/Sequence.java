@@ -60,7 +60,7 @@ public interface Sequence<C extends Compound> extends Iterable<C>, Accessioned {
 	 */
 	public int getIndexOf(C compound);
 
-/**
+	/**
 	 * Scans through the Sequence looking for the last occurrence of the given
 	 * compound
 	 *
@@ -84,7 +84,7 @@ public interface Sequence<C extends Compound> extends Iterable<C>, Accessioned {
 	 * indexed from 1
 	 *
 	 * @param start Biological index start; must be greater than 0
-	 * @param end Biological end; must be less than length + 1
+	 * @param end   Biological end; must be less than length + 1
 	 * @return A SequenceView of the offset
 	 */
 	public SequenceView<C> getSubSequence(Integer start, Integer end);
@@ -103,9 +103,9 @@ public interface Sequence<C extends Compound> extends Iterable<C>, Accessioned {
 	public int countCompounds(C... compounds);
 
 	/**
-	 * Does the <em>right thing</em> to get the inverse of the current
-	 * Sequence. This means either reversing the Sequence and optionally
-	 * complementing the Sequence.
+	 * Does the <em>right thing</em> to get the inverse of the current Sequence.
+	 * This means either reversing the Sequence and optionally complementing the
+	 * Sequence.
 	 */
 	public SequenceView<C> getInverse();
 }

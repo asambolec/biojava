@@ -34,8 +34,7 @@ import org.biojava.nbio.structure.align.multiple.util.MultipleAlignmentTools;
  * @since 4.1.0
  *
  */
-public class BlockImpl extends AbstractScoresCache implements Serializable,
-		Block, Cloneable {
+public class BlockImpl extends AbstractScoresCache implements Serializable, Block, Cloneable {
 
 	private static final long serialVersionUID = -5804042669466177641L;
 
@@ -47,18 +46,18 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 	private List<Integer> alignResCounts;
 
 	/**
-	 * Constructor. Links also the parent to this instance, by adding the Block
-	 * to the parent's list.
+	 * Constructor. Links also the parent to this instance, by adding the Block to
+	 * the parent's list.
 	 *
-	 * @param blockSet
-	 *            the parent BlockSet of the BlockImpl instance.
+	 * @param blockSet the parent BlockSet of the BlockImpl instance.
 	 * @return BlockImpl a BlockImpl instance linked to its parent BlockSet.
 	 */
 	public BlockImpl(BlockSet blockSet) {
 
 		parent = blockSet;
-		if (parent != null)
+		if (parent != null) {
 			parent.getBlocks().add(this);
+		}
 		alignRes = null;
 		coreLength = -1; // Value -1 indicates not yet calculated.
 		alignResCounts = null; // Value null not yet calculated
@@ -67,8 +66,7 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 	/**
 	 * Copy constructor.
 	 *
-	 * @param b
-	 *            BlockImpl object to be copied.
+	 * @param b BlockImpl object to be copied.
 	 * @return BlockImpl an identical copy of the input BlockImpl object.
 	 */
 	public BlockImpl(BlockImpl b) {
@@ -80,7 +78,7 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 		this.alignRes = null;
 		if (b.alignRes != null) {
 			// Make a deep copy of everything
-			alignRes = new ArrayList<List<Integer>>();
+			alignRes = new ArrayList<>();
 			for (int k = 0; k < b.size(); k++) {
 				alignRes.add(new ArrayList<Integer>(b.alignRes.get(k)));
 			}
@@ -101,8 +99,8 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public String toString() {
-		return "BlockImpl [alignRes=" + alignRes + ", coreLength=" + coreLength
-				+ "]";
+		return new StringBuilder().append("BlockImpl [alignRes=").append(alignRes).append(", coreLength=")
+				.append(coreLength).append("]").toString();
 	}
 
 	@Override
@@ -127,10 +125,12 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public int length() {
-		if (alignRes == null)
+		if (alignRes == null) {
 			return 0;
-		if (alignRes.size() == 0)
+		}
+		if (alignRes.size() == 0) {
 			return 0;
+		}
 		return alignRes.get(0).size();
 	}
 
@@ -141,8 +141,9 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public int getCoreLength() {
-		if (coreLength == -1)
+		if (coreLength == -1) {
 			updateCoreLength();
+		}
 		return coreLength;
 	}
 
@@ -184,16 +185,18 @@ public class BlockImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public List<Integer> getAlignResCounts() {
-		
-		if (alignResCounts != null)
+
+		if (alignResCounts != null) {
 			return alignResCounts;
-		
-		alignResCounts = new ArrayList<Integer>(size());
+		}
+
+		alignResCounts = new ArrayList<>(size());
 		for (int s = 0; s < size(); s++) {
 			int count = 0;
 			for (int r = 0; r < length(); r++) {
-				if (alignRes.get(s).get(r) != null)
+				if (alignRes.get(s).get(r) != null) {
 					count++;
+				}
 			}
 			alignResCounts.add(count);
 		}

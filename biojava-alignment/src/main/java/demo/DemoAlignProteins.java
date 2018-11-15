@@ -33,8 +33,12 @@ import org.biojava.nbio.core.sequence.compound.AminoAcidCompound;
 import org.biojava.nbio.core.sequence.io.FastaReaderHelper;
 
 import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoAlignProteins {
+
+	private static final Logger logger = LoggerFactory.getLogger(DemoAlignProteins.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -53,22 +57,19 @@ public class DemoAlignProteins {
 		penalty.setOpenPenalty(gop);
 		penalty.setExtensionPenalty(extend);
 
-
-		PairwiseSequenceAligner<ProteinSequence, AminoAcidCompound> smithWaterman =
-				Alignments.getPairwiseAligner(s1, s2, PairwiseSequenceAlignerType.LOCAL, penalty, matrix);
+		PairwiseSequenceAligner<ProteinSequence, AminoAcidCompound> smithWaterman = Alignments.getPairwiseAligner(s1,
+				s2, PairwiseSequenceAlignerType.LOCAL, penalty, matrix);
 
 		SequencePair<ProteinSequence, AminoAcidCompound> pair = smithWaterman.getPair();
 
-
-		System.out.println(pair.toString(60));
-
+		logger.info(pair.toString(60));
 
 	}
 
 	private static ProteinSequence getSequenceForId(String uniProtId) throws Exception {
 		URL uniprotFasta = new URL(String.format("http://www.uniprot.org/uniprot/%s.fasta", uniProtId));
 		ProteinSequence seq = FastaReaderHelper.readFastaProteinSequence(uniprotFasta.openStream()).get(uniProtId);
-		System.out.printf("id : %s %s%s%s", uniProtId, seq, System.getProperty("line.separator"), seq.getOriginalHeader());
+		logger.info("id : %s %s%s%s", uniProtId, seq, System.getProperty("line.separator"), seq.getOriginalHeader());
 		System.out.println();
 
 		return seq;

@@ -28,18 +28,14 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-
-/** a utility class that listens to Ramsol script commands in the @link {@link BiojavaJmol} class
+/**
+ * a utility class that listens to Ramsol script commands in the @link
+ * {@link BiojavaJmol} class
  *
  * @author Andreas Prlic
  *
  */
-public class RasmolCommandListener
-extends KeyAdapter
-implements ActionListener,
-MouseListener {
+public class RasmolCommandListener extends KeyAdapter implements ActionListener, MouseListener {
 
 	JTextField textfield;
 	JmolPanel jmolPanel;
@@ -47,20 +43,18 @@ MouseListener {
 	List<String> history;
 	int historyPosition;
 
-	public RasmolCommandListener(JmolPanel panel, JTextField field){
+	public RasmolCommandListener(JmolPanel panel, JTextField field) {
 		textfield = field;
 		jmolPanel = panel;
-		history = new ArrayList<String>();
+		history = new ArrayList<>();
 		historyPosition = -2; // -2 = history = empty;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		/*
-	        if ( spice.isLoading() ) {
-	            logger.finest("loading data, please be patient");
-	            return ;
-	        }
+		 * if ( spice.isLoading() ) { logger.finest("loading data, please be patient");
+		 * return ; }
 		 */
 		String cmd = textfield.getText();
 		jmolPanel.executeCmd(cmd);
@@ -69,93 +63,97 @@ MouseListener {
 		// now comes history part:
 
 		// no need for history:
-		if ( cmd.equals("")) return;
+		if ("".equals(cmd)) {
+			return;
+		}
 
 		// check last command in history
 		// if equivalent, don't add,
 		// otherwise add
-		if (history.size()>0){
-			String txt=history.get(history.size()-1);
-			if (! txt.equals(cmd)) {
+		if (history.size() > 0) {
+			String txt = history.get(history.size() - 1);
+			if (!txt.equals(cmd)) {
 				history.add(cmd);
 			}
 		} else {
 			// the first time always add
 			history.add(cmd);
 		}
-		historyPosition=history.size();
-
+		historyPosition = history.size();
 
 	}
 
 	@Override
-	public void  mouseClicked(MouseEvent e){
+	public void mouseClicked(MouseEvent e) {
 		String cmd = textfield.getText();
-		if ( cmd.equals(StructureAlignmentJmol.COMMAND_LINE_HELP)){
-			textfield.setText("");
-			textfield.repaint();
+		if (!cmd.equals(StructureAlignmentJmol.COMMAND_LINE_HELP)) {
+			return;
 		}
+		textfield.setText("");
+		textfield.repaint();
 	};
 
+	@Override
+	public void mouseExited(MouseEvent e) {
+	};
 
 	@Override
-	public void  mouseExited(MouseEvent e){};
-	@Override
-	public void  mouseReleased(MouseEvent e){};
-	@Override
-	public void  mousePressed(MouseEvent e){};
+	public void mouseReleased(MouseEvent e) {
+	};
 
 	@Override
-	public void  mouseEntered(MouseEvent e){};
+	public void mousePressed(MouseEvent e) {
+	};
 
-	/** takes care of the cursor up/down keys. triggers copying of stored
-	 * commands into the current textfield
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	};
+
+	/**
+	 * takes care of the cursor up/down keys. triggers copying of stored commands
+	 * into the current textfield
 	 *
 	 */
 
-
 	@Override
-	public void keyReleased(KeyEvent e){
+	public void keyReleased(KeyEvent e) {
 
 		int code = e.getKeyCode();
-		//String s = e.getKeyText(code);
-		//System.out.println(s);
-		if (( code == KeyEvent.VK_UP ) ||
-				( code == KeyEvent.VK_KP_UP)) {
+		// String s = e.getKeyText(code);
+		// System.out.println(s);
+		if ((code == KeyEvent.VK_UP) || (code == KeyEvent.VK_KP_UP)) {
 			// go one back in history;
-			if ( historyPosition > 0){
-				historyPosition= historyPosition-1;
+			if (historyPosition > 0) {
+				historyPosition -= 1;
 			}
-		} else if (( code == KeyEvent.VK_DOWN ) ||
-				( code == KeyEvent.VK_KP_DOWN)) {
-			if ( historyPosition < (history.size()-1) ){
+		} else if ((code == KeyEvent.VK_DOWN) || (code == KeyEvent.VK_KP_DOWN)) {
+			if (historyPosition < (history.size() - 1)) {
 				historyPosition++;
 			} else {
 				// clear command if at beginning of history
 				textfield.setText("");
-				historyPosition=history.size();
+				historyPosition = history.size();
 				return;
 			}
-		} else if ( code == KeyEvent.VK_PAGE_UP) {
-			if ( historyPosition > 0) {
+		} else if (code == KeyEvent.VK_PAGE_UP) {
+			if (historyPosition > 0) {
 				historyPosition = 0;
 			}
-		} else if ( code == KeyEvent.VK_PAGE_DOWN) {
-			if ( historyPosition >= 0) {
-				historyPosition = history.size()-1;
+		} else if (code == KeyEvent.VK_PAGE_DOWN) {
+			if (historyPosition >= 0) {
+				historyPosition = history.size() - 1;
 			}
 		} else {
 			// some other key has been pressed, do nothing
 			return;
 		}
 
-		if ( historyPosition >= 0) {
-			String txt = history.get(historyPosition);
-			textfield.setText(txt);
+		if (historyPosition < 0) {
+			return;
 		}
-
+		String txt = history.get(historyPosition);
+		textfield.setText(txt);
 
 	}
-
 
 }

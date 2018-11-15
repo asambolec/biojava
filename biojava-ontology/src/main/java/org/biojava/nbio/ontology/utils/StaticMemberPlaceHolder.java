@@ -37,7 +37,8 @@ public class StaticMemberPlaceHolder implements Serializable {
 		this.fieldName = field.getName();
 	}
 
-	protected StaticMemberPlaceHolder() {}
+	protected StaticMemberPlaceHolder() {
+	}
 
 	public Object readResolve() throws ObjectStreamException {
 		try {
@@ -45,11 +46,9 @@ public class StaticMemberPlaceHolder implements Serializable {
 			Field f = c.getDeclaredField(fieldName);
 			return f.get(null);
 		} catch (Exception e) {
-			throw new InvalidObjectException(
-				"Unable to retrieve static field " + fieldName +
-				"for class " + className + " because:\n" +
-				e.getMessage()
-			);
+			throw new InvalidObjectException(new StringBuilder().append("Unable to retrieve static field ")
+					.append(fieldName).append("for class ").append(className).append(" because:\n")
+					.append(e.getMessage()).toString());
 		}
 	}
 }

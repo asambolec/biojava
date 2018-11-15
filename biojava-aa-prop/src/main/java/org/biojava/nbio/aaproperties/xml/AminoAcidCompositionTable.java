@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
-@XmlRootElement(name="compoundtable", namespace="http://biojava.org")
+@XmlRootElement(name = "compoundtable", namespace = "http://biojava.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class AminoAcidCompositionTable {
 
@@ -50,13 +49,14 @@ public class AminoAcidCompositionTable {
 	 */
 	private Map<Character, Double> aaSymbol2MolecularWeight;
 
-	public AminoAcidCompositionTable(){}
+	public AminoAcidCompositionTable() {
+	}
 
-	public AminoAcidCompositionTable(List<AminoAcidComposition> aaList){
+	public AminoAcidCompositionTable(List<AminoAcidComposition> aaList) {
 		this.setAminoacid(aaList);
 	}
 
-	public ModifiedAminoAcidCompoundSet getAminoAcidCompoundSet(){
+	public ModifiedAminoAcidCompoundSet getAminoAcidCompoundSet() {
 		return this.modifiedAminoAcidCompoundSet;
 	}
 
@@ -68,52 +68,58 @@ public class AminoAcidCompositionTable {
 		this.aminoacid = aminoacid;
 	}
 
-	public Set<Character> getSymbolSet(){
+	public Set<Character> getSymbolSet() {
 		return this.aaSymbol2MolecularWeight.keySet();
 	}
 
-	private void generatesAminoAcidCompoundSet(){
-		this.modifiedAminoAcidCompoundSet = new ModifiedAminoAcidCompoundSet(this.aminoacid, this.aaSymbol2MolecularWeight);
+	private void generatesAminoAcidCompoundSet() {
+		this.modifiedAminoAcidCompoundSet = new ModifiedAminoAcidCompoundSet(this.aminoacid,
+				this.aaSymbol2MolecularWeight);
 	}
 
 	/**
-	 * Computes and store the molecular weight of each amino acid by its symbol in aaSymbol2MolecularWeight.
+	 * Computes and store the molecular weight of each amino acid by its symbol in
+	 * aaSymbol2MolecularWeight.
 	 *
-	 * @param eTable
-	 * 		Stores the mass of elements and isotopes
+	 * @param eTable Stores the mass of elements and isotopes
 	 */
-	public void computeMolecularWeight(ElementTable eTable){
-		this.aaSymbol2MolecularWeight = new HashMap<Character, Double>();
-		for(AminoAcidComposition a:aminoacid){
-			//Check to ensure that the symbol is of single character
-			if(a.getSymbol().length() != 1){
-				throw new Error(a.getSymbol() + " is not allowed. Symbols must be single character.\r\nPlease check AminoAcidComposition XML file");
+	public void computeMolecularWeight(ElementTable eTable) {
+		this.aaSymbol2MolecularWeight = new HashMap<>();
+		for (AminoAcidComposition a : aminoacid) {
+			// Check to ensure that the symbol is of single character
+			if (a.getSymbol().length() != 1) {
+				throw new Error(a.getSymbol()
+						+ " is not allowed. Symbols must be single character.\r\nPlease check AminoAcidComposition XML file");
 			}
-			//Check to ensure that the symbols are not repeated
+			// Check to ensure that the symbols are not repeated
 			char c = a.getSymbol().charAt(0);
-			if(this.aaSymbol2MolecularWeight.keySet().contains(c)){
-				throw new Error("Symbol " + c + " is repeated.\r\n" +
-						"Please check AminoAcidComposition XML file to ensure there are no repeated symbols. Note that this is case-insensitive.\r\n" +
-						"This means that having 'A' and 'a' would be repeating.");
+			if (this.aaSymbol2MolecularWeight.keySet().contains(c)) {
+				throw new Error(new StringBuilder().append("Symbol ").append(c).append(" is repeated.\r\n").append(
+						"Please check AminoAcidComposition XML file to ensure there are no repeated symbols. Note that this is case-insensitive.\r\n")
+						.append("This means that having 'A' and 'a' would be repeating.").toString());
 			}
 			double total = 0.0;
-			if(a.getElementList() != null){
-				for(Name2Count element:a.getElementList()){
+			if (a.getElementList() != null) {
+				for (Name2Count element : a.getElementList()) {
 					element.getName();
-					if(eTable.getElement(element.getName()) == null){
-						throw new Error("Element " + element.getName() + " could not be found. " +
-								"\r\nPlease ensure that its name is correct in AminoAcidComposition.xml and is defined in ElementMass.xml.");
+					if (eTable.getElement(element.getName()) == null) {
+						throw new Error(new StringBuilder().append("Element ").append(element.getName())
+								.append(" could not be found. ")
+								.append("\r\nPlease ensure that its name is correct in AminoAcidComposition.xml and is defined in ElementMass.xml.")
+								.toString());
 					}
 					eTable.getElement(element.getName()).getMass();
 					total += eTable.getElement(element.getName()).getMass() * element.getCount();
 				}
 			}
-			if(a.getIsotopeList() != null){
-				for(Name2Count isotope:a.getIsotopeList()){
+			if (a.getIsotopeList() != null) {
+				for (Name2Count isotope : a.getIsotopeList()) {
 					isotope.getName();
-					if(eTable.getIsotope(isotope.getName()) == null){
-						throw new Error("Isotope " + isotope.getName() + " could not be found. " +
-							"\r\nPlease ensure that its name is correct in AminoAcidComposition.xml and is defined in ElementMass.xml.");
+					if (eTable.getIsotope(isotope.getName()) == null) {
+						throw new Error(new StringBuilder().append("Isotope ").append(isotope.getName())
+								.append(" could not be found. ")
+								.append("\r\nPlease ensure that its name is correct in AminoAcidComposition.xml and is defined in ElementMass.xml.")
+								.toString());
 					}
 					eTable.getIsotope(isotope.getName()).getMass();
 					total += eTable.getIsotope(isotope.getName()).getMass() * isotope.getCount();
@@ -126,20 +132,22 @@ public class AminoAcidCompositionTable {
 	}
 
 	/**
-	 * @param aaSymbol
-	 * 	Standard symbol of Amino Acid
+	 * @param aaSymbol Standard symbol of Amino Acid
 	 * @return the molecular weight given its symbol
-	 * @throws NullPointerException
-	 * 	thrown if AminoAcidCompositionTable.computeMolecularWeight(ElementTable) is not called before this method
+	 * @throws NullPointerException thrown if
+	 *                              AminoAcidCompositionTable.computeMolecularWeight(ElementTable)
+	 *                              is not called before this method
 	 */
-	public double getMolecularWeight(Character aaSymbol) throws NullPointerException{
-		if(this.aaSymbol2MolecularWeight == null){
-			throw new NullPointerException("Please call AminoAcidCompositionTable.computeMolecularWeight(ElementTable) before this method");
+	public double getMolecularWeight(Character aaSymbol) {
+		if (this.aaSymbol2MolecularWeight == null) {
+			throw new NullPointerException(
+					"Please call AminoAcidCompositionTable.computeMolecularWeight(ElementTable) before this method");
 		}
 		Double d = this.aaSymbol2MolecularWeight.get(aaSymbol);
-		if(d == null)
+		if (d == null) {
 			return 0;
-		else
+		} else {
 			return d;
+		}
 	}
 }

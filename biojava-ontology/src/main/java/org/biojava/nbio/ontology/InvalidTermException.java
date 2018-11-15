@@ -21,24 +21,20 @@
 
 package org.biojava.nbio.ontology;
 
-
 /**
- * Thrown to indicate that an ontology term is not acceptable or
- * appropriate in a given context
+ * Thrown to indicate that an ontology term is not acceptable or appropriate in
+ * a given context
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.4
  */
 
-public class InvalidTermException
-		extends OntologyException
-{
+public class InvalidTermException extends OntologyException {
 
 	private static final long serialVersionUID = 1L;
 
-public InvalidTermException() {
-		super();
+	public InvalidTermException() {
 	}
 
 	public InvalidTermException(String message) {

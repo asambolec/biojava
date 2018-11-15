@@ -35,11 +35,14 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RepresentativeXMLConverter {
 
+	private static final Logger logger = LoggerFactory.getLogger(RepresentativeXMLConverter.class);
 
-	public static final String toXML(SortedSet<String> representatives){
+	public static final String toXML(SortedSet<String> representatives) {
 		StringWriter sw = new StringWriter();
 		PrintWriter writer = new PrintWriter(sw);
 
@@ -47,20 +50,20 @@ public class RepresentativeXMLConverter {
 		try {
 			xml.openTag("representatives");
 
-			for ( String repr : representatives){
+			for (String repr : representatives) {
 				xml.openTag("pdbChain");
 				xml.attribute("name", repr);
 				xml.closeTag("pdbChain");
 			}
 			xml.closeTag("representatives");
-		} catch(IOException ex){
-			ex.printStackTrace();
+		} catch (IOException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 		return sw.toString();
 	}
 
-	public static final SortedSet<String> fromXML(String xml){
-		SortedSet<String> representatives = new TreeSet<String>();
+	public static final SortedSet<String> fromXML(String xml) {
+		SortedSet<String> representatives = new TreeSet<>();
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = factory.newDocumentBuilder();
@@ -71,27 +74,25 @@ public class RepresentativeXMLConverter {
 			// normalize text representation
 			doc.getDocumentElement().normalize();
 
-
-			//Element rootElement = doc.getDocumentElement();
+			// Element rootElement = doc.getDocumentElement();
 
 			NodeList listOfPairs = doc.getElementsByTagName("pdbChain");
-			//int numArrays = listOfArrays.getLength();
+			// int numArrays = listOfArrays.getLength();
 
 			// go over the blocks
-			for(int i=0; i<listOfPairs.getLength() ; i++)
-			{
-				Node pair       = listOfPairs.item(i);
-				//NodeList valList = pair.getChildNodes();
-				//int numChildren  = valList.getLength();
+			for (int i = 0; i < listOfPairs.getLength(); i++) {
+				Node pair = listOfPairs.item(i);
+				// NodeList valList = pair.getChildNodes();
+				// int numChildren = valList.getLength();
 
 				NamedNodeMap map = pair.getAttributes();
 
-				String name =  map.getNamedItem("name").getTextContent();
+				String name = map.getNamedItem("name").getTextContent();
 				representatives.add(name);
 			}
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return representatives;

@@ -20,32 +20,29 @@
  */
 package org.biojava.nbio.structure.align;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.align.ce.ConfigStrucAligParams;
 import org.biojava.nbio.structure.align.model.AFPChain;
 
-public abstract class AbstractStructureAlignment implements StructureAlignment{
+public abstract class AbstractStructureAlignment implements StructureAlignment {
 
 	public static String newline = System.getProperty("line.separator");
 
 	@Override
-	abstract public  AFPChain align(Atom[] ca1, Atom[] ca2)
-			throws StructureException;
+	abstract public AFPChain align(Atom[] ca1, Atom[] ca2) throws StructureException;
 
 	@Override
-	abstract public AFPChain align(Atom[] ca1, Atom[] ca2, Object params)
-			throws StructureException;
+	abstract public AFPChain align(Atom[] ca1, Atom[] ca2, Object params) throws StructureException;
 
 	@Override
-	abstract public String getAlgorithmName() ;
+	abstract public String getAlgorithmName();
 
 	@Override
-	abstract public ConfigStrucAligParams getParameters() ;
+	abstract public ConfigStrucAligParams getParameters();
 
 	@Override
-	abstract public String getVersion() ;
+	abstract public String getVersion();
 
 	@Override
 	abstract public void setParameters(ConfigStrucAligParams parameters);

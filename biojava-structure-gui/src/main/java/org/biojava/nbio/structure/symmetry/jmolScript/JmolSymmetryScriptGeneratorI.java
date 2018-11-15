@@ -26,7 +26,6 @@ package org.biojava.nbio.structure.symmetry.jmolScript;
 import org.biojava.nbio.structure.symmetry.axis.RotationAxisAligner;
 import org.biojava.nbio.structure.symmetry.geometry.Icosahedron;
 
-
 /**
  * @author Peter
  *
@@ -48,7 +47,7 @@ public class JmolSymmetryScriptGeneratorI extends JmolSymmetryScriptGeneratorPoi
 		// find maximum extension of polyhedron
 		double polyhedronExtension = getPolyhedron().getCirumscribedRadius();
 
-		int zoom = Math.round((float)(maxExtension/polyhedronExtension * 110));
+		int zoom = Math.round((float) (maxExtension / polyhedronExtension * 110));
 		if (zoom > 100) {
 			zoom = 100;
 		}

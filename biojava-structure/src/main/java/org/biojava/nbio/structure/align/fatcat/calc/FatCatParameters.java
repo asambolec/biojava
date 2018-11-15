@@ -32,15 +32,17 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class FatCatParameters implements ConfigStrucAligParams {
 
-public class FatCatParameters implements ConfigStrucAligParams
-{
+	private static final Logger logger = LoggerFactory.getLogger(FatCatParameters.class);
 
 	public static final int DEFAULT_FRAGLEN = 8;
 
-	int fragLen  ; // the length of the fragments to consider...
-	int fragLenSq ;
+	int fragLen; // the length of the fragments to consider...
+	int fragLenSq;
 	Double rmsdCut; // cutoff for AFP detection.
 	double disCut; // for AFPs connection, to be tuned, 4.0
 	double afpDisCut;
@@ -60,317 +62,240 @@ public class FatCatParameters implements ConfigStrucAligParams
 	double resScore;
 	double fragScore;
 	int sparse;
-	boolean optimizeAlignment; //whether to do post-processing to improve the alignment
-	public FatCatParameters(){
+	boolean optimizeAlignment; // whether to do post-processing to improve the alignment
+
+	public FatCatParameters() {
 		reset();
 	}
 
-
 	@Override
-	public void reset(){
+	public void reset() {
 		// Note: Update FatCatUserArgumentProcessor.FatCatStartupParams after
 		// modifying user-exposed values
 		fragLen = DEFAULT_FRAGLEN;
 		fragLenSq = fragLen * fragLen;
-		rmsdCut = 3.0; //cutoff for AFP detection
-		disCut = 5.0; //for AFPs connection, to be tuned, 4.0
+		rmsdCut = 3.0; // cutoff for AFP detection
+		disCut = 5.0; // for AFPs connection, to be tuned, 4.0
 		afpDisCut = fragLenSq * disCut * disCut;
 		afpDisCut0 = fragLenSq * disCut;
-		disSmooth = 4.0; //for smoothly calculation of twist penalty calculation
-		misCut = 2 * fragLen; //structural-dismilar ranges allowed between AFPs
-		maxGap = 40; //try-1 30
+		disSmooth = 4.0; // for smoothly calculation of twist penalty calculation
+		misCut = 2 * fragLen; // structural-dismilar ranges allowed between AFPs
+		maxGap = 40; // try-1 30
 		maxGapFrag = fragLen + maxGap;
-		disFilter = 2.0 * rmsdCut; //for single AFP denifition to be tuned! //two CA-dis is 3.6
-		badRmsd = 4.0; //very important paramerter for twists detection
+		disFilter = 2.0 * rmsdCut; // for single AFP denifition to be tuned! //two CA-dis is 3.6
+		badRmsd = 4.0; // very important paramerter for twists detection
 		maxTra = 5;
 		gapCreate = -5.0;
 		gapExtend = -0.5;
-		misScore = gapExtend; //comparable to gapExtend
-		torsionPenalty = 5 * gapCreate; //to be tuned
-		maxPenalty = 1 * gapCreate; //to be tuned
-		resScore = 3.0; //on average, the score for each well-matched residue pair
-		fragScore = resScore * fragLen; //the score for each well-matched fragment
+		misScore = gapExtend; // comparable to gapExtend
+		torsionPenalty = 5 * gapCreate; // to be tuned
+		maxPenalty = 1 * gapCreate; // to be tuned
+		resScore = 3.0; // on average, the score for each well-matched residue pair
+		fragScore = resScore * fragLen; // the score for each well-matched fragment
 		sparse = 0;
-		optimizeAlignment = true; //No effect at the moment
+		optimizeAlignment = true; // No effect at the moment
 	}
 
-
-	public Integer getFragLen()
-	{
+	public Integer getFragLen() {
 		return fragLen;
 	}
 
-
-	public void setFragLen(Integer fragLen)
-	{
+	public void setFragLen(Integer fragLen) {
 		this.fragLen = fragLen;
 	}
 
-
-	public int getFragLenSq()
-	{
+	public int getFragLenSq() {
 		return fragLenSq;
 	}
 
-
-	public void setFragLenSq(int fragLenSq)
-	{
+	public void setFragLenSq(int fragLenSq) {
 		this.fragLenSq = fragLenSq;
 	}
 
-
-	/** The cutoff to be used during AFP detection
+	/**
+	 * The cutoff to be used during AFP detection
 	 *
 	 * @return rmsdCut parameter
 	 */
-	public Double getRmsdCut()
-	{
+	public Double getRmsdCut() {
 		return rmsdCut;
 	}
 
-	/** The cutoff to be used during AFP detection
+	/**
+	 * The cutoff to be used during AFP detection
 	 *
 	 * @param rmsdCut
 	 */
-	public void setRmsdCut(Double rmsdCut)
-	{
+	public void setRmsdCut(Double rmsdCut) {
 		this.rmsdCut = rmsdCut;
 	}
 
-	/** Get the distance cutoff used during AFP chain connectivity checks
+	/**
+	 * Get the distance cutoff used during AFP chain connectivity checks
 	 *
 	 * @return distance Cutoff
 	 */
-	public Double getDisCut()
-	{
+	public Double getDisCut() {
 		return disCut;
 	}
 
-
-	public void setDisCut(Double disCut)
-	{
+	public void setDisCut(Double disCut) {
 		this.disCut = disCut;
 	}
 
-
-	public double getAfpDisCut()
-	{
+	public double getAfpDisCut() {
 		return afpDisCut;
 	}
 
-
-	public void setAfpDisCut(double afpDisCut)
-	{
+	public void setAfpDisCut(double afpDisCut) {
 		this.afpDisCut = afpDisCut;
 	}
 
-
-	public double getAfpDisCut0()
-	{
+	public double getAfpDisCut0() {
 		return afpDisCut0;
 	}
 
-
-	public void setAfpDisCut0(double afpDisCut0)
-	{
+	public void setAfpDisCut0(double afpDisCut0) {
 		this.afpDisCut0 = afpDisCut0;
 	}
 
-
-	public double getDisSmooth()
-	{
+	public double getDisSmooth() {
 		return disSmooth;
 	}
 
-
-	public void setDisSmooth(double disSmooth)
-	{
+	public void setDisSmooth(double disSmooth) {
 		this.disSmooth = disSmooth;
 	}
 
-
-	public int getMisCut()
-	{
+	public int getMisCut() {
 		return misCut;
 	}
 
-
-	public void setMisCut(int misCut)
-	{
+	public void setMisCut(int misCut) {
 		this.misCut = misCut;
 	}
 
-
-	public int getMaxGap()
-	{
+	public int getMaxGap() {
 		return maxGap;
 	}
 
-
-	public void setMaxGap(int maxGap)
-	{
+	public void setMaxGap(int maxGap) {
 		this.maxGap = maxGap;
 	}
 
-
-	public int getMaxGapFrag()
-	{
+	public int getMaxGapFrag() {
 		return maxGapFrag;
 	}
 
-
-	public void setMaxGapFrag(int maxGapFrag)
-	{
+	public void setMaxGapFrag(int maxGapFrag) {
 		this.maxGapFrag = maxGapFrag;
 	}
 
-
-	public double getDisFilter()
-	{
+	public double getDisFilter() {
 		return disFilter;
 	}
 
-
-	public void setDisFilter(double disFilter)
-	{
+	public void setDisFilter(double disFilter) {
 		this.disFilter = disFilter;
 	}
 
-
-	public double getBadRmsd()
-	{
+	public double getBadRmsd() {
 		return badRmsd;
 	}
 
-
-	public void setBadRmsd(double badRmsd)
-	{
+	public void setBadRmsd(double badRmsd) {
 		this.badRmsd = badRmsd;
 	}
 
-
-	/** get the maximum number of Twists that are allowed...
+	/**
+	 * get the maximum number of Twists that are allowed...
 	 *
 	 * @return max nr of allowed twists
 	 */
-	public Integer getMaxTra()
-	{
+	public Integer getMaxTra() {
 		return maxTra;
 	}
 
-	/** set the maximum number of Twists that are allowed...
+	/**
+	 * set the maximum number of Twists that are allowed...
 	 *
 	 * @param maxTra
 	 */
-	public void setMaxTra(Integer maxTra)
-	{
+	public void setMaxTra(Integer maxTra) {
 		this.maxTra = maxTra;
 	}
 
-
-	public double getGapCreate()
-	{
+	public double getGapCreate() {
 		return gapCreate;
 	}
 
-
-	public void setGapCreate(double gapCreate)
-	{
+	public void setGapCreate(double gapCreate) {
 		this.gapCreate = gapCreate;
 	}
 
-
-	public double getGapExtend()
-	{
+	public double getGapExtend() {
 		return gapExtend;
 	}
 
-
-	public void setGapExtend(double gapExtend)
-	{
+	public void setGapExtend(double gapExtend) {
 		this.gapExtend = gapExtend;
 	}
 
-
-	public double getMisScore()
-	{
+	public double getMisScore() {
 		return misScore;
 	}
 
-
-	public void setMisScore(double misScore)
-	{
+	public void setMisScore(double misScore) {
 		this.misScore = misScore;
 	}
 
-
-	public double getTorsionPenalty()
-	{
+	public double getTorsionPenalty() {
 		return torsionPenalty;
 	}
 
-
-	public void setTorsionPenalty(double torsionPenalty)
-	{
+	public void setTorsionPenalty(double torsionPenalty) {
 		this.torsionPenalty = torsionPenalty;
 	}
 
-
-	public double getMaxPenalty()
-	{
+	public double getMaxPenalty() {
 		return maxPenalty;
 	}
 
-
-	public void setMaxPenalty(double maxPenalty)
-	{
+	public void setMaxPenalty(double maxPenalty) {
 		this.maxPenalty = maxPenalty;
 	}
 
-
-	public double getResScore()
-	{
+	public double getResScore() {
 		return resScore;
 	}
 
-
-	public void setResScore(double resScore)
-	{
+	public void setResScore(double resScore) {
 		this.resScore = resScore;
 	}
 
-
-	public double getFragScore()
-	{
+	public double getFragScore() {
 		return fragScore;
 	}
 
-
-	public void setFragScore(double fragScore)
-	{
+	public void setFragScore(double fragScore) {
 		this.fragScore = fragScore;
 	}
 
-
-	public int getSparse()
-	{
+	public int getSparse() {
 		return sparse;
 	}
 
-
-	public void setSparse(int sparse)
-	{
+	public void setSparse(int sparse) {
 		this.sparse = sparse;
 	}
 
-
 	@Override
 	public List<String> getUserConfigHelp() {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		String fragLen = "The length of the fragments.";
 		String rmsdCutHelp = "The RMSD cutoff to be used during AFP detection.";
 		String disCutHelp = "The distance cutoff used when calculate the connectivity of AFP pairs";
-		String twistHelp ="The number of twists that are allowed to be introduced. If set to 0 alignments are run in RIGID mode.";
+		String twistHelp = "The number of twists that are allowed to be introduced. If set to 0 alignments are run in RIGID mode.";
 		params.add(fragLen);
 		params.add(rmsdCutHelp);
 		params.add(disCutHelp);
@@ -379,10 +304,9 @@ public class FatCatParameters implements ConfigStrucAligParams
 
 	}
 
-
 	@Override
 	public List<String> getUserConfigParameterNames() {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		params.add("Fragment Length");
 		params.add("RMSD Cutoff");
 		params.add("AFP Distance Cutoff");
@@ -390,10 +314,9 @@ public class FatCatParameters implements ConfigStrucAligParams
 		return params;
 	}
 
-
 	@Override
 	public List<String> getUserConfigParameters() {
-		List<String> params = new ArrayList<String>();
+		List<String> params = new ArrayList<>();
 		params.add("FragLen");
 		params.add("RmsdCut");
 		params.add("DisCut");
@@ -401,12 +324,11 @@ public class FatCatParameters implements ConfigStrucAligParams
 		return params;
 	}
 
-
 	@Override
-	@SuppressWarnings({  "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public List<Class> getUserConfigTypes() {
 
-		List<Class> params = new ArrayList<Class>();
+		List<Class> params = new ArrayList<>();
 		params.add(Integer.class);
 		params.add(Double.class);
 		params.add(Double.class);
@@ -414,52 +336,52 @@ public class FatCatParameters implements ConfigStrucAligParams
 		return params;
 	}
 
-
 	@Override
-	public String toString(){
+	public String toString() {
 		StringWriter writer = new StringWriter();
 		writer.append("[");
-		if ( maxTra == 0)
+		if (maxTra == 0) {
 			writer.append("Mode: rigid, ");
-		else
+		} else {
 			writer.append("Mode: flexible, ");
+		}
 		List<String> params = getUserConfigParameters();
 
-		for ( String s : params){
+		params.stream().map(s -> {
 			writer.append(s);
 			writer.append(": ");
-			Object val = getValue(s);
+			return getValue(s);
+		}).forEach(val -> {
 			writer.append(val.toString());
 			writer.append(", ");
-		}
+		});
 		writer.append("]");
 		return writer.toString();
 	}
 
-	private Object  getValue(String name){
+	private Object getValue(String name) {
 
 		try {
 			String methodName = "get" + name;
 
 			Class<?> paramC = this.getClass();
 
-			Method m =paramC.getMethod(methodName,(Class[])null);
+			Method m = paramC.getMethod(methodName, (Class[]) null);
 
 			Object value = m.invoke(this);
 
 			return value;
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return null;
 		}
-
 
 	}
 
 	/**
-	 * Whether the alignment algorithm should try its best to optimize the alignment,
-	 * or we are happy with a quick and dirty result.
-	 * NB: Not implemented in jFatCat
+	 * Whether the alignment algorithm should try its best to optimize the
+	 * alignment, or we are happy with a quick and dirty result. NB: Not implemented
+	 * in jFatCat
 	 *
 	 * @return optimizeAlignment
 	 */
@@ -468,9 +390,9 @@ public class FatCatParameters implements ConfigStrucAligParams
 	}
 
 	/**
-	 * Whether the alignment algorithm should try its best to optimize the alignment,
-	 * or we are happy with a quick and dirty result.
-	 * NB: Not implemented in jFatCat
+	 * Whether the alignment algorithm should try its best to optimize the
+	 * alignment, or we are happy with a quick and dirty result. NB: Not implemented
+	 * in jFatCat
 	 *
 	 * @param optimizeAlignment
 	 */

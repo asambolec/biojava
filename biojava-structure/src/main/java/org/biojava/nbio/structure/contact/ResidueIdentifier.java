@@ -29,10 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A bean for identifying groups in GroupContactSets.
- * Used only within the contact package to be able to compare
- * contacts between chains of same entity/compound based on residue numbers
- * and independently from chain identifiers.
+ * A bean for identifying groups in GroupContactSets. Used only within the
+ * contact package to be able to compare contacts between chains of same
+ * entity/compound based on residue numbers and independently from chain
+ * identifiers.
  *
  * @author duarte_j
  */
@@ -44,17 +44,18 @@ class ResidueIdentifier implements Serializable {
 
 	private int seqResIndex;
 
-
 	public ResidueIdentifier(Group g) {
 
 		Chain c = g.getChain();
-		if (c==null) {
-			logger.warn("Chain is not available for group {}. Contact comparison will not work for this residue",g.toString());
+		if (c == null) {
+			logger.warn("Chain is not available for group {}. Contact comparison will not work for this residue",
+					g.toString());
 			this.seqResIndex = -1;
 		} else {
 			EntityInfo comp = c.getEntityInfo();
-			if (comp==null) {
-				logger.warn("Compound is not available for group {}. Contact comparison will not work for this residue",g.toString());
+			if (comp == null) {
+				logger.warn("Compound is not available for group {}. Contact comparison will not work for this residue",
+						g.toString());
 				this.seqResIndex = -1;
 			} else {
 				this.seqResIndex = comp.getAlignedResIndex(g, c);
@@ -78,12 +79,15 @@ class ResidueIdentifier implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ResidueIdentifier other = (ResidueIdentifier) obj;
 
 		return this.seqResIndex == other.seqResIndex;

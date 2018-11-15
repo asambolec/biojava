@@ -37,54 +37,62 @@ public class SubunitClustererParameters implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Subunits aligned with these or better scores will be considered "identical".
+	 */
+	private static final double hcSequenceIdentityLocal = 0.95;
+
+	private static final double hcSequenceCoverageLocal = 0.75;
+
+	private static final double hcSequenceIdentityGlobal = 0.85;
+
 	private int minimumSequenceLength = 20;
+
 	private int absoluteMinimumSequenceLength = 5;
+
 	private double minimumSequenceLengthFraction = 0.75;
 
 	private boolean useGlobalMetrics;
+
 	private double sequenceIdentityThreshold;
+
 	private double sequenceCoverageThreshold = 0.75;
 
 	private double rmsdThreshold = 3.0;
+
 	private double structureCoverageThreshold = 0.75;
+
 	private double tmThreshold = 0.5;
 
 	private SubunitClustererMethod clustererMethod = SubunitClustererMethod.SEQUENCE_STRUCTURE;
 
 	private String superpositionAlgorithm = CeMain.algorithmName;
+
 	private boolean optimizeAlignment = true;
 
 	private boolean useSequenceCoverage;
+
 	private boolean useRMSD;
+
 	private boolean useStructureCoverage;
+
 	private boolean useTMScore;
 
 	private boolean internalSymmetry = false;
 
 	/**
-	 * Subunits aligned with these or better scores will be considered "identical".
-	 */
-	private static final double hcSequenceIdentityLocal = 0.95;
-	private static final double hcSequenceCoverageLocal = 0.75;
-	private static final double hcSequenceIdentityGlobal = 0.85;
-
-	/**
-	 * "Local" metrics are scoring
-	 * SubunitClustererMethod.SEQUENCE: sequence identity of a local alignment
-	 *                                  (normalised by the number of aligned residues)
-	 *                                  sequence coverage of the alignment
-	 *                                  (normalised by the length of the longer sequence)
-	 * SubunitClustererMethod.STRUCTURE: RMSD of the aligned substructures
-	 *                                   and structure coverage of the alignment
-	 *                                   (normalised by the length of the larger structure)
-	 * Two thresholds for each method are required.
+	 * "Local" metrics are scoring SubunitClustererMethod.SEQUENCE: sequence
+	 * identity of a local alignment (normalised by the number of aligned residues)
+	 * sequence coverage of the alignment (normalised by the length of the longer
+	 * sequence) SubunitClustererMethod.STRUCTURE: RMSD of the aligned substructures
+	 * and structure coverage of the alignment (normalised by the length of the
+	 * larger structure) Two thresholds for each method are required.
 	 *
-	 * "Global" metrics are scoring
-	 * SubunitClustererMethod.SEQUENCE: sequence identity of a global alignment
-	 *                                  (normalised by the length of the alignment)
+	 * "Global" metrics are scoring SubunitClustererMethod.SEQUENCE: sequence
+	 * identity of a global alignment (normalised by the length of the alignment)
 	 * SubunitClustererMethod.STRUCTURE: TMScore of the aligned structures
-	 *                                  (normalised by the length of the larger structure)
-	 * One threshold for each method is required.
+	 * (normalised by the length of the larger structure) One threshold for each
+	 * method is required.
 	 *
 	 */
 	public SubunitClustererParameters(boolean useGlobalMetrics) {
@@ -134,9 +142,9 @@ public class SubunitClustererParameters implements Serializable {
 
 	/**
 	 * If the shortest subunit sequence length is higher or equal the
-	 * minimumSequenceLengthFraction times the median subunit sequence length,
-	 * then the minimumSequenceLength is set to shortest subunit sequence
-	 * length, but not shorter than the absoluteMinimumSequenceLength.
+	 * minimumSequenceLengthFraction times the median subunit sequence length, then
+	 * the minimumSequenceLength is set to shortest subunit sequence length, but not
+	 * shorter than the absoluteMinimumSequenceLength.
 	 * <p>
 	 * This adaptive feature allows the consideration of structures mainly
 	 * constructed by very short chains, such as collagen (1A3I)
@@ -149,25 +157,24 @@ public class SubunitClustererParameters implements Serializable {
 
 	/**
 	 * If the shortest subunit sequence length is higher or equal the
-	 * minimumSequenceLengthFraction times the median subunit sequence length,
-	 * then the minimumSequenceLength is set to shortest subunit sequence
-	 * length, but not shorter than the absoluteMinimumSequenceLength.
+	 * minimumSequenceLengthFraction times the median subunit sequence length, then
+	 * the minimumSequenceLength is set to shortest subunit sequence length, but not
+	 * shorter than the absoluteMinimumSequenceLength.
 	 * <p>
 	 * This adaptive feature allows the consideration of structures mainly
 	 * constructed by very short chains, such as collagen (1A3I)
 	 * 
 	 * @param absoluteMinimumSequenceLength
 	 */
-	public void setAbsoluteMinimumSequenceLength(
-			int absoluteMinimumSequenceLength) {
+	public void setAbsoluteMinimumSequenceLength(int absoluteMinimumSequenceLength) {
 		this.absoluteMinimumSequenceLength = absoluteMinimumSequenceLength;
 	}
 
 	/**
 	 * If the shortest subunit sequence length is higher or equal the
-	 * minimumSequenceLengthFraction times the median subunit sequence length,
-	 * then the minimumSequenceLength is set to shortest subunit sequence
-	 * length, but not shorter than the absoluteMinimumSequenceLength.
+	 * minimumSequenceLengthFraction times the median subunit sequence length, then
+	 * the minimumSequenceLength is set to shortest subunit sequence length, but not
+	 * shorter than the absoluteMinimumSequenceLength.
 	 * <p>
 	 * This adaptive feature allows the consideration of structures mainly
 	 * constructed by very short chains, such as collagen (1A3I)
@@ -180,25 +187,24 @@ public class SubunitClustererParameters implements Serializable {
 
 	/**
 	 * If the shortest subunit sequence length is higher or equal the
-	 * minimumSequenceLengthFraction times the median subunit sequence length,
-	 * then the minimumSequenceLength is set to shortest subunit sequence
-	 * length, but not shorter than the absoluteMinimumSequenceLength.
+	 * minimumSequenceLengthFraction times the median subunit sequence length, then
+	 * the minimumSequenceLength is set to shortest subunit sequence length, but not
+	 * shorter than the absoluteMinimumSequenceLength.
 	 * <p>
 	 * This adaptive feature allows the consideration of structures mainly
 	 * constructed by very short chains, such as collagen (1A3I)
 	 * 
 	 * @param minimumSequenceLengthFraction
 	 */
-	public void setMinimumSequenceLengthFraction(
-			double minimumSequenceLengthFraction) {
+	public void setMinimumSequenceLengthFraction(double minimumSequenceLengthFraction) {
 		this.minimumSequenceLengthFraction = minimumSequenceLengthFraction;
 	}
 
 	/**
 	 * Sequence identity threshold to consider for the subunits clustering.
 	 * <p>
-	 * Two subunits with sequence identity equal or higher than the threshold
-	 * will be clustered together.
+	 * Two subunits with sequence identity equal or higher than the threshold will
+	 * be clustered together.
 	 * 
 	 * @return sequenceIdentityThreshold
 	 */
@@ -207,11 +213,10 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Sequence identity threshold to consider for the sequence subunit
-	 * clustering.
+	 * Sequence identity threshold to consider for the sequence subunit clustering.
 	 * <p>
-	 * Two subunits with sequence identity equal or higher than the threshold
-	 * will be clustered together.
+	 * Two subunits with sequence identity equal or higher than the threshold will
+	 * be clustered together.
 	 * 
 	 * @param sequenceIdentityThreshold
 	 */
@@ -337,8 +342,8 @@ public class SubunitClustererParameters implements Serializable {
 	 * The {@link SubunitClustererMethod#STRUCTURE} must be chosen to consider
 	 * internal symmetry, otherwise this parameter will be ignored.
 	 * 
-	 * @param internalSymmetry
-	 *            true if internal symmetry is considered, false otherwise
+	 * @param internalSymmetry true if internal symmetry is considered, false
+	 *                         otherwise
 	 */
 	public void setInternalSymmetry(boolean internalSymmetry) {
 		this.internalSymmetry = internalSymmetry;
@@ -346,15 +351,13 @@ public class SubunitClustererParameters implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SubunitClustererParameters [minimumSequenceLength="
-				+ minimumSequenceLength + ", absoluteMinimumSequenceLength="
-				+ absoluteMinimumSequenceLength
-				+ ", minimumSequenceLengthFraction="
-				+ minimumSequenceLengthFraction
-				+ ", sequenceIdentityThreshold=" + sequenceIdentityThreshold
-				+ ", rmsdThreshold=" + rmsdThreshold + ", coverageThreshold="
-				+ sequenceCoverageThreshold + ", clustererMethod=" + clustererMethod
-				+ ", internalSymmetry=" + internalSymmetry + "]";
+		return new StringBuilder().append("SubunitClustererParameters [minimumSequenceLength=")
+				.append(minimumSequenceLength).append(", absoluteMinimumSequenceLength=")
+				.append(absoluteMinimumSequenceLength).append(", minimumSequenceLengthFraction=")
+				.append(minimumSequenceLengthFraction).append(", sequenceIdentityThreshold=")
+				.append(sequenceIdentityThreshold).append(", rmsdThreshold=").append(rmsdThreshold)
+				.append(", coverageThreshold=").append(sequenceCoverageThreshold).append(", clustererMethod=")
+				.append(clustererMethod).append(", internalSymmetry=").append(internalSymmetry).append("]").toString();
 	}
 
 	/**
@@ -376,9 +379,9 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Whether the alignment algorithm should try its best to optimize the alignment,
-	 * or we are happy with a quick and dirty result. Effect depends on implementation
-	 * of the specific algorithm's method.	 *
+	 * Whether the alignment algorithm should try its best to optimize the
+	 * alignment, or we are happy with a quick and dirty result. Effect depends on
+	 * implementation of the specific algorithm's method. *
 	 *
 	 * @return optimizeAlignment
 	 */
@@ -387,9 +390,9 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Whether the alignment algorithm should try its best to optimize the alignment,
-	 * or we are happy with a quick and dirty result. Effect depends on implementation
-	 * of the specific algorithm's method.	 *
+	 * Whether the alignment algorithm should try its best to optimize the
+	 * alignment, or we are happy with a quick and dirty result. Effect depends on
+	 * implementation of the specific algorithm's method. *
 	 *
 	 * @param optimizeAlignment
 	 */
@@ -402,7 +405,9 @@ public class SubunitClustererParameters implements Serializable {
 	 *
 	 * @return useRMSD
 	 */
-	public boolean isUseRMSD() { return useRMSD; }
+	public boolean isUseRMSD() {
+		return useRMSD;
+	}
 
 	/**
 	 * Use RMSD for evaluating structure similarity
@@ -468,8 +473,8 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Use metrics calculated relative to the whole sequence or structure,
-	 * rather than the aligned part only
+	 * Use metrics calculated relative to the whole sequence or structure, rather
+	 * than the aligned part only
 	 *
 	 * @return useGlobalMetrics
 	 */
@@ -478,8 +483,8 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Use metrics calculated relative to the whole sequence or structure,
-	 * rather than the aligned part only
+	 * Use metrics calculated relative to the whole sequence or structure, rather
+	 * than the aligned part only
 	 *
 	 * @param useGlobalMetrics
 	 */
@@ -488,23 +493,23 @@ public class SubunitClustererParameters implements Serializable {
 	}
 
 	/**
-	 * Whether the subunits can be considered "identical" by sequence alignment.
-	 * For local sequence alignment (normalized by the number of aligned pairs)
-	 * this means 0.95 or higher identity and 0.75 or higher coverage.
-	 * For global sequence alignment (normalised by the alignment length)
-	 * this means 0.85 or higher sequence identity.
+	 * Whether the subunits can be considered "identical" by sequence alignment. For
+	 * local sequence alignment (normalized by the number of aligned pairs) this
+	 * means 0.95 or higher identity and 0.75 or higher coverage. For global
+	 * sequence alignment (normalised by the alignment length) this means 0.85 or
+	 * higher sequence identity.
 	 *
 	 * @param sequenceIdentity
 	 * @param sequenceCoverage
-	 * @return true if the sequence alignment scores are equal to
-	 * or better than the "high confidence" scores, false otherwise.
+	 * @return true if the sequence alignment scores are equal to or better than the
+	 *         "high confidence" scores, false otherwise.
 	 */
 	public boolean isHighConfidenceScores(double sequenceIdentity, double sequenceCoverage) {
-		if (useGlobalMetrics)
-			return sequenceIdentity>=hcSequenceIdentityGlobal;
-		else
-			return sequenceIdentity>=hcSequenceIdentityLocal && sequenceCoverage >= hcSequenceCoverageLocal;
+		if (useGlobalMetrics) {
+			return sequenceIdentity >= hcSequenceIdentityGlobal;
+		} else {
+			return sequenceIdentity >= hcSequenceIdentityLocal && sequenceCoverage >= hcSequenceCoverageLocal;
+		}
 	}
-
 
 }

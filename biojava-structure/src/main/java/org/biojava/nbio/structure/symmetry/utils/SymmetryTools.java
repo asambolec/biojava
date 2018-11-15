@@ -81,8 +81,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SymmetryTools {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SymmetryTools.class);
+	private static final Logger logger = LoggerFactory.getLogger(SymmetryTools.class);
 
 	/** Prevent instantiation. */
 	private SymmetryTools() {
@@ -101,19 +100,18 @@ public class SymmetryTools {
 	 * @param gradientExpCoeff
 	 * @return
 	 */
-	private static double getResetVal(double unpenalizedScore,
-			double nResFromMainDiag, double[] gradientPolyCoeff,
+	private static double getResetVal(double unpenalizedScore, double nResFromMainDiag, double[] gradientPolyCoeff,
 			double gradientExpCoeff) {
 
-		if (Double.isNaN(unpenalizedScore))
+		if (Double.isNaN(unpenalizedScore)) {
 			return 0; // what else?
+		}
 
 		// We can actually return a positive value if this is high enough
 		double updateVal = unpenalizedScore;
 		updateVal -= gradientExpCoeff * Math.pow(Math.E, -nResFromMainDiag);
 		for (int p = 0; p < gradientPolyCoeff.length; p++) {
-			updateVal -= gradientPolyCoeff[gradientPolyCoeff.length - 1 - p]
-					* Math.pow(nResFromMainDiag, -p);
+			updateVal -= gradientPolyCoeff[gradientPolyCoeff.length - 1 - p] * Math.pow(nResFromMainDiag, -p);
 		}
 		return updateVal;
 	}
@@ -122,24 +120,18 @@ public class SymmetryTools {
 	 * Grays out the main diagonal of a duplicated distance matrix.
 	 *
 	 * @param ca2
-	 * @param rows
-	 *            Number of rows
-	 * @param cols
-	 *            Number of original columns
-	 * @param calculator
-	 *            Used to get the matrix if origM is null
-	 * @param origM
-	 *            starting matrix. If null, uses
-	 *            {@link CECalculator#getMatMatrix()}
-	 * @param blankWindowSize
-	 *            Width of section to gray out
+	 * @param rows              Number of rows
+	 * @param cols              Number of original columns
+	 * @param calculator        Used to get the matrix if origM is null
+	 * @param origM             starting matrix. If null, uses
+	 *                          {@link CECalculator#getMatMatrix()}
+	 * @param blankWindowSize   Width of section to gray out
 	 * @param gradientPolyCoeff
 	 * @param gradientExpCoeff
 	 * @return
 	 */
-	public static Matrix grayOutCEOrig(Atom[] ca2, int rows, int cols,
-			CECalculator calculator, Matrix origM, int blankWindowSize,
-			double[] gradientPolyCoeff, double gradientExpCoeff) {
+	public static Matrix grayOutCEOrig(Atom[] ca2, int rows, int cols, CECalculator calculator, Matrix origM,
+			int blankWindowSize, double[] gradientPolyCoeff, double gradientExpCoeff) {
 
 		if (origM == null) {
 			origM = new Matrix(calculator.getMatMatrix());
@@ -151,8 +143,7 @@ public class SymmetryTools {
 			for (int j = 0; j < cols; j++) {
 				int diff = Math.abs(i - j);
 
-				double resetVal = getResetVal(origM.get(i, j), diff,
-						gradientPolyCoeff, gradientExpCoeff);
+				double resetVal = getResetVal(origM.get(i, j), diff, gradientPolyCoeff, gradientExpCoeff);
 
 				if (diff < blankWindowSize) {
 					origM.set(i, j, origM.get(i, j) + resetVal);
@@ -160,8 +151,7 @@ public class SymmetryTools {
 				}
 				int diff2 = Math.abs(i - (j - ca2.length / 2)); // other side
 
-				double resetVal2 = getResetVal(origM.get(i, j), diff2,
-						gradientPolyCoeff, gradientExpCoeff);
+				double resetVal2 = getResetVal(origM.get(i, j), diff2, gradientPolyCoeff, gradientExpCoeff);
 
 				if (diff2 < blankWindowSize) {
 					origM.set(i, j, origM.get(i, j) + resetVal2);
@@ -172,13 +162,11 @@ public class SymmetryTools {
 		return origM;
 	}
 
-	public static Matrix grayOutPreviousAlignment(AFPChain afpChain,
-			Atom[] ca2, int rows, int cols, CECalculator calculator,
-			Matrix max, int blankWindowSize, double[] gradientPolyCoeff,
+	public static Matrix grayOutPreviousAlignment(AFPChain afpChain, Atom[] ca2, int rows, int cols,
+			CECalculator calculator, Matrix max, int blankWindowSize, double[] gradientPolyCoeff,
 			double gradientExpCoeff) {
 
-		max = grayOutCEOrig(ca2, rows, cols, calculator, max, blankWindowSize,
-				gradientPolyCoeff, gradientExpCoeff);
+		max = grayOutCEOrig(ca2, rows, cols, calculator, max, blankWindowSize, gradientPolyCoeff, gradientExpCoeff);
 
 		double[][] dist1 = calculator.getDist1();
 		double[][] dist2 = calculator.getDist2();
@@ -207,63 +195,50 @@ public class SymmetryTools {
 					// blank diagonal of dist1
 					for (int k = 0; k < blankWindowSize / 2; k++) {
 						if (i1 - k >= 0) {
-							double resetVal = getResetVal(
-									max.get(i1 - k, i1 - k), 0,
-									gradientPolyCoeff, gradientExpCoeff);
+							double resetVal = getResetVal(max.get(i1 - k, i1 - k), 0, gradientPolyCoeff,
+									gradientExpCoeff);
 							dist1[i1 - k][i1 - k] = resetVal;
 						} else if (i1 + k < rows) {
-							double resetVal = getResetVal(
-									max.get(i1 + k, i1 + k), 0,
-									gradientPolyCoeff, gradientExpCoeff);
+							double resetVal = getResetVal(max.get(i1 + k, i1 + k), 0, gradientPolyCoeff,
+									gradientExpCoeff);
 							dist1[i1 + k][i1 + k] = resetVal;
 						}
 
 					}
 
 					for (int j2 = start2; j2 < end2; j2++) {
-						double resetVal = getResetVal(max.get(i1, j2),
-								Math.abs(i1 - j2), gradientPolyCoeff,
+						double resetVal = getResetVal(max.get(i1, j2), Math.abs(i1 - j2), gradientPolyCoeff,
 								gradientExpCoeff);
 						max.set(i1, j2, resetVal);
 						if (j2 < breakPoint) {
-							double resetVal2 = getResetVal(
-									max.get(i1, j2 + breakPoint),
-									Math.abs(i1 - (j2 + breakPoint)),
-									gradientPolyCoeff, gradientExpCoeff);
+							double resetVal2 = getResetVal(max.get(i1, j2 + breakPoint),
+									Math.abs(i1 - (j2 + breakPoint)), gradientPolyCoeff, gradientExpCoeff);
 							max.set(i1, j2 + breakPoint, resetVal2);
 						} else {
-							double resetVal2 = getResetVal(
-									max.get(i1, j2 - breakPoint),
-									Math.abs(i1 - (j2 - breakPoint)),
-									gradientPolyCoeff, gradientExpCoeff);
+							double resetVal2 = getResetVal(max.get(i1, j2 - breakPoint),
+									Math.abs(i1 - (j2 - breakPoint)), gradientPolyCoeff, gradientExpCoeff);
 							max.set(i1, j2 - breakPoint, resetVal2);
 						}
 						for (int k = 0; k < blankWindowSize / 2; k++) {
 							if (j2 - k >= 0) {
 								if (j2 - k < breakPoint) {
-									double resetVal2 = getResetVal(
-											max.get(j2 - k, j2 - k), 0,
-											gradientPolyCoeff, gradientExpCoeff);
+									double resetVal2 = getResetVal(max.get(j2 - k, j2 - k), 0, gradientPolyCoeff,
+											gradientExpCoeff);
 									dist2[j2 - k][j2 - k] = resetVal2;
 								} else {
-									double resetVal2 = getResetVal(max.get(j2
-											- k - breakPoint, j2 - k), 0,
+									double resetVal2 = getResetVal(max.get(j2 - k - breakPoint, j2 - k), 0,
 											gradientPolyCoeff, gradientExpCoeff);
-									dist2[j2 - k - breakPoint][j2 - k
-											- breakPoint] = resetVal2;
+									dist2[j2 - k - breakPoint][j2 - k - breakPoint] = resetVal2;
 								}
 							} else if (j2 + k < cols) {
 								if (j2 + k < breakPoint) {
-									double resetVal2 = getResetVal(
-											max.get(j2 + k, j2 + k), 0,
-											gradientPolyCoeff, gradientExpCoeff);
+									double resetVal2 = getResetVal(max.get(j2 + k, j2 + k), 0, gradientPolyCoeff,
+											gradientExpCoeff);
 									dist2[j2 + k][j2 + k] = resetVal2;
 								} else {
-									double resetVal2 = getResetVal(max.get(j2
-											+ k - breakPoint, j2 + k), 0,
+									double resetVal2 = getResetVal(max.get(j2 + k - breakPoint, j2 + k), 0,
 											gradientPolyCoeff, gradientExpCoeff);
-									dist2[j2 + k - breakPoint][j2 + k
-											- breakPoint] = resetVal2;
+									dist2[j2 + k - breakPoint][j2 + k - breakPoint] = resetVal2;
 								}
 							}
 						}
@@ -278,8 +253,8 @@ public class SymmetryTools {
 
 	}
 
-	public Matrix getDkMatrix(Atom[] ca1, Atom[] ca2, int fragmentLength,
-			double[] dist1, double[] dist2, int rows, int cols) {
+	public Matrix getDkMatrix(Atom[] ca1, Atom[] ca2, int fragmentLength, double[] dist1, double[] dist2, int rows,
+			int cols) {
 
 		Matrix diffDistMax = Matrix.identity(ca1.length, ca2.length);
 
@@ -320,21 +295,19 @@ public class SymmetryTools {
 
 	}
 
-	public static Matrix blankOutPreviousAlignment(AFPChain afpChain,
-			Atom[] ca2, int rows, int cols, CECalculator calculator,
-			Matrix max, int blankWindowSize) {
-		return grayOutPreviousAlignment(afpChain, ca2, rows, cols, calculator,
-				max, blankWindowSize, new double[] { Integer.MIN_VALUE }, 0.0);
+	public static Matrix blankOutPreviousAlignment(AFPChain afpChain, Atom[] ca2, int rows, int cols,
+			CECalculator calculator, Matrix max, int blankWindowSize) {
+		return grayOutPreviousAlignment(afpChain, ca2, rows, cols, calculator, max, blankWindowSize,
+				new double[] { Integer.MIN_VALUE }, 0.0);
 	}
 
-	public static Matrix blankOutCEOrig(Atom[] ca2, int rows, int cols,
-			CECalculator calculator, Matrix origM, int blankWindowSize) {
-		return grayOutCEOrig(ca2, rows, cols, calculator, origM,
-				blankWindowSize, new double[] { Integer.MIN_VALUE }, 0.0);
+	public static Matrix blankOutCEOrig(Atom[] ca2, int rows, int cols, CECalculator calculator, Matrix origM,
+			int blankWindowSize) {
+		return grayOutCEOrig(ca2, rows, cols, calculator, origM, blankWindowSize, new double[] { Integer.MIN_VALUE },
+				0.0);
 	}
 
-	public static Matrix getDkMatrix(Atom[] ca1, Atom[] ca2, int k,
-			int fragmentLength) {
+	public static Matrix getDkMatrix(Atom[] ca1, Atom[] ca2, int k, int fragmentLength) {
 
 		double[] dist1 = AlignUtils.getDiagonalAtK(ca1, k);
 		double[] dist2 = AlignUtils.getDiagonalAtK(ca2, k);
@@ -367,9 +340,8 @@ public class SymmetryTools {
 		return m2;
 	}
 
-	public static boolean[][] blankOutBreakFlag(AFPChain afpChain, Atom[] ca2,
-			int rows, int cols, CECalculator calculator, boolean[][] breakFlag,
-			int blankWindowSize) {
+	public static boolean[][] blankOutBreakFlag(AFPChain afpChain, Atom[] ca2, int rows, int cols,
+			CECalculator calculator, boolean[][] breakFlag, int blankWindowSize) {
 
 		int[][][] optAln = afpChain.getOptAln();
 		int blockNum = afpChain.getBlockNum();
@@ -413,8 +385,8 @@ public class SymmetryTools {
 
 	/**
 	 * Returns the <em>magnitude</em> of the angle between the first and second
-	 * blocks of {@code afpChain}, measured in degrees. This is always a
-	 * positive value (unsigned).
+	 * blocks of {@code afpChain}, measured in degrees. This is always a positive
+	 * value (unsigned).
 	 *
 	 * @param afpChain
 	 * @param ca1
@@ -427,57 +399,51 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Converts a set of AFP alignments into a Graph of aligned residues, where
-	 * each vertex is a residue and each edge means the connection between the
-	 * two residues in one of the alignments.
+	 * Converts a set of AFP alignments into a Graph of aligned residues, where each
+	 * vertex is a residue and each edge means the connection between the two
+	 * residues in one of the alignments.
 	 *
-	 * @param afps
-	 *            List of AFPChains
-	 * @param atoms
-	 *            Atom array of the symmetric structure
-	 * @param undirected
-	 *            if true, the graph is undirected
+	 * @param afps       List of AFPChains
+	 * @param atoms      Atom array of the symmetric structure
+	 * @param undirected if true, the graph is undirected
 	 *
 	 * @return adjacency List of aligned residues
 	 */
-	public static List<List<Integer>> buildSymmetryGraph(List<AFPChain> afps,
-			Atom[] atoms, boolean undirected) {
+	public static List<List<Integer>> buildSymmetryGraph(List<AFPChain> afps, Atom[] atoms, boolean undirected) {
 
-		List<List<Integer>> graph = new ArrayList<List<Integer>>();
+		List<List<Integer>> graph = new ArrayList<>();
 
-		for (int n = 0; n < atoms.length; n++) {
+		for (Atom atom : atoms) {
 			graph.add(new ArrayList<Integer>());
 		}
 
-		for (int k = 0; k < afps.size(); k++) {
-			for (int i = 0; i < afps.get(k).getOptAln().length; i++) {
-				for (int j = 0; j < afps.get(k).getOptAln()[i][0].length; j++) {
-					Integer res1 = afps.get(k).getOptAln()[i][0][j];
-					Integer res2 = afps.get(k).getOptAln()[i][1][j];
+		afps.forEach(afp -> {
+			for (int i = 0; i < afp.getOptAln().length; i++) {
+				for (int j = 0; j < afp.getOptAln()[i][0].length; j++) {
+					Integer res1 = afp.getOptAln()[i][0][j];
+					Integer res2 = afp.getOptAln()[i][1][j];
 					graph.get(res1).add(res2);
-					if (undirected)
+					if (undirected) {
 						graph.get(res2).add(res1);
+					}
 				}
 			}
-		}
+		});
 		return graph;
 	}
 
 	/**
-	 * Converts a self alignment into a directed jGraphT of aligned residues,
-	 * where each vertex is a residue and each edge means the equivalence
-	 * between the two residues in the self-alignment.
+	 * Converts a self alignment into a directed jGraphT of aligned residues, where
+	 * each vertex is a residue and each edge means the equivalence between the two
+	 * residues in the self-alignment.
 	 *
-	 * @param selfAlignment
-	 *            AFPChain
+	 * @param selfAlignment AFPChain
 	 *
 	 * @return alignment Graph
 	 */
-	public static Graph<Integer, DefaultEdge> buildSymmetryGraph(
-			AFPChain selfAlignment) {
+	public static Graph<Integer, DefaultEdge> buildSymmetryGraph(AFPChain selfAlignment) {
 
-		Graph<Integer, DefaultEdge> graph = new SimpleGraph<Integer, DefaultEdge>(
-				DefaultEdge.class);
+		Graph<Integer, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
 
 		for (int i = 0; i < selfAlignment.getOptAln().length; i++) {
 			for (int j = 0; j < selfAlignment.getOptAln()[i][0].length; j++) {
@@ -495,24 +461,22 @@ public class SymmetryTools {
 	 * Method that converts the symmetric units of a structure into different
 	 * structures, so that they can be individually visualized.
 	 *
-	 * @param symmetry
-	 *            CeSymmResult
+	 * @param symmetry CeSymmResult
 	 * @throws StructureException
 	 * @result List of structures, by repeat index sequentially
 	 * 
 	 */
-	public static List<Structure> divideStructure(CeSymmResult symmetry)
-			throws StructureException {
+	public static List<Structure> divideStructure(CeSymmResult symmetry) throws StructureException {
 
-		if (!symmetry.isRefined())
-			throw new IllegalArgumentException("The symmetry result "
-					+ "is not refined, repeats cannot be defined");
+		if (!symmetry.isRefined()) {
+			throw new IllegalArgumentException("The symmetry result " + "is not refined, repeats cannot be defined");
+		}
 
 		int order = symmetry.getMultipleAlignment().size();
 		Atom[] atoms = symmetry.getAtoms();
 		Set<Group> allGroups = StructureTools.getAllGroupsFromSubset(atoms, GroupType.HETATM);
 		List<StructureIdentifier> repeatsId = symmetry.getRepeatsID();
-		List<Structure> repeats = new ArrayList<Structure>(order);
+		List<Structure> repeats = new ArrayList<>(order);
 
 		// Create new structure containing the repeat atoms
 		for (int i = 0; i < order; i++) {
@@ -526,27 +490,25 @@ public class SymmetryTools {
 			// Repeats are always sequential blocks
 			int res1 = align.getStartResidue(i);
 			int res2 = align.getFinalResidue(i);
-			
+
 			// All atoms from the repeat, used for ligand search
 			// AA have an average of 8.45 atoms, so guess capacity with that
-			List<Atom> repeat = new ArrayList<>(Math.max(9*(res2-res1+1),9));
+			List<Atom> repeat = new ArrayList<>(Math.max(9 * (res2 - res1 + 1), 9));
 			// speedy chain lookup
 			Chain prevChain = null;
-			for(int k=res1;k<=res2; k++) {
+			for (int k = res1; k <= res2; k++) {
 				Group g = atoms[k].getGroup();
-				prevChain = StructureTools.addGroupToStructure(s, g, 0, prevChain,true);
+				prevChain = StructureTools.addGroupToStructure(s, g, 0, prevChain, true);
 				repeat.addAll(g.getAtoms());
 			}
 
-			
-			List<Group> ligands = StructureTools.getLigandsByProximity(
-					allGroups,
-					repeat.toArray(new Atom[repeat.size()]),
-					StructureTools.DEFAULT_LIGAND_PROXIMITY_CUTOFF);
-			
-			logger.warn("Adding {} ligands to {}",ligands.size(), symmetry.getMultipleAlignment().getStructureIdentifier(i));
-			for( Group ligand : ligands) {
-				prevChain = StructureTools.addGroupToStructure(s, ligand, 0, prevChain,true);
+			List<Group> ligands = StructureTools.getLigandsByProximity(allGroups,
+					repeat.toArray(new Atom[repeat.size()]), StructureTools.DEFAULT_LIGAND_PROXIMITY_CUTOFF);
+
+			logger.warn("Adding {} ligands to {}", ligands.size(),
+					symmetry.getMultipleAlignment().getStructureIdentifier(i));
+			for (Group ligand : ligands) {
+				prevChain = StructureTools.addGroupToStructure(s, ligand, 0, prevChain, true);
 			}
 
 			repeats.add(s);
@@ -555,21 +517,20 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Method that converts a repeats symmetric alignment into an alignment of
-	 * whole structures.
+	 * Method that converts a repeats symmetric alignment into an alignment of whole
+	 * structures.
 	 * <p>
-	 * Example: if the structure has repeats A,B and C, the original alignment
-	 * is A-B-C, and the returned alignment is ABC-BCA-CAB.
+	 * Example: if the structure has repeats A,B and C, the original alignment is
+	 * A-B-C, and the returned alignment is ABC-BCA-CAB.
 	 *
-	 * @param symm
-	 *            CeSymmResult
+	 * @param symm CeSymmResult
 	 * @return MultipleAlignment of the full structure superpositions
 	 */
 	public static MultipleAlignment toFullAlignment(CeSymmResult symm) {
 
-		if (!symm.isRefined())
-			throw new IllegalArgumentException("The symmetry result "
-					+ "is not refined, repeats cannot be defined");
+		if (!symm.isRefined()) {
+			throw new IllegalArgumentException("The symmetry result " + "is not refined, repeats cannot be defined");
+		}
 
 		MultipleAlignment full = symm.getMultipleAlignment().clone();
 
@@ -584,26 +545,23 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Method that converts a symmetry alignment into an alignment of the
-	 * repeats only, as new independent structures.
+	 * Method that converts a symmetry alignment into an alignment of the repeats
+	 * only, as new independent structures.
 	 * <p>
-	 * This method changes the structure identifiers, the Atom arrays and
-	 * re-scles the aligned residues in the Blocks corresponding to those
-	 * changes.
+	 * This method changes the structure identifiers, the Atom arrays and re-scles
+	 * the aligned residues in the Blocks corresponding to those changes.
 	 * <p>
 	 * Application: display superimposed repeats in Jmol.
 	 *
-	 * @param result
-	 *            CeSymmResult of symmetry
+	 * @param result CeSymmResult of symmetry
 	 * @return MultipleAlignment of the repeats
 	 * @throws StructureException
 	 */
-	public static MultipleAlignment toRepeatsAlignment(CeSymmResult result)
-			throws StructureException {
+	public static MultipleAlignment toRepeatsAlignment(CeSymmResult result) throws StructureException {
 
-		if (!result.isRefined())
-			throw new IllegalArgumentException("The symmetry result "
-					+ "is not refined, repeats cannot be defined");
+		if (!result.isRefined()) {
+			throw new IllegalArgumentException("The symmetry result " + "is not refined, repeats cannot be defined");
+		}
 
 		MultipleAlignment msa = result.getMultipleAlignment();
 		MultipleAlignmentEnsemble newEnsemble = msa.getEnsemble().clone();
@@ -612,10 +570,9 @@ public class SymmetryTools {
 
 		MultipleAlignment repeats = newEnsemble.getMultipleAlignment(0);
 		Block block = repeats.getBlock(0);
-		List<Atom[]> atomArrays = new ArrayList<Atom[]>();
+		List<Atom[]> atomArrays = new ArrayList<>();
 
-		for (Structure s : repSt)
-			atomArrays.add(StructureTools.getRepresentativeAtomArray(s));
+		repSt.forEach(s -> atomArrays.add(StructureTools.getRepresentativeAtomArray(s)));
 
 		newEnsemble.setAtomArrays(atomArrays);
 
@@ -625,8 +582,9 @@ public class SymmetryTools {
 			// Normalize aligned residues
 			for (int res = 0; res < block.length(); res++) {
 				Integer residue = block.getAlignRes().get(su).get(res);
-				if (residue != null)
+				if (residue != null) {
 					residue -= start;
+				}
 				block.getAlignRes().get(su).set(res, residue);
 			}
 		}
@@ -636,47 +594,42 @@ public class SymmetryTools {
 
 	/**
 	 * Converts a refined symmetry AFPChain alignment into the standard
-	 * representation of symmetry in a MultipleAlignment, that contains the
-	 * entire Atom array of the strcuture and the symmetric repeats are orgaized
-	 * in different rows in a single Block.
+	 * representation of symmetry in a MultipleAlignment, that contains the entire
+	 * Atom array of the strcuture and the symmetric repeats are orgaized in
+	 * different rows in a single Block.
 	 *
-	 * @param symm
-	 *            AFPChain created with a symmetry algorithm and refined
-	 * @param atoms
-	 *            Atom array of the entire structure
+	 * @param symm  AFPChain created with a symmetry algorithm and refined
+	 * @param atoms Atom array of the entire structure
 	 * @return MultipleAlignment format of the symmetry
 	 * @throws StructureException
 	 */
-	public static MultipleAlignment fromAFP(AFPChain symm, Atom[] atoms)
-			throws StructureException {
+	public static MultipleAlignment fromAFP(AFPChain symm, Atom[] atoms) throws StructureException {
 
 		if (!symm.getAlgorithmName().contains("symm")) {
-			throw new IllegalArgumentException(
-					"The input alignment is not a symmetry alignment.");
+			throw new IllegalArgumentException("The input alignment is not a symmetry alignment.");
 		}
 
-		MultipleAlignmentEnsemble e = new MultipleAlignmentEnsembleImpl(symm,
-				atoms, atoms, false);
-		e.setAtomArrays(new ArrayList<Atom[]>());
+		MultipleAlignmentEnsemble e = new MultipleAlignmentEnsembleImpl(symm, atoms, atoms, false);
+		e.setAtomArrays(new ArrayList<>());
 		StructureIdentifier name = null;
 		if (e.getStructureIdentifiers() != null) {
-			if (!e.getStructureIdentifiers().isEmpty())
+			if (!e.getStructureIdentifiers().isEmpty()) {
 				name = e.getStructureIdentifiers().get(0);
-		} else
-			name = atoms[0].getGroup().getChain().getStructure()
-					.getStructureIdentifier();
+			}
+		} else {
+			name = atoms[0].getGroup().getChain().getStructure().getStructureIdentifier();
+		}
 
-		e.setStructureIdentifiers(new ArrayList<StructureIdentifier>());
+		e.setStructureIdentifiers(new ArrayList<>());
 
 		MultipleAlignment result = new MultipleAlignmentImpl();
 		BlockSet bs = new BlockSetImpl(result);
 		Block b = new BlockImpl(bs);
-		b.setAlignRes(new ArrayList<List<Integer>>());
+		b.setAlignRes(new ArrayList<>());
 
 		int order = symm.getBlockNum();
 		for (int su = 0; su < order; su++) {
-			List<Integer> residues = e.getMultipleAlignment(0).getBlock(su)
-					.getAlignRes().get(0);
+			List<Integer> residues = e.getMultipleAlignment(0).getBlock(su).getAlignRes().get(0);
 			b.getAlignRes().add(residues);
 			e.getStructureIdentifiers().add(name);
 			e.getAtomArrays().add(atoms);
@@ -692,23 +645,19 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Given a symmetry result, it calculates the overall global symmetry,
-	 * factoring out the alignment and detection steps of
-	 * {@link QuatSymmetryDetector} algorithm.
+	 * Given a symmetry result, it calculates the overall global symmetry, factoring
+	 * out the alignment and detection steps of {@link QuatSymmetryDetector}
+	 * algorithm.
 	 *
-	 * @param result
-	 *            symmetry result
+	 * @param result symmetry result
 	 * @return global symmetry results
 	 * @throws StructureException
 	 */
-	public static QuatSymmetryResults getQuaternarySymmetry(CeSymmResult result)
-			throws StructureException {
+	public static QuatSymmetryResults getQuaternarySymmetry(CeSymmResult result) throws StructureException {
 
 		// Obtain the subunits of the repeats
 		List<Atom[]> atoms = toRepeatsAlignment(result).getAtomArrays();
-		List<Subunit> subunits = atoms.stream()
-				.map(a -> new Subunit(a, null, null, null))
-				.collect(Collectors.toList());
+		List<Subunit> subunits = atoms.stream().map(a -> new Subunit(a, null, null, null)).collect(Collectors.toList());
 
 		// The clustering thresholds are set to 0 so that all always merged
 		SubunitClustererParameters cp = new SubunitClustererParameters();
@@ -718,53 +667,50 @@ public class SymmetryTools {
 
 		QuatSymmetryParameters sp = new QuatSymmetryParameters();
 
-		QuatSymmetryResults gSymmetry = QuatSymmetryDetector
-				.calcGlobalSymmetry(subunits, sp, cp);
+		QuatSymmetryResults gSymmetry = QuatSymmetryDetector.calcGlobalSymmetry(subunits, sp, cp);
 
 		return gSymmetry;
 	}
 
 	/**
-	 * Returns the List of Groups of the corresponding representative Atom
-	 * array. The representative Atom array needs to fulfill: no two Atoms are
-	 * from the same Group and Groups are sequential (connected in the original
-	 * Structure), except if they are from different Chains.
+	 * Returns the List of Groups of the corresponding representative Atom array.
+	 * The representative Atom array needs to fulfill: no two Atoms are from the
+	 * same Group and Groups are sequential (connected in the original Structure),
+	 * except if they are from different Chains.
 	 *
-	 * @param rAtoms
-	 *            array of representative Atoms (CA, P, etc).
+	 * @param rAtoms array of representative Atoms (CA, P, etc).
 	 * @return List of Groups
 	 */
 	public static List<Group> getGroups(Atom[] rAtoms) {
 
-		List<Group> groups = new ArrayList<Group>(rAtoms.length);
+		List<Group> groups = new ArrayList<>(rAtoms.length);
 
 		for (Atom a : rAtoms) {
 			Group g = a.getGroup();
-			if (g != null)
+			if (g != null) {
 				groups.add(g);
-			else
+			} else {
 				logger.info("Group not found for representative Atom {}", a);
+			}
 		}
 		return groups;
 	}
 
 	/**
-	 * Calculates the set of symmetry operation Matrices (transformations) of
-	 * the new alignment, based on the symmetry relations in the SymmetryAxes
-	 * object. It sets the transformations to the input MultipleAlignment and
-	 * SymmetryAxes objects. If the SymmetryAxes object is null, the
-	 * superposition of the repeats is done without symmetry constraints.
+	 * Calculates the set of symmetry operation Matrices (transformations) of the
+	 * new alignment, based on the symmetry relations in the SymmetryAxes object. It
+	 * sets the transformations to the input MultipleAlignment and SymmetryAxes
+	 * objects. If the SymmetryAxes object is null, the superposition of the repeats
+	 * is done without symmetry constraints.
 	 * <p>
 	 * This method also sets the scores (RMSD and TM-score) after the new
 	 * superposition has been updated.
 	 *
-	 * @param axes
-	 *            SymmetryAxes object. It will be modified.
-	 * @param msa
-	 *            MultipleAlignment. It will be modified.
+	 * @param axes SymmetryAxes object. It will be modified.
+	 * @param msa  MultipleAlignment. It will be modified.
 	 */
-	public static void updateSymmetryTransformation(SymmetryAxes axes,
-			MultipleAlignment msa) throws StructureException {
+	public static void updateSymmetryTransformation(SymmetryAxes axes, MultipleAlignment msa)
+			throws StructureException {
 
 		List<List<Integer>> block = msa.getBlocks().get(0).getAlignRes();
 		int length = block.get(0).size();
@@ -773,15 +719,14 @@ public class SymmetryTools {
 			for (int level = 0; level < axes.getNumLevels(); level++) {
 
 				// Calculate the aligned atom arrays to superimpose
-				List<Atom> list1 = new ArrayList<Atom>();
-				List<Atom> list2 = new ArrayList<Atom>();
+				List<Atom> list1 = new ArrayList<>();
+				List<Atom> list2 = new ArrayList<>();
 
 				for (int firstRepeat : axes.getFirstRepeats(level)) {
 
 					Matrix4d transform = axes.getRepeatTransform(firstRepeat);
 
-					List<List<Integer>> relation = axes.getRepeatRelation(
-							level, firstRepeat);
+					List<List<Integer>> relation = axes.getRepeatRelation(level, firstRepeat);
 
 					for (int index = 0; index < relation.get(0).size(); index++) {
 						int p1 = relation.get(0).get(index);
@@ -791,10 +736,8 @@ public class SymmetryTools {
 							Integer pos1 = block.get(p1).get(k);
 							Integer pos2 = block.get(p2).get(k);
 							if (pos1 != null && pos2 != null) {
-								Atom a = (Atom) msa.getAtomArrays().get(p1)[pos1]
-										.clone();
-								Atom b = (Atom) msa.getAtomArrays().get(p2)[pos2]
-										.clone();
+								Atom a = (Atom) msa.getAtomArrays().get(p1)[pos1].clone();
+								Atom b = (Atom) msa.getAtomArrays().get(p2)[pos2].clone();
 								Calc.transform(a, transform);
 								Calc.transform(b, transform);
 								list1.add(a);
@@ -809,14 +752,12 @@ public class SymmetryTools {
 
 				// Calculate the new transformation information
 				if (arr1.length > 0 && arr2.length > 0) {
-					Matrix4d axis = SuperPositions.superpose(
-							Calc.atomsToPoints(arr1), 
-							Calc.atomsToPoints(arr2));
+					Matrix4d axis = SuperPositions.superpose(Calc.atomsToPoints(arr1), Calc.atomsToPoints(arr2));
 					axes.updateAxis(level, axis);
 				}
 
 				// Get the transformations from the SymmetryAxes
-				List<Matrix4d> transformations = new ArrayList<Matrix4d>();
+				List<Matrix4d> transformations = new ArrayList<>();
 				for (int su = 0; su < msa.size(); su++) {
 					transformations.add(axes.getRepeatTransform(su));
 				}
@@ -830,19 +771,16 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Update the scores (TM-score and RMSD) of a symmetry multiple alignment.
-	 * This method does not redo the superposition of the alignment.
+	 * Update the scores (TM-score and RMSD) of a symmetry multiple alignment. This
+	 * method does not redo the superposition of the alignment.
 	 *
-	 * @param symm
-	 *            Symmetry Multiple Alignment of Repeats
+	 * @param symm Symmetry Multiple Alignment of Repeats
 	 * @throws StructureException
 	 */
-	public static void updateSymmetryScores(MultipleAlignment symm)
-			throws StructureException {
+	public static void updateSymmetryScores(MultipleAlignment symm) throws StructureException {
 
 		// Multiply by the order of symmetry to normalize score
-		double tmScore = MultipleAlignmentScorer.getAvgTMScore(symm)
-				* symm.size();
+		double tmScore = MultipleAlignmentScorer.getAvgTMScore(symm) * symm.size();
 		double rmsd = MultipleAlignmentScorer.getRMSD(symm);
 
 		symm.putScore(MultipleAlignmentScorer.AVGTM_SCORE, tmScore);
@@ -850,26 +788,24 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Returns the representative Atom Array of the first model, if the
-	 * structure is NMR, or the Array for each model, if it is a biological
-	 * assembly with multiple models.
+	 * Returns the representative Atom Array of the first model, if the structure is
+	 * NMR, or the Array for each model, if it is a biological assembly with
+	 * multiple models.
 	 * 
 	 * @param structure
 	 * @return representative Atom[]
 	 */
 	public static Atom[] getRepresentativeAtoms(Structure structure) {
 
-		if (structure.isNmr())
+		if (structure.isNmr()) {
 			return StructureTools.getRepresentativeAtomArray(structure);
-
-		else {
+		} else {
 
 			// Get Atoms of all models
-			List<Atom> atomList = new ArrayList<Atom>();
+			List<Atom> atomList = new ArrayList<>();
 			for (int m = 0; m < structure.nrModels(); m++) {
-				for (Chain c : structure.getModel(m))
-					atomList.addAll(Arrays.asList(StructureTools
-							.getRepresentativeAtomArray(c)));
+				structure.getModel(m)
+						.forEach(c -> atomList.addAll(Arrays.asList(StructureTools.getRepresentativeAtomArray(c))));
 			}
 			return atomList.toArray(new Atom[0]);
 		}
@@ -877,25 +813,25 @@ public class SymmetryTools {
 	}
 
 	/**
-	 * Find valid symmetry orders for a given stoichiometry. For instance, an
-	 * A6B4 protein would give [1,2] because (A6B4)1 and (A3B2)2 are valid
+	 * Find valid symmetry orders for a given stoichiometry. For instance, an A6B4
+	 * protein would give [1,2] because (A6B4)1 and (A3B2)2 are valid
 	 * decompositions.
 	 * 
-	 * @param stoichiometry
-	 *            List giving the number of copies in each Subunit cluster
+	 * @param stoichiometry List giving the number of copies in each Subunit cluster
 	 * @return The common factors of the stoichiometry
 	 */
 	public static List<Integer> getValidFolds(List<Integer> stoichiometry) {
 
-		List<Integer> denominators = new ArrayList<Integer>();
+		List<Integer> denominators = new ArrayList<>();
 
-		if (stoichiometry.isEmpty())
+		if (stoichiometry.isEmpty()) {
 			return denominators;
+		}
 
 		int nChains = Collections.max(stoichiometry);
 
 		// Remove duplicate stoichiometries
-		Set<Integer> nominators = new TreeSet<Integer>(stoichiometry);
+		Set<Integer> nominators = new TreeSet<>(stoichiometry);
 
 		// find common denominators
 		for (int d = 1; d <= nChains; d++) {

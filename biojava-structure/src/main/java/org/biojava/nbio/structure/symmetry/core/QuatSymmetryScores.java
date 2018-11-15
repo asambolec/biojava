@@ -45,78 +45,91 @@ public class QuatSymmetryScores {
 	public double getMinRmsd() {
 		return minRmsd;
 	}
+
 	/**
 	 * @param minRmsd the minRmsd to set
 	 */
 	public void setMinRmsd(double minRmsd) {
 		this.minRmsd = minRmsd;
 	}
+
 	/**
 	 * @return the maxRmsd
 	 */
 	public double getMaxRmsd() {
 		return maxRmsd;
 	}
+
 	/**
 	 * @param maxRmsd the maxRmsd to set
 	 */
 	public void setMaxRmsd(double maxRmsd) {
 		this.maxRmsd = maxRmsd;
 	}
+
 	/**
 	 * @return the rmsd
 	 */
 	public double getRmsd() {
 		return rmsd;
 	}
+
 	/**
 	 * @param rmsd the rmsd to set
 	 */
 	public void setRmsd(double rmsd) {
 		this.rmsd = rmsd;
 	}
+
 	/**
 	 * @return the minTm
 	 */
 	public double getMinTm() {
 		return minTm;
 	}
+
 	/**
 	 * @param minTm the minTm to set
 	 */
 	public void setMinTm(double minTm) {
 		this.minTm = minTm;
 	}
+
 	/**
 	 * @return the maxTm
 	 */
 	public double getMaxTm() {
 		return maxTm;
 	}
+
 	/**
 	 * @param maxTm the maxTm to set
 	 */
 	public void setMaxTm(double maxTm) {
 		this.maxTm = maxTm;
 	}
+
 	/**
 	 * @return the tm
 	 */
 	public double getTm() {
 		return tm;
 	}
+
 	/**
 	 * @param tm the tm to set
 	 */
 	public void setTm(double tm) {
 		this.tm = tm;
 	}
+
 	/**
 	 * @return the rmsdCenters
 	 */
 	public double getRmsdCenters() {
 		return rmsdCenters;
 	}
+
 	/**
 	 * @param rmsdCenters the rmsdCenters to set
 	 */
@@ -130,36 +143,42 @@ public class QuatSymmetryScores {
 	public double getRmsdIntra() {
 		return rmsdIntra;
 	}
+
 	/**
 	 * @param rmsdIntra the rmsdIntra to set
 	 */
 	public void setRmsdIntra(double rmsdIntra) {
 		this.rmsdIntra = rmsdIntra;
 	}
+
 	/**
 	 * @return the tmIntra
 	 */
 	public double getTmIntra() {
 		return tmIntra;
 	}
+
 	/**
 	 * @param tmIntra the tmIntra to set
 	 */
 	public void setTmIntra(double tmIntra) {
 		this.tmIntra = tmIntra;
 	}
+
 	/**
 	 * @return the symDeviation
 	 */
 	public double getSymDeviation() {
 		return symDeviation;
 	}
+
 	/**
 	 * @param symDeviation the symDeviation to set
 	 */
 	public void setSymDeviation(double symDeviation) {
 		this.symDeviation = symDeviation;
 	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

@@ -33,14 +33,67 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A feature is currently any descriptive item that can be associated with a sequence position(s)
- * A feature has a type and a source which is currently a string to allow flexibility for the user
- * Ideally well defined features should have a class to describe attributes of that feature
+ * A feature is currently any descriptive item that can be associated with a
+ * sequence position(s) A feature has a type and a source which is currently a
+ * string to allow flexibility for the user Ideally well defined features should
+ * have a class to describe attributes of that feature
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends Compound>
 		implements FeatureInterface<S, C> {
-	List<FeatureInterface<S, C>> childrenFeatures = new ArrayList<FeatureInterface<S, C>>();
+	/**
+	 * Sort features by start position and then longest length. When features are
+	 * added having them sorted by start position and then longest length helps on
+	 * the layout of overlapping features so they are delivered in a proper order.
+	 */
+
+	public static final Comparator<FeatureInterface<?, ?>> LOCATION_LENGTH = (FeatureInterface<?, ?> e1,
+			FeatureInterface<?, ?> e2) -> {
+		double v1 = e1.getLocations().getStart().getPosition();
+		double v2 = e2.getLocations().getStart().getPosition();
+		if (v1 < v2) {
+			return -1;
+		} else if (v1 > v2) {
+			return 1;
+		} else {
+			double end1 = e1.getLocations().getEnd().getPosition();
+			double end2 = e2.getLocations().getEnd().getPosition();
+			if (end1 > end2) {
+				return -1;
+			} else if (end1 < end2) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+
+	};
+	/**
+	 * Sort features by length. //TODO need to handle cases where features have
+	 * multiple locations, strand etc
+	 *
+	 */
+
+	static public final Comparator<FeatureInterface<?, ?>> LENGTH = (FeatureInterface<?, ?> e1,
+			FeatureInterface<?, ?> e2) -> {
+		double v1 = Math.abs(e1.getLocations().getEnd().getPosition() - e1.getLocations().getStart().getPosition());
+		double v2 = Math.abs(e2.getLocations().getEnd().getPosition() - e2.getLocations().getStart().getPosition());
+		if (v1 < v2) {
+			return -1;
+		} else if (v1 > v2) {
+			return 1;
+		} else {
+			return 0;
+		}
+
+	};
+	/**
+	 * Sort features by type
+	 */
+	public static final Comparator<FeatureInterface<?, ?>> TYPE = (FeatureInterface<?, ?> o1,
+			FeatureInterface<?, ?> o2) -> o1.getType().compareTo(o2.getType());
+	List<FeatureInterface<S, C>> childrenFeatures = new ArrayList<>();
 	FeatureInterface<S, C> parentFeature;
 	AbstractLocation sequenceLocation;
 	String type = "";
@@ -48,22 +101,26 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	private String description = "";
 	private String shortDescription = "";
 	private Object userObject = null;
-	private Map<String, List<Qualifier>> Qualifiers = new HashMap<String, List<Qualifier>>();
+	private Map<String, List<Qualifier>> Qualifiers = new HashMap<>();
 
 	/**
 	 * A feature has a type and a source
+	 * 
 	 * @param type
 	 * @param source
 	 */
-	public AbstractFeature(String type,String source){
+	public AbstractFeature(String type, String source) {
 		this.type = type;
 		this.source = source;
 	}
 
 	/**
-	 * A feature could be a single sequence position like a mutation or a post translational modification of an amino acid.
-	 * It could also be the docking interface of N number of amino acids on the surface. The location wold then be a collection
-	 * of sequence positions instead of a single sequence position or the begin and end of a sequence segment.
+	 * A feature could be a single sequence position like a mutation or a post
+	 * translational modification of an amino acid. It could also be the docking
+	 * interface of N number of amino acids on the surface. The location wold then
+	 * be a collection of sequence positions instead of a single sequence position
+	 * or the begin and end of a sequence segment.
+	 * 
 	 * @return
 	 */
 
@@ -73,9 +130,12 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	}
 
 	/**
-	 *  A feature could be a single sequence position like a mutation or a post translational modification of an amino acid.
-	 * It could also be the docking interface of N number of amino acids on the surface. The location wold then be a collection
-	 * of sequence positions instead of a single sequence position or the begin and end of a sequence segment.
+	 * A feature could be a single sequence position like a mutation or a post
+	 * translational modification of an amino acid. It could also be the docking
+	 * interface of N number of amino acids on the surface. The location wold then
+	 * be a collection of sequence positions instead of a single sequence position
+	 * or the begin and end of a sequence segment.
+	 * 
 	 * @param loc
 	 */
 	@Override
@@ -85,6 +145,7 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * The feature type
+	 * 
 	 * @return
 	 */
 	@Override
@@ -94,6 +155,7 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * Set the feature type
+	 * 
 	 * @param type
 	 */
 	@Override
@@ -103,6 +165,7 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * The feature source
+	 * 
 	 * @return
 	 */
 
@@ -113,6 +176,7 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * Set the feature source
+	 * 
 	 * @param source
 	 */
 	@Override
@@ -121,8 +185,10 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	}
 
 	/**
-	 * A feature can be the child or contained by a parent feature. An example is a Helix feature could contain
-	 * children features. A PFAM domain could contain secondary structures.
+	 * A feature can be the child or contained by a parent feature. An example is a
+	 * Helix feature could contain children features. A PFAM domain could contain
+	 * secondary structures.
+	 * 
 	 * @param feature
 	 */
 	@Override
@@ -132,15 +198,17 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * Get the parent Feature
+	 * 
 	 * @return
 	 */
 	@Override
 	public FeatureInterface<S, C> getParentFeature() {
-	   return parentFeature;
+		return parentFeature;
 	}
 
 	/**
 	 * Get the children features
+	 * 
 	 * @return
 	 */
 	@Override
@@ -150,6 +218,7 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 
 	/**
 	 * Set the children features
+	 * 
 	 * @param features
 	 */
 	@Override
@@ -191,69 +260,6 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	}
 
 	/**
-	 * Sort features by start position and then longest length. When features are added
-	 * having them sorted by start position and then longest length helps on the layout
-	 * of overlapping features so they are delivered in a proper order.
-	 */
-
-	public static final Comparator<FeatureInterface<?, ?>> LOCATION_LENGTH = new Comparator<FeatureInterface<?, ?>>() {
-
-		@Override
-		public int compare(FeatureInterface<?, ?> e1, FeatureInterface<?, ?> e2) {
-			double v1 = e1.getLocations().getStart().getPosition();
-			double v2 = e2.getLocations().getStart().getPosition();
-			if (v1 < v2) {
-				return -1;
-			} else if (v1 > v2) {
-				return 1;
-			} else {
-				double end1 = e1.getLocations().getEnd().getPosition();
-				double end2 = e2.getLocations().getEnd().getPosition();
-				if(end1 > end2)
-					return -1;
-				else if(end1 < end2)
-					return 1;
-				else
-				return 0;
-			}
-
-		}
-	};
-
-	 /**
-	 * Sort features by length. //TODO need to handle cases where features have multiple locations, strand etc
-	 *
-	 */
-
-	static public final Comparator<FeatureInterface<?, ?>> LENGTH = new Comparator<FeatureInterface<?, ?>>() {
-
-		@Override
-		public int compare(FeatureInterface<?, ?> e1, FeatureInterface<?, ?> e2) {
-			double v1 = Math.abs(e1.getLocations().getEnd().getPosition()- e1.getLocations().getStart().getPosition());
-			double v2 = Math.abs(e2.getLocations().getEnd().getPosition() -  e2.getLocations().getStart().getPosition());
-			if (v1 < v2) {
-				return -1;
-			} else if (v1 > v2) {
-				return 1;
-			} else {
-				return 0;
-			}
-
-		}
-	};
-
-	/**
-	 * Sort features by type
-	 */
-	public static final Comparator<FeatureInterface<?, ?>> TYPE = new Comparator<FeatureInterface<?, ?>>() {
-
-		@Override
-		public int compare(FeatureInterface<?, ?> o1, FeatureInterface<?, ?> o2) {
-			return o1.getType().compareTo(o2.getType());
-		}
-	};
-
-	/**
 	 * @return the userObject
 	 */
 	@Override
@@ -262,8 +268,10 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	}
 
 	/**
-	 * Allow the user to associate an object with the feature. This way if a feature which is displayed in a GUI
-	 * is clicked on the application can then get a user defined object associated with the feature.
+	 * Allow the user to associate an object with the feature. This way if a feature
+	 * which is displayed in a GUI is clicked on the application can then get a user
+	 * defined object associated with the feature.
+	 * 
 	 * @param userObject the userObject to set
 	 */
 	@Override
@@ -287,12 +295,12 @@ public abstract class AbstractFeature<S extends AbstractSequence<C>, C extends C
 	@Override
 	public void addQualifier(String key, Qualifier qualifier) {
 		// Check for key. Update list of values
-		if (Qualifiers.containsKey(key)){
+		if (Qualifiers.containsKey(key)) {
 			List<Qualifier> vals = Qualifiers.get(key);
 			vals.add(qualifier);
 			Qualifiers.put(key, vals);
 		} else {
-			List<Qualifier> vals = new ArrayList<Qualifier>();
+			List<Qualifier> vals = new ArrayList<>();
 			vals.add(qualifier);
 			Qualifiers.put(key, vals);
 		}

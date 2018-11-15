@@ -28,7 +28,6 @@ import java.util.ArrayList;
  */
 public class GroupResults {
 
-
 	/**
 	 *
 	 */
@@ -44,5 +43,5 @@ public class GroupResults {
 	/**
 	 *
 	 */
-	public String signatureName ="";
+	public String signatureName = "";
 }

@@ -27,17 +27,20 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 
 /**
  * A stub StructureIdentifier, representing the full structure in all cases.
+ * 
  * @author Spencer Bliven
  *
  */
 public class PassthroughIdentifier implements StructureIdentifier {
 
 	private static final long serialVersionUID = -2773111624414448950L;
-	
+
 	private String identifier;
+
 	public PassthroughIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
+
 	@Override
 	public String getIdentifier() {
 		return identifier;
@@ -55,13 +58,14 @@ public class PassthroughIdentifier implements StructureIdentifier {
 	public Structure reduce(Structure input) throws StructureException {
 		return input;
 	}
+
 	/**
 	 * Passthrough identifiers don't know how to load a structure
+	 * 
 	 * @return null
 	 */
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-			IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		return null;
 	}
 

@@ -34,8 +34,7 @@ import javax.vecmath.Matrix4d;
  * @since 4.1.0
  *
  */
-public class BlockSetImpl extends AbstractScoresCache implements Serializable,
-		BlockSet, Cloneable {
+public class BlockSetImpl extends AbstractScoresCache implements Serializable, BlockSet, Cloneable {
 
 	private static final long serialVersionUID = -1015791986000076089L;
 
@@ -50,18 +49,18 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 	private List<Integer> alignResCounts;
 
 	/**
-	 * Constructor. Links also the parent to this instance by adding the
-	 * BlockSet to the parent's List.
+	 * Constructor. Links also the parent to this instance by adding the BlockSet to
+	 * the parent's List.
 	 *
-	 * @param alignment
-	 *            MultipleAlignment parent of the BlockSet.
+	 * @param alignment MultipleAlignment parent of the BlockSet.
 	 * @return BlockSet an instance linked to the parent alignment.
 	 */
 	public BlockSetImpl(MultipleAlignment alignment) {
 
 		parent = alignment;
-		if (parent != null)
+		if (parent != null) {
 			parent.getBlockSets().add(this);
+		}
 		blocks = null;
 
 		pose = null;
@@ -71,11 +70,9 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 	}
 
 	/**
-	 * Copy constructor. Makes also a deep copy of all constituent {@link Block}
-	 * s.
+	 * Copy constructor. Makes also a deep copy of all constituent {@link Block} s.
 	 *
-	 * @param bs
-	 *            BlockSet object to be copied.
+	 * @param bs BlockSet object to be copied.
 	 * @return BlockSet an identical copy of the input object.
 	 */
 	public BlockSetImpl(BlockSetImpl bs) {
@@ -88,22 +85,18 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 		this.pose = null;
 		if (bs.pose != null) {
 			// Make a deep copy of everything
-			this.pose = new ArrayList<Matrix4d>();
-			for (Matrix4d trans : bs.pose) {
-				Matrix4d newTrans = (Matrix4d) trans.clone();
-				pose.add(newTrans);
-			}
+			this.pose = new ArrayList<>();
+			bs.pose.stream().map(trans -> (Matrix4d) trans.clone()).forEach(pose::add);
 		}
 
 		blocks = null;
 		if (bs.blocks != null) {
 			// Make a deep copy of everything
-			this.blocks = new ArrayList<Block>();
-			for (Block b : bs.blocks) {
-				Block newB = b.clone();
+			this.blocks = new ArrayList<>();
+			bs.blocks.stream().map(Block::clone).forEach(newB -> {
 				newB.setBlockSet(this);
 				this.blocks.add(newB);
-			}
+			});
 		}
 	}
 
@@ -114,9 +107,7 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 		coreLength = -1;
 		alignResCounts = null;
 		pose = null;
-		for (Block a : getBlocks()) {
-			a.clear();
-		}
+		getBlocks().forEach(Block::clear);
 	}
 
 	@Override
@@ -126,8 +117,8 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public String toString() {
-		return "BlockSetImpl [blocks=" + blocks + ", pose=" + pose
-				+ ", length=" + length + ", coreLength=" + coreLength + "]";
+		return new StringBuilder().append("BlockSetImpl [blocks=").append(blocks).append(", pose=").append(pose)
+				.append(", length=").append(length).append(", coreLength=").append(coreLength).append("]").toString();
 	}
 
 	@Override
@@ -142,17 +133,16 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 
 	@Override
 	public List<Block> getBlocks() {
-		if (blocks == null)
-			blocks = new ArrayList<Block>();
+		if (blocks == null) {
+			blocks = new ArrayList<>();
+		}
 		return blocks;
 	}
 
 	@Override
 	public void setBlocks(List<Block> blocks) {
 		this.blocks = blocks;
-		for (Block b : blocks) {
-			b.setBlockSet(this);
-		}
+		blocks.forEach(b -> b.setBlockSet(this));
 	}
 
 	@Override
@@ -163,61 +153,58 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 	@Override
 	public void setTransformations(List<Matrix4d> transformations) {
 		if (size() != transformations.size()) {
-			throw new IllegalArgumentException(
-					"Wrong number of structures for this alignment");
+			throw new IllegalArgumentException("Wrong number of structures for this alignment");
 		}
 		pose = transformations;
 	}
 
 	@Override
 	public int length() {
-		if (length == -1)
+		if (length == -1) {
 			updateLength();
+		}
 		return length;
 	}
 
 	@Override
 	public int size() {
 		// Get the size from the variables that can contain the information
-		if (parent != null)
+		if (parent != null) {
 			return parent.size();
-		else if (getBlocks().size() == 0) {
-			throw new IndexOutOfBoundsException(
-					"Empty BlockSet: number of Blocks == 0.");
-		} else
+		} else if (getBlocks().size() == 0) {
+			throw new IndexOutOfBoundsException("Empty BlockSet: number of Blocks == 0.");
+		} else {
 			return blocks.get(0).size();
+		}
 	}
 
 	@Override
 	public int getCoreLength() {
-		if (coreLength == -1)
+		if (coreLength == -1) {
 			updateCoreLength();
+		}
 		return coreLength;
 	}
 
 	protected void updateLength() {
 		if (getBlocks().size() == 0) {
-			throw new IndexOutOfBoundsException(
-					"Empty BlockSet: number of Blocks == 0.");
+			throw new IndexOutOfBoundsException("Empty BlockSet: number of Blocks == 0.");
 		}
 		// Try to calculate it from the Block information
 		else {
 			length = 0;
-			for (Block block : blocks)
-				length += block.length();
+			blocks.forEach(block -> length += block.length());
 		}
 	}
 
 	protected void updateCoreLength() {
 		if (getBlocks().size() == 0) {
-			throw new IndexOutOfBoundsException(
-					"Empty BlockSet: number of Blocks == 0.");
+			throw new IndexOutOfBoundsException("Empty BlockSet: number of Blocks == 0.");
 		}
 		// Try to calculate it from the Block information
 		else {
 			coreLength = 0;
-			for (Block block : blocks)
-				coreLength += block.getCoreLength();
+			blocks.forEach(block -> coreLength += block.getCoreLength());
 		}
 	}
 
@@ -229,18 +216,20 @@ public class BlockSetImpl extends AbstractScoresCache implements Serializable,
 	@Override
 	public List<Integer> getAlignResCounts() {
 
-		if (alignResCounts != null)
+		if (alignResCounts != null) {
 			return alignResCounts;
-
-		alignResCounts = new ArrayList<Integer>(size());
-		for (int s = 0; s < size(); s++)
-			alignResCounts.add(0);
-
-		for (Block b : blocks) {
-			List<Integer> bcounts = b.getAlignResCounts();
-			for (int s = 0; s < size(); s++)
-				alignResCounts.set(s, alignResCounts.get(s) + bcounts.get(s));
 		}
+
+		alignResCounts = new ArrayList<>(size());
+		for (int s = 0; s < size(); s++) {
+			alignResCounts.add(0);
+		}
+
+		blocks.stream().map(Block::getAlignResCounts).forEach(bcounts -> {
+			for (int s = 0; s < size(); s++) {
+				alignResCounts.set(s, alignResCounts.get(s) + bcounts.get(s));
+			}
+		});
 		return alignResCounts;
 	}
 

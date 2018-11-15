@@ -32,7 +32,7 @@ package org.biojava.nbio.alignment.io;
  *
  */
 class StockholmResidueAnnotation {
-	//TODO use proper data types
+	// TODO use proper data types
 	private String secondaryStructure;
 	private String surfaceAccessibility;
 	private String transMembrane;
@@ -42,60 +42,77 @@ class StockholmResidueAnnotation {
 	private String asPFamPredicted;
 	private String asSwissProt;
 	private String intron;
+
 	public String getSecondaryStructure() {
 		return secondaryStructure;
 	}
+
 	public void setSecondaryStructure(String secondaryStructure) {
 		this.secondaryStructure = secondaryStructure;
 	}
+
 	public String getSurfaceAccessibility() {
 		return surfaceAccessibility;
 	}
+
 	public void setSurfaceAccessibility(String surfaceAccessibility) {
 		this.surfaceAccessibility = surfaceAccessibility;
 	}
+
 	public String getTransMembrane() {
 		return transMembrane;
 	}
+
 	public void setTransMembrane(String transMembrane) {
 		this.transMembrane = transMembrane;
 	}
+
 	public String getPosteriorProbability() {
 		return posteriorProbability;
 	}
+
 	public void setPosteriorProbability(String posteriorProbability) {
 		this.posteriorProbability = posteriorProbability;
 	}
+
 	public String getLigandBinding() {
 		return ligandBinding;
 	}
+
 	public void setLigandBinding(String ligandBinding) {
 		this.ligandBinding = ligandBinding;
 	}
+
 	public String getActiveSite() {
 		return activeSite;
 	}
+
 	public void setActiveSite(String activeSite) {
 		this.activeSite = activeSite;
 	}
+
 	public String getAsPFamPredicted() {
 		return asPFamPredicted;
 	}
+
 	public void setAsPFamPredicted(String asPFamPredicted) {
 		this.asPFamPredicted = asPFamPredicted;
 	}
+
 	public String getAsSwissProt() {
 		return asSwissProt;
 	}
+
 	public void setAsSwissProt(String asSwissProt) {
 		this.asSwissProt = asSwissProt;
 	}
+
 	public String getIntron() {
 		return intron;
 	}
+
 	public void setIntron(String intron) {
 		this.intron = intron;
 	}
-
 
 }

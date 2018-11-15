@@ -25,34 +25,19 @@ package org.biojava.nbio.ws.alignment.qblast;
 
 /**
  * Output parameters accepted by QBlast service. <br/>
- * Not all are mandatory. Certain parameters only work with a subset of other parameters in the list.
+ * Not all are mandatory. Certain parameters only work with a subset of other
+ * parameters in the list.
  * <p/>
- * Taken from <a href=https://www.ncbi.nlm.nih.gov/staff/tao/URLAPI/new/node9.html>Blast URL API</a>
+ * Taken from <a
+ * href=https://www.ncbi.nlm.nih.gov/staff/tao/URLAPI/new/node9.html>Blast URL
+ * API</a>
  *
  * @author Gediminas Rimsa
  */
 public enum BlastOutputParameterEnum {
 
-	ALIGNMENTS,
-	ALIGNMENT_VIEW,
-	DESCRIPTIONS,
-	DATABASE_SORT,
-	DISPLAY_SORT,
-	EXPECT_HIGH,
-	EXPECT_LOW,
-	FORMAT_OBJECT,
-	FORMAT_ENTREZ_QUERY,
-	FORMAT_TYPE,
-	HSP_SORT,
-	I_THRESH,
-	MASK_CHAR,
-	MASK_COLOR,
-	NCBI_GI,
-	NOHEADER,
-	NUM_OVERVIEW,
-	RID,
-	SHOW_CDS_FEATURE,
-	SHOW_LINKOUT,
-	SHOW_OVERVIEW
+	ALIGNMENTS, ALIGNMENT_VIEW, DESCRIPTIONS, DATABASE_SORT, DISPLAY_SORT, EXPECT_HIGH, EXPECT_LOW, FORMAT_OBJECT,
+	FORMAT_ENTREZ_QUERY, FORMAT_TYPE, HSP_SORT, I_THRESH, MASK_CHAR, MASK_COLOR, NCBI_GI, NOHEADER, NUM_OVERVIEW, RID,
+	SHOW_CDS_FEATURE, SHOW_LINKOUT, SHOW_OVERVIEW
 
 }

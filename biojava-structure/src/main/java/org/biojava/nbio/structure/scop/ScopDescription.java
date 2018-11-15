@@ -25,10 +25,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
-/** Contains data from
- * dir.des.scop.txt_1.75
+/**
+ * Contains data from dir.des.scop.txt_1.75
  *
- * <p>e.g
+ * <p>
+ * e.g
+ * 
  * <pre>
  * SunID	Cat	Class   	Name	Description
  * -----	---	-----   	----	-----------
@@ -39,9 +41,9 @@ import java.io.Serializable;
  * @author Andreas Prlic
  *
  */
-@XmlRootElement(name = "ScopDescription", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "ScopDescription", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class ScopDescription implements Serializable,Cloneable{
+public class ScopDescription implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 8579808155176839161L;
 	int sunID;
@@ -50,9 +52,8 @@ public class ScopDescription implements Serializable,Cloneable{
 	String name;
 	String description;
 
-
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder buf = new StringBuilder();
 
 		buf.append(String.valueOf(sunID));
@@ -68,45 +69,43 @@ public class ScopDescription implements Serializable,Cloneable{
 		return buf.toString();
 	}
 
-
-	public int getSunID()
-	{
+	public int getSunID() {
 		return sunID;
 	}
-	public void setSunID(int sunID)
-	{
+
+	public void setSunID(int sunID) {
 		this.sunID = sunID;
 	}
-	public ScopCategory getCategory()
-	{
+
+	public ScopCategory getCategory() {
 		return category;
 	}
-	public void setCategory(ScopCategory category)
-	{
+
+	public void setCategory(ScopCategory category) {
 		this.category = category;
 	}
-	public String getClassificationId()
-	{
+
+	public String getClassificationId() {
 		return classificationId;
 	}
-	public void setClassificationId(String classificationId)
-	{
+
+	public void setClassificationId(String classificationId) {
 		this.classificationId = classificationId;
 	}
-	public String getName()
-	{
+
+	public String getName() {
 		return name;
 	}
-	public void setName(String name)
-	{
+
+	public void setName(String name) {
 		this.name = name;
 	}
-	public String getDescription()
-	{
+
+	public String getDescription() {
 		return description;
 	}
-	public void setDescription(String description)
-	{
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
@@ -116,38 +115,43 @@ public class ScopDescription implements Serializable,Cloneable{
 	 * Return a portion of the classificationID corresponding to the specified
 	 * category (class, fold, superfamily, family).
 	 *
-	 * <p>Example: for SCOP family "b.5.1.1",
+	 * <p>
+	 * Example: for SCOP family "b.5.1.1",
 	 * getClassificationId(ScopCategory.Superfamily) => "b.5.1"
 	 */
 	public String getClassificationId(ScopCategory category) {
-		if(classificationId == null || classificationId.isEmpty()) {
+		if (classificationId == null || classificationId.isEmpty()) {
 			return null;
 		}
 
 		int numParts = 0;
-		switch(category) {
-		case Family:      numParts++;
-		case Superfamily: numParts++;
-		case Fold:        numParts++;
-		case Class:       numParts++; break;
+		switch (category) {
+		case Family:
+			numParts++;
+		case Superfamily:
+			numParts++;
+		case Fold:
+			numParts++;
+		case Class:
+			numParts++;
+			break;
 		default:
 			throw new IllegalArgumentException("Only Class, Fold, Superfamily, and Family are supported.");
 		}
 
 		int endChar = -1;
-		for(int i = 0;i<numParts-1;i++) {
-			endChar = classificationId.indexOf('.', endChar+1);
-			if(endChar<0) {
+		for (int i = 0; i < numParts - 1; i++) {
+			endChar = classificationId.indexOf('.', endChar + 1);
+			if (endChar < 0) {
 				// Not enough items in the classification for this category
 				return null;
 			}
 		}
-		endChar = classificationId.indexOf('.', endChar+1);
-		if(endChar<0) {
+		endChar = classificationId.indexOf('.', endChar + 1);
+		if (endChar < 0) {
 			// category goes to the end
 			return classificationId;
-		}
-		else {
+		} else {
 			return classificationId.substring(0, endChar);
 		}
 
@@ -161,16 +165,12 @@ public class ScopDescription implements Serializable,Cloneable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-		+ ((category == null) ? 0 : category.hashCode());
-		result = prime
-		* result
-		+ ((classificationId == null) ? 0 : classificationId.hashCode());
+		result = prime * result + ((category == null) ? 0 : category.hashCode());
+		result = prime * result + ((classificationId == null) ? 0 : classificationId.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + sunID;
 		return result;
 	}
-
 
 	/**
 	 * Compares the fields sunID, category, classificationId, and name for equality
@@ -195,7 +195,7 @@ public class ScopDescription implements Serializable,Cloneable{
 			if (other.category != null) {
 				return false;
 			}
-		} else if (!category.equals(other.category)) {
+		} else if (category != other.category) {
 			return false;
 		}
 		if (classificationId == null) {
@@ -215,7 +215,6 @@ public class ScopDescription implements Serializable,Cloneable{
 		return sunID == other.sunID;
 	}
 
-
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		super.clone();
@@ -228,7 +227,5 @@ public class ScopDescription implements Serializable,Cloneable{
 		n.setSunID(getSunID());
 		return n;
 	}
-
-
 
 }

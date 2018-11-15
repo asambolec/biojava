@@ -82,7 +82,6 @@ public class Rotation {
 		return traceTmScoreMin;
 	}
 
-
 	/**
 	 * @return the permutation
 	 */
@@ -172,7 +171,7 @@ public class Rotation {
 	 */
 	public int getNStart() {
 		int nStart = 0;
-		for (int i: permutation) {
+		for (int i : permutation) {
 			if (i == -1) {
 				nStart++;
 			}

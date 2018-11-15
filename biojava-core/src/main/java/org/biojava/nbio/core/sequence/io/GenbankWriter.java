@@ -32,7 +32,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 
-
 /**
  * @author mckeee1
  *
@@ -53,8 +52,7 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 	 * @param sequences
 	 * @param headerFormat
 	 */
-	public GenbankWriter(OutputStream os, Collection<S> sequences,
-			GenbankHeaderFormatInterface<S, C> headerFormat) {
+	public GenbankWriter(OutputStream os, Collection<S> sequences, GenbankHeaderFormatInterface<S, C> headerFormat) {
 
 		this.os = os;
 		this.sequences = sequences;
@@ -70,8 +68,8 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 	 * @param lineLength
 	 */
 
-	public GenbankWriter(OutputStream os, Collection<S> sequences,
-			GenbankHeaderFormatInterface<S, C> headerFormat, int lineLength) {
+	public GenbankWriter(OutputStream os, Collection<S> sequences, GenbankHeaderFormatInterface<S, C> headerFormat,
+			int lineLength) {
 		this.os = os;
 		this.sequences = sequences;
 		this.headerFormat = headerFormat;
@@ -79,8 +77,8 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 	}
 
 	/**
-	 * Allow an override of operating system line separator for programs that
-	 * needs a specific CRLF or CR or LF option
+	 * Allow an override of operating system line separator for programs that needs
+	 * a specific CRLF or CR or LF option
 	 *
 	 * @param lineSeparator
 	 */
@@ -90,18 +88,17 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 		// TODO - Force lower case?
 		// boolean closeit = false;
 		PrintWriter writer = new PrintWriter(os);
-		for (S sequence : sequences) {
+		sequences.forEach(sequence -> {
 			String header = headerFormat.getHeader(sequence);
 			writer.format(header);
 			writer.println();
 			// os.write(lineSep);
 
 			/*
-			 * if isinstance(record.seq, UnknownSeq): #We have already recorded
-			 * the length, and there is no need #to record a long sequence of
-			 * NNNNNNN...NNN or whatever. if "contig" in record.annotations:
-			 * self._write_contig(record) else: self.handle.write("ORIGIN\n")
-			 * return
+			 * if isinstance(record.seq, UnknownSeq): #We have already recorded the length,
+			 * and there is no need #to record a long sequence of NNNNNNN...NNN or whatever.
+			 * if "contig" in record.annotations: self._write_contig(record) else:
+			 * self.handle.write("ORIGIN\n") return
 			 */
 
 			String data = sequence.getSequenceAsString().toLowerCase();
@@ -110,10 +107,8 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 			// os.write(lineSep);
 
 			for (int line_number = 0; line_number < seq_len; line_number += lineLength) {
-				writer.print(StringManipulationHelper.padLeft(
-						Integer.toString(line_number + 1), SEQUENCE_INDENT));
-				for (int words = line_number; words < Math.min(line_number
-						+ lineLength, seq_len); words += 10) {
+				writer.print(StringManipulationHelper.padLeft(Integer.toString(line_number + 1), SEQUENCE_INDENT));
+				for (int words = line_number; words < Math.min(line_number + lineLength, seq_len); words += 10) {
 					if ((words + 10) > data.length()) {
 						writer.print((" " + data.substring(words)));
 					} else {
@@ -126,7 +121,7 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 
 			writer.println("//");
 
-		}
+		});
 
 		writer.flush();
 
@@ -148,11 +143,10 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 	 * // System.out.println(proteinSequences);
 	 *
 	 * FileOutputStream fileOutputStream = new
-	 * FileOutputStream("/Users/Scooter/scripps/dyadic/c1-454Scaffolds_temp.faa"
-	 * );
+	 * FileOutputStream("/Users/Scooter/scripps/dyadic/c1-454Scaffolds_temp.faa" );
 	 *
-	 * BufferedOutputStream bo = new BufferedOutputStream(fileOutputStream);
-	 * long start = System.currentTimeMillis(); FastaWriter<ProteinSequence,
+	 * BufferedOutputStream bo = new BufferedOutputStream(fileOutputStream); long
+	 * start = System.currentTimeMillis(); FastaWriter<ProteinSequence,
 	 * AminoAcidCompound> fastaWriter = new FastaWriter<ProteinSequence,
 	 * AminoAcidCompound>(bo, proteinSequences.values(), new
 	 * GenericFastaHeaderFormat<ProteinSequence, AminoAcidCompound>());
@@ -172,8 +166,7 @@ public class GenbankWriter<S extends Sequence<?>, C extends Compound> {
 	}
 
 	/**
-	 * @param lineLength
-	 *            the lineLength to set
+	 * @param lineLength the lineLength to set
 	 */
 	public void setLineLength(int lineLength) {
 		this.lineLength = lineLength;
