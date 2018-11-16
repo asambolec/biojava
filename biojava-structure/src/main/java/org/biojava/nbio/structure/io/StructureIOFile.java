@@ -30,22 +30,25 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *  StructureIOFile extends StructureProvider with methods specific to
- *  parsing files from the filesystem.
+ * StructureIOFile extends StructureProvider with methods specific to parsing
+ * files from the filesystem.
+ * 
  * @author Andreas Prlic
  */
 public interface StructureIOFile extends StructureProvider {
 
 	/**
-	 * Associates a file extension with this particular StructureIOFile,
-	 * indicating that files of that type can be parsed. This is generally
-	 * called only in the constructor of the implementing class.
-	 * @param ext  a String ...
+	 * Associates a file extension with this particular StructureIOFile, indicating
+	 * that files of that type can be parsed. This is generally called only in the
+	 * constructor of the implementing class.
+	 * 
+	 * @param ext a String ...
 	 */
 	public void addExtension(String ext);
 
 	/**
 	 * Returns a list of extensions supported by this class
+	 * 
 	 * @return a (potentially empty) list of strings
 	 */
 	public List<String> getExtensions();
@@ -54,20 +57,21 @@ public interface StructureIOFile extends StructureProvider {
 	 * Open filename and return a Structure object.
 	 *
 	 * Not to be confused with {@link #getStructureById(String)}
-	 * @param filename  The path to the file. Must be the correct format for the
-	 *  implementing class.
+	 * 
+	 * @param filename The path to the file. Must be the correct format for the
+	 *                 implementing class.
 	 * @return a Structure object
 	 * @throws IOException ...
 	 */
-	public Structure getStructure(String filename) throws IOException ;
+	public Structure getStructure(String filename) throws IOException;
 
 	/**
-	 * Read file from File and returns
-	 * a Structure object.
-	 * @param file file containing the structure. Must be the correct format for
-	 *  the implementing class
+	 * Read file from File and returns a Structure object.
+	 * 
+	 * @param file file containing the structure. Must be the correct format for the
+	 *             implementing class
 	 * @return a Structure object
 	 * @throws IOException ...
 	 */
-	public Structure getStructure(File file) throws IOException ;
+	public Structure getStructure(File file) throws IOException;
 }

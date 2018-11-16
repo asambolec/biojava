@@ -28,13 +28,6 @@ import org.biojava.nbio.core.sequence.template.AbstractNucleotideCompoundSet;
  */
 public class RNACompoundSet extends AbstractNucleotideCompoundSet<NucleotideCompound> {
 
-	private static class InitaliseOnDemand {
-		public static final RNACompoundSet INSTANCE = new RNACompoundSet();
-	}
-	public static RNACompoundSet getRNACompoundSet() {
-		return InitaliseOnDemand.INSTANCE;
-	}
-
 	public RNACompoundSet() {
 		addNucleotideCompound("A", "U");
 		addNucleotideCompound("U", "A");
@@ -44,8 +37,16 @@ public class RNACompoundSet extends AbstractNucleotideCompoundSet<NucleotideComp
 		addNucleotideCompound("-", "-");
 	}
 
+	public static RNACompoundSet getRNACompoundSet() {
+		return InitaliseOnDemand.INSTANCE;
+	}
+
 	@Override
-public NucleotideCompound newNucleotideCompound(String base, String complement, String... equivalents) {
+	public NucleotideCompound newNucleotideCompound(String base, String complement, String... equivalents) {
 		return new NucleotideCompound(base, this, complement);
+	}
+
+	private static class InitaliseOnDemand {
+		public static final RNACompoundSet INSTANCE = new RNACompoundSet();
 	}
 }

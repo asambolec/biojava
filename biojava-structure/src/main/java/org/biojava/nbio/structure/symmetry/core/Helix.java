@@ -101,6 +101,7 @@ public class Helix {
 
 	/**
 	 * Returns the pitch angle of the helix
+	 * 
 	 * @param transformation helix transformation
 	 * @return
 	 */
@@ -110,6 +111,7 @@ public class Helix {
 
 	/**
 	 * Returns the AxisAngle of the helix transformation
+	 * 
 	 * @param transformation helix transformation
 	 * @return
 	 */
@@ -152,23 +154,24 @@ public class Helix {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Permutation   : " + getPermutation() + "\n");
-		sb.append("Repeat units  : " + getRepeatUnits() + "\n");
-		sb.append("Rise          : " + getRise() + "\n");
-		sb.append("Angle         : " + Math.toDegrees(getAngle()) +"\n");
-		sb.append("Fold          : " + getFold() + "\n");
+		sb.append(new StringBuilder().append("Permutation   : ").append(getPermutation()).append("\n").toString());
+		sb.append(new StringBuilder().append("Repeat units  : ").append(getRepeatUnits()).append("\n").toString());
+		sb.append(new StringBuilder().append("Rise          : ").append(getRise()).append("\n").toString());
+		sb.append(new StringBuilder().append("Angle         : ").append(Math.toDegrees(getAngle())).append("\n")
+				.toString());
+		sb.append(new StringBuilder().append("Fold          : ").append(getFold()).append("\n").toString());
 		return sb.toString();
 	}
 
 	public List<List<Integer>> getLayerLines() {
-		List<List<Integer>> layerLines = new ArrayList<List<Integer>>();
+		List<List<Integer>> layerLines = new ArrayList<>();
 
 		createLineSegments(permutation, layerLines);
 
-//		System.out.println("Line segments: " + layerLines.size());
-//		for (List<Integer> lineSegment: layerLines) {
-//			System.out.println(lineSegment);
-//		}
+		// System.out.println("Line segments: " + layerLines.size());
+		// for (List<Integer> lineSegment: layerLines) {
+		// System.out.println(lineSegment);
+		// }
 
 		int count = layerLines.size();
 
@@ -179,20 +182,19 @@ public class Helix {
 			// after joining line segments, get rid of the empty line segments left behind
 			trimEmptyLineSegments(layerLines);
 
-//			System.out.println("Line segments: " + count);
-//			for (List<Integer> lineSegment: layerLines) {
-//				System.out.println(lineSegment);
-//			}
+			// System.out.println("Line segments: " + count);
+			// for (List<Integer> lineSegment: layerLines) {
+			// System.out.println(lineSegment);
+			// }
 		} while (layerLines.size() < count);
 
 		return layerLines;
 	}
 
-	private static void createLineSegments(List<Integer> permutation,
-			List<List<Integer>> layerLines) {
+	private static void createLineSegments(List<Integer> permutation, List<List<Integer>> layerLines) {
 		for (int i = 0; i < permutation.size(); i++) {
-			if (permutation.get(i) != -1 ) {
-				List<Integer> lineSegment = new ArrayList<Integer>();
+			if (permutation.get(i) != -1) {
+				List<Integer> lineSegment = new ArrayList<>();
 				lineSegment.add(i);
 				lineSegment.add(permutation.get(i));
 				layerLines.add(lineSegment);
@@ -201,21 +203,21 @@ public class Helix {
 	}
 
 	private static void joinLineSegments(List<List<Integer>> layerLines) {
-		for (int i = 0; i < layerLines.size()-1; i++) {
+		for (int i = 0; i < layerLines.size() - 1; i++) {
 			List<Integer> lineSegmentI = layerLines.get(i);
-			if (! lineSegmentI.isEmpty()) {
+			if (!lineSegmentI.isEmpty()) {
 				for (int j = i + 1; j < layerLines.size(); j++) {
 					List<Integer> lineSegmentJ = layerLines.get(j);
-					if (! lineSegmentJ.isEmpty()) {
-						if (lineSegmentI.get(lineSegmentI.size()-1).equals(lineSegmentJ.get(0))) {
-//							System.out.println("join right: " + lineSegmentI + " - " + lineSegmentJ);
-							lineSegmentI.addAll(lineSegmentJ.subList(1,  lineSegmentJ.size()));
-//							System.out.println("joned segment: " + lineSegmentI);
+					if (!lineSegmentJ.isEmpty()) {
+						if (lineSegmentI.get(lineSegmentI.size() - 1).equals(lineSegmentJ.get(0))) {
+							// System.out.println("join right: " + lineSegmentI + " - " + lineSegmentJ);
+							lineSegmentI.addAll(lineSegmentJ.subList(1, lineSegmentJ.size()));
+							// System.out.println("joned segment: " + lineSegmentI);
 							lineSegmentJ.clear();
-						} else if ((lineSegmentI.get(0).equals(lineSegmentJ.get(lineSegmentJ.size()-1)))) {
-							lineSegmentI.addAll(0, lineSegmentJ.subList(0,  lineSegmentJ.size()-1));
-//							System.out.println("join left: " + lineSegmentJ + " - " + lineSegmentI);
-//							System.out.println("joned segment: " + lineSegmentI);
+						} else if ((lineSegmentI.get(0).equals(lineSegmentJ.get(lineSegmentJ.size() - 1)))) {
+							lineSegmentI.addAll(0, lineSegmentJ.subList(0, lineSegmentJ.size() - 1));
+							// System.out.println("join left: " + lineSegmentJ + " - " + lineSegmentI);
+							// System.out.println("joned segment: " + lineSegmentI);
 							lineSegmentJ.clear();
 						}
 					}

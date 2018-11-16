@@ -22,20 +22,18 @@
  */
 package org.biojava.nbio.structure.align.pairwise;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.AtomImpl;
 import org.biojava.nbio.structure.jama.Matrix;
 
-
-/** a pair of fragments of two protein structures
+/**
+ * a pair of fragments of two protein structures
  *
  * @author Andreas Prlic
  * @since 1.5
  * @version %I% %G%
  */
 public class FragmentPair {
-
 
 	int length;
 	int pos1;
@@ -49,59 +47,61 @@ public class FragmentPair {
 	int used;
 	int covered;
 
-	//filled if fragments are superimposed
+	// filled if fragments are superimposed
 	Matrix rot;
 	Atom trans;
 
-	//this unit vector indicates the rotation of j onto i
+	// this unit vector indicates the rotation of j onto i
 	Atom unitv;
 
 	Atom center1;
 	Atom center2;
 
-
 	public FragmentPair(int length, int p1, int p2) {
-		super();
-		this.length = length ;
-		 pos1 = p1;
-		 pos2 = p2;
+		this.length = length;
+		pos1 = p1;
+		pos2 = p2;
 
-		 contacts = 0;
-		 cluster = 0;
-		 rms = 0.0;
-		 used = 0;
-		 covered = 0;
+		contacts = 0;
+		cluster = 0;
+		rms = 0.0;
+		used = 0;
+		covered = 0;
 
-		 unitv = new AtomImpl();
-		 unitv.setX(0);
-		 unitv.setY(0);
-		 unitv.setZ(1);
-		 rot = null;
-		 trans = new AtomImpl();
-		 center1 = new AtomImpl();
-		 center2 = new AtomImpl();
+		unitv = new AtomImpl();
+		unitv.setX(0);
+		unitv.setY(0);
+		unitv.setZ(1);
+		rot = null;
+		trans = new AtomImpl();
+		center1 = new AtomImpl();
+		center2 = new AtomImpl();
 
 	}
+
 	@Override
-	public Object clone(){
+	public Object clone() {
 
-		FragmentPair n = new FragmentPair(length,pos1,pos2);
-		if ( center1 !=null)
-			n.setCenter1((Atom)center1.clone());
+		FragmentPair n = new FragmentPair(length, pos1, pos2);
+		if (center1 != null) {
+			n.setCenter1((Atom) center1.clone());
+		}
 
-		if ( center2 != null)
-			n.setCenter2((Atom)center2.clone());
+		if (center2 != null) {
+			n.setCenter2((Atom) center2.clone());
+		}
 
 		n.setCluster(cluster);
 		n.setContacts(contacts);
 		n.setCovered(covered);
 		n.setRms(rms);
 		n.setLength(length);
-		n.setRot((Matrix)rot.clone());
-		n.setUnitv((Atom)unitv.clone());
+		n.setRot((Matrix) rot.clone());
+		n.setUnitv((Atom) unitv.clone());
 
 		return n;
 	}
+
 	public int getCluster() {
 		return cluster;
 	}

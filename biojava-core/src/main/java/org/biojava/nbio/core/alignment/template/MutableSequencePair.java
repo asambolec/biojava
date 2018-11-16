@@ -29,20 +29,22 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Defines a mutable (editable) data structure for the results of pairwise sequence alignment.
+ * Defines a mutable (editable) data structure for the results of pairwise
+ * sequence alignment.
  *
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
-public interface MutableSequencePair<S extends Sequence<C>, C extends Compound> extends MutableProfile<S, C>,
-		SequencePair<S, C> {
+public interface MutableSequencePair<S extends Sequence<C>, C extends Compound>
+		extends MutableProfile<S, C>, SequencePair<S, C> {
 
 	/**
 	 * Sets both {@link AlignedSequence}s of the pair.
 	 *
-	 * @param query becomes the first {@link AlignedSequence} of the pair
+	 * @param query  becomes the first {@link AlignedSequence} of the pair
 	 * @param target becomes the second {@link AlignedSequence} of the pair
 	 * @throws IllegalArgumentException if query and target are different lengths
 	 */
@@ -52,7 +54,8 @@ public interface MutableSequencePair<S extends Sequence<C>, C extends Compound> 
 	 * Sets the first {@link AlignedSequence} of the pair.
 	 *
 	 * @param query becomes the first {@link AlignedSequence} of the pair
-	 * @throws IllegalArgumentException if (new) query and (old) target are different lengths
+	 * @throws IllegalArgumentException if (new) query and (old) target are
+	 *                                  different lengths
 	 */
 	void setQuery(AlignedSequence<S, C> query);
 
@@ -60,7 +63,8 @@ public interface MutableSequencePair<S extends Sequence<C>, C extends Compound> 
 	 * Sets the second {@link AlignedSequence} of the pair.
 	 *
 	 * @param target becomes the second {@link AlignedSequence} of the pair
-	 * @throws IllegalArgumentException if (old) query and (new) target are different lengths
+	 * @throws IllegalArgumentException if (old) query and (new) target are
+	 *                                  different lengths
 	 */
 	void setTarget(AlignedSequence<S, C> target);
 

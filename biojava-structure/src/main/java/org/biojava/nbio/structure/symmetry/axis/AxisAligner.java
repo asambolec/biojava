@@ -33,14 +33,16 @@ import java.util.List;
 public abstract class AxisAligner {
 
 	/**
-	 * Returns an instance of AxisAligner for differnt type of QuatSymmetryResults (factory method)
+	 * Returns an instance of AxisAligner for differnt type of QuatSymmetryResults
+	 * (factory method)
+	 * 
 	 * @param results symmetry results
 	 * @return instance of AxisAligner
 	 */
 	public static AxisAligner getInstance(QuatSymmetryResults results) {
 		String symmetry = results.getSymmetry();
 
-		if (symmetry.equals("H")) {
+		if ("H".equals(symmetry)) {
 			return new HelixAxisAligner(results);
 		} else {
 			return new RotationAxisAligner(results);
@@ -65,22 +67,24 @@ public abstract class AxisAligner {
 
 	/**
 	 * Returns the radius for drawing polyhedra
+	 * 
 	 * @return double radius
 	 */
 	public abstract double getRadius();
 
 	/**
-	 * Returns a transformation matrix transform polyhedra for Cn structures.
-	 * The center in this matrix is the geometric center, rather then the centroid.
-	 * In Cn structures those are usually not the same.
+	 * Returns a transformation matrix transform polyhedra for Cn structures. The
+	 * center in this matrix is the geometric center, rather then the centroid. In
+	 * Cn structures those are usually not the same.
+	 * 
 	 * @return
 	 */
 	public abstract Matrix4d getGeometicCenterTransformation();
 
 	/**
-	 * Returns the geometric center of polyhedron. In the case of the Cn
-	 * point group, the centroid and geometric center are usually not
-	 * identical.
+	 * Returns the geometric center of polyhedron. In the case of the Cn point
+	 * group, the centroid and geometric center are usually not identical.
+	 * 
 	 * @return
 	 */
 	public abstract Point3d getGeometricCenter();

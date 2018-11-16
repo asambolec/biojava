@@ -32,7 +32,6 @@ public interface AlignmentProgressListener {
 
 	public void requestingAlignmentsFromServer(int nrAlignments);
 
-	public void sentResultsToServer(int nrAlignments,String serverMessage);
-
+	public void sentResultsToServer(int nrAlignments, String serverMessage);
 
 }

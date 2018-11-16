@@ -26,7 +26,8 @@ import org.biojava.nbio.structure.io.mmcif.model.ChemComp;
 
 import java.util.*;
 
-/** Some tools for working with chemical compounds.
+/**
+ * Some tools for working with chemical compounds.
  *
  * @author Andreas Prlic
  * @since 1.7
@@ -48,21 +49,23 @@ public class ChemCompTools {
 	private static final Map<Character, String> AMINO_ACID_LOOKUP_1TO3;
 
 	/**
-	 * Lookup table to convert standard nucleic acid's monomer ids to one-letter-codes
+	 * Lookup table to convert standard nucleic acid's monomer ids to
+	 * one-letter-codes
 	 */
 	private static final Map<String, Character> DNA_LOOKUP_2TO1;
 
 	/**
-	 * Lookup table to convert standard nucleic acid's one-letter-codes to monomer ids
+	 * Lookup table to convert standard nucleic acid's one-letter-codes to monomer
+	 * ids
 	 */
 	private static final Map<Character, String> DNA_LOOKUP_1TO2;
 
 	/**
-	 * Static block that initializes lookup maps and initializes their <tt>ResidueInfo</tt> instances
+	 * Static block that initializes lookup maps and initializes their
+	 * <tt>ResidueInfo</tt> instances
 	 */
-	static
-	{
-		Map<String, Character> foo = new HashMap<String, Character>();
+	static {
+		Map<String, Character> foo = new HashMap<>();
 		foo.put("ALA", 'A');
 		foo.put("ASP", 'D');
 		foo.put("ASN", 'N');
@@ -87,7 +90,7 @@ public class ChemCompTools {
 		foo.put("VAL", 'V');
 		AMINO_ACID_LOOKUP_3TO1 = Collections.unmodifiableMap((Collections.synchronizedMap(foo)));
 
-		Map<Character, String> bar = new HashMap<Character, String>();
+		Map<Character, String> bar = new HashMap<>();
 		bar.put('A', "ALA");
 		bar.put('D', "ASP");
 		bar.put('N', "ASN");
@@ -112,52 +115,48 @@ public class ChemCompTools {
 		bar.put('V', "VAL");
 		AMINO_ACID_LOOKUP_1TO3 = Collections.unmodifiableMap(Collections.synchronizedMap(bar));
 
-		foo = new HashMap<String, Character>();
-		foo.put("DA",'A');
-		foo.put("DC",'C');
-		foo.put("DG",'G');
-		foo.put("DI",'I');
-		foo.put("DU",'U');
-		foo.put("DT",'T');
+		foo = new HashMap<>();
+		foo.put("DA", 'A');
+		foo.put("DC", 'C');
+		foo.put("DG", 'G');
+		foo.put("DI", 'I');
+		foo.put("DU", 'U');
+		foo.put("DT", 'T');
 		DNA_LOOKUP_2TO1 = Collections.unmodifiableMap((Collections.synchronizedMap(foo)));
 
-		bar = new HashMap<Character, String>();
-		bar.put('A',"DA");
-		bar.put('C',"DC");
-		bar.put('G',"DG");
-		bar.put('I',"DI");
-		bar.put('U',"DU");
-		bar.put('T',"DT");
+		bar = new HashMap<>();
+		bar.put('A', "DA");
+		bar.put('C', "DC");
+		bar.put('G', "DG");
+		bar.put('I', "DI");
+		bar.put('U', "DU");
+		bar.put('T', "DT");
 		DNA_LOOKUP_1TO2 = Collections.unmodifiableMap(Collections.synchronizedMap(bar));
 
-
 		// initialise standard chemical components
-		List<String> stdMonIds = new ArrayList<String>();
+		List<String> stdMonIds = new ArrayList<>();
 		stdMonIds.addAll(AMINO_ACID_LOOKUP_3TO1.keySet());
 		stdMonIds.addAll(DNA_LOOKUP_2TO1.keySet());
 
-
-
 	}
 
-	public static Character getAminoOneLetter(String chemCompId){
-		return  AMINO_ACID_LOOKUP_3TO1.get(chemCompId);
+	public static Character getAminoOneLetter(String chemCompId) {
+		return AMINO_ACID_LOOKUP_3TO1.get(chemCompId);
 	}
 
-
-	public static Character getDNAOneLetter(String chemCompId){
-		return  DNA_LOOKUP_2TO1.get(chemCompId) ;
+	public static Character getDNAOneLetter(String chemCompId) {
+		return DNA_LOOKUP_2TO1.get(chemCompId);
 	}
 
-	public static String getAminoThreeLetter(Character c){
+	public static String getAminoThreeLetter(Character c) {
 		return AMINO_ACID_LOOKUP_1TO3.get(c);
 	}
 
-	public static String getDNATwoLetter(Character c){
+	public static String getDNATwoLetter(Character c) {
 		return DNA_LOOKUP_1TO2.get(c);
 	}
 
-	public static final boolean isStandardChemComp(ChemComp cc){
+	public static final boolean isStandardChemComp(ChemComp cc) {
 
 		String pid = cc.getMon_nstd_parent_comp_id();
 		String one = cc.getOne_letter_code();
@@ -165,18 +164,17 @@ public class ChemCompTools {
 		PolymerType polymerType = cc.getPolymerType();
 
 		// standard residues have no parent
-		if ((pid == null) || (pid.equals("?"))){
+		if ((pid == null) || ("?".equals(pid))) {
 
 			// and they have a one letter code
-			if ( ( one != null) && ( ! one.equals("?") )){
+			if ((one != null) && (!"?".equals(one))) {
 
 				// peptides and dpeptides must not have X
-				if ( (polymerType == PolymerType.peptide) ||
-						( polymerType == PolymerType.dpeptide)) {
+				if ((polymerType == PolymerType.peptide) || (polymerType == PolymerType.dpeptide)) {
 					return performPeptideCheck(cc, one);
 
 				}
-				if (polymerType == PolymerType.rna){
+				if (polymerType == PolymerType.rna) {
 					return performRNACheck(cc);
 				}
 				if (polymerType == PolymerType.dna) {
@@ -185,77 +183,78 @@ public class ChemCompTools {
 
 				}
 
-				//System.err.println("Non standard chem comp: " + cc);
+				// System.err.println("Non standard chem comp: " + cc);
 				return false;
 			}
 		}
 		return false;
 	}
 
-
 	private static boolean performRNACheck(ChemComp cc) {
-		if (cc.getId().length() == 1)
+		if (cc.getId().length() == 1) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
-
 	private static boolean performDNACheck(ChemComp cc) {
-		if ( cc.getId().equals(UNKNOWN_NUCLEOTIDE.toString()))
+		if (cc.getId().equals(UNKNOWN_NUCLEOTIDE.toString())) {
 			return false;
+		}
 
 		Character c = getDNAOneLetter(cc.getId());
-		if ( c==null){
+		if (c == null) {
 			// we did not find it in the list of standard nucleotides
 			return false;
 		}
 		return true;
 	}
 
-
 	private static boolean performPeptideCheck(ChemComp cc, String one) {
 		if (one.equals(UNKNOWN_ONE_LETTER_CODE.toString())) {
 			return false;
 		}
-		Character c =  getAminoOneLetter(cc.getId());
-		if ( c==null){
+		Character c = getAminoOneLetter(cc.getId());
+		if (c == null) {
 			// we did not find it in the list of standard aminos
 			return false;
 		}
 		return true;
 	}
 
-
 	// TODO: component 175 has 3 chars as a one letter code...
 	// Figure out what to do with it...
 	// so does: 4F3,5ZA and others
-	public static Character getOneLetterCode(ChemComp cc, ChemicalComponentDictionary dictionary){
-		if ( cc.getResidueType() == ResidueType.nonPolymer )
+	public static Character getOneLetterCode(ChemComp cc, ChemicalComponentDictionary dictionary) {
+		if (cc.getResidueType() == ResidueType.nonPolymer) {
 			return null;
+		}
 
-		if ( cc.isStandard())
+		if (cc.isStandard()) {
 			return cc.getOne_letter_code().charAt(0);
+		}
 
 		ChemComp parent = dictionary.getParent(cc);
-		if ( parent == null){
-			//System.err.println("parent is null " + cc);
+		if (parent == null) {
+			// System.err.println("parent is null " + cc);
 			return cc.getOne_letter_code().charAt(0);
 		}
 		PolymerType poly = cc.getPolymerType();
-		if (( poly == PolymerType.peptide) || ( poly == PolymerType.dpeptide)){
+		if ((poly == PolymerType.peptide) || (poly == PolymerType.dpeptide)) {
 			Character c = getAminoOneLetter(parent.getId());
-			if ( c == null)
+			if (c == null) {
 				c = UNKNOWN_ONE_LETTER_CODE;
+			}
 			return c;
 		}
-		if ( poly == PolymerType.dna){
-			Character c = getDNAOneLetter(parent.getId());
-			if (c == null)
-				c = UNKNOWN_NUCLEOTIDE;
-			return c;
-
+		if (poly != PolymerType.dna) {
+			return cc.getMon_nstd_parent_comp_id().charAt(0);
 		}
-		return cc.getMon_nstd_parent_comp_id().charAt(0);
+		Character c = getDNAOneLetter(parent.getId());
+		if (c == null) {
+			c = UNKNOWN_NUCLEOTIDE;
+		}
+		return c;
 	}
 }

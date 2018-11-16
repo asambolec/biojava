@@ -36,15 +36,17 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Save an alignment to a specified File by the user. The alignment to be
- * saved depends on the constructor used to instantiate this class, so that
- * AFPChains and MultipleAlignments can be saved.
+ * Save an alignment to a specified File by the user. The alignment to be saved
+ * depends on the constructor used to instantiate this class, so that AFPChains
+ * and MultipleAlignments can be saved.
  * <p>
  * The format to save the alignment depends on the Frame that generated the
- * Action: from a sequence alignment a FatCat or FASTA formats are saved,
- * and from a Jmol view an XML format is saved.
+ * Action: from a sequence alignment a FatCat or FASTA formats are saved, and
+ * from a Jmol view an XML format is saved.
  *
  * @author Aleix Lafita
  * @version 2.0 - adapted for MultipleAligments
@@ -52,32 +54,32 @@ import java.io.FileWriter;
  */
 public class MySaveFileListener implements ActionListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(MySaveFileListener.class);
 	private AFPChain afpChain;
 	private MultipleAlignment msa;
 	private boolean printText;
 
-	public MySaveFileListener (AFPChain afpChain){
+	public MySaveFileListener(AFPChain afpChain) {
 		this.afpChain = afpChain;
 		this.msa = null;
 		printText = false;
 	}
 
-	public MySaveFileListener (MultipleAlignment msa){
+	public MySaveFileListener(MultipleAlignment msa) {
 		this.afpChain = null;
 		this.msa = msa;
 		printText = false;
 	}
 
 	/**
-	 * Constructor to avoid checking which of the two is null before
-	 * instantiating this class. One of the two, or both, have to be null.
-	 * If both are different than null the MultipleAlignment will be saved
-	 * only.
+	 * Constructor to avoid checking which of the two is null before instantiating
+	 * this class. One of the two, or both, have to be null. If both are different
+	 * than null the MultipleAlignment will be saved only.
 	 *
 	 * @param afpChain
 	 * @param msa
 	 */
-	public MySaveFileListener (AFPChain afpChain, MultipleAlignment msa){
+	public MySaveFileListener(AFPChain afpChain, MultipleAlignment msa) {
 		this.afpChain = afpChain;
 		this.msa = msa;
 		printText = false;
@@ -86,63 +88,62 @@ public class MySaveFileListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
-		//Return if nothing to save
+		// Return if nothing to save
 		if (afpChain == null && msa == null) {
-			JOptionPane.showMessageDialog(null,
-					"Could not save alignment, no alignment being displayed.");
+			JOptionPane.showMessageDialog(null, "Could not save alignment, no alignment being displayed.");
 			return;
 		}
 
-		//Choose the file path from the user input
+		// Choose the file path from the user input
 		JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showSaveDialog(null);
 
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
-			System.err.println("User canceled file save.");
+			logger.error("User canceled file save.");
 			return;
 		}
 		File selFile = fc.getSelectedFile();
-		if (selFile == null) return;
+		if (selFile == null) {
+			return;
+		}
 
-		System.out.println("Saving alignment to file: " + selFile.getName());
+		logger.info("Saving alignment to file: " + selFile.getName());
 
-		//XML serialization of the alignment
+		// XML serialization of the alignment
 		try {
 
 			String output = "";
 
-			if (msa!=null){
+			if (msa != null) {
 				if (!printText) {
 					output = MultipleAlignmentWriter.toXML(msa.getEnsemble());
 				} else {
 					output = MultipleAlignmentWriter.toFASTA(msa);
 				}
-			}
-			else if (afpChain!=null){
+			} else if (afpChain != null) {
 				UserConfiguration config = WebStartMain.getWebStartConfig();
 				AtomCache cache = new AtomCache(config);
 
-				//TODO use the right ca atoms, fails for a custom file!
-				//This is a bad solution, solved for MultipleAlignments
-				Atom[] ca1 =cache.getAtoms(afpChain.getName1());
-				Atom[] ca2 =cache.getAtoms(afpChain.getName2());
+				// TODO use the right ca atoms, fails for a custom file!
+				// This is a bad solution, solved for MultipleAlignments
+				Atom[] ca1 = cache.getAtoms(afpChain.getName1());
+				Atom[] ca2 = cache.getAtoms(afpChain.getName2());
 
 				if (!printText) {
-					output = AFPChainXMLConverter.toXML(afpChain,ca1,ca2);
+					output = AFPChainXMLConverter.toXML(afpChain, ca1, ca2);
 				} else {
-					output = afpChain.toFatcat(ca1,ca2);
+					output = afpChain.toFatcat(ca1, ca2);
 				}
 			}
 
-			//Write to the file
+			// Write to the file
 			BufferedWriter out = new BufferedWriter(new FileWriter(selFile));
 			out.write(output);
 			out.close();
 
-		} catch (Exception e){
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-					"Could not save file. Exception: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			JOptionPane.showMessageDialog(null, "Could not save file. Exception: " + e.getMessage());
 		}
 	}
 

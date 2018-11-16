@@ -38,102 +38,86 @@ public class ModificationLinkage {
 
 	/**
 	 *
-	 * @param components {@link Component}s involved in a modification.
+	 * @param components        {@link Component}s involved in a modification.
 	 * @param indexOfComponent1 index of the first component.
 	 * @param indexOfComponent2 index of the second component.
 	 */
-	public ModificationLinkage(
-			final List<Component> components,
-			final int indexOfComponent1,
+	public ModificationLinkage(final List<Component> components, final int indexOfComponent1,
 			final int indexOfComponent2) {
-		this(components, indexOfComponent1, null,
-				null, indexOfComponent2, null, null);
+		this(components, indexOfComponent1, null, null, indexOfComponent2, null, null);
 	}
 
 	/**
 	 *
-	 * @param components {@link Component}s involved in a modification.
-	 * @param indexOfComponent1 index of the first component.
-	 * @param labelOfAtomOnComponent1 label of the atom on the first
-	 *  component.
-	 * @param indexOfComponent2 index of the second component.
-	 * @param labelOfAtomOnComponent2 label of the atom on the second
-	 *  component.
+	 * @param components              {@link Component}s involved in a modification.
+	 * @param indexOfComponent1       index of the first component.
+	 * @param labelOfAtomOnComponent1 label of the atom on the first component.
+	 * @param indexOfComponent2       index of the second component.
+	 * @param labelOfAtomOnComponent2 label of the atom on the second component.
 	 */
-	public ModificationLinkage(
-			final List<Component> components,
-			final int indexOfComponent1,
-			final String pdbNameOfAtomsOnComponent1,
-			final int indexOfComponent2,
+	public ModificationLinkage(final List<Component> components, final int indexOfComponent1,
+			final String pdbNameOfAtomsOnComponent1, final int indexOfComponent2,
 			final String pdbNameOfAtomsOnComponent2) {
-		this(components, indexOfComponent1,
-				Collections.singletonList(pdbNameOfAtomsOnComponent1),
-				null, indexOfComponent2,
-				Collections.singletonList(pdbNameOfAtomsOnComponent2),
-				null);
+		this(components, indexOfComponent1, Collections.singletonList(pdbNameOfAtomsOnComponent1), null,
+				indexOfComponent2, Collections.singletonList(pdbNameOfAtomsOnComponent2), null);
 	}
 
 	/**
 	 *
-	 * @param components {@link Component}s involved in a modification.
-	 * @param indexOfComponent1 index of the first component.
-	 * @param labelOfAtomOnComponent1 label of the atom on the first
-	 *  component.
-	 * @param indexOfComponent2 index of the second component.
-	 * @param labelOfAtomOnComponent2 label of the atom on the second
-	 *  component.
+	 * @param components              {@link Component}s involved in a modification.
+	 * @param indexOfComponent1       index of the first component.
+	 * @param labelOfAtomOnComponent1 label of the atom on the first component.
+	 * @param indexOfComponent2       index of the second component.
+	 * @param labelOfAtomOnComponent2 label of the atom on the second component.
 	 */
-	public ModificationLinkage(
-			final List<Component> components,
-			final int indexOfComponent1,
-			final List<String> pdbNameOfPotentialAtomsOnComponent1,
-			final int indexOfComponent2,
+	public ModificationLinkage(final List<Component> components, final int indexOfComponent1,
+			final List<String> pdbNameOfPotentialAtomsOnComponent1, final int indexOfComponent2,
 			final List<String> pdbNameOfPotentialAtomsOnComponent2) {
-		this(components, indexOfComponent1, pdbNameOfPotentialAtomsOnComponent1,
-				null, indexOfComponent2, pdbNameOfPotentialAtomsOnComponent2, null);
+		this(components, indexOfComponent1, pdbNameOfPotentialAtomsOnComponent1, null, indexOfComponent2,
+				pdbNameOfPotentialAtomsOnComponent2, null);
 	}
 
 	/**
 	 *
-	 * @param components {@link Component}s involved in a modification.
-	 * @param indexOfComponent1 index of the first component.
-	 * @param pdbNameOfPotentialAtomsOnComponent1 a list of PDB names of
-	 *  potential atoms on the first component.
-	 * @param labelOfAtomOnComponent1 label of the atom on the first
-	 *  component.
-	 * @param indexOfComponent2 index of the second component.
-	 * @param pdbNameOfPotentialAtomsOnComponent2 a list of PDB names of
-	 *  potential atoms on the second component.
-	 * @param labelOfAtomOnComponent2 label of the atom on the second
-	 *  component.
+	 * @param components                          {@link Component}s involved in a
+	 *                                            modification.
+	 * @param indexOfComponent1                   index of the first component.
+	 * @param pdbNameOfPotentialAtomsOnComponent1 a list of PDB names of potential
+	 *                                            atoms on the first component.
+	 * @param labelOfAtomOnComponent1             label of the atom on the first
+	 *                                            component.
+	 * @param indexOfComponent2                   index of the second component.
+	 * @param pdbNameOfPotentialAtomsOnComponent2 a list of PDB names of potential
+	 *                                            atoms on the second component.
+	 * @param labelOfAtomOnComponent2             label of the atom on the second
+	 *                                            component.
 	 */
-	public ModificationLinkage(
-			final List<Component> components,
-			final int indexOfComponent1,
-			final List<String> pdbNameOfPotentialAtomsOnComponent1,
-			final String labelOfAtomOnComponent1,
-			final int indexOfComponent2,
-			final List<String> pdbNameOfPotentialAtomsOnComponent2,
+	public ModificationLinkage(final List<Component> components, final int indexOfComponent1,
+			final List<String> pdbNameOfPotentialAtomsOnComponent1, final String labelOfAtomOnComponent1,
+			final int indexOfComponent2, final List<String> pdbNameOfPotentialAtomsOnComponent2,
 			final String labelOfAtomOnComponent2) {
 		if (components == null) {
 			throw new IllegalArgumentException("Null components");
 		}
 
-		if ( indexOfComponent1 < 0)
+		if (indexOfComponent1 < 0) {
 			throw new IllegalArgumentException("indexOfComponent1 has to be >= 0");
-		if ( indexOfComponent1 >= components.size())
+		}
+		if (indexOfComponent1 >= components.size()) {
 			throw new IllegalArgumentException("indexOfComponent1 has to be <= components.size()");
+		}
 
-		if ( indexOfComponent2 < 0)
+		if (indexOfComponent2 < 0) {
 			throw new IllegalArgumentException("indexOfComponent2 has to be >= 0");
-		if ( indexOfComponent2 >= components.size())
-			throw new IllegalArgumentException("indexOfComponent2 [" + indexOfComponent2 + "] has to be <= components.size() [" + components.size()+"]");
-
-
+		}
+		if (indexOfComponent2 >= components.size()) {
+			throw new IllegalArgumentException(new StringBuilder().append("indexOfComponent2 [")
+					.append(indexOfComponent2).append("] has to be <= components.size() [").append(components.size())
+					.append("]").toString());
+		}
 
 		if (indexOfComponent1 == indexOfComponent2) {
-			throw new IllegalArgumentException("No linkage is allowed for an" +
-					" identical component.");
+			throw new IllegalArgumentException("No linkage is allowed for an" + " identical component.");
 		}
 
 		this.components = components;
@@ -218,13 +202,15 @@ public class ModificationLinkage {
 		Component comp2 = getComponent2();
 		List<String> atom1 = getPDBNameOfPotentialAtomsOnComponent1();
 		List<String> atom2 = getPDBNameOfPotentialAtomsOnComponent2();
-		if ( comp1 == null || comp2 == null) {
+		if (comp1 == null || comp2 == null) {
 			return "ModificationLinkage: empty";
 		}
-		if ( comp1.getPdbccIds() != null && comp2.getPdbccIds() != null) {
-			return "ModificationLinkage: " + comp1.getPdbccIds().toString()+":"+atom1+"<=>" + comp2.getPdbccIds()+atom2;
+		if (comp1.getPdbccIds() != null && comp2.getPdbccIds() != null) {
+			return new StringBuilder().append("ModificationLinkage: ").append(comp1.getPdbccIds().toString())
+					.append(":").append(atom1).append("<=>").append(comp2.getPdbccIds()).append(atom2).toString();
 		} else {
-			return "ModificationLinkage :"+atom1+"<=>" + atom2;
+			return new StringBuilder().append("ModificationLinkage :").append(atom1).append("<=>").append(atom2)
+					.toString();
 		}
 	}
 }

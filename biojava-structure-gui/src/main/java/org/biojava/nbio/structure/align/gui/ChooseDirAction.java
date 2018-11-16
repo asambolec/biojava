@@ -30,23 +30,29 @@ import org.biojava.nbio.structure.align.webstart.WebStartMain;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** Ask the user to provide a directory containting PDB files.
- * Sets the idr in the provided textField.
+/**
+ * Ask the user to provide a directory containting PDB files. Sets the idr in
+ * the provided textField.
+ * 
  * @author Andreas Prlic
  *
  */
-public class ChooseDirAction extends AbstractAction{
+public class ChooseDirAction extends AbstractAction {
 
+	private static final Logger logger = LoggerFactory.getLogger(ChooseDirAction.class);
+	public static final long serialVersionUID = 0l;
 	JTextField textField;
 	UserConfiguration config;
-	public ChooseDirAction (JTextField textField, UserConfiguration config){
+
+	public ChooseDirAction(JTextField textField, UserConfiguration config) {
 		super("Choose");
 		this.config = config;
 		this.textField = textField;
 	}
-	public static final long serialVersionUID = 0l;
+
 	// This method is called when the button is pressed
 	@Override
 	public void actionPerformed(ActionEvent evt) {
@@ -54,11 +60,11 @@ public class ChooseDirAction extends AbstractAction{
 		JFileChooser chooser = new JFileChooser();
 		String txt = textField.getText();
 
-		if ( config == null) {
-			System.out.println("config == null, calling getWebStartConfig...");
+		if (config == null) {
+			logger.info("config == null, calling getWebStartConfig...");
 			config = WebStartMain.getWebStartConfig();
 		}
-		if ( txt != null){
+		if (txt != null) {
 			chooser.setCurrentDirectory(new java.io.File(txt));
 			config.setPdbFilePath(txt);
 
@@ -71,14 +77,14 @@ public class ChooseDirAction extends AbstractAction{
 		chooser.setAcceptAllFileFilterUsed(false);
 		//
 
-
-//		In response to a button click:
+		// In response to a button click:
 		int returnVal = chooser.showOpenDialog(null);
-		if ( returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-			textField.setText(file.getAbsolutePath());
-			textField.repaint();
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
 		}
+		File file = chooser.getSelectedFile();
+		textField.setText(file.getAbsolutePath());
+		textField.repaint();
 
 	}
 }

@@ -35,9 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Controls global {@link EcodDatabase EcodDatabases} being used.
- * Implements a multiton pattern through {@link #getEcodDatabase(String)},
- * and a singleton pattern through {@link #getEcodDatabase()}.
+ * Controls global {@link EcodDatabase EcodDatabases} being used. Implements a
+ * multiton pattern through {@link #getEcodDatabase(String)}, and a singleton
+ * pattern through {@link #getEcodDatabase()}.
+ * 
  * @author Spencer Bliven
  * @see ScopFactory
  * @see CathFactory
@@ -46,12 +47,16 @@ import org.slf4j.LoggerFactory;
 public class EcodFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(EcodFactory.class);
-	
+
 	public static final String DEFAULT_VERSION = EcodInstallation.DEFAULT_VERSION;
 
-	private static Map<String, SoftReference<EcodDatabase>> versionedEcodDBs =
-			Collections.synchronizedMap(new HashMap<String, SoftReference<EcodDatabase>>());
+	private static Map<String, SoftReference<EcodDatabase>> versionedEcodDBs = Collections
+			.synchronizedMap(new HashMap<>());
 	private static String defaultVersion = EcodInstallation.DEFAULT_VERSION;
+
+	/** Can't instantiate */
+	private EcodFactory() {
+	}
 
 	/**
 	 * Returns the (singleton) database for the current default version
@@ -61,37 +66,37 @@ public class EcodFactory {
 	}
 
 	public static EcodDatabase getEcodDatabase(String version) {
-		if( version == null )
+		if (version == null) {
 			version = defaultVersion;
+		}
 
-		logger.trace("Waiting for EcodFactory lock to get version "+version);
-		synchronized(versionedEcodDBs) {
-			logger.trace("Got EcodFactory lock to get version "+version);
+		logger.trace("Waiting for EcodFactory lock to get version " + version);
+		synchronized (versionedEcodDBs) {
+			logger.trace("Got EcodFactory lock to get version " + version);
 
 			releaseReferences();
 
 			SoftReference<EcodDatabase> ecodRef = versionedEcodDBs.get(version.toLowerCase());
 			EcodDatabase ecod = null;
-			if(ecodRef != null) {
+			if (ecodRef != null) {
 				ecod = ecodRef.get();
 			}
-			if( ecod == null ) {
-				logger.debug("Creating new {}, version {}",EcodInstallation.class.getSimpleName(),version);
+			if (ecod == null) {
+				logger.debug("Creating new {}, version {}", EcodInstallation.class.getSimpleName(), version);
 				String cacheDir = new UserConfiguration().getCacheFilePath();
 				ecod = new EcodInstallation(cacheDir, version);
-				versionedEcodDBs.put(version.toLowerCase(), new SoftReference<EcodDatabase>(ecod));
+				versionedEcodDBs.put(version.toLowerCase(), new SoftReference<>(ecod));
 
 				// If the parsed version differed from that requested, add that too
 				// Note that getVersion() may trigger file parsing
 				try {
-					if( ! versionedEcodDBs.containsKey(ecod.getVersion().toLowerCase()) ) {
-						versionedEcodDBs.put(ecod.getVersion().toLowerCase(),new SoftReference<EcodDatabase>(ecod));
-					}
+					versionedEcodDBs.putIfAbsent(ecod.getVersion().toLowerCase(), new SoftReference<>(ecod));
 				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
 					// For parsing errors, just use the requested version
 				}
 			}
-			logger.trace("Releasing EcodFactory lock after getting version "+version);
+			logger.trace("Releasing EcodFactory lock after getting version " + version);
 
 			return ecod;
 		}
@@ -101,13 +106,13 @@ public class EcodFactory {
 	 * removes SoftReferences which have already been garbage collected
 	 */
 	private static void releaseReferences() {
-		synchronized(versionedEcodDBs) {
+		synchronized (versionedEcodDBs) {
 			Iterator<Entry<String, SoftReference<EcodDatabase>>> it = versionedEcodDBs.entrySet().iterator();
-			while(it.hasNext()) {
+			while (it.hasNext()) {
 				Entry<String, SoftReference<EcodDatabase>> entry = it.next();
 				SoftReference<EcodDatabase> ref = entry.getValue();
-				if(ref.get() == null) {
-					logger.debug("Removed version {} from EcodFactory to save memory.",entry.getKey());
+				if (ref.get() == null) {
+					logger.debug("Removed version {} from EcodFactory to save memory.", entry.getKey());
 					it.remove();
 				}
 			}
@@ -116,14 +121,12 @@ public class EcodFactory {
 
 	/**
 	 * Updates the default version
+	 * 
 	 * @param version
 	 */
 	public static void setEcodDatabase(String version) {
 		getEcodDatabase(version);
 		defaultVersion = version;
 	}
-
-	/** Can't instantiate */
-	private EcodFactory() {}
 
 }

@@ -29,23 +29,23 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-
-
 /**
- * A term in an ontology.  This has an {@link org.biojava.nbio.Annotation Annotation}
- * which can be used for storing additional human-displayable information.  It
- * is strongly recommended that the Annotation is not used for any machine-readable
- * data -- this should be represented by relations in the ontology instead.
+ * A term in an ontology. This has an {@link org.biojava.nbio.Annotation
+ * Annotation} which can be used for storing additional human-displayable
+ * information. It is strongly recommended that the Annotation is not used for
+ * any machine-readable data -- this should be represented by relations in the
+ * ontology instead.
  *
  * <p>
  * Terms are things that represent things. They are the same sort of thing as a
  * Java object or a prolog atom. A sub-set of terms are themselves relations.
- * This means that they are used to describe associations between pairs of terms.
- * Since all terms can be described, it is possible (and indeed encouraged) to
- * describe relations. As a minimum, you should consider saying if they are
- * identity or partial order relations, or if they are transitive, reflexive,
- * symmetrical, anti-symmetrical or anything else you know about them. This gives
- * the inference engine some chance of working out what is going on.
+ * This means that they are used to describe associations between pairs of
+ * terms. Since all terms can be described, it is possible (and indeed
+ * encouraged) to describe relations. As a minimum, you should consider saying
+ * if they are identity or partial order relations, or if they are transitive,
+ * reflexive, symmetrical, anti-symmetrical or anything else you know about
+ * them. This gives the inference engine some chance of working out what is
+ * going on.
  * </p>
  *
  * @author Thomas Down
@@ -56,27 +56,28 @@ import java.util.TreeSet;
 
 public interface Term extends Annotatable {
 	/**
-	 * ChangeType which indicates that this term's ontology has been
-	 * altered
+	 * ChangeType which indicates that this term's ontology has been altered
 	 */
-
 
 	/**
 	 * Return the name of this term.
+	 * 
 	 * @return the name of the term
 	 */
 
 	public String getName();
 
 	/**
-	 * Return a human-readable description of this term, or the empty string if
-	 * none is available.
+	 * Return a human-readable description of this term, or the empty string if none
+	 * is available.
+	 * 
 	 * @return the description of the term
 	 */
 
 	public String getDescription();
 
-	/** set the description of the term;
+	/**
+	 * set the description of the term;
 	 *
 	 * @param description
 	 *
@@ -85,6 +86,7 @@ public interface Term extends Annotatable {
 
 	/**
 	 * Return the ontology in which this term exists.
+	 * 
 	 * @return the ontology
 	 */
 
@@ -92,6 +94,7 @@ public interface Term extends Annotatable {
 
 	/**
 	 * Return the synonyms for this term.
+	 * 
 	 * @return the synonyms
 	 */
 
@@ -99,6 +102,7 @@ public interface Term extends Annotatable {
 
 	/**
 	 * Add a synonym for this term.
+	 * 
 	 * @param synonym the synonym
 	 */
 
@@ -106,6 +110,7 @@ public interface Term extends Annotatable {
 
 	/**
 	 * Remove a synonym for this term.
+	 * 
 	 * @param synonym
 	 */
 
@@ -113,13 +118,12 @@ public interface Term extends Annotatable {
 
 	/**
 	 * Simple in-memory implementation of an ontology term.
-	 * @see org.biojavax.ontology.SimpleComparableTerm
-	 * This can be used to implement Ontology.createTerm
+	 * 
+	 * @see org.biojavax.ontology.SimpleComparableTerm This can be used to implement
+	 *      Ontology.createTerm
 	 */
 
-	public static class Impl
-	extends AbstractTerm
-	implements Term, java.io.Serializable {
+	public static class Impl extends AbstractTerm implements Term, java.io.Serializable {
 		/**
 		 *
 		 */
@@ -132,11 +136,11 @@ public interface Term extends Annotatable {
 		private Set<Object> synonyms;
 
 		public Impl(Ontology ontology, String name) {
-			this(ontology,name,null,null);
+			this(ontology, name, null, null);
 		}
 
 		public Impl(Ontology ontology, String name, String description) {
-			this(ontology,name,description,null);
+			this(ontology, name, description, null);
 		}
 
 		public Impl(Ontology ontology, String name, String description, Object[] synonyms) {
@@ -144,9 +148,9 @@ public interface Term extends Annotatable {
 				throw new NullPointerException("Name must not be null");
 			}
 			// by AP - description can change from now on...
-			//if (description == null) {
-			//    throw new NullPointerException("Description must not be null");
-			//}
+			// if (description == null) {
+			// throw new NullPointerException("Description must not be null");
+			// }
 			if (ontology == null) {
 				throw new NullPointerException("Ontology must not be null");
 			}
@@ -155,8 +159,10 @@ public interface Term extends Annotatable {
 			this.description = description;
 			this.ontology = ontology;
 
-			this.synonyms = new TreeSet<Object>();
-			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+			this.synonyms = new TreeSet<>();
+			if (synonyms != null) {
+				this.synonyms.addAll(Arrays.asList(synonyms));
+			}
 		}
 
 		@Override
@@ -210,24 +216,27 @@ public interface Term extends Annotatable {
 			return annotation;
 		}
 
-	  @Override
-	public int hashCode() {
-		int value = 17;
-		if(getName() != null)
-		  value *= 31 * getName().hashCode();
-		return 17 * value;
-	  }
+		@Override
+		public int hashCode() {
+			int value = 17;
+			if (getName() != null) {
+				value *= 31 * getName().hashCode();
+			}
+			return 17 * value;
+		}
 
-	  @Override
-	public boolean equals(Object obj)
-	  {
-		if(obj == this) return true;
-		if(!(obj instanceof Term)) return false;
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == this) {
+				return true;
+			}
+			if (!(obj instanceof Term)) {
+				return false;
+			}
 
-		Term that = (Term) obj;
+			Term that = (Term) obj;
 
-		return this.getOntology() == that.getOntology() &&
-				this.getName() == that.getName();
-	  }
+			return this.getOntology() == that.getOntology() && this.getName().equals(that.getName());
+		}
 	}
 }

@@ -56,21 +56,6 @@ import java.util.Map;
  */
 public class TranscriptionEngine {
 
-	private static final class IOD {
-
-		public static final TranscriptionEngine INSTANCE = new TranscriptionEngine.Builder()
-				.build();
-	}
-
-	/**
-	 * Default instance to use when Transcribing from DNA -&gt; RNA -&gt;
-	 * Protein. If you require anything that is not a default setting then look
-	 * at @ TranscriptionEngine.Builder} for customisation options.
-	 */
-	public static TranscriptionEngine getDefault() {
-		return IOD.INSTANCE;
-	}
-
 	private final Table table;
 	private final RNAToAminoAcidTranslator rnaAminoAcidTranslator;
 	private final DNAToRNATranslator dnaRnaTranslator;
@@ -80,13 +65,10 @@ public class TranscriptionEngine {
 	private final CompoundSet<NucleotideCompound> rnaCompounds;
 	private final CompoundSet<AminoAcidCompound> aminoAcidCompounds;
 
-	private TranscriptionEngine(Table table,
-			RNAToAminoAcidTranslator rnaAminoAcidTranslator,
-			DNAToRNATranslator dnaRnaTranslator,
-			SequenceCreatorInterface<AminoAcidCompound> proteinSequenceCreator,
+	private TranscriptionEngine(Table table, RNAToAminoAcidTranslator rnaAminoAcidTranslator,
+			DNAToRNATranslator dnaRnaTranslator, SequenceCreatorInterface<AminoAcidCompound> proteinSequenceCreator,
 			SequenceCreatorInterface<NucleotideCompound> rnaSequenceCreator,
-			CompoundSet<NucleotideCompound> dnaCompounds,
-			CompoundSet<NucleotideCompound> rnaCompounds,
+			CompoundSet<NucleotideCompound> dnaCompounds, CompoundSet<NucleotideCompound> rnaCompounds,
 			CompoundSet<AminoAcidCompound> aminoAcidCompounds) {
 		this.table = table;
 		this.rnaAminoAcidTranslator = rnaAminoAcidTranslator;
@@ -99,39 +81,40 @@ public class TranscriptionEngine {
 	}
 
 	/**
-	 * Quick method to let you go from a CDS to a Peptide quickly. It assumes
-	 * you are translating only in the first frame
+	 * Default instance to use when Transcribing from DNA -&gt; RNA -&gt; Protein.
+	 * If you require anything that is not a default setting then look at @
+	 * TranscriptionEngine.Builder} for customisation options.
+	 */
+	public static TranscriptionEngine getDefault() {
+		return IOD.INSTANCE;
+	}
+
+	/**
+	 * Quick method to let you go from a CDS to a Peptide quickly. It assumes you
+	 * are translating only in the first frame
 	 *
-	 * @param dna
-	 *            The CDS to translate
+	 * @param dna The CDS to translate
 	 * @return The Protein Sequence
 	 */
-	public Sequence<AminoAcidCompound> translate(
-			Sequence<NucleotideCompound> dna) {
-		Map<Frame, Sequence<AminoAcidCompound>> trans = multipleFrameTranslation(
-				dna, Frame.ONE);
+	public Sequence<AminoAcidCompound> translate(Sequence<NucleotideCompound> dna) {
+		Map<Frame, Sequence<AminoAcidCompound>> trans = multipleFrameTranslation(dna, Frame.ONE);
 		return trans.get(Frame.ONE);
 	}
 
 	/**
 	 * A way of translating DNA in a number of frames
 	 *
-	 * @param dna
-	 *            The CDS to translate
-	 * @param frames
-	 *            The Frames to translate in
-	 * @return All generated protein sequences in the given frames. Can have
-	 *         null entries
+	 * @param dna    The CDS to translate
+	 * @param frames The Frames to translate in
+	 * @return All generated protein sequences in the given frames. Can have null
+	 *         entries
 	 */
-	public Map<Frame, Sequence<AminoAcidCompound>> multipleFrameTranslation(
-			Sequence<NucleotideCompound> dna, Frame... frames) {
-		Map<Frame, Sequence<AminoAcidCompound>> results = new EnumMap<Frame, Sequence<AminoAcidCompound>>(
-				Frame.class);
+	public Map<Frame, Sequence<AminoAcidCompound>> multipleFrameTranslation(Sequence<NucleotideCompound> dna,
+			Frame... frames) {
+		Map<Frame, Sequence<AminoAcidCompound>> results = new EnumMap<>(Frame.class);
 		for (Frame frame : frames) {
-			Sequence<NucleotideCompound> rna = getDnaRnaTranslator()
-					.createSequence(dna, frame);
-			Sequence<AminoAcidCompound> peptide = getRnaAminoAcidTranslator()
-					.createSequence(rna);
+			Sequence<NucleotideCompound> rna = getDnaRnaTranslator().createSequence(dna, frame);
+			Sequence<AminoAcidCompound> peptide = getRnaAminoAcidTranslator().createSequence(rna);
 			results.put(frame, peptide);
 		}
 		return results;
@@ -169,6 +152,11 @@ public class TranscriptionEngine {
 		return aminoAcidCompounds;
 	}
 
+	private static final class IOD {
+
+		public static final TranscriptionEngine INSTANCE = new TranscriptionEngine.Builder().build();
+	}
+
 	/**
 	 * This class is the way to create a {@link TranslationEngine}.
 	 */
@@ -192,15 +180,13 @@ public class TranscriptionEngine {
 
 		/**
 		 * The method to finish any calls to the builder with which returns a
-		 * transcription engine. The engine is designed to provide everything
-		 * required for transcription to those classes which will do the
-		 * transcription.
+		 * transcription engine. The engine is designed to provide everything required
+		 * for transcription to those classes which will do the transcription.
 		 */
 		public TranscriptionEngine build() {
-			return new TranscriptionEngine(getTable(),
-					getRnaAminoAcidTranslator(), getDnaRnaTranslator(),
-					getProteinCreator(), getRnaCreator(), getDnaCompounds(),
-					getRnaCompounds(), getAminoAcidCompounds());
+			return new TranscriptionEngine(getTable(), getRnaAminoAcidTranslator(), getDnaRnaTranslator(),
+					getProteinCreator(), getRnaCreator(), getDnaCompounds(), getRnaCompounds(),
+					getAminoAcidCompounds());
 		}
 
 		// ---- START OF BUILDER METHODS
@@ -237,8 +223,7 @@ public class TranscriptionEngine {
 			return this;
 		}
 
-		public Builder aminoAcidsCompounds(
-				CompoundSet<AminoAcidCompound> compounds) {
+		public Builder aminoAcidsCompounds(CompoundSet<AminoAcidCompound> compounds) {
 			this.aminoAcidCompounds = compounds;
 			return this;
 		}
@@ -248,20 +233,17 @@ public class TranscriptionEngine {
 			return this;
 		}
 
-		public Builder rnaAminoAcidTranslator(
-				RNAToAminoAcidTranslator translator) {
+		public Builder rnaAminoAcidTranslator(RNAToAminoAcidTranslator translator) {
 			this.rnaAminoAcidTranslator = translator;
 			return this;
 		}
 
-		public Builder proteinCreator(
-				SequenceCreatorInterface<AminoAcidCompound> creator) {
+		public Builder proteinCreator(SequenceCreatorInterface<AminoAcidCompound> creator) {
 			this.proteinSequenceCreator = creator;
 			return this;
 		}
 
-		public Builder rnaCreator(
-				SequenceCreatorInterface<NucleotideCompound> creator) {
+		public Builder rnaCreator(SequenceCreatorInterface<NucleotideCompound> creator) {
 			this.rnaSequenceCreator = creator;
 			return this;
 		}
@@ -282,8 +264,8 @@ public class TranscriptionEngine {
 		}
 
 		/**
-		 * If set, then the last codon translated in the resulting peptide
-		 * sequence will be the stop codon
+		 * If set, then the last codon translated in the resulting peptide sequence will
+		 * be the stop codon
 		 */
 		public Builder stopAtStopCodons(boolean stopAtStopCodons) {
 			this.stopAtStopCodons = stopAtStopCodons;
@@ -291,8 +273,7 @@ public class TranscriptionEngine {
 		}
 
 		/**
-		 * If set, then translation will not start until a start codon is
-		 * encountered
+		 * If set, then translation will not start until a start codon is encountered
 		 */
 		public Builder waitForStartCodon(boolean waitForStartCodon) {
 			this.waitForStartCodon = waitForStartCodon;
@@ -300,8 +281,8 @@ public class TranscriptionEngine {
 		}
 
 		/**
-		 * Performs an optimisation where RNASequences are not translated into
-		 * their own objects but are views onto the base DNA sequence.
+		 * Performs an optimisation where RNASequences are not translated into their own
+		 * objects but are views onto the base DNA sequence.
 		 */
 		public Builder decorateRna(boolean decorateRna) {
 			this.decorateRna = decorateRna;
@@ -334,25 +315,21 @@ public class TranscriptionEngine {
 			if (dnaRnaTranslator != null) {
 				return dnaRnaTranslator;
 			}
-			return new DNAToRNATranslator(new RNASequenceCreator(
-					getRnaCompounds()), getDnaCompounds(), getRnaCompounds(),
-					isDecorateRna());
+			return new DNAToRNATranslator(new RNASequenceCreator(getRnaCompounds()), getDnaCompounds(),
+					getRnaCompounds(), isDecorateRna());
 		}
 
 		private RNAToAminoAcidTranslator getRnaAminoAcidTranslator() {
 			if (rnaAminoAcidTranslator != null) {
 				return rnaAminoAcidTranslator;
 			}
-			return new RNAToAminoAcidTranslator(getProteinCreator(),
-					getRnaCompounds(), getCodons(), getAminoAcidCompounds(),
-					getTable(), isTrimStop(), isInitMet(),
-					isTranslateNCodons(), isStopAtStopCodons(),
-					isWaitForStartCodon());
+			return new RNAToAminoAcidTranslator(getProteinCreator(), getRnaCompounds(), getCodons(),
+					getAminoAcidCompounds(), getTable(), isTrimStop(), isInitMet(), isTranslateNCodons(),
+					isStopAtStopCodons(), isWaitForStartCodon());
 		}
 
 		private CompoundSet<Codon> getCodons() {
-			return getTable().getCodonCompoundSet(getRnaCompounds(),
-					getAminoAcidCompounds());
+			return getTable().getCodonCompoundSet(getRnaCompounds(), getAminoAcidCompounds());
 		}
 
 		private SequenceCreatorInterface<AminoAcidCompound> getProteinCreator() {

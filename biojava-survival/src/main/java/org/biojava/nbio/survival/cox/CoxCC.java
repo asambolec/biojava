@@ -41,10 +41,10 @@ public class CoxCC {
 	 */
 	static public void process(CoxInfo ci) throws Exception {
 		ArrayList<SurvivalInfo> survivalInfoList = ci.survivalInfoList;
-		//r
-		ArrayList<String> variables = new ArrayList<String>(ci.getCoefficientsList().keySet());
+		// r
+		ArrayList<String> variables = new ArrayList<>(ci.getCoefficientsList().keySet());
 
-		ArrayList<Integer> strataClass = new ArrayList<Integer>(survivalInfoList.size());
+		ArrayList<Integer> strataClass = new ArrayList<>(survivalInfoList.size());
 		double[] wt = new double[survivalInfoList.size()];
 		for (int i = 0; i < survivalInfoList.size(); i++) {
 			SurvivalInfo si = survivalInfoList.get(i);
@@ -52,20 +52,19 @@ public class CoxCC {
 			wt[i] = si.getWeight();
 		}
 
-
 		double[][] r = ResidualsCoxph.process(ci, ResidualsCoxph.Type.score, false, null); // dn not use weighted
 
 		// ArrayList<String> variables = ci.survivalInfoList.get(0).getDataVariables();
-//        if (false) {
-//            for (int i = 0; i < survivalInfoList.size(); i++) {
-//                SurvivalInfo si = survivalInfoList.get(i);
-//                System.out.print("Cox cc " + si.getOrder());
-//                for (int j = 0; j < variables.size(); j++) {
-//                    System.out.print(" " + r[i][j]);
-//                }
-//                System.out.println();
-//            }
-//        }
+		// if (false) {
+		// for (int i = 0; i < survivalInfoList.size(); i++) {
+		// SurvivalInfo si = survivalInfoList.get(i);
+		// System.out.print("Cox cc " + si.getOrder());
+		// for (int j = 0; j < variables.size(); j++) {
+		// System.out.print(" " + r[i][j]);
+		// }
+		// System.out.println();
+		// }
+		// }
 
 		double[][] rvar = null;
 
@@ -74,23 +73,21 @@ public class CoxCC {
 		} else {
 			rvar = ci.getVariance();
 		}
-		//nj
-		LinkedHashMap<Integer, Double> nj = new LinkedHashMap<Integer, Double>();
+		// nj
+		LinkedHashMap<Integer, Double> nj = new LinkedHashMap<>();
 		Collections.sort(strataClass);
-		for (Integer value : strataClass) {
+		strataClass.forEach(value -> {
 			Double count = nj.get(value);
 			if (count == null) {
 				count = 0.0;
 			}
 			count++;
 			nj.put(value, count);
-		}
-		//Nj
-		LinkedHashMap<Integer, Double> Nj = new LinkedHashMap<Integer, Double>();
-		//N = N + Nj[key];
-		double N = 0;
-		for (int i = 0; i < survivalInfoList.size(); i++) {
-			SurvivalInfo si = survivalInfoList.get(i);
+		});
+		// Nj
+		LinkedHashMap<Integer, Double> Nj = new LinkedHashMap<>();
+		// N = N + Nj[key];
+		survivalInfoList.forEach(si -> {
 			Integer strata = si.getStrata();
 			Double weight = si.getWeight();
 			Double sum = Nj.get(strata);
@@ -100,33 +97,32 @@ public class CoxCC {
 			sum = sum + weight;
 			Nj.put(strata, sum);
 
-		}
+		});
 
-		for(Double value : Nj.values()){
-			N = N + value;
-		}
+		double N = Nj.values().stream().mapToDouble(Double::doubleValue).sum();
 
-		LinkedHashMap<Integer, Double> k1j = new LinkedHashMap<Integer, Double>();
-		for (Integer key : nj.keySet()) {
-			double _nj = (nj.get(key)); //trying to copy what R is doing on precision
+		LinkedHashMap<Integer, Double> k1j = new LinkedHashMap<>();
+		nj.keySet().forEach(key -> {
+			double _nj = (nj.get(key)); // trying to copy what R is doing on precision
 			double _Nj = (Nj.get(key));
-			//         System.out.println("nj=" + _nj + " Nj=" + _Nj);
+			// System.out.println("nj=" + _nj + " Nj=" + _Nj);
 			k1j.put(key, _Nj * ((_Nj / _nj) - 1));
-		}
+		});
 
 		double[][] V = new double[variables.size()][variables.size()];
 
 		for (Integer i : k1j.keySet()) {
-			//          System.out.println("Strata=" + i + " " + k1j.get(i) + " " + Nj.get(i) + " " + nj.get(i));
+			// System.out.println("Strata=" + i + " " + k1j.get(i) + " " + Nj.get(i) + " " +
+			// nj.get(i));
 			if (nj.get(i) > 1) {
-				LinkedHashMap<String, DescriptiveStatistics> variableStatsMap = new LinkedHashMap<String, DescriptiveStatistics>();
+				LinkedHashMap<String, DescriptiveStatistics> variableStatsMap = new LinkedHashMap<>();
 
 				for (int p = 0; p < survivalInfoList.size(); p++) {
 					SurvivalInfo si = survivalInfoList.get(p);
 					if (si.getStrata() != i) {
 						continue;
 					}
-					//              System.out.print(si.order + " ");
+					// System.out.print(si.order + " ");
 					for (int col = 0; col < variables.size(); col++) {
 						String v = variables.get(col);
 						DescriptiveStatistics ds = variableStatsMap.get(v);
@@ -135,11 +131,12 @@ public class CoxCC {
 							variableStatsMap.put(v, ds);
 						}
 						ds.addValue(r[p][col]);
-						//                  System.out.print(si.getResidualVariable(v) + "  ");
+						// System.out.print(si.getResidualVariable(v) + " ");
 					}
-					//              System.out.println();
+					// System.out.println();
 				}
-				//calculate variance covariance matrix var(r[class==levels(class)[i],],use='comp')
+				// calculate variance covariance matrix
+				// var(r[class==levels(class)[i],],use='comp')
 				double[][] var_covar = new double[variables.size()][variables.size()];
 				for (int m = 0; m < variables.size(); m++) {
 					String var_m = variables.get(m);
@@ -157,34 +154,35 @@ public class CoxCC {
 						}
 					}
 				}
-		 //              System.out.println();
-		 //              System.out.println("sstrat=" + i);
-		 //              StdArrayIO.print(var_covar);
+				// System.out.println();
+				// System.out.println("sstrat=" + i);
+				// StdArrayIO.print(var_covar);
 
-					   V = Matrix.add(V, Matrix.scale(var_covar, k1j.get(i))  );
+				V = Matrix.add(V, Matrix.scale(var_covar, k1j.get(i)));
 
-		 //       for (int m = 0; m < V.length; m++) {
-		 //           for (int n = 0; n < V.length; n++) {
-		 //               V[m][n] = V[m][n] + (k1j.get(i) * var_covar[m][n]);
-		  //
-		 //           }
-		  //      }
+				// for (int m = 0; m < V.length; m++) {
+				// for (int n = 0; n < V.length; n++) {
+				// V[m][n] = V[m][n] + (k1j.get(i) * var_covar[m][n]);
+				//
+				// }
+				// }
 			}
 		}
-		//     System.out.println("V");
-		//     StdArrayIO.print(V);
-		//     System.out.println();
-		//z$var <- rvar + rvar %*% V %*% rvar # replace variance in z
+		// System.out.println("V");
+		// StdArrayIO.print(V);
+		// System.out.println();
+		// z$var <- rvar + rvar %*% V %*% rvar # replace variance in z
 		double[][] imat1 = Matrix.multiply(rvar, V);
 		imat1 = Matrix.multiply(imat1, rvar);
 		imat1 = Matrix.add(rvar, imat1);
-		//  System.out.println("New var");
-		//  StdArrayIO.print(imat1);
+		// System.out.println("New var");
+		// StdArrayIO.print(imat1);
 		ci.setVariance(imat1);
 
-		//need to update walsh stats for overall model
+		// need to update walsh stats for overall model
 		CoxR.calculateWaldTestInfo(ci);
-		//per Bob/Kathryn email on 4/23/2014 in a weighted model LogRank p-value is no longer valid so should erase it
+		// per Bob/Kathryn email on 4/23/2014 in a weighted model LogRank p-value is no
+		// longer valid so should erase it
 		ci.setScoreLogrankTest(Double.NaN);
 		ci.setScoreLogrankTestpvalue(Double.NaN);
 	}

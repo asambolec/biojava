@@ -24,6 +24,7 @@ package org.biojava.nbio.core.exceptions;
 
 /**
  * Thrown from AbstractCompundTranslator
+ * 
  * @author Andy Yates
  *
  */

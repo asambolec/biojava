@@ -40,6 +40,8 @@ import org.biojava.nbio.phylo.TreeConstructorType;
 import org.forester.evoinference.matrix.distance.BasicSymmetricalDistanceMatrix;
 import org.forester.evoinference.matrix.distance.DistanceMatrix;
 import org.forester.phylogeny.Phylogeny;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This demo contains the CookBook example to create a phylogenetic tree from a
@@ -51,51 +53,42 @@ import org.forester.phylogeny.Phylogeny;
  */
 public class DemoDistanceTree {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoDistanceTree.class);
+
 	public static void main(String[] args) throws Exception {
 
 		// 0. This is just to load an example MSA from a FASTA file
-		InputStream inStream = TreeConstructor.class
-				.getResourceAsStream("/PF00104_small.fasta");
+		InputStream inStream = TreeConstructor.class.getResourceAsStream("/PF00104_small.fasta");
 
-		FastaReader<ProteinSequence, AminoAcidCompound> fastaReader =
-				new FastaReader<ProteinSequence, AminoAcidCompound>(
-				inStream,
+		FastaReader<ProteinSequence, AminoAcidCompound> fastaReader = new FastaReader<>(inStream,
 				new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>(),
-				new ProteinSequenceCreator(AminoAcidCompoundSet
-						.getAminoAcidCompoundSet()));
+				new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet()));
 
-		LinkedHashMap<String, ProteinSequence> proteinSequences =
-				fastaReader.process();
+		LinkedHashMap<String, ProteinSequence> proteinSequences = fastaReader.process();
 
 		inStream.close();
 
-		MultipleSequenceAlignment<ProteinSequence, AminoAcidCompound> msa =
-				new MultipleSequenceAlignment<ProteinSequence, AminoAcidCompound>();
+		MultipleSequenceAlignment<ProteinSequence, AminoAcidCompound> msa = new MultipleSequenceAlignment<>();
 
-		for (ProteinSequence proteinSequence : proteinSequences.values()) {
-			msa.addAlignedSequence(proteinSequence);
-		}
+		proteinSequences.values().forEach(msa::addAlignedSequence);
 
 		long readT = System.currentTimeMillis();
 
 		// 1. Calculate the evolutionary distance matrix (can take long)
-		SubstitutionMatrix<AminoAcidCompound> M = SubstitutionMatrixHelper
-				.getBlosum62();
-		DistanceMatrix DM = DistanceMatrixCalculator
-				.dissimilarityScore(msa, M);
+		SubstitutionMatrix<AminoAcidCompound> M = SubstitutionMatrixHelper.getBlosum62();
+		DistanceMatrix DM = DistanceMatrixCalculator.dissimilarityScore(msa, M);
 
 		// 2. Construct a distance tree using the NJ algorithm
-		Phylogeny phylo = TreeConstructor.distanceTree(
-				(BasicSymmetricalDistanceMatrix) DM, TreeConstructorType.NJ);
+		Phylogeny phylo = TreeConstructor.distanceTree((BasicSymmetricalDistanceMatrix) DM, TreeConstructorType.NJ);
 
 		long treeT = System.currentTimeMillis();
 		String newick = ForesterWrapper.getNewickString(phylo, true);
-		System.out.println(newick);
-		System.out.println("Tree Construction: " + (treeT - readT) + " ms.");
+		logger.info(newick);
+		logger.info(new StringBuilder().append("Tree Construction: ").append(treeT - readT).append(" ms.").toString());
 
 		// 3. Evaluate the goodness of fit of the tree
 		double cv = DistanceTreeEvaluator.evaluate(phylo, DM);
-		System.out.println("CV of the tree: " + (int) (cv * 100) + " %");
+		logger.info(new StringBuilder().append("CV of the tree: ").append((int) (cv * 100)).append(" %").toString());
 
 	}
 }

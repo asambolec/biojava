@@ -25,7 +25,6 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
@@ -36,11 +35,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -90,14 +91,8 @@ import java.util.List;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-	"angleOutlier",
-	"clash",
-	"bondOutlier",
-	"mogAngleOutlier",
-	"symmClash",
-	"mogBondOutlier"
-})
+@XmlType(name = "", propOrder = { "angleOutlier", "clash", "bondOutlier", "mogAngleOutlier", "symmClash",
+		"mogBondOutlier" })
 @XmlRootElement(name = "ModelledSubgroup")
 public class ModelledSubgroup {
 
@@ -184,27 +179,28 @@ public class ModelledSubgroup {
 	 * Gets the value of the angleOutlier property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the angleOutlier property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the angleOutlier property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getAngleOutlier().add(newItem);
+	 * getAngleOutlier().add(newItem);
 	 * </pre>
 	 *
 	 *
 	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link AngleOutlier }
+	 * Objects of the following type(s) are allowed in the list {@link AngleOutlier
+	 * }
 	 *
 	 *
 	 */
 	public List<AngleOutlier> getAngleOutlier() {
 		if (angleOutlier == null) {
-			angleOutlier = new ArrayList<AngleOutlier>();
+			angleOutlier = new ArrayList<>();
 		}
 		return this.angleOutlier;
 	}
@@ -213,27 +209,27 @@ public class ModelledSubgroup {
 	 * Gets the value of the clash property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the clash property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the clash property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getClash().add(newItem);
+	 * getClash().add(newItem);
 	 * </pre>
 	 *
 	 *
 	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link Clash }
+	 * Objects of the following type(s) are allowed in the list {@link Clash }
 	 *
 	 *
 	 */
 	public List<Clash> getClash() {
 		if (clash == null) {
-			clash = new ArrayList<Clash>();
+			clash = new ArrayList<>();
 		}
 		return this.clash;
 	}
@@ -242,27 +238,27 @@ public class ModelledSubgroup {
 	 * Gets the value of the bondOutlier property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the bondOutlier property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the bondOutlier property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getBondOutlier().add(newItem);
+	 * getBondOutlier().add(newItem);
 	 * </pre>
 	 *
 	 *
 	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link BondOutlier }
+	 * Objects of the following type(s) are allowed in the list {@link BondOutlier }
 	 *
 	 *
 	 */
 	public List<BondOutlier> getBondOutlier() {
 		if (bondOutlier == null) {
-			bondOutlier = new ArrayList<BondOutlier>();
+			bondOutlier = new ArrayList<>();
 		}
 		return this.bondOutlier;
 	}
@@ -271,15 +267,16 @@ public class ModelledSubgroup {
 	 * Gets the value of the mogAngleOutlier property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the mogAngleOutlier property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the mogAngleOutlier property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getMogAngleOutlier().add(newItem);
+	 * getMogAngleOutlier().add(newItem);
 	 * </pre>
 	 *
 	 *
@@ -291,7 +288,7 @@ public class ModelledSubgroup {
 	 */
 	public List<MogAngleOutlier> getMogAngleOutlier() {
 		if (mogAngleOutlier == null) {
-			mogAngleOutlier = new ArrayList<MogAngleOutlier>();
+			mogAngleOutlier = new ArrayList<>();
 		}
 		return this.mogAngleOutlier;
 	}
@@ -300,27 +297,27 @@ public class ModelledSubgroup {
 	 * Gets the value of the symmClash property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the symmClash property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the symmClash property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getSymmClash().add(newItem);
+	 * getSymmClash().add(newItem);
 	 * </pre>
 	 *
 	 *
 	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link SymmClash }
+	 * Objects of the following type(s) are allowed in the list {@link SymmClash }
 	 *
 	 *
 	 */
 	public List<SymmClash> getSymmClash() {
 		if (symmClash == null) {
-			symmClash = new ArrayList<SymmClash>();
+			symmClash = new ArrayList<>();
 		}
 		return this.symmClash;
 	}
@@ -329,15 +326,16 @@ public class ModelledSubgroup {
 	 * Gets the value of the mogBondOutlier property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the mogBondOutlier property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the mogBondOutlier property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getMogBondOutlier().add(newItem);
+	 * getMogBondOutlier().add(newItem);
 	 * </pre>
 	 *
 	 *
@@ -349,7 +347,7 @@ public class ModelledSubgroup {
 	 */
 	public List<MogBondOutlier> getMogBondOutlier() {
 		if (mogBondOutlier == null) {
-			mogBondOutlier = new ArrayList<MogBondOutlier>();
+			mogBondOutlier = new ArrayList<>();
 		}
 		return this.mogBondOutlier;
 	}
@@ -357,9 +355,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the natomsEDS property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNatomsEDS() {
@@ -369,9 +365,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the natomsEDS property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNatomsEDS(BigInteger value) {
@@ -381,9 +375,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the altcode property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAltcode() {
@@ -393,9 +385,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the altcode property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAltcode(String value) {
@@ -405,9 +395,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the avgoccu property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getAvgoccu() {
@@ -417,9 +405,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the avgoccu property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setAvgoccu(BigDecimal value) {
@@ -429,9 +415,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the chain property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getChain() {
@@ -441,9 +425,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the chain property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setChain(String value) {
@@ -453,9 +435,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the ent property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getEnt() {
@@ -465,9 +445,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the ent property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setEnt(BigInteger value) {
@@ -477,9 +455,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the flippableSidechain property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getFlippableSidechain() {
@@ -489,9 +465,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the flippableSidechain property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setFlippableSidechain(BigInteger value) {
@@ -501,9 +475,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the icode property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getIcode() {
@@ -513,9 +485,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the icode property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setIcode(String value) {
@@ -525,9 +495,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the ligRSRZ property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getLigRSRZ() {
@@ -537,9 +505,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the ligRSRZ property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setLigRSRZ(BigDecimal value) {
@@ -549,9 +515,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the ligRSRnbrMean property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getLigRSRnbrMean() {
@@ -561,9 +525,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the ligRSRnbrMean property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setLigRSRnbrMean(BigDecimal value) {
@@ -573,9 +535,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the ligRSRnbrStdev property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getLigRSRnbrStdev() {
@@ -585,9 +545,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the ligRSRnbrStdev property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setLigRSRnbrStdev(BigDecimal value) {
@@ -597,9 +555,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the ligRSRnumnbrs property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getLigRSRnumnbrs() {
@@ -609,9 +565,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the ligRSRnumnbrs property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setLigRSRnumnbrs(BigInteger value) {
@@ -621,9 +575,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the model property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getModel() {
@@ -633,9 +585,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the model property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setModel(BigInteger value) {
@@ -645,9 +595,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the mogulIgnore property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getMogulIgnore() {
@@ -657,9 +605,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the mogulIgnore property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setMogulIgnore(String value) {
@@ -669,9 +615,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the numHReduce property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNumHReduce() {
@@ -681,9 +625,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the numHReduce property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNumHReduce(BigInteger value) {
@@ -693,9 +635,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the owab property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getOwab() {
@@ -705,9 +645,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the owab property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setOwab(BigDecimal value) {
@@ -717,9 +655,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the phi property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPhi() {
@@ -729,9 +665,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the phi property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPhi(BigDecimal value) {
@@ -741,9 +675,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the psi property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPsi() {
@@ -753,9 +685,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the psi property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPsi(BigDecimal value) {
@@ -765,9 +695,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the rama property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getRama() {
@@ -777,9 +705,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the rama property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setRama(String value) {
@@ -789,9 +715,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the resname property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getResname() {
@@ -801,9 +725,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the resname property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setResname(String value) {
@@ -813,9 +735,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the resnum property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getResnum() {
@@ -825,9 +745,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the resnum property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setResnum(BigInteger value) {
@@ -837,9 +755,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the rota property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getRota() {
@@ -849,9 +765,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the rota property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setRota(String value) {
@@ -861,9 +775,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the rscc property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRscc() {
@@ -873,9 +785,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the rscc property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRscc(BigDecimal value) {
@@ -885,9 +795,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the rsr property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRsr() {
@@ -897,9 +805,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the rsr property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRsr(BigDecimal value) {
@@ -909,9 +815,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the rsrz property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRsrz() {
@@ -921,9 +825,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the rsrz property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRsrz(BigDecimal value) {
@@ -933,9 +835,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the said property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getSaid() {
@@ -945,9 +845,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the said property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setSaid(String value) {
@@ -957,9 +855,7 @@ public class ModelledSubgroup {
 	/**
 	 * Gets the value of the seq property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getSeq() {
@@ -969,9 +865,7 @@ public class ModelledSubgroup {
 	/**
 	 * Sets the value of the seq property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setSeq(String value) {

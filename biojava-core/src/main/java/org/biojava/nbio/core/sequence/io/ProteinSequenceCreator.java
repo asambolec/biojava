@@ -34,56 +34,58 @@ import org.biojava.nbio.core.sequence.template.ProxySequenceReader;
 import java.util.List;
 
 /**
- * Used to create a ProteinSequence from a String to allow for details
- * about the location of the sequence etc.
+ * Used to create a ProteinSequence from a String to allow for details about the
+ * location of the sequence etc.
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
-public class ProteinSequenceCreator implements
-		SequenceCreatorInterface<AminoAcidCompound> {
+public class ProteinSequenceCreator implements SequenceCreatorInterface<AminoAcidCompound> {
 
 	private CompoundSet<AminoAcidCompound> compoundSet;
-/**
- *
- * @param compoundSet
- */
+
+	/**
+	 *
+	 * @param compoundSet
+	 */
 	public ProteinSequenceCreator(CompoundSet<AminoAcidCompound> compoundSet) {
 		this.compoundSet = compoundSet;
 	}
-/**
- *
- * @param sequence
- * @param index not used in this implementation
- * @return
- * @throws CompoundNotFoundException
- */
+
+	/**
+	 *
+	 * @param sequence
+	 * @param index    not used in this implementation
+	 * @return
+	 * @throws CompoundNotFoundException
+	 */
 	@Override
-public AbstractSequence<AminoAcidCompound> getSequence(String sequence,
-			long index) throws CompoundNotFoundException {
+	public AbstractSequence<AminoAcidCompound> getSequence(String sequence, long index)
+			throws CompoundNotFoundException {
 		return new ProteinSequence(sequence, compoundSet);
 	}
-/**
- *
- * @param list
- * @return
- */
+
+	/**
+	 *
+	 * @param list
+	 * @return
+	 */
 	@Override
-public AbstractSequence<AminoAcidCompound> getSequence(
-			List<AminoAcidCompound> list) {
-		ArrayListProxySequenceReader<AminoAcidCompound> store = new ArrayListProxySequenceReader<AminoAcidCompound>();
+	public AbstractSequence<AminoAcidCompound> getSequence(List<AminoAcidCompound> list) {
+		ArrayListProxySequenceReader<AminoAcidCompound> store = new ArrayListProxySequenceReader<>();
 		store.setCompoundSet(compoundSet);
 		store.setContents(list);
 		return new ProteinSequence(store);
 	}
-/**
- *
- * @param proxyLoader
- * @param index not used in this implementation
- * @return
- */
+
+	/**
+	 *
+	 * @param proxyLoader
+	 * @param index       not used in this implementation
+	 * @return
+	 */
 	@Override
-public AbstractSequence<AminoAcidCompound> getSequence(
-			ProxySequenceReader<AminoAcidCompound> proxyLoader, long index) {
+	public AbstractSequence<AminoAcidCompound> getSequence(ProxySequenceReader<AminoAcidCompound> proxyLoader,
+			long index) {
 		return new ProteinSequence(proxyLoader, compoundSet);
 	}
 }

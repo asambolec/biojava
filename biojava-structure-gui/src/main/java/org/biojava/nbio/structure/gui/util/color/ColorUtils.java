@@ -25,14 +25,15 @@
 package org.biojava.nbio.structure.gui.util.color;
 
 import java.awt.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ColorUtils
-{
+public class ColorUtils {
 
-	public static Color orange =   Color.decode("#FFA500");
-	public static Color cyan   =   Color.decode("#00FFFF");
-	public static Color gold   =   Color.decode("#FFD700");
-
+	private static final Logger logger = LoggerFactory.getLogger(ColorUtils.class);
+	public static Color orange = Color.decode("#FFA500");
+	public static Color cyan = Color.decode("#00FFFF");
+	public static Color gold = Color.decode("#FFD700");
 
 	static final Color c1 = Color.decode("#228B22"); // green
 	static final Color c2 = Color.decode("#8F8FFF"); // blue
@@ -41,30 +42,32 @@ public class ColorUtils
 	static final Color c5 = Color.decode("#FF00FF"); // pink
 	static final Color c6 = Color.decode("#C71585"); // red
 
-	public static final Color[] colorWheel = new Color[] {c1, c2, c3, c4 , c5,c6};
+	public static final Color[] colorWheel = new Color[] { c1, c2, c3, c4, c5, c6 };
 
-
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		int i = -1;
-		for ( Color color : colorWheel){
+		for (Color color : colorWheel) {
 			i++;
 			float[] af = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-			System.out.println("position "  + i + "  " + af[0] + " " + af[1] + " " + af[2]);
-			//System.out.println(rotateHue(color, 0.1f));
+			logger.info(new StringBuilder().append("position ").append(i).append("  ").append(af[0]).append(" ")
+					.append(af[1]).append(" ").append(af[2]).toString());
+			// System.out.println(rotateHue(color, 0.1f));
 		}
 	}
 
-	public static String toHexColor(Color col){
+	public static String toHexColor(Color col) {
 		return Integer.toHexString((col.getRGB() & 0xffffff) | 0x1000000).substring(1);
 	}
 
 	/**
 	 * Rotate a color through HSB space
-	 * @param color Starting color
-	 * @param fraction Amount to add to the hue. The integer part is discarded to leave a number in [0,1)
+	 * 
+	 * @param color    Starting color
+	 * @param fraction Amount to add to the hue. The integer part is discarded to
+	 *                 leave a number in [0,1)
 	 * @return
 	 */
-	public static Color rotateHue (Color color, float fraction) {
+	public static Color rotateHue(Color color, float fraction) {
 
 		float[] af = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
 
@@ -72,13 +75,13 @@ public class ColorUtils
 		float saturation = af[1];
 		float brightness = af[2];
 
-		float hueNew = hue  + fraction;
+		float hueNew = hue + fraction;
 
 		Color hsb = Color.getHSBColor(hueNew, saturation, brightness);
 		return new Color(hsb.getRed(), hsb.getGreen(), hsb.getBlue(), color.getAlpha());
 	}
 
-	public static Color getIntermediate(Color start, Color end, int stepSize, int position ){
+	public static Color getIntermediate(Color start, Color end, int stepSize, int position) {
 
 		float[] af1 = Color.RGBtoHSB(start.getRed(), start.getGreen(), start.getBlue(), null);
 
@@ -87,25 +90,26 @@ public class ColorUtils
 		float hue1 = af1[0];
 		float hue2 = af2[0];
 
-		if ( hue2 < hue1) {
+		if (hue2 < hue1) {
 
 			hue2 = af1[0];
 			hue1 = af2[0];
 		}
 
-		//float saturation = af1[1] + af2[1] / 2f;
-		//float brightness = af1[2] + af2[2] / 2f;
+		// float saturation = af1[1] + af2[1] / 2f;
+		// float brightness = af1[2] + af2[2] / 2f;
 
-		float range = Math.abs(hue2-hue1);
+		float range = Math.abs(hue2 - hue1);
 
-		while ( position > stepSize){
-			position = position - stepSize ;
+		while (position > stepSize) {
+			position -= stepSize;
 		}
 
-		float inc = (range * position / stepSize) ;
+		float inc = (range * position / stepSize);
 		float hueNew = hue1 + inc;
 
-		//System.out.println(position + " " + hue1 + " " + hue2 + " new: " + hueNew + " inc " + inc + " range " + range);
+		// System.out.println(position + " " + hue1 + " " + hue2 + " new: " + hueNew + "
+		// inc " + inc + " range " + range);
 		return Color.getHSBColor(hueNew, af1[1], af1[2]);
 
 	}
@@ -113,45 +117,67 @@ public class ColorUtils
 	/**
 	 * Make a color darker. (RGB color scheme)
 	 *
-	 * @param color     Color to make darker.
-	 * @param fraction  Darkness fraction.
-	 * @return          Darker color.
+	 * @param color    Color to make darker.
+	 * @param fraction Darkness fraction.
+	 * @return Darker color.
 	 */
-	public static Color darker (Color color, double fraction)
-	{
-		int red   = (int) Math.round (color.getRed()   * (1.0 - fraction));
-		int green = (int) Math.round (color.getGreen() * (1.0 - fraction));
-		int blue  = (int) Math.round (color.getBlue()  * (1.0 - fraction));
+	public static Color darker(Color color, double fraction) {
+		int red = (int) Math.round(color.getRed() * (1.0 - fraction));
+		int green = (int) Math.round(color.getGreen() * (1.0 - fraction));
+		int blue = (int) Math.round(color.getBlue() * (1.0 - fraction));
 
-		if (red   < 0) red   = 0; else if (red   > 255) red   = 255;
-		if (green < 0) green = 0; else if (green > 255) green = 255;
-		if (blue  < 0) blue  = 0; else if (blue  > 255) blue  = 255;
+		if (red < 0) {
+			red = 0;
+		} else if (red > 255) {
+			red = 255;
+		}
+		if (green < 0) {
+			green = 0;
+		} else if (green > 255) {
+			green = 255;
+		}
+		if (blue < 0) {
+			blue = 0;
+		} else if (blue > 255) {
+			blue = 255;
+		}
 
 		int alpha = color.getAlpha();
 
-		return new Color (red, green, blue, alpha);
+		return new Color(red, green, blue, alpha);
 	}
 
 	/**
 	 * Make a color lighter. (RGB color scheme)
 	 *
-	 * @param color     Color to make lighter.
-	 * @param fraction  Darkness fraction.
-	 * @return          Lighter color.
+	 * @param color    Color to make lighter.
+	 * @param fraction Darkness fraction.
+	 * @return Lighter color.
 	 */
-	public static Color lighter (Color color, double fraction)
-	{
-		int red   = (int) Math.round (color.getRed()   * (1.0 + fraction));
-		int green = (int) Math.round (color.getGreen() * (1.0 + fraction));
-		int blue  = (int) Math.round (color.getBlue()  * (1.0 + fraction));
+	public static Color lighter(Color color, double fraction) {
+		int red = (int) Math.round(color.getRed() * (1.0 + fraction));
+		int green = (int) Math.round(color.getGreen() * (1.0 + fraction));
+		int blue = (int) Math.round(color.getBlue() * (1.0 + fraction));
 
-		if (red   < 0) red   = 0; else if (red   > 255) red   = 255;
-		if (green < 0) green = 0; else if (green > 255) green = 255;
-		if (blue  < 0) blue  = 0; else if (blue  > 255) blue  = 255;
+		if (red < 0) {
+			red = 0;
+		} else if (red > 255) {
+			red = 255;
+		}
+		if (green < 0) {
+			green = 0;
+		} else if (green > 255) {
+			green = 255;
+		}
+		if (blue < 0) {
+			blue = 0;
+		} else if (blue > 255) {
+			blue = 255;
+		}
 
 		int alpha = color.getAlpha();
 
-		return new Color (red, green, blue, alpha);
+		return new Color(red, green, blue, alpha);
 	}
 
 }

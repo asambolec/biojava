@@ -47,118 +47,117 @@ import org.biojava.nbio.structure.align.multiple.util.MultipleAlignmentWriter;
  */
 public class MultipleAlignmentXMLConverter {
 
-	public synchronized static void printXMLensemble(PrettyXMLWriter xml,
-			MultipleAlignmentEnsemble ensemble)	throws IOException {
+	public synchronized static void printXMLensemble(PrettyXMLWriter xml, MultipleAlignmentEnsemble ensemble)
+			throws IOException {
 
 		xml.openTag("MultipleAlignmentEnsemble");
 
-		printXMLheader(xml,ensemble);
+		printXMLheader(xml, ensemble);
 
-		for (MultipleAlignment msa:ensemble.getMultipleAlignments()){
-			printXMLalignment(xml,msa);
+		for (MultipleAlignment msa : ensemble.getMultipleAlignments()) {
+			printXMLalignment(xml, msa);
 		}
-		printXMLscoresCache(xml,ensemble);
+		printXMLscoresCache(xml, ensemble);
 
 		xml.closeTag("MultipleAlignmentEnsemble");
 	}
 
-	public synchronized static void printXMLalignment(PrettyXMLWriter xml,
-			MultipleAlignment msa) throws IOException {
+	public synchronized static void printXMLalignment(PrettyXMLWriter xml, MultipleAlignment msa) throws IOException {
 
 		xml.openTag("MultipleAlignment");
 
-		for(BlockSet bs:msa.getBlockSets()) {
+		for (BlockSet bs : msa.getBlockSets()) {
 			printXMLblockSet(xml, bs);
 		}
-		printXMLscoresCache(xml,msa);
+		printXMLscoresCache(xml, msa);
 
 		xml.closeTag("MultipleAlignment");
 	}
 
-	public synchronized static void printXMLblockSet(PrettyXMLWriter xml,
-			BlockSet bs) throws IOException {
+	public synchronized static void printXMLblockSet(PrettyXMLWriter xml, BlockSet bs) throws IOException {
 
 		xml.openTag("BlockSet");
 
-		for(Block b:bs.getBlocks()) {
+		for (Block b : bs.getBlocks()) {
 			printXMLblock(xml, b);
 		}
 
-		if (bs.getTransformations() != null){
-			for(Matrix4d t:bs.getTransformations()){
+		if (bs.getTransformations() != null) {
+			for (Matrix4d t : bs.getTransformations()) {
 				printXMLmatrix4d(xml, t);
 			}
 		}
-		printXMLscoresCache(xml,bs);
+		printXMLscoresCache(xml, bs);
 
 		xml.closeTag("BlockSet");
 	}
 
-	public synchronized static void printXMLblock(PrettyXMLWriter xml,
-			Block b) throws IOException {
+	public synchronized static void printXMLblock(PrettyXMLWriter xml, Block b) throws IOException {
 
 		xml.openTag("Block");
 		List<List<Integer>> alignment = b.getAlignRes();
 
-		for (int pos=0;pos<alignment.get(0).size(); pos++){
+		for (int pos = 0; pos < alignment.get(0).size(); pos++) {
 
-			xml.openTag("eqr"+pos);
-			for (int str=0; str<alignment.size(); str++){
-				xml.attribute("str"+(str+1),alignment.get(str).get(pos)+"");
+			xml.openTag("eqr" + pos);
+			for (int str = 0; str < alignment.size(); str++) {
+				xml.attribute("str" + (str + 1), Integer.toString(alignment.get(str).get(pos)));
 			}
-			xml.closeTag("eqr"+pos);
+			xml.closeTag("eqr" + pos);
 		}
-		printXMLscoresCache(xml,b);
+		printXMLscoresCache(xml, b);
 
 		xml.closeTag("Block");
 	}
 
-	public synchronized static void printXMLmatrix4d(PrettyXMLWriter xml,
-			Matrix4d transform) throws IOException {
+	public synchronized static void printXMLmatrix4d(PrettyXMLWriter xml, Matrix4d transform) throws IOException {
 
-		if (transform == null) return;
+		if (transform == null) {
+			return;
+		}
 		xml.openTag("Matrix4d");
 
-		for (int x=0;x<4;x++){
-			for (int y=0;y<4;y++){
-				String key = "mat"+(x+1)+(y+1);
-				String value = transform.getElement(x,y)+"";
-				xml.attribute(key,value);
+		for (int x = 0; x < 4; x++) {
+			for (int y = 0; y < 4; y++) {
+				String key = new StringBuilder().append("mat").append(x + 1).append(y + 1).toString();
+				String value = Double.toString(transform.getElement(x, y));
+				xml.attribute(key, value);
 			}
 		}
 		xml.closeTag("Matrix4d");
 	}
 
-	public synchronized static void printXMLscoresCache(PrettyXMLWriter xml,
-			ScoresCache cache) throws IOException {
+	public synchronized static void printXMLscoresCache(PrettyXMLWriter xml, ScoresCache cache) throws IOException {
 
-		if (cache == null) return;
+		if (cache == null) {
+			return;
+		}
 		xml.openTag("ScoresCache");
 
-		//We need a new tag for every score, we don't know their names
-		for (String score:cache.getScores()){
+		// We need a new tag for every score, we don't know their names
+		for (String score : cache.getScores()) {
 			xml.openTag(score);
-			String value = cache.getScore(score)+"";
+			String value = Double.toString(cache.getScore(score));
 			xml.attribute("value", value);
 			xml.closeTag(score);
 		}
 		xml.closeTag("ScoresCache");
 	}
 
-	public synchronized static void printXMLheader(PrettyXMLWriter xml,
-			MultipleAlignmentEnsemble ensemble) throws IOException{
+	public synchronized static void printXMLheader(PrettyXMLWriter xml, MultipleAlignmentEnsemble ensemble)
+			throws IOException {
 
-		//Creation properties
+		// Creation properties
 		xml.attribute("Algorithm", ensemble.getAlgorithmName());
 		xml.attribute("Version", ensemble.getVersion());
-		xml.attribute("IOTime", ensemble.getIoTime()+"");
-		xml.attribute("CalculationTime", ensemble.getCalculationTime()+"");
+		xml.attribute("IOTime", Long.toString(ensemble.getIoTime()));
+		xml.attribute("CalculationTime", Long.toString(ensemble.getCalculationTime()));
 
-		//Structure Identifiers
+		// Structure Identifiers
 		xml.openTag("Structures");
-		for (int i=0; i<ensemble.size(); i++){
+		for (int i = 0; i < ensemble.size(); i++) {
 			StructureIdentifier name = ensemble.getStructureIdentifiers().get(i);
-			xml.attribute("name"+(i+1), name.getIdentifier());
+			xml.attribute("name" + (i + 1), name.getIdentifier());
 		}
 		xml.closeTag("Structures");
 	}

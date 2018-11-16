@@ -23,10 +23,10 @@ package org.biojava.nbio.structure.domain.pdp;
 public class PDPDistanceMatrix {
 	int[][] dist;
 	int nclose;
-	int[] iclose ;
-	int[] jclose ;
+	int[] iclose;
+	int[] jclose;
 
-	public PDPDistanceMatrix(){
+	public PDPDistanceMatrix() {
 
 	}
 
@@ -61,8 +61,5 @@ public class PDPDistanceMatrix {
 	public void setJclose(int[] jclose) {
 		this.jclose = jclose;
 	}
-
-
-
 
 }

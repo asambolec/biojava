@@ -31,54 +31,54 @@ import org.biojava.nbio.ontology.obo.OboFileParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-
-
-/** Parses an OBO file.
+/**
+ * Parses an OBO file.
  *
  * @author Andreas Prlic
  * @since 1.7
  *
- * <h2>Example</h2>
- * <pre>
- * OboParser parser = new OboParser();
-		InputStream inStream = this.getClass().getResourceAsStream("/files/ontology/biosapiens.obo");
-
-		BufferedReader oboFile = new BufferedReader ( new InputStreamReader ( inStream ) );
-		try {
-			Ontology ontology = parser.parseOBO(oboFile, "BioSapiens", "the BioSapiens ontology");
-
-			Set keys = ontology.getTerms();
-			Iterator iter = keys.iterator();
-			while (iter.hasNext()){
-				System.out.println(iter.next());
-			}
-
-		} catch (Exception e){
-			e.printStackTrace();
-		}
- * </pre>
+ *        <h2>Example</h2>
+ * 
+ *        <pre>
+ *        OboParser parser = new OboParser();
+ *        InputStream inStream = this.getClass().getResourceAsStream("/files/ontology/biosapiens.obo");
+ * 
+ *        BufferedReader oboFile = new BufferedReader(new InputStreamReader(inStream));
+ *        try {
+ *        	Ontology ontology = parser.parseOBO(oboFile, "BioSapiens", "the BioSapiens ontology");
+ * 
+ *        	Set keys = ontology.getTerms();
+ *        	Iterator iter = keys.iterator();
+ *        	while (iter.hasNext()) {
+ *        		System.out.println(iter.next());
+ *        	}
+ * 
+ *        } catch (Exception e) {
+ *        	e.printStackTrace();
+ *        }
+ *        </pre>
  *
  */
 public class OboParser {
 
-	/** Parse a OBO file and return its content as a BioJava Ontology object
+	private static final Logger logger = LoggerFactory.getLogger(OboParser.class);
+
+	/**
+	 * Parse a OBO file and return its content as a BioJava Ontology object
 	 *
-	 * @param oboFile the file to be parsed
+	 * @param oboFile         the file to be parsed
 	 * @param ontoName
 	 * @param ontoDescription
-
+	 * 
 	 * @return the ontology represented as a BioJava ontology file
 	 * @throws ParseException
 	 * @throws IOException
 	 */
-	public Ontology parseOBO(
-			BufferedReader oboFile,
-			String ontoName,
-			String ontoDescription
-			)
-					throws ParseException, IOException {
+	public Ontology parseOBO(BufferedReader oboFile, String ontoName, String ontoDescription)
+			throws ParseException, IOException {
 
 		try {
 			OntologyFactory factory = OntoTools.getDefaultFactory();
@@ -93,9 +93,9 @@ public class OboParser {
 
 			return ontology;
 
-
 		} catch (AlreadyExistsException ex) {
-			throw new RuntimeException( "Duplication in ontology");
+			logger.error(ex.getMessage(), ex);
+			throw new RuntimeException("Duplication in ontology");
 		} catch (OntologyException ex) {
 			throw new RuntimeException(ex);
 		}

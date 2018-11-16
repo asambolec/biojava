@@ -24,7 +24,6 @@
 
 package demo;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureTools;
@@ -39,24 +38,27 @@ import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.scop.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** A class demonstrating the use of the SCOP parsing tools
+/**
+ * A class demonstrating the use of the SCOP parsing tools
  *
  * @author Andreas Prlic
  *
  */
-public class DemoSCOP
-{
-	public static void main(String[] args){
+public class DemoSCOP {
+	private static final Logger logger = LoggerFactory.getLogger(DemoSCOP.class);
+
+	public static void main(String[] args) {
 
 		DemoSCOP demo = new DemoSCOP();
-
 
 		// this creates a local copy of SCOP
 		ScopDatabase scop = new ScopInstallation();
 
 		// an alternative would be this one, which fetches data dynamically
-		//ScopDatabase scop = new RemoteScopInstallation();
+		// ScopDatabase scop = new RemoteScopInstallation();
 
 		ScopFactory.setScopDatabase(scop);
 
@@ -66,11 +68,11 @@ public class DemoSCOP
 		demo.alignSuperfamily();
 	}
 
-	/** Traverse throught the SCOP hierarchy
+	/**
+	 * Traverse throught the SCOP hierarchy
 	 *
 	 */
-	public void traverseHierarchy()
-	{
+	public void traverseHierarchy() {
 		String pdbId = "4HHB";
 		// download SCOP if required and load into memory
 		ScopDatabase scop = ScopFactory.getSCOP();
@@ -81,58 +83,58 @@ public class DemoSCOP
 
 		ScopNode node = scop.getScopNode(domains.get(0).getSunid());
 
-		while (node != null){
+		while (node != null) {
 
-			System.out.println("This node: sunid:" + node.getSunid() );
-			System.out.println(scop.getScopDescriptionBySunid(node.getSunid()));
+			logger.info("This node: sunid:" + node.getSunid());
+			logger.info(String.valueOf(scop.getScopDescriptionBySunid(node.getSunid())));
 			node = scop.getScopNode(node.getParentSunid());
 		}
 
 	}
 
-	/** Get various categories
+	/**
+	 * Get various categories
 	 *
 	 */
-	public void getCategories(){
+	public void getCategories() {
 		// download SCOP if required and load into memory
 		ScopDatabase scop = ScopFactory.getSCOP();
 		List<ScopDescription> superfams = scop.getByCategory(ScopCategory.Superfamily);
 
-		System.out.println("Total nr. of superfamilies:" + superfams.size());
+		logger.info("Total nr. of superfamilies:" + superfams.size());
 
 		List<ScopDescription> folds = scop.getByCategory(ScopCategory.Fold);
-		System.out.println("Total nr. of folds:" + folds.size());
+		logger.info("Total nr. of folds:" + folds.size());
 
 	}
 
-	public void alignSuperfamily(){
+	public void alignSuperfamily() {
 		// download SCOP if required and load into memory
 		ScopDatabase scop = ScopFactory.getSCOP();
 		List<ScopDescription> superfams = scop.getByCategory(ScopCategory.Superfamily);
 
-		System.out.println("Total nr. of superfamilies:" + superfams.size());
-
+		logger.info("Total nr. of superfamilies:" + superfams.size());
 
 		// configure where to load PDB files from and
 		// what information to load
 		AtomCache cache = new AtomCache();
-		FileParsingParameters fileparams = new FileParsingParameters() ;
+		FileParsingParameters fileparams = new FileParsingParameters();
 		fileparams.setAlignSeqRes(false);
 		fileparams.setParseSecStruc(false);
 		cache.setFileParsingParams(fileparams);
 
 		// get tge first superfamily
 		ScopDescription superfam1 = superfams.get(0);
-		System.out.println("First superfamily: " + superfam1);
+		logger.info("First superfamily: " + superfam1);
 
 		ScopNode node = scop.getScopNode(superfam1.getSunID());
-		System.out.println("scopNode for first superfamily:" + node);
+		logger.info("scopNode for first superfamily:" + node);
 
 		List<ScopDomain> doms4superfam1 = scop.getScopDomainsBySunid(superfam1.getSunID());
 		ScopDomain dom1 = doms4superfam1.get(0);
 
 		// align the first domain against all others members of this superfamily
-		for ( int i = 1 ; i < doms4superfam1.size() ; i ++){
+		for (int i = 1; i < doms4superfam1.size(); i++) {
 
 			ScopDomain dom2 = doms4superfam1.get(i);
 
@@ -145,23 +147,24 @@ public class DemoSCOP
 				StructureAlignment ce = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
 				AFPChain afpChain = ce.align(ca1, ca2);
 
-				//System.out.println(afpChain.toCE(ca1, ca2));
+				// System.out.println(afpChain.toCE(ca1, ca2));
 
-				//StructureAlignmentDisplay.display(afpChain, ca1, ca2);
+				// StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
-				System.out.println(dom1.getScopId() + " vs. " + dom2.getScopId()+ " :" + afpChain.getProbability());
+				logger.info(new StringBuilder().append(dom1.getScopId()).append(" vs. ").append(dom2.getScopId())
+						.append(" :").append(afpChain.getProbability()).toString());
 				double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2);
 				afpChain.setTMScore(tmScore);
-				System.out.println(AfpChainWriter.toScoresList(afpChain));
+				logger.info(AfpChainWriter.toScoresList(afpChain));
 
-			} catch (Exception e){
-				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 
 	}
 
-	public void printDomainsForPDB(){
+	public void printDomainsForPDB() {
 		String pdbId = "4HHB";
 
 		// download SCOP if required and load into memory
@@ -169,9 +172,8 @@ public class DemoSCOP
 
 		List<ScopDomain> domains = scop.getDomainsForPDB(pdbId);
 
-		System.out.println(domains);
+		logger.info(String.valueOf(domains));
 
 	}
-
 
 }

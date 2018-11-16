@@ -24,14 +24,15 @@ package org.biojava.nbio.structure.align.util;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-
-/** A class that manages the Strings that are defined in the spice.properties file.
- * This will be usefull for internationalisation.
+/**
+ * A class that manages the Strings that are defined in the spice.properties
+ * file. This will be usefull for internationalisation.
  *
- * TODO: provide .properties files for other locales.
- * e.g. jfatcat_de_DE.properties, etc.
+ * TODO: provide .properties files for other locales. e.g.
+ * jfatcat_de_DE.properties, etc.
  *
  * @author Andreas Prlic
  * @since 1:43:04 PM
@@ -39,35 +40,37 @@ import java.util.ResourceBundle;
  */
 public class ResourceManager {
 
-	private String BUNDLE_NAME ;
+	private static final Logger logger = LoggerFactory.getLogger(ResourceManager.class);
 
-	private ResourceBundle RESOURCE_BUNDLE ;
+	private String BUNDLE_NAME;
 
+	private ResourceBundle resourceBundle;
 
 	public ResourceManager() {
-		BUNDLE_NAME =  "jfatcat"; //$NON-NLS-1$;
-		RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+		BUNDLE_NAME = "jfatcat"; //$NON-NLS-1$ ;
+		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	}
 
-	private ResourceManager(String bundleName){
+	private ResourceManager(String bundleName) {
 		try {
-			RESOURCE_BUNDLE = ResourceBundle.getBundle(bundleName);
-		} catch(Exception e){
-			e.printStackTrace();
+			resourceBundle = ResourceBundle.getBundle(bundleName);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
-	public static ResourceManager getResourceManager(String bundleName){
+
+	public static ResourceManager getResourceManager(String bundleName) {
 		return new ResourceManager(bundleName);
 	}
 
 	public String getString(String key) {
 
 		try {
-			return RESOURCE_BUNDLE.getString(key);
+			return resourceBundle.getString(key);
 		} catch (MissingResourceException e) {
-			System.err.println(e.getMessage());
-			return '!' + key + '!';
+			logger.error(e.getMessage(), e);
+			return new StringBuilder().append('!').append(key).append('!').toString();
 		}
 	}
 }

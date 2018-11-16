@@ -1,7 +1,9 @@
 /**
- * Classes related to the implementation of the CE alignment algorithm, here called jCE.
+ * Classes related to the implementation of the CE alignment algorithm, here
+ * called jCE.
  *
  * CE reference:
+ * 
  * <pre>
  * Shindyalov IN, Bourne PE (1998)
  * Protein structure alignment by incremental combinatorial extension (CE) of the optimal path.
@@ -9,6 +11,7 @@
  * </pre>
  *
  * see also:
+ * 
  * <pre>
  * Andreas Prlic; Spencer Bliven; Peter W. Rose; Wolfgang F. Bluhm; Chris Bizon; Adam Godzik; Philip E. Bourne (2010)
  * Pre-calculated protein structure alignments at the RCSB PDB website

@@ -25,19 +25,18 @@ import org.biojava.nbio.core.sequence.io.template.SequenceCreatorInterface;
 
 import java.util.*;
 
-
 public abstract class AbstractCompoundTranslator<F extends Compound, T extends Compound>
 		implements CompoundTranslator<F, T> {
 
 	private final SequenceCreatorInterface<T> creator;
-	private final Map<F, List<T>>          mapper;
-	private final CompoundSet<F>              fromCompoundSet;
-	private final CompoundSet<T>              toCompoundSet;
+	private final Map<F, List<T>> mapper;
+	private final CompoundSet<F> fromCompoundSet;
+	private final CompoundSet<T> toCompoundSet;
 
-	public AbstractCompoundTranslator(SequenceCreatorInterface<T> creator,
-			CompoundSet<F> fromCompoundSet, CompoundSet<T> toCompoundSet) {
+	public AbstractCompoundTranslator(SequenceCreatorInterface<T> creator, CompoundSet<F> fromCompoundSet,
+			CompoundSet<T> toCompoundSet) {
 		this.creator = creator;
-		this.mapper = new HashMap<F, List<T>>();
+		this.mapper = new HashMap<>();
 		this.fromCompoundSet = fromCompoundSet;
 		this.toCompoundSet = toCompoundSet;
 	}
@@ -64,40 +63,37 @@ public abstract class AbstractCompoundTranslator<F extends Compound, T extends C
 
 	protected void addCompounds(F source, T... targets) {
 
-	 List<T> l = mapper.get(source);
-	 if ( l == null) {
-		 l = new ArrayList<T>();
-		 mapper.put(source, l);
-	 }
-		 l.addAll(Arrays.asList(targets));
+		List<T> l = mapper.get(source);
+		if (l == null) {
+			l = new ArrayList<>();
+			mapper.put(source, l);
+		}
+		l.addAll(Arrays.asList(targets));
 	}
 
 	@Override
 	public List<T> translateMany(F fromCompound) {
 		if (!mapper.containsKey(fromCompound)) {
-			throw new TranslationException("Can not translate compound "+fromCompound);
+			throw new TranslationException("Can not translate compound " + fromCompound);
 		}
 		return mapper.get(fromCompound);
 	}
 
-		@Override
+	@Override
 	public T translate(F fromCompound) {
 		List<T> compounds = translateMany(fromCompound);
 		if (compounds.isEmpty()) {
 			throw new TranslationException("No compounds found for " + fromCompound);
-		}
-		else if (compounds.size() > 1) {
-			throw new TranslationException("Too many compounds found for "
-					+ fromCompound);
-		}
-		else {
+		} else if (compounds.size() > 1) {
+			throw new TranslationException("Too many compounds found for " + fromCompound);
+		} else {
 			return compounds.get(0);
 		}
 	}
 
-		@Override
+	@Override
 	public List<Sequence<T>> createSequences(Sequence<F> originalSequence) {
-		List<List<T>> workingList = new ArrayList<List<T>>();
+		List<List<T>> workingList = new ArrayList<>();
 		for (F source : originalSequence) {
 			List<T> compounds = translateMany(source);
 
@@ -111,8 +107,8 @@ public abstract class AbstractCompoundTranslator<F extends Compound, T extends C
 			// AUG UGG GAU AGC
 			// AUG UGG GAC AGC
 			if (compounds.isEmpty()) {
-				throw new TranslationException("Compound " + source + " resulted in "
-						+ "no target compounds");
+				throw new TranslationException(new StringBuilder().append("Compound ").append(source)
+						.append(" resulted in ").append("no target compounds").toString());
 			}
 			addCompoundsToList(compounds, workingList);
 		}
@@ -126,7 +122,7 @@ public abstract class AbstractCompoundTranslator<F extends Compound, T extends C
 
 	protected void addCompoundsToList(List<T> compounds, List<List<T>> workingList) {
 		int size = compounds.size();
-		List<List<T>> currentWorkingList = new ArrayList<List<T>>();
+		List<List<T>> currentWorkingList = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
 			boolean last = (i == (size - 1));
 			// If last run we add the compound to the top set of lists & then
@@ -147,18 +143,14 @@ public abstract class AbstractCompoundTranslator<F extends Compound, T extends C
 	}
 
 	protected List<Sequence<T>> workingListToSequences(List<List<T>> workingList) {
-		List<Sequence<T>> sequences = new ArrayList<Sequence<T>>();
-		for (List<T> seqList : workingList) {
-			sequences.add(getCreator().getSequence(seqList));
-		}
+		List<Sequence<T>> sequences = new ArrayList<>();
+		workingList.forEach(seqList -> sequences.add(getCreator().getSequence(seqList)));
 		return sequences;
 	}
 
 	private List<List<T>> duplicateList(List<List<T>> incoming) {
-		List<List<T>> outgoing = new ArrayList<List<T>>();
-		for (List<T> current : incoming) {
-			outgoing.add(new ArrayList<T>(current));
-		}
+		List<List<T>> outgoing = new ArrayList<>();
+		incoming.forEach(current -> outgoing.add(new ArrayList<T>(current)));
 		return outgoing;
 	}
 
@@ -168,19 +160,16 @@ public abstract class AbstractCompoundTranslator<F extends Compound, T extends C
 			list.add(new ArrayList<T>());
 		}
 
-		for (List<T> current : list) {
-			current.add(compound);
-		}
+		list.forEach(current -> current.add(compound));
 	}
 
-		@Override
+	@Override
 	public Sequence<T> createSequence(Sequence<F> originalSequence) {
 		Collection<Sequence<T>> sequences = createSequences(originalSequence);
 		if (sequences.size() > 1) {
-			throw new TranslationException("Too many sequences created; "
-					+ "createSequence() assumes only one sequence can be created");
-		}
-		else if (sequences.isEmpty()) {
+			throw new TranslationException(
+					"Too many sequences created; " + "createSequence() assumes only one sequence can be created");
+		} else if (sequences.isEmpty()) {
 			throw new TranslationException("No sequences created");
 		}
 		return sequences.iterator().next();

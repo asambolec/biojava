@@ -26,7 +26,7 @@ package org.biojava.nbio.genome.parsers.genename;
 import java.io.Serializable;
 import java.util.List;
 
-public class GeneChromosomePosition implements Comparable<GeneChromosomePosition>, Serializable{
+public class GeneChromosomePosition implements Comparable<GeneChromosomePosition>, Serializable {
 
 	private static final long serialVersionUID = -6886306238993367835L;
 	private String geneName;
@@ -45,126 +45,103 @@ public class GeneChromosomePosition implements Comparable<GeneChromosomePosition
 		return geneName;
 	}
 
-
 	public void setGeneName(String geneName) {
 		this.geneName = geneName;
 	}
-
 
 	public String getGenebankId() {
 		return genebankId;
 	}
 
-
 	public void setGenebankId(String genebankId) {
 		this.genebankId = genebankId;
 	}
-
 
 	public String getChromosome() {
 		return chromosome;
 	}
 
-
 	public void setChromosome(String chromosome) {
 		this.chromosome = chromosome;
 	}
-
 
 	public Character getOrientation() {
 		return orientation;
 	}
 
-
 	public void setOrientation(Character orientation) {
 		this.orientation = orientation;
 	}
-
 
 	public Integer getTranscriptionStart() {
 		return transcriptionStart;
 	}
 
-
 	public void setTranscriptionStart(Integer transcriptionStart) {
 		this.transcriptionStart = transcriptionStart;
 	}
-
 
 	public Integer getTranscriptionEnd() {
 		return transcriptionEnd;
 	}
 
-
 	public void setTranscriptionEnd(Integer transcriptionEnd) {
 		this.transcriptionEnd = transcriptionEnd;
 	}
-
 
 	public Integer getCdsStart() {
 		return cdsStart;
 	}
 
-
 	public void setCdsStart(Integer cdsStart) {
 		this.cdsStart = cdsStart;
 	}
-
 
 	public Integer getCdsEnd() {
 		return cdsEnd;
 	}
 
-
 	public void setCdsEnd(Integer cdsEnd) {
 		this.cdsEnd = cdsEnd;
 	}
-
 
 	public int getExonCount() {
 		return exonCount;
 	}
 
-
 	public void setExonCount(int exonCount) {
 		this.exonCount = exonCount;
 	}
-
 
 	public List<Integer> getExonStarts() {
 		return exonStarts;
 	}
 
-
 	public void setExonStarts(List<Integer> exonStarts) {
 		this.exonStarts = exonStarts;
 	}
-
 
 	public List<Integer> getExonEnds() {
 		return exonEnds;
 	}
 
-
 	public void setExonEnds(List<Integer> exonEnds) {
 		this.exonEnds = exonEnds;
 	}
-
 
 	@Override
 	public int compareTo(GeneChromosomePosition o) {
 		return geneName.compareTo(o.getGeneName());
 	}
 
-
 	@Override
 	public String toString() {
-		return "GeneChromosomePosition [geneName=" + geneName + ", genebankId="
-				+ genebankId + ", chromosome=" + chromosome + ", orientation="
-				+ orientation + ", transcriptionStart=" + transcriptionStart
-				+ ", transcriptionEnd=" + transcriptionEnd + ", cdsStart="
-				+ cdsStart + ", cdsEnd=" + cdsEnd + ", exonCount=" + exonCount
-				+ ", exonStarts=" + exonStarts + ", exonEnds=" + exonEnds + "]";
+		return new StringBuilder().append("GeneChromosomePosition [geneName=").append(geneName).append(", genebankId=")
+				.append(genebankId).append(", chromosome=").append(chromosome).append(", orientation=")
+				.append(orientation).append(", transcriptionStart=").append(transcriptionStart)
+				.append(", transcriptionEnd=").append(transcriptionEnd).append(", cdsStart=").append(cdsStart)
+				.append(", cdsEnd=").append(cdsEnd).append(", exonCount=").append(exonCount).append(", exonStarts=")
+				.append(exonStarts).append(", exonEnds=").append(exonEnds).append("]").toString();
 	}
 
 }

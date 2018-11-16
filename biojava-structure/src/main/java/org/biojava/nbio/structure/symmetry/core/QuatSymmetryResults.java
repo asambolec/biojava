@@ -61,22 +61,19 @@ public class QuatSymmetryResults {
 	/**
 	 * Constructor for rotational symmetries.
 	 * 
-	 * @param stoichiometry
-	 *            Stoichiometry used to calculate symmetry
+	 * @param stoichiometry Stoichiometry used to calculate symmetry
 	 * @param rotationGroup
 	 * @param method
 	 */
-	public QuatSymmetryResults(Stoichiometry stoichiometry,
-			RotationGroup rotationGroup, SymmetryPerceptionMethod method) {
+	public QuatSymmetryResults(Stoichiometry stoichiometry, RotationGroup rotationGroup,
+			SymmetryPerceptionMethod method) {
 
 		this.stoichiometry = stoichiometry;
 		this.clusters = stoichiometry.getClusters();
 
-		subunits = new ArrayList<Subunit>();
-		for (SubunitCluster c : clusters) {
-			subunits.addAll(c.getSubunits());
-		}
-			
+		subunits = new ArrayList<>();
+		clusters.forEach(c -> subunits.addAll(c.getSubunits()));
+
 		this.rotationGroup = rotationGroup;
 		this.method = method;
 	}
@@ -84,21 +81,17 @@ public class QuatSymmetryResults {
 	/**
 	 * Constructor for roto-translational symmetries.
 	 * 
-	 * @param stoichiometry
-	 *            Stoichiometry used to calculate symmetry
+	 * @param stoichiometry Stoichiometry used to calculate symmetry
 	 * @param helixLayers
 	 * @param method
 	 */
-	public QuatSymmetryResults(Stoichiometry stoichiometry,
-			HelixLayers helixLayers, SymmetryPerceptionMethod method) {
+	public QuatSymmetryResults(Stoichiometry stoichiometry, HelixLayers helixLayers, SymmetryPerceptionMethod method) {
 
 		this.stoichiometry = stoichiometry;
 		this.clusters = stoichiometry.getClusters();
-		
-		subunits = new ArrayList<Subunit>();
-		for (SubunitCluster c : clusters) {
-			subunits.addAll(c.getSubunits());
-		}
+
+		subunits = new ArrayList<>();
+		clusters.forEach(c -> subunits.addAll(c.getSubunits()));
 
 		this.helixLayers = helixLayers;
 		this.method = method;
@@ -106,27 +99,24 @@ public class QuatSymmetryResults {
 
 	/**
 	 * Determine if this symmetry result is a subset of the other Symmetry result.
-	 * Checks the following conditions:
-	 * - 'Other' includes all subunits of 'this'.
-	 * - 'Other' has the same or higher order than 'this'.
+	 * Checks the following conditions: - 'Other' includes all subunits of 'this'. -
+	 * 'Other' has the same or higher order than 'this'.
 	 *
-	 * Special treatment for the helical symmetry:
-	 * - 'Other' includes all subunits of 'this'.
-	 * - 'this' may be Cn, as well as H
+	 * Special treatment for the helical symmetry: - 'Other' includes all subunits
+	 * of 'this'. - 'this' may be Cn, as well as H
 	 *
-	 *  Note that isSupersededBy establishes a partial order, i.e. for some
-	 *  symmetries A and B, neither A.isSupersededBy(B) nor B.isSupersededBy(A)
-	 *  may be true.
+	 * Note that isSupersededBy establishes a partial order, i.e. for some
+	 * symmetries A and B, neither A.isSupersededBy(B) nor B.isSupersededBy(A) may
+	 * be true.
 	 *
-	 * @param other
-	 *            QuatSymmetryResults
+	 * @param other QuatSymmetryResults
 	 *
 	 * @return true if other supersedes this, false otherwise
 	 */
 
 	public boolean isSupersededBy(QuatSymmetryResults other) {
-		if(other.getSymmetry().startsWith("H")) {
-			if(this.getSymmetry().startsWith("C") || this.getSymmetry().startsWith("H")) {
+		if (other.getSymmetry().startsWith("H")) {
+			if (this.getSymmetry().startsWith("C") || this.getSymmetry().startsWith("H")) {
 				if (other.subunits.containsAll(this.subunits)) {
 					return true;
 				}
@@ -138,8 +128,8 @@ public class QuatSymmetryResults {
 			return false;
 		}
 
-		if (this.rotationGroup.getOrder() <= other.rotationGroup.getOrder() &&
-				other.subunits.containsAll(this.subunits)) {
+		if (this.rotationGroup.getOrder() <= other.rotationGroup.getOrder()
+				&& other.subunits.containsAll(this.subunits)) {
 			return true;
 		}
 		return false;
@@ -159,10 +149,10 @@ public class QuatSymmetryResults {
 	 *
 	 * @return an unmodifiable view of the List
 	 */
-	public List<Subunit> getSubunits() {		
-		return Collections.unmodifiableList(subunits);		
+	public List<Subunit> getSubunits() {
+		return Collections.unmodifiableList(subunits);
 	}
-	
+
 	/**
 	 * Return the number of Subunits involved in the symmetry.
 	 * 
@@ -171,7 +161,7 @@ public class QuatSymmetryResults {
 	public int getSubunitCount() {
 		return subunits.size();
 	}
-	
+
 	/**
 	 * @return rotation group (point group) information representing rotational
 	 *         quaternary symmetry.
@@ -196,8 +186,8 @@ public class QuatSymmetryResults {
 	}
 
 	/**
-	 * @return the symmetry group symbol. For point groups returns the point
-	 *         group symbol and for helical symmetry returns "H".
+	 * @return the symmetry group symbol. For point groups returns the point group
+	 *         symbol and for helical symmetry returns "H".
 	 */
 	public String getSymmetry() {
 		if (helixLayers != null && helixLayers.size() > 0) {
@@ -229,8 +219,8 @@ public class QuatSymmetryResults {
 	}
 
 	/**
-	 * A local result means that only a subset of the original Subunits was used
-	 * for symmetry determination.
+	 * A local result means that only a subset of the original Subunits was used for
+	 * symmetry determination.
 	 * 
 	 * @return true if local result, false otherwise
 	 */
@@ -239,11 +229,10 @@ public class QuatSymmetryResults {
 	}
 
 	/**
-	 * A local result means that only a subset of the original Subunits was used
-	 * for symmetry determination.
+	 * A local result means that only a subset of the original Subunits was used for
+	 * symmetry determination.
 	 * 
-	 * @param local
-	 *            true if local result, false otherwise
+	 * @param local true if local result, false otherwise
 	 */
 	void setLocal(boolean local) {
 		this.local = local;
@@ -259,10 +248,10 @@ public class QuatSymmetryResults {
 
 	@Override
 	public String toString() {
-		return "QuatSymmetryResults [stoichiometry: " + getStoichiometry()
-				+ ", symmetry: " + getSymmetry() + ", pseudo-stoichiometric: "
-				+ isPseudoStoichiometric() + ", local: " + local + ", method: "
-				+ method + "]";
+		return new StringBuilder().append("QuatSymmetryResults [stoichiometry: ").append(getStoichiometry())
+				.append(", symmetry: ").append(getSymmetry()).append(", pseudo-stoichiometric: ")
+				.append(isPseudoStoichiometric()).append(", local: ").append(local).append(", method: ").append(method)
+				.append("]").toString();
 	}
 
 }

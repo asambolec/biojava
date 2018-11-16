@@ -52,8 +52,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
-/** Performs a multi threaded database search for an input protein structure
+/**
+ * Performs a multi threaded database search for an input protein structure
  *
  * @author Andreas Prlic
  *
@@ -63,7 +63,7 @@ public class MultiThreadedDBSearch {
 
 	private final static Logger logger = LoggerFactory.getLogger(MultiThreadedDBSearch.class);
 
-	AtomicBoolean interrupted  ;
+	AtomicBoolean interrupted;
 
 	StructureAlignment algorithm;
 
@@ -84,35 +84,32 @@ public class MultiThreadedDBSearch {
 	String customFile1;
 	String customChain1;
 
-	public MultiThreadedDBSearch(String name, Structure structure,
-			String outFile,
-			StructureAlignment algorithm,
-			int nrCPUs, boolean domainSplit){
+	public MultiThreadedDBSearch(String name, Structure structure, String outFile, StructureAlignment algorithm,
+			int nrCPUs, boolean domainSplit) {
 
 		interrupted = new AtomicBoolean(false);
-		this.name1= name;
+		this.name1 = name;
 		this.structure1 = structure;
 		this.outFile = outFile;
 		this.algorithm = algorithm;
 		this.nrCPUs = nrCPUs;
 		this.domainSplit = domainSplit;
-		cache  = new AtomCache();
+		cache = new AtomCache();
 
 		String serverLocation = FarmJobParameters.DEFAULT_SERVER_URL;
-		if ( representatives == null){
-			SortedSet<String> repre = JFatCatClient.getRepresentatives(serverLocation,40);
+		if (representatives == null) {
+			SortedSet<String> repre = JFatCatClient.getRepresentatives(serverLocation, 40);
 			logger.info("got {} representatives for comparison", repre.size());
 			representatives = repre;
 		}
 	}
 
-
 	public String getCustomFile1() {
 		return customFile1;
 	}
 
-
-	/** set the file path for a custom, user provided file, not a standard PDB file.
+	/**
+	 * set the file path for a custom, user provided file, not a standard PDB file.
 	 *
 	 * @param customFile1
 	 */
@@ -120,20 +117,18 @@ public class MultiThreadedDBSearch {
 		this.customFile1 = customFile1;
 	}
 
-
-
 	public String getCustomChain1() {
 		return customChain1;
 	}
 
-	/** sets a chain in a custom, user provided file
+	/**
+	 * sets a chain in a custom, user provided file
 	 *
 	 * @param customChain1
 	 */
 	public void setCustomChain1(String customChain1) {
 		this.customChain1 = customChain1;
 	}
-
 
 	public AtomCache getAtomCache() {
 		return cache;
@@ -143,8 +138,6 @@ public class MultiThreadedDBSearch {
 		this.cache = cache;
 	}
 
-
-
 	public StructureAlignment getAlgorithm() {
 		return algorithm;
 	}
@@ -153,75 +146,67 @@ public class MultiThreadedDBSearch {
 		this.algorithm = algo;
 	}
 
-
 	public String getOutFile() {
 		return outFile;
 	}
-
 
 	public void setOutFile(String outFile) {
 		this.outFile = outFile;
 	}
 
+	public static String getLegend(String algorithmName) {
 
-	public static String getLegend(String algorithmName){
-
-		if ( algorithmName.equalsIgnoreCase(CeMain.algorithmName) ||
-				algorithmName.equalsIgnoreCase(CeSideChainMain.algorithmName) ||
-				algorithmName.equalsIgnoreCase(CeCPMain.algorithmName)) {
-			return "# name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t " ;
+		if (algorithmName.equalsIgnoreCase(CeMain.algorithmName)
+				|| algorithmName.equalsIgnoreCase(CeSideChainMain.algorithmName)
+				|| algorithmName.equalsIgnoreCase(CeCPMain.algorithmName)) {
+			return "# name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t ";
 		}
 
 		// looks like a FATCAT alignment
 
-		return "# name1\tname2\tscore\tprobability\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t " ;
+		return "# name1\tname2\tscore\tprobability\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t ";
 
 	}
-
-
 
 	public File getResultFile() {
 		return resultList;
 	}
 
-
 	public void setResultFile(File resultList) {
 		this.resultList = resultList;
 	}
 
-
-	public void run(){
+	public void run() {
 
 		File outFileF = null;
-		SynchronizedOutFile out ;
+		SynchronizedOutFile out;
 
 		try {
 			checkLocalFiles();
 
-			if ( interrupted.get())
+			if (interrupted.get()) {
 				return;
+			}
 
 			String header = "# algorithm:" + algorithm.getAlgorithmName();
 			String legend = getLegend(algorithm.getAlgorithmName());
 
-
-
 			outFileF = new File(outFile);
-			if ( ! outFileF.isDirectory()){
-				logger.error("{} is not a directory, can't create result files in there...", outFileF.getAbsolutePath());
+			if (!outFileF.isDirectory()) {
+				logger.error("{} is not a directory, can't create result files in there...",
+						outFileF.getAbsolutePath());
 				interrupt();
 				cleanup();
 			}
 
-			if ( name1 == null)
+			if (name1 == null) {
 				name1 = "CUSTOM";
+			}
 
-
-			resultList = new File(outFileF,"results_" + name1 + ".out");
+			resultList = new File(outFileF,
+					new StringBuilder().append("results_").append(name1).append(".out").toString());
 
 			logger.info("writing results to {}", resultList.getAbsolutePath());
-
-
 
 			out = new SynchronizedOutFile(resultList);
 
@@ -230,25 +215,25 @@ public class MultiThreadedDBSearch {
 			out.write(legend);
 			out.write(AFPChain.newline);
 
-			if ( name1.equals("CUSTOM")) {
+			if ("CUSTOM".equals(name1)) {
 
 				String config1 = "#param:file1=" + customFile1;
 				out.write(config1);
 				out.write(AFPChain.newline);
 
-				if ( customChain1 != null) {
-				String config2 = "#param:chain1=" + customChain1;
-				out.write(config2);
-				out.write(AFPChain.newline);
+				if (customChain1 != null) {
+					String config2 = "#param:chain1=" + customChain1;
+					out.write(config2);
+					out.write(AFPChain.newline);
 				}
 
 			}
 
-			if ( algorithm.getAlgorithmName().startsWith("jCE")){
+			if (algorithm.getAlgorithmName().startsWith("jCE")) {
 				ConfigStrucAligParams params = algorithm.getParameters();
-				if ( params instanceof CeParameters){
+				if (params instanceof CeParameters) {
 					CeParameters ceParams = (CeParameters) params;
-					if ( ceParams.getScoringStrategy() != CeParameters.ScoringStrategy.DEFAULT_SCORING_STRATEGY) {
+					if (ceParams.getScoringStrategy() != CeParameters.ScoringStrategy.DEFAULT_SCORING_STRATEGY) {
 						String scoring = "#param:scoring=" + ceParams.getScoringStrategy();
 						out.write(scoring);
 						out.write(AFPChain.newline);
@@ -257,18 +242,12 @@ public class MultiThreadedDBSearch {
 			}
 
 			out.flush();
-		} catch (IOException e){
-			logger.error("Error while loading representative structure {}", name1, e);
-			interrupt();
-			cleanup();
-			return;
-		} catch (StructureException e) {
+		} catch (StructureException | IOException e) {
 			logger.error("Error while loading representative structure {}", name1, e);
 			interrupt();
 			cleanup();
 			return;
 		}
-
 
 		int nrJobs = 0;
 		DomainProvider domainProvider;
@@ -279,19 +258,19 @@ public class MultiThreadedDBSearch {
 
 			Atom[] ca1 = StructureTools.getRepresentativeAtomArray(structure1);
 
-			for (String repre : representatives){
+			for (String repre : representatives) {
 
-				if( domainSplit ) {
+				if (domainSplit) {
 					SortedSet<String> domainNames = domainProvider.getDomainNames(repre);
-					//logger.debug(repre +" got domains: " +domainNames);
-					if( domainNames == null || domainNames.size()==0){
+					// logger.debug(repre +" got domains: " +domainNames);
+					if (domainNames == null || domainNames.size() == 0) {
 						// no domains found, use whole chain.
 						submit(name1, repre, ca1, algorithm, outFileF, out, cache);
 						nrJobs++;
 						continue;
 					}
-					//logger.debug("got " + domainNames.size() + " for " + repre);
-					for( String domain : domainNames){
+					// logger.debug("got " + domainNames.size() + " for " + repre);
+					for (String domain : domainNames) {
 						submit(name1, domain, ca1, algorithm, outFileF, out, cache);
 						nrJobs++;
 					}
@@ -301,103 +280,99 @@ public class MultiThreadedDBSearch {
 				}
 
 			}
-		} catch(IOException e) {
-			logger.error("Error while fetching representative domains", e);
-			interrupt();
-			cleanup();
-			return;
-		} catch (StructureException e) {
+		} catch (StructureException | IOException e) {
 			logger.error("Error while fetching representative domains", e);
 			interrupt();
 			cleanup();
 			return;
 		}
 
-
-		ThreadPoolExecutor  pool = ConcurrencyTools.getThreadPool();
+		ThreadPoolExecutor pool = ConcurrencyTools.getThreadPool();
 		logger.info("{}", pool.getPoolSize());
 
 		long startTime = System.currentTimeMillis();
 
 		try {
-			while ( pool.getCompletedTaskCount() < nrJobs-1  ) {
-				//long now = System.currentTimeMillis();
-				//logger.debug( pool.getCompletedTaskCount() + " " + (now-startTime)/1000 + " " + pool.getPoolSize() + " " + pool.getActiveCount()  + " " + pool.getTaskCount()  );
-				//				if ((now-startTime)/1000 > 60) {
+			while (pool.getCompletedTaskCount() < nrJobs - 1) {
+				// long now = System.currentTimeMillis();
+				// logger.debug( pool.getCompletedTaskCount() + " " + (now-startTime)/1000 + " "
+				// + pool.getPoolSize() + " " + pool.getActiveCount() + " " +
+				// pool.getTaskCount() );
+				// if ((now-startTime)/1000 > 60) {
 				//
-				//					interrupt();
-				//					logger.debug("completed: " + pool.getCompletedTaskCount());
-				//				}
+				// interrupt();
+				// logger.debug("completed: " + pool.getCompletedTaskCount());
+				// }
 
-				if ( interrupted.get())
+				if (interrupted.get()) {
 					break;
+				}
 
 				Thread.sleep(2000);
 
 			}
 			out.close();
-		}
-		catch (Exception e){
+		} catch (Exception e) {
 			logger.error("Exception: ", e);
 			interrupt();
 			cleanup();
 		}
 
-		if (domainProvider instanceof RemoteDomainProvider){
+		if (domainProvider instanceof RemoteDomainProvider) {
 			RemoteDomainProvider remote = (RemoteDomainProvider) domainProvider;
 			remote.flushCache();
 		}
 		long now = System.currentTimeMillis();
-		logger.info("Calculation took : {} sec.", (now-startTime)/1000);
-		logger.info("{} {} {} {}", pool.getCompletedTaskCount(), pool.getPoolSize(), pool.getActiveCount(), pool.getTaskCount());
+		logger.info("Calculation took : {} sec.", (now - startTime) / 1000);
+		logger.info("{} {} {} {}", pool.getCompletedTaskCount(), pool.getPoolSize(), pool.getActiveCount(),
+				pool.getTaskCount());
 	}
-
-
 
 	private void checkLocalFiles() throws IOException, StructureException {
 
 		logger.info("Checking local PDB installation in directory: {}", cache.getPath());
 
 		File f = new File(cache.getPath());
-		if ( ! f.isDirectory()) {
+		if (!f.isDirectory()) {
 			logger.error("The path {} should point to a directory!", f.getAbsolutePath());
 		}
 
-		if ( ! f.canWrite()) {
-			logger.error("You do not have permission to write to {}. There could be a problem if the PDB installation is not up-to-date with fetching missing PDB files.", f.getAbsolutePath());
+		if (!f.canWrite()) {
+			logger.error(
+					"You do not have permission to write to {}. There could be a problem if the PDB installation is not up-to-date with fetching missing PDB files.",
+					f.getAbsolutePath());
 		}
 
 		DomainProvider domainProvider = DomainProviderFactory.getDomainProvider();
 
+		for (String repre : representatives) {
 
-
-		for (String repre : representatives){
-
-			if ( interrupted.get())
+			if (interrupted.get()) {
 				return;
+			}
 
-			if( domainSplit ) {
+			if (domainSplit) {
 				SortedSet<String> domainNames = domainProvider.getDomainNames(repre);
-				//logger.debug(repre +" got domains: " +domainNames);
-				if( domainNames == null || domainNames.size()==0){
+				// logger.debug(repre +" got domains: " +domainNames);
+				if (domainNames == null || domainNames.size() == 0) {
 					// no domains found, use whole chain.
-					//submit(name1, repre, ca1, algorithm, outFileF, out, cache);
+					// submit(name1, repre, ca1, algorithm, outFileF, out, cache);
 					checkFile(repre);
 					continue;
 				}
-				//logger.debug("got " + domainNames.size() + " for " + repre);
-				for( String domain : domainNames){
-					//submit(name1, domain, ca1, algorithm, outFileF, out, cache);
+				// logger.debug("got " + domainNames.size() + " for " + repre);
+				for (String domain : domainNames) {
+					// submit(name1, domain, ca1, algorithm, outFileF, out, cache);
 					checkFile(domain);
 				}
 			} else {
-				//submit(name1, repre, ca1, algorithm, outFileF, out, cache);
+				// submit(name1, repre, ca1, algorithm, outFileF, out, cache);
 				checkFile(repre);
 			}
 
 		}
 
-		if ( domainProvider instanceof RemoteDomainProvider ) {
+		if (domainProvider instanceof RemoteDomainProvider) {
 			RemoteDomainProvider remoteP = (RemoteDomainProvider) domainProvider;
 			remoteP.flushCache();
 		}
@@ -405,7 +380,6 @@ public class MultiThreadedDBSearch {
 		logger.info("done checking local files...");
 
 	}
-
 
 	private void checkFile(String repre) throws IOException, StructureException {
 
@@ -418,14 +392,14 @@ public class MultiThreadedDBSearch {
 		reader.prefetchStructure(name.getPdbId());
 	}
 
-
-	private void submit(String name12, String repre, Atom[] ca1, StructureAlignment algorithm , File outFileF , SynchronizedOutFile out , AtomCache cache ) {
+	private void submit(String name12, String repre, Atom[] ca1, StructureAlignment algorithm, File outFileF,
+			SynchronizedOutFile out, AtomCache cache) {
 		CallableStructureAlignment ali = new CallableStructureAlignment();
 
 		PdbPair pair = new PdbPair(name1, repre);
 		try {
 			ali.setCa1(ca1);
-		} catch (Exception e){
+		} catch (Exception e) {
 			logger.error("Exception: ", e);
 			ConcurrencyTools.shutdown();
 			return;
@@ -441,8 +415,8 @@ public class MultiThreadedDBSearch {
 
 	}
 
-
-	/** stops what is currently happening and does not continue
+	/**
+	 * stops what is currently happening and does not continue
 	 *
 	 *
 	 */
@@ -452,21 +426,20 @@ public class MultiThreadedDBSearch {
 		pool.shutdownNow();
 		try {
 			DomainProvider domainProvider = DomainProviderFactory.getDomainProvider();
-			if (domainProvider instanceof RemoteDomainProvider){
+			if (domainProvider instanceof RemoteDomainProvider) {
 				RemoteDomainProvider remote = (RemoteDomainProvider) domainProvider;
 				remote.flushCache();
 			}
 		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 			// If errors occur, the cache should be empty anyways
 		}
 
 	}
 
-	public void cleanup()
-	{
+	public void cleanup() {
 
 		structure1 = null;
-
 
 	}
 

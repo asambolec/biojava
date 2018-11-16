@@ -30,13 +30,6 @@ package org.biojava.nbio.ws.alignment.qblast;
  */
 public enum BlastMatrixEnum {
 
-	BLOSUM45,
-	BLOSUM50,
-	BLOSUM62,
-	BLOSUM80,
-	BLOSUM90,
-	PAM250,
-	PAM30,
-	PAM70
+	BLOSUM45, BLOSUM50, BLOSUM62, BLOSUM80, BLOSUM90, PAM250, PAM30, PAM70
 
 }

@@ -53,38 +53,31 @@ import org.slf4j.LoggerFactory;
  *
  */
 public abstract class AbstractAlignmentJmol
-implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
+		implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAlignmentJmol.class);
-	protected Structure structure;
-	protected ColorBrewer colorPalette = ColorBrewer.Spectral;
-
-	protected JmolPanel jmolPanel;
-	protected JFrame frame;
-	protected JTextField text ;
-	protected JTextField status;
-
-	protected static final String COMMAND_LINE_HELP =
-			"enter Jmol scripting command...";
-
+	protected static final String COMMAND_LINE_HELP = "enter Jmol scripting command...";
 	protected static final int DEFAULT_HEIGHT = 500;
 	protected static final int DEFAULT_WIDTH = 500;
-	protected static final String DEFAULT_SCRIPT =
-			ResourceManager.getResourceManager("ce").
-			getString("default.alignment.jmol.script");
-
+	protected static final String DEFAULT_SCRIPT = ResourceManager.getResourceManager("ce")
+			.getString("default.alignment.jmol.script");
 	protected static int nrOpenWindows = 0;
+	protected Structure structure;
+	protected ColorBrewer colorPalette = ColorBrewer.Spectral;
+	protected JmolPanel jmolPanel;
+	protected JFrame frame;
+	protected JTextField text;
+	protected JTextField status;
 
 	/**
-	 * Display the structures after the variable initialization in the
-	 * constructor.
+	 * Display the structures after the variable initialization in the constructor.
 	 */
 	protected abstract void initCoords();
 
 	/**
 	 * Set all the member variables to null.
 	 */
-	public void destroy(){
+	public void destroy() {
 		logger.debug("cleaning up AlignmentJmol window");
 		jmolPanel.removeMouseListener(this);
 		jmolPanel.removeMouseMotionListener(this);
@@ -98,13 +91,14 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 
 	/**
 	 * Create and set a new structure from a given atom array.
+	 * 
 	 * @param atoms
 	 */
-	public void setAtoms(Atom[] atoms){
+	public void setAtoms(Atom[] atoms) {
 		Structure s = new StructureImpl();
 		Chain c = new ChainImpl();
 		c.setId("A");
-		for (Atom a: atoms){
+		for (Atom a : atoms) {
 			c.addGroup(a.getGroup());
 		}
 		s.addChain(c);
@@ -127,6 +121,7 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 
 	/**
 	 * Set the jmolPanel of the AlignmentJmol instance.
+	 * 
 	 * @param jmolPanel
 	 */
 	public void setJmolPanel(JmolPanel jmolPanel) {
@@ -135,10 +130,11 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 
 	/**
 	 * Execute a command String in the current Jmol panel.
+	 * 
 	 * @param rasmolScript
 	 */
-	public void evalString(String rasmolScript){
-		if ( jmolPanel == null ){
+	public void evalString(String rasmolScript) {
+		if (jmolPanel == null) {
 			logger.error("please install Jmol first");
 			return;
 		}
@@ -147,11 +143,12 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 
 	/**
 	 * Set a new Structure to visualize in the AlignmentJmol window.
+	 * 
 	 * @param s
 	 */
 	public void setStructure(Structure s) {
 
-		if (jmolPanel == null){
+		if (jmolPanel == null) {
 			logger.error("please install Jmol first");
 			return;
 		}
@@ -161,15 +158,15 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 		// actually this is very simple
 		// just convert the structure to a PDB file
 
-		//String pdb = s.toPDB();
-		//System.out.println(s.isNmr());
+		// String pdb = s.toPDB();
+		// System.out.println(s.isNmr());
 
-		//System.out.println(pdb);
+		// System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
-		//viewer.openFile("/Path/To/PDB/1tim.pdb");
+		// viewer.openFile("/Path/To/PDB/1tim.pdb");
 
-		//System.out.println(pdb);
-		//jmolPanel.openStringInline(pdb);
+		// System.out.println(pdb);
+		// jmolPanel.openStringInline(pdb);
 
 		// send the PDB file to Jmol.
 		// there are also other ways to interact with Jmol,
@@ -183,22 +180,22 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 	/**
 	 * Return the current Structure in the AlignmentJmol instance.
 	 */
-	public Structure getStructure(){
+	public Structure getStructure() {
 		return structure;
 	}
 
 	/**
-	 * Returns a List of internal Distance Matrices,
-	 * one for each structure in the alignment.
-	 * Returns null if no alignment is being displayed.
+	 * Returns a List of internal Distance Matrices, one for each structure in the
+	 * alignment. Returns null if no alignment is being displayed.
 	 */
 	public abstract List<Matrix> getDistanceMatrices();
 
 	/**
 	 * Set the title of the AlignmentJmol window.
+	 * 
 	 * @param label
 	 */
-	public void setTitle(String title){
+	public void setTitle(String title) {
 		frame.setTitle(title);
 		frame.repaint();
 	}
@@ -206,19 +203,22 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 	/**
 	 * Return the title of the AlignmentJmol window.
 	 */
-	public String getTitle(){
+	public String getTitle() {
 		return frame.getTitle();
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent e) {}
+	public void mouseDragged(MouseEvent e) {
+	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
 
 		JmolViewer viewer = jmolPanel.getViewer();
-		int pos = viewer.findNearestAtomIndex( e.getX(), e.getY() );
-		if ( pos == -1 ) { return ; }
+		int pos = viewer.findNearestAtomIndex(e.getX(), e.getY());
+		if (pos == -1) {
+			return;
+		}
 
 		String atomInfo = ((Viewer) viewer).getAtomInfo(pos);
 		text.setText(atomInfo);
@@ -226,39 +226,47 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e) {
+	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {
+	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {
+	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 
 		JmolViewer viewer = jmolPanel.getViewer();
 		int pos = viewer.findNearestAtomIndex(e.getX(), e.getY());
-		if (pos == -1) return;
+		if (pos == -1) {
+			return;
+		}
 
 		String atomInfo = ((Viewer) viewer).getAtomInfo(pos);
 		status.setText("clicked: " + atomInfo);
 		AtomInfo ai = AtomInfoParser.parse(atomInfo);
 
-		String cmd = "select " + ai.getResidueNumber()+":"
-				+ai.getChainId()+"/"+ai.getModelNumber()
-				+ "; set display selected;";
+		String cmd = new StringBuilder().append("select ").append(ai.getResidueNumber()).append(":")
+				.append(ai.getChainId()).append("/").append(ai.getModelNumber()).append("; set display selected;")
+				.toString();
 		evalString(cmd);
 	}
 
 	@Override
-	public void windowActivated(WindowEvent e) {}
+	public void windowActivated(WindowEvent e) {
+	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {
+	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
@@ -266,16 +274,20 @@ implements MouseMotionListener, MouseListener, WindowListener, ActionListener {
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent e) {}
+	public void windowDeactivated(WindowEvent e) {
+	}
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {}
+	public void windowDeiconified(WindowEvent e) {
+	}
 
 	@Override
-	public void windowIconified(WindowEvent e) {}
+	public void windowIconified(WindowEvent e) {
+	}
 
 	@Override
-	public void windowOpened(WindowEvent e) {}
+	public void windowOpened(WindowEvent e) {
+	}
 
 	@Override
 	public abstract void actionPerformed(ActionEvent e);

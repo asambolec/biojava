@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class QualityFeature<S extends AbstractSequence<C>, C extends Compound> extends AbstractFeature<S, C> {
 
-	private List<Number> qualities = new ArrayList<Number>();
+	private List<Number> qualities = new ArrayList<>();
 
 	/**
 	 * @param type
@@ -71,7 +71,7 @@ public class QualityFeature<S extends AbstractSequence<C>, C extends Compound> e
 
 	/**
 	 * @param biostart biological start index (starts with 1)
-	 * @param bioend biological end index (starts with 1)
+	 * @param bioend   biological end index (starts with 1)
 	 * @return a sublist of the qualities between the given biological indices
 	 */
 	public List<Number> getQualities(int biostart, int bioend) {

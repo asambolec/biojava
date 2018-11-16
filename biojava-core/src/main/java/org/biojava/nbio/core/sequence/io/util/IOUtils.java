@@ -63,12 +63,11 @@ public class IOUtils {
 	/**
 	 * Moves the bytes from input to output using a 4KB byte array.
 	 *
-	 * @param input Input stream of bytes
+	 * @param input  Input stream of bytes
 	 * @param output Output stream of bytes
 	 * @throws IOException If anything occurs in the case of the reads and writes
 	 */
-	public static void copy(InputStream input, OutputStream output)
-			throws IOException {
+	public static void copy(InputStream input, OutputStream output) throws IOException {
 		byte[] buffer = new byte[BUFFER];
 		int n = 0;
 		while (-1 != (n = input.read(buffer))) {
@@ -77,27 +76,26 @@ public class IOUtils {
 	}
 
 	/**
-	 * Takes in a reader and a processor, reads every line from the given
-	 * file and then invokes the processor. What you do with the lines is
-	 * dependent on your processor.
+	 * Takes in a reader and a processor, reads every line from the given file and
+	 * then invokes the processor. What you do with the lines is dependent on your
+	 * processor.
 	 *
 	 * The code will automatically close the given BufferedReader.
 	 *
-	 * @param br The reader to process
+	 * @param br        The reader to process
 	 * @param processor The processor to invoke on all lines
 	 * @throws ParserException Can throw this if we cannot parse the given reader
 	 */
-	public static void processReader(BufferedReader br, ReaderProcessor processor) throws ParserException {
+	public static void processReader(BufferedReader br, ReaderProcessor processor) {
 		String line;
 		try {
-			while( (line = br.readLine()) != null ) {
+			while ((line = br.readLine()) != null) {
 				processor.process(line);
 			}
-		}
-		catch(IOException e) {
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 			throw new ParserException("Could not read from the given BufferedReader");
-		}
-		finally {
+		} finally {
 			close(br);
 		}
 	}
@@ -109,37 +107,31 @@ public class IOUtils {
 	 * @return List of Strings
 	 * @throws ParserException Can throw this if we cannot parse the given reader
 	 */
-	public static List<String> getList(BufferedReader br) throws ParserException {
-		final List<String> list = new ArrayList<String>();
-		processReader(br, new ReaderProcessor() {
-			@Override
-			public void process(String line) {
-				list.add(line);
-			}
-		});
+	public static List<String> getList(BufferedReader br) {
+		final List<String> list = new ArrayList<>();
+		processReader(br, list::add);
 		return list;
 	}
 
 	/**
-	 * Delegates to {@link #getList(BufferedReader)} by wrapping the InputStream
-	 * in a valid reader. No encoding is mentioned so if you need anything
-	 * more advanced then use the other version of this method.
+	 * Delegates to {@link #getList(BufferedReader)} by wrapping the InputStream in
+	 * a valid reader. No encoding is mentioned so if you need anything more
+	 * advanced then use the other version of this method.
 	 *
 	 * @param is InputStream which is a text file
 	 * @return List of Strings representing the lines of the files
-	 * @throws ParserException Can throw this if the file is not a file or we
-	 * cannot parse it
+	 * @throws ParserException Can throw this if the file is not a file or we cannot
+	 *                         parse it
 	 */
-	public static List<String> getList(InputStream is) throws ParserException {
+	public static List<String> getList(InputStream is) {
 		return getList(new BufferedReader(new InputStreamReader(is)));
 	}
 
 	/**
-	 * Delegates to {@link #getList(InputStream)} by wrapping the File
-	 * in a valid stream. No encoding is mentioned so if you need anything
-	 * more advanced then use the other version of this method. Since this
-	 * uses {@link #openFile(File)} this code can support GZipped and plain
-	 * files.
+	 * Delegates to {@link #getList(InputStream)} by wrapping the File in a valid
+	 * stream. No encoding is mentioned so if you need anything more advanced then
+	 * use the other version of this method. Since this uses {@link #openFile(File)}
+	 * this code can support GZipped and plain files.
 	 *
 	 * @param file File which is a text file
 	 * @return List of Strings representing the lines of the files
@@ -150,9 +142,9 @@ public class IOUtils {
 	}
 
 	/**
-	 * For a filename this code will check the extension of the file for a
-	 * .gz extension. If it finds one then the InputStream given back
-	 * is a {@link GZIPInputStream}. Otherwise we return a normal
+	 * For a filename this code will check the extension of the file for a .gz
+	 * extension. If it finds one then the InputStream given back is a
+	 * {@link GZIPInputStream}. Otherwise we return a normal
 	 * {@link FileInputStream}.
 	 *
 	 * @param file File which may or may not be GZipped
@@ -161,30 +153,19 @@ public class IOUtils {
 	 */
 	public static InputStream openFile(File file) throws IOException {
 		final InputStream is;
-		if(!file.isFile()) {
-			throw new ParserException("The file "+file+" is not a file.");
+		if (!file.isFile()) {
+			throw new ParserException(
+					new StringBuilder().append("The file ").append(file).append(" is not a file.").toString());
 		}
 		String name = file.getName();
 
-		if(name.endsWith(".gz")) {
+		if (name.endsWith(".gz")) {
 			is = new GZIPInputStream(new FileInputStream(file));
-		}
-		else {
+		} else {
 			is = new FileInputStream(file);
 		}
 
 		return is;
-	}
-
-	/**
-	 * Closure interface used when working with
-	 * {@link IOUtils#processReader(String)}. Each time a line is encountered
-	 * the object that implements this interface will be invoked.
-	 *
-	 * @author ayates
-	 */
-	public static interface ReaderProcessor {
-		void process(String line) throws IOException;
 	}
 
 	/**
@@ -209,7 +190,8 @@ public class IOUtils {
 	 */
 	public static <S extends Sequence<C>, C extends Compound> int getGCGChecksum(S sequence) {
 		String s = sequence.toString().toUpperCase();
-		int count = 0, check = 0;
+		int count = 0;
+		int check = 0;
 		for (int i = 0; i < s.length(); i++) {
 			count++;
 			check += count * s.charAt(i);
@@ -229,13 +211,12 @@ public class IOUtils {
 	public static <S extends Sequence<C>, C extends Compound> String getGCGHeader(List<S> sequences) {
 		StringBuilder header = new StringBuilder();
 		S s1 = sequences.get(0);
-		header.append(String.format("MSA from BioJava%n%n MSF: %d  Type: %s  Check: %d ..%n%n",
-				s1.getLength(), getGCGType(s1.getCompoundSet()), getGCGChecksum(sequences)));
-		String format = " Name: " + getIDFormat(sequences) + " Len: " + s1.getLength() + "  Check: %4d  Weight: 1.0%n";
-		for (S as : sequences) {
-			header.append(String.format(format, as.getAccession(), getGCGChecksum(as)));
-			// TODO show weights in MSF header
-		}
+		header.append(String.format("MSA from BioJava%n%n MSF: %d  Type: %s  Check: %d ..%n%n", s1.getLength(),
+				getGCGType(s1.getCompoundSet()), getGCGChecksum(sequences)));
+		String format = new StringBuilder().append(" Name: ").append(getIDFormat(sequences)).append(" Len: ")
+				.append(s1.getLength()).append("  Check: %4d  Weight: 1.0%n").toString();
+		// TODO show weights in MSF header
+		sequences.forEach(as -> header.append(String.format(format, as.getAccession(), getGCGChecksum(as))));
 		header.append(String.format("%n//%n%n"));
 		// TODO? convert gap characters to '.'
 		return header.toString();
@@ -243,12 +224,14 @@ public class IOUtils {
 
 	/**
 	 * Determines GCG type
+	 * 
 	 * @param cs compound set of sequences
 	 * @return GCG type
 	 */
 	public static <C extends Compound> String getGCGType(CompoundSet<C> cs) {
-		return (cs == DNACompoundSet.getDNACompoundSet() || cs == AmbiguityDNACompoundSet.getDNACompoundSet()) ? "D" :
-			(cs == RNACompoundSet.getRNACompoundSet() || cs == AmbiguityRNACompoundSet.getRNACompoundSet()) ? "R" : "P";
+		return (cs == DNACompoundSet.getDNACompoundSet() || cs == AmbiguityDNACompoundSet.getDNACompoundSet()) ? "D"
+				: (cs == RNACompoundSet.getRNACompoundSet() || cs == AmbiguityRNACompoundSet.getRNACompoundSet()) ? "R"
+						: "P";
 	}
 
 	/**
@@ -262,17 +245,17 @@ public class IOUtils {
 		for (S as : sequences) {
 			length = Math.max(length, (as.getAccession() == null) ? 0 : as.getAccession().toString().length());
 		}
-		return (length == 0) ? null : "%-" + (length + 1) + "s";
+		return (length == 0) ? null : new StringBuilder().append("%-").append(length + 1).append("s").toString();
 	}
 
 	/**
 	 * Creates formatted String for a single character of PDB output
 	 *
-	 * @param web true for HTML display
-	 * @param c1 character in first sequence
-	 * @param c2 character in second sequence
+	 * @param web     true for HTML display
+	 * @param c1      character in first sequence
+	 * @param c2      character in second sequence
 	 * @param similar true if c1 and c2 are considered similar compounds
-	 * @param c character to display
+	 * @param c       character to display
 	 * @return formatted String
 	 */
 	public static String getPDBCharacter(boolean web, char c1, char c2, boolean similar, char c) {
@@ -283,9 +266,9 @@ public class IOUtils {
 	/**
 	 * Creates formatted String for displaying conservation in PDB output
 	 *
-	 * @param web true for HTML display
-	 * @param c1 character in first sequence
-	 * @param c2 character in second sequence
+	 * @param web     true for HTML display
+	 * @param c1      character in first sequence
+	 * @param c2      character in second sequence
 	 * @param similar true if c1 and c2 are considered similar compounds
 	 * @return formatted String
 	 */
@@ -296,14 +279,15 @@ public class IOUtils {
 	// helper method for getPDBCharacter and getPDBConservation
 	private static String getPDBString(boolean web, char c1, char c2, boolean similar, String m, String sm, String dm,
 			String qg) {
-		if (c1 == c2)
-			return web ? "<span class=\"m\">" + m + "</span>" : m;
-		else if (similar)
-			return web ? "<span class=\"sm\">" + sm + "</span>" : sm;
-		else if (c1 == '-' || c2 == '-')
-			return web ? "<span class=\"dm\">" + dm + "</span>" : dm;
-		else
-			return web ? "<span class=\"qg\">" + qg + "</span>" : qg;
+		if (c1 == c2) {
+			return web ? new StringBuilder().append("<span class=\"m\">").append(m).append("</span>").toString() : m;
+		} else if (similar) {
+			return web ? new StringBuilder().append("<span class=\"sm\">").append(sm).append("</span>").toString() : sm;
+		} else if (c1 == '-' || c2 == '-') {
+			return web ? new StringBuilder().append("<span class=\"dm\">").append(dm).append("</span>").toString() : dm;
+		} else {
+			return web ? new StringBuilder().append("<span class=\"qg\">").append(qg).append("</span>").toString() : qg;
+		}
 	}
 
 	/**
@@ -327,7 +311,9 @@ public class IOUtils {
 
 	/**
 	 * Prints {@code string} to {@code file}.
-	 * @throws IOException If any I/O exception occurs while printing; this method does not catch any exceptions
+	 * 
+	 * @throws IOException If any I/O exception occurs while printing; this method
+	 *                     does not catch any exceptions
 	 */
 	public static void print(String string, File file) throws IOException {
 		PrintWriter out = null;
@@ -337,8 +323,21 @@ public class IOUtils {
 			out.flush();
 			out.close();
 		} finally {
-			if (out != null) out.close();
+			if (out != null) {
+				out.close();
+			}
 		}
+	}
+
+	/**
+	 * Closure interface used when working with
+	 * {@link IOUtils#processReader(String)}. Each time a line is encountered the
+	 * object that implements this interface will be invoked.
+	 *
+	 * @author ayates
+	 */
+	public static interface ReaderProcessor {
+		void process(String line) throws IOException;
 	}
 
 }

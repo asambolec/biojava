@@ -30,54 +30,65 @@ public class DatabasePDBrev {
 	String num;
 
 	@Override
-	public String toString(){
-		StringBuffer buf = new StringBuffer();
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
 		buf.append("DatabasePDBrev ");
 		buf.append("mod_type :");
 		buf.append(mod_type);
 		buf.append(" ");
 		buf.append(this.getDate());
-		buf.append( " ");
-		buf.append( this.getDate_original());
+		buf.append(" ");
+		buf.append(this.getDate_original());
 
 		return buf.toString();
 	}
+
 	public String getNum() {
 		return num;
 	}
+
 	public void setNum(String num) {
 		this.num = num;
 	}
+
 	public String getDate() {
 		return date;
 	}
+
 	public void setDate(String date) {
 		this.date = date;
 	}
+
 	public String getDate_original() {
 		return date_original;
 	}
+
 	public void setDate_original(String date_original) {
 		this.date_original = date_original;
 	}
+
 	public String getStatus() {
 		return status;
 	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
 	public String getReplaces() {
 		return replaces;
 	}
+
 	public void setReplaces(String replaces) {
 		this.replaces = replaces;
 	}
+
 	public String getMod_type() {
 		return mod_type;
 	}
+
 	public void setMod_type(String mod_type) {
 		this.mod_type = mod_type;
 	}
-
 
 }

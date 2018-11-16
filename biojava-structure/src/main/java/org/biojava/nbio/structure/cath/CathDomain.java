@@ -50,9 +50,9 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	public static final long serialVersionUID = 1L;
 
 	/**
-	 * The CATH domain code. Always 7 characters in length, combining the PDB and chain letter with the number of the domain within CATH.
-	 * Example: 1aoiA00
-	 * If the chain letter '0', domain refers to an entire PDB entry.
+	 * The CATH domain code. Always 7 characters in length, combining the PDB and
+	 * chain letter with the number of the domain within CATH. Example: 1aoiA00 If
+	 * the chain letter '0', domain refers to an entire PDB entry.
 	 */
 	String domainName; // 7 characters 1oaiA00
 
@@ -108,8 +108,9 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	Integer length;
 
 	/**
-	 * The resolution of the domain structure. Nominally in Angstroms,
-	 * the values 999.000 and 1000.000 signify NMR structures and obsolete structures, respectively.
+	 * The resolution of the domain structure. Nominally in Angstroms, the values
+	 * 999.000 and 1000.000 signify NMR structures and obsolete structures,
+	 * respectively.
 	 */
 	Double resolution;
 
@@ -171,12 +172,12 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	}
 
 	/**
-	 * Returns a string of the form {@code PDBID.CHAIN}.
-	 * For example: {@code 1hiv.A}.
+	 * Returns a string of the form {@code PDBID.CHAIN}. For example:
+	 * {@code 1hiv.A}.
 	 */
 	public String getPdbIdAndChain() {
-		return domainName.substring(0, 4) +
-				(!domainName.substring(4, 5).equals("0") ? "." + domainName.substring(4, 5) : "");
+		return domainName.substring(0, 4)
+				+ (!"0".equals(domainName.substring(4, 5)) ? "." + domainName.substring(4, 5) : "");
 	}
 
 	public Integer getDomainId() {
@@ -280,10 +281,9 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	}
 
 	public String getCATH() {
-		return Integer.toString(getClassId()) + "." +
-				Integer.toString(getArchitectureId()) + "." +
-				Integer.toString(getTopologyId()) + "." +
-				Integer.toString(getHomologyId());
+		return new StringBuilder().append(Integer.toString(getClassId())).append(".")
+				.append(Integer.toString(getArchitectureId())).append(".").append(Integer.toString(getTopologyId()))
+				.append(".").append(Integer.toString(getHomologyId())).toString();
 	}
 
 	public void setSOLID(String cathCode) {
@@ -296,35 +296,35 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	}
 
 	public String getSOILD() {
-		return Integer.toString(getSequenceFamilyId()) + "." +
-				Integer.toString(getOrthologousSequenceFamilyId()) + "." +
-				Integer.toString(getLikeSequenceFamilyId()) + "." +
-				Integer.toString(getIdenticalSequenceFamilyId()) + "." +
-				Integer.toString(getDomainCounter());
+		return new StringBuilder().append(Integer.toString(getSequenceFamilyId())).append(".")
+				.append(Integer.toString(getOrthologousSequenceFamilyId())).append(".")
+				.append(Integer.toString(getLikeSequenceFamilyId())).append(".")
+				.append(Integer.toString(getIdenticalSequenceFamilyId())).append(".")
+				.append(Integer.toString(getDomainCounter())).toString();
 	}
 
 	public Integer getClassificationId(CathCategory cathCategory) {
 		switch (cathCategory) {
-			case Class:
-				return getClassId();
-			case Architecture:
-				return getArchitectureId();
-			case Topolgy:
-				return getTopologyId();
-			case Homology:
-				return getHomologyId();
-			case SequenceFamily:
-				return getSequenceFamilyId();
-			case OrthologousSequenceFamily:
-				return getOrthologousSequenceFamilyId();
-			case LikeSequenceFamily:
-				return getLikeSequenceFamilyId();
-			case IdenticalSequenceFamily:
-				return getIdenticalSequenceFamilyId();
-			case DomainCounter:
-				return getDomainCounter();
-			default:
-				return null;
+		case Class:
+			return getClassId();
+		case Architecture:
+			return getArchitectureId();
+		case Topolgy:
+			return getTopologyId();
+		case Homology:
+			return getHomologyId();
+		case SequenceFamily:
+			return getSequenceFamilyId();
+		case OrthologousSequenceFamily:
+			return getOrthologousSequenceFamilyId();
+		case LikeSequenceFamily:
+			return getLikeSequenceFamilyId();
+		case IdenticalSequenceFamily:
+			return getIdenticalSequenceFamilyId();
+		case DomainCounter:
+			return getDomainCounter();
+		default:
+			return null;
 		}
 	}
 
@@ -402,29 +402,27 @@ public class CathDomain implements Serializable, StructureIdentifier {
 
 	@Override
 	public String toString() {
-		return "CathDomain [domainName=" + domainName + ", classId=" + classId
-				+ ", architectureId=" + architectureId + ", topologyId="
-				+ topologyId + ", homologyId=" + homologyId
-				+ ", sequenceFamilyId=" + sequenceFamilyId
-				+ ", orthologousSequenceFamilyId="
-				+ orthologousSequenceFamilyId + ", likeSequenceFamilyId="
-				+ likeSequenceFamilyId + ", identicalSequenceFamilyId="
-				+ identicalSequenceFamilyId + ", domainCounter="
-				+ domainCounter + ", length=" + length + ", resolution="
-				+ resolution + ", format=" + format + ", version=" + version
-				+ ", date=" + date + ", name=" + name + ", source=" + source
-				+ ", sequenceHeader=" + sequenceHeader + ", sequence="
-				+ sequence + ", segments=" + segments + ", comment=" + comment
-				+ "]";
+		return new StringBuilder().append("CathDomain [domainName=").append(domainName).append(", classId=")
+				.append(classId).append(", architectureId=").append(architectureId).append(", topologyId=")
+				.append(topologyId).append(", homologyId=").append(homologyId).append(", sequenceFamilyId=")
+				.append(sequenceFamilyId).append(", orthologousSequenceFamilyId=").append(orthologousSequenceFamilyId)
+				.append(", likeSequenceFamilyId=").append(likeSequenceFamilyId).append(", identicalSequenceFamilyId=")
+				.append(identicalSequenceFamilyId).append(", domainCounter=").append(domainCounter).append(", length=")
+				.append(length).append(", resolution=").append(resolution).append(", format=").append(format)
+				.append(", version=").append(version).append(", date=").append(date).append(", name=").append(name)
+				.append(", source=").append(source).append(", sequenceHeader=").append(sequenceHeader)
+				.append(", sequence=").append(sequence).append(", segments=").append(segments).append(", comment=")
+				.append(comment).append("]").toString();
 	}
 
 	/**
-	 * Returns the chains this domain is defined over; contains more than 1 element only if this domains is a multi-chain domain.
+	 * Returns the chains this domain is defined over; contains more than 1 element
+	 * only if this domains is a multi-chain domain.
 	 */
 	public Set<String> getChains() {
-		Set<String> chains = new HashSet<String>();
+		Set<String> chains = new HashSet<>();
 		List<ResidueRange> rrs = toCanonical().getResidueRanges();
-		for (ResidueRange rr : rrs) chains.add(rr.getChainName());
+		rrs.forEach(rr -> chains.add(rr.getChainName()));
 		return chains;
 	}
 
@@ -435,11 +433,10 @@ public class CathDomain implements Serializable, StructureIdentifier {
 
 	@Override
 	public SubstructureIdentifier toCanonical() {
-		List<ResidueRange> ranges = new ArrayList<ResidueRange>();
+		List<ResidueRange> ranges = new ArrayList<>();
 		String chain = String.valueOf(getDomainName().charAt(getDomainName().length() - 3));
-		for (CathSegment segment : this.getSegments()) {
-			ranges.add(new ResidueRange(chain, segment.getStart(), segment.getStop()));
-		}
+		this.getSegments()
+				.forEach(segment -> ranges.add(new ResidueRange(chain, segment.getStart(), segment.getStop())));
 
 		return new SubstructureIdentifier(getThePdbId(), ranges);
 	}
@@ -450,10 +447,8 @@ public class CathDomain implements Serializable, StructureIdentifier {
 	}
 
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-			IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		return cache.getStructure(getThePdbId());
 	}
-
 
 }

@@ -28,12 +28,12 @@ import org.biojava.nbio.structure.align.events.AlignmentProgressListener;
 
 public class CountProgressListener implements AlignmentProgressListener {
 
-	int nrCalculated ;
+	int nrCalculated;
 	int nrSubmitted;
 
-	public CountProgressListener(){
+	public CountProgressListener() {
 		nrCalculated = 0;
-		nrSubmitted  = 0;
+		nrSubmitted = 0;
 	}
 
 	@Override
@@ -68,16 +68,13 @@ public class CountProgressListener implements AlignmentProgressListener {
 
 	@Override
 	public void sentResultsToServer(int nrAlignments, String serverMessage) {
-		nrSubmitted+=nrAlignments;
+		nrSubmitted += nrAlignments;
 	}
-
 
 	@Override
 	public String toString() {
-		return "[nrCalculated=" + nrCalculated
-				+ ", nrSubmitted=" + nrSubmitted + "]";
+		return new StringBuilder().append("[nrCalculated=").append(nrCalculated).append(", nrSubmitted=")
+				.append(nrSubmitted).append("]").toString();
 	}
-
-
 
 }

@@ -28,7 +28,6 @@ package org.biojava.nbio.core.sequence.template;
 import java.util.List;
 import java.util.Set;
 
-
 public interface CompoundSet<C extends Compound> {
 
 	/**
@@ -37,14 +36,14 @@ public interface CompoundSet<C extends Compound> {
 	public int getMaxSingleCompoundStringLength();
 
 	/**
-	 * Returns true if all String representations of Compounds are of the
-	 * same length.
+	 * Returns true if all String representations of Compounds are of the same
+	 * length.
 	 */
 	public boolean isCompoundStringLengthEqual();
 
 	/**
-	 * Return null if not recognised. Throw IllegalArgumentException if string
-	 * is longer than maximum allowed by {@link #getStringForCompound(Compound)}.
+	 * Return null if not recognised. Throw IllegalArgumentException if string is
+	 * longer than maximum allowed by {@link #getStringForCompound(Compound)}.
 	 */
 	public C getCompoundForString(String string);
 

@@ -30,10 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.List;
 
-@XmlRootElement(name = "ScopNode", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "ScopNode", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class ScopNode implements Serializable
-{
+public class ScopNode implements Serializable {
 
 	/**
 	 *
@@ -44,44 +43,38 @@ public class ScopNode implements Serializable
 	int parentSunid;
 	List<Integer> children;
 
-	public ScopNode(){
+	public ScopNode() {
 
 	}
-
-
 
 	@Override
-	public String toString()
-	{
-		return "ScopNode [children=" + children + ", parentSunid=" + parentSunid + ", sunid=" + sunid + "]";
+	public String toString() {
+		return new StringBuilder().append("ScopNode [children=").append(children).append(", parentSunid=")
+				.append(parentSunid).append(", sunid=").append(sunid).append("]").toString();
 	}
 
-
-
-	public int getSunid()
-	{
+	public int getSunid() {
 		return sunid;
 	}
-	public void setSunid(int sunid)
-	{
+
+	public void setSunid(int sunid) {
 		this.sunid = sunid;
 	}
-	public int getParentSunid()
-	{
+
+	public int getParentSunid() {
 		return parentSunid;
 	}
-	public void setParentSunid(int parentSunid)
-	{
+
+	public void setParentSunid(int parentSunid) {
 		this.parentSunid = parentSunid;
 	}
-	public List<Integer> getChildren()
-	{
+
+	public List<Integer> getChildren() {
 		return children;
 	}
-	public void setChildren(List<Integer> children)
-	{
+
+	public void setChildren(List<Integer> children) {
 		this.children = children;
 	}
-
 
 }

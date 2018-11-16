@@ -28,6 +28,7 @@ import java.io.IOException;
 
 /**
  * Used to parse a stream of a fasta file to get the sequence
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class FastaSequenceParser implements SequenceParserInterface {

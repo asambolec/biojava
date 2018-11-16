@@ -28,15 +28,13 @@ import java.util.*;
 
 public class ModifiedAminoAcidCompoundSet implements CompoundSet<AminoAcidCompound> {
 
-	private final Map<String, AminoAcidCompound> aminoAcidCompoundCache = new HashMap<String, AminoAcidCompound>();
+	private final Map<String, AminoAcidCompound> aminoAcidCompoundCache = new HashMap<>();
 
-	public ModifiedAminoAcidCompoundSet(List<AminoAcidComposition> aaList, Map<Character, Double> aaSymbol2MolecularWeight) {
+	public ModifiedAminoAcidCompoundSet(List<AminoAcidComposition> aaList,
+			Map<Character, Double> aaSymbol2MolecularWeight) {
 		this.aminoAcidCompoundCache.put("-", new AminoAcidCompound(null, "-", "", "", 0.0f));
-		for (AminoAcidComposition aa : aaList) {
-			this.aminoAcidCompoundCache.put(aa.getSymbol(),
-					new AminoAcidCompound(null, aa.getSymbol(), aa.getShorName(), aa.getName(),
-							aaSymbol2MolecularWeight.get(aa.getSymbol().charAt(0)).floatValue()));
-		}
+		aaList.forEach(aa -> this.aminoAcidCompoundCache.put(aa.getSymbol(), new AminoAcidCompound(null, aa.getSymbol(),
+				aa.getShorName(), aa.getName(), aaSymbol2MolecularWeight.get(aa.getSymbol().charAt(0)).floatValue())));
 	}
 
 	@Override
@@ -51,11 +49,12 @@ public class ModifiedAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 
 	@Override
 	public AminoAcidCompound getCompoundForString(String string) {
-		if (string.length() == 0) {
+		if (string.isEmpty()) {
 			return null;
 		}
 		if (string.length() > this.getMaxSingleCompoundStringLength()) {
-			throw new IllegalArgumentException("String supplied (" + string + ") is too long. Max is " + getMaxSingleCompoundStringLength());
+			throw new IllegalArgumentException(new StringBuilder().append("String supplied (").append(string)
+					.append(") is too long. Max is ").append(getMaxSingleCompoundStringLength()).toString());
 		}
 		return this.aminoAcidCompoundCache.get(string);
 	}
@@ -84,7 +83,7 @@ public class ModifiedAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 
 	@Override
 	public List<AminoAcidCompound> getAllCompounds() {
-		return new ArrayList<AminoAcidCompound>(aminoAcidCompoundCache.values());
+		return new ArrayList<>(aminoAcidCompoundCache.values());
 	}
 
 	@Override

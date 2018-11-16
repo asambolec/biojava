@@ -29,7 +29,7 @@ import java.io.Serializable;
  *
  * @author Daniel Asarnow
  */
-public class CathSegment implements Serializable{
+public class CathSegment implements Serializable {
 
 	public static final long serialVersionUID = 1L;
 
@@ -39,14 +39,14 @@ public class CathSegment implements Serializable{
 	Integer segmentId;
 
 	/**
-	 * The first residue in the segment.
-	 * Refers to the complete residue specification (sequence number AND insertion code).
+	 * The first residue in the segment. Refers to the complete residue
+	 * specification (sequence number AND insertion code).
 	 */
 	String start;
 
-	 /**
-	 * The last residue in the segment.
-	 * Refers to the complete residue specification (sequence number AND insertion code).
+	/**
+	 * The last residue in the segment. Refers to the complete residue specification
+	 * (sequence number AND insertion code).
 	 */
 	String stop;
 
@@ -81,11 +81,11 @@ public class CathSegment implements Serializable{
 		this.start = start;
 	}
 
-	public String  getStop() {
+	public String getStop() {
 		return stop;
 	}
 
-	public void setStop(String  stop) {
+	public void setStop(String stop) {
 		this.stop = stop;
 	}
 
@@ -115,10 +115,9 @@ public class CathSegment implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CathSegment [segmentId=" + segmentId + ", start=" + start
-				+ ", stop=" + stop + ", length=" + length + ", sequenceHeader="
-				+ sequenceHeader + ", sequence=" + sequence + "]";
+		return new StringBuilder().append("CathSegment [segmentId=").append(segmentId).append(", start=").append(start)
+				.append(", stop=").append(stop).append(", length=").append(length).append(", sequenceHeader=")
+				.append(sequenceHeader).append(", sequence=").append(sequence).append("]").toString();
 	}
-
 
 }

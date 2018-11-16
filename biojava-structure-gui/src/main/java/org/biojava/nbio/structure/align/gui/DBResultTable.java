@@ -53,12 +53,16 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class DBResultTable implements ActionListener {
 
-public class DBResultTable implements ActionListener{
-
-	public static final String[] ceColumnNames =  {"name1","tname2","score","z-score"    ,"rmsd","len1","len2","cov1","cov2","%ID","Description",""};
-	public static final String[] fatColumnNames = {"name1","tname2","score","probability","rmsd","len1","len2","cov1","cov2","%ID","Description",""};
+	private static final Logger logger = LoggerFactory.getLogger(DBResultTable.class);
+	public static final String[] ceColumnNames = { "name1", "tname2", "score", "z-score", "rmsd", "len1", "len2",
+			"cov1", "cov2", "%ID", "Description", "" };
+	public static final String[] fatColumnNames = { "name1", "tname2", "score", "probability", "rmsd", "len1", "len2",
+			"cov1", "cov2", "%ID", "Description", "" };
 
 	Object[][] data;
 	JTable table;
@@ -71,58 +75,57 @@ public class DBResultTable implements ActionListener{
 
 	boolean isCE = true;
 	UserConfiguration config;
-	AtomCache cache ;
+	AtomCache cache;
 
-	String userPath ;
+	String userPath;
 	String userChain;
 
-
-
-	public static void main(String[] args){
-
-		String file = "/tmp/results_4hhb.A.out";
-
-		DBResultTable table = new DBResultTable();
-		UserConfiguration config = WebStartMain.getDefaultConfig();
-		table.show(new File(file),config);
-	}
-
-	public DBResultTable(){
+	public DBResultTable() {
 		oldName1 = "";
 		oldName2 = "";
 		userPath = null;
 		userChain = null;
 	}
 
-	public void show(BufferedReader in, UserConfiguration config) throws IOException{
+	public static void main(String[] args) {
+
+		String file = "/tmp/results_4hhb.A.out";
+
+		DBResultTable table = new DBResultTable();
+		UserConfiguration config = WebStartMain.getDefaultConfig();
+		table.show(new File(file), config);
+	}
+
+	public void show(BufferedReader in, UserConfiguration config) throws IOException {
 		String str;
-		List<String[]> tmpdat = new ArrayList<String[]>();
+		List<String[]> tmpdat = new ArrayList<>();
 		while ((str = in.readLine()) != null) {
-			if ( str.startsWith("#")) {
-				if ( str.startsWith("# algorithm:")) {
+			if (str.startsWith("#")) {
+				if (str.startsWith("# algorithm:")) {
 					String[] spl = str.split(":");
-					if ( spl.length == 2) {
+					if (spl.length == 2) {
 						algorithmName = spl[1];
-						if (algorithmName.startsWith("jCE"))
+						if (algorithmName.startsWith("jCE")) {
 							isCE = true;
-						else
+						} else {
 							isCE = false;
+						}
 					}
 					initAlgorithm(algorithmName);
 
 				}
 
-				else if ( str.startsWith("#param:file1=")){
+				else if (str.startsWith("#param:file1=")) {
 					String path = str.substring(13);
 					userPath = path.trim();
 				}
 
-				else if ( str.startsWith("#param:chain1=")){
+				else if (str.startsWith("#param:chain1=")) {
 					String chain = str.substring(14);
 					userChain = chain.trim();
 				}
 
-				else if ( str.startsWith("#param:scoring=")){
+				else if (str.startsWith("#param:scoring=")) {
 					try {
 						String[] spl = str.split("=");
 						ScoringStrategy scoreS;
@@ -130,34 +133,35 @@ public class DBResultTable implements ActionListener{
 							// try to convert from integer score
 							int stratNum = Integer.parseInt(spl[1]);
 							ScoringStrategy[] vals = ScoringStrategy.values();
-							scoreS = vals[stratNum];//throws OutOfBounds if invalid; caught below
-						} catch(NumberFormatException e) {
+							scoreS = vals[stratNum];// throws OutOfBounds if invalid; caught below
+						} catch (NumberFormatException e) {
+							logger.error(e.getMessage(), e);
 							scoreS = ScoringStrategy.valueOf(spl[1]); //
 						}
-						if (algorithm != null){
+						if (algorithm != null) {
 							// scoring is a parameter of CE...
 							ConfigStrucAligParams params = algorithm.getParameters();
-							if ( params instanceof CeParameters){
+							if (params instanceof CeParameters) {
 								CeParameters ceParams = (CeParameters) params;
 								ceParams.setScoringStrategy(scoreS);
 							}
 						}
-					} catch (IndexOutOfBoundsException e){
-						System.err.println("Unknown scoring strategy from line: " + str);
-					} catch (IllegalArgumentException e) {
-						System.err.println("Unknown scoring strategy from line: " + str);
+					} catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+						logger.error(e.getMessage(), e);
+						logger.error("Unknown scoring strategy from line: " + str);
 					} catch (Exception e) {
-						System.err.println("Unknown parameter can't read parameters from line: " + str);
-						e.printStackTrace();
+						logger.error("Unknown parameter can't read parameters from line: " + str);
+						logger.error(e.getMessage(), e);
 					}
 
 				}
 				continue;
 			}
 			String[] spl = str.split("\t");
-			if ( spl.length != ceColumnNames.length -1) {
-				System.err.println("wrong table width! " + spl.length + " should be: " + (ceColumnNames.length -1 ));
-				System.err.println(str);
+			if (spl.length != ceColumnNames.length - 1) {
+				logger.error(new StringBuilder().append("wrong table width! ").append(spl.length).append(" should be: ")
+						.append(ceColumnNames.length - 1).toString());
+				logger.error(str);
 				continue;
 			}
 			tmpdat.add(spl);
@@ -168,15 +172,15 @@ public class DBResultTable implements ActionListener{
 		Object[][] d = new Object[tmpdat.size()][ceColumnNames.length + 1];
 
 		int i = -1;
-		for (String[] spl : tmpdat){
+		for (String[] spl : tmpdat) {
 
 			i++;
 			Object[] o = new Object[spl.length + 1];
-			for ( int j=0; j< spl.length;j++){
+			for (int j = 0; j < spl.length; j++) {
 
-				if (( j >= 2 && j <= 4)|| (j==9)) {
+				if ((j >= 2 && j <= 4) || (j == 9)) {
 					o[j] = Double.parseDouble(spl[j]);
-				}  else if (  j >4 && j< 10) {
+				} else if (j > 4 && j < 10) {
 
 					o[j] = Integer.parseInt(spl[j]);
 				} else {
@@ -184,28 +188,28 @@ public class DBResultTable implements ActionListener{
 				}
 			}
 
-			o[spl.length ] = "Align";
+			o[spl.length] = "Align";
 
 			d[i] = o;
 
 		}
 		data = d;
 		String[] columnNames = ceColumnNames;
-		if ( ! isCE)
+		if (!isCE) {
 			columnNames = fatColumnNames;
+		}
 		table = new JTable(data, columnNames);
 
 		TableRowSorter<TableModel> sorter = new MyTableRowSorter(table.getModel());
 		table.setRowSorter(sorter);
-		//table.setAutoCreateRowSorter(true);
+		// table.setAutoCreateRowSorter(true);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		table.setFillsViewportHeight(true);
 
 		// take care of selections:
-		table.setSelectionMode( ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		table.getSelectionModel().addListSelectionListener(new RowListener());
-
 
 		JFrame f = new JFrame();
 		f.getContentPane().add(scrollPane);
@@ -214,7 +218,7 @@ public class DBResultTable implements ActionListener{
 
 	}
 
-	public void show(File file, UserConfiguration config){
+	public void show(File file, UserConfiguration config) {
 		this.config = config;
 
 		cache = new AtomCache(config);
@@ -223,12 +227,12 @@ public class DBResultTable implements ActionListener{
 			show(in, config);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-	public void show(URL url, UserConfiguration config){
+	public void show(URL url, UserConfiguration config) {
 		this.config = config;
 
 		cache = new AtomCache(config);
@@ -237,22 +241,21 @@ public class DBResultTable implements ActionListener{
 			show(in, config);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-
 	private void initAlgorithm(String algorithmName) {
 		try {
 			algorithm = StructureAlignmentFactory.getAlgorithm(algorithmName);
-		} catch (Exception e){
-			e.printStackTrace();
-			System.err.println("Can't guess algorithm from output. Using jCE as default...");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			logger.error("Can't guess algorithm from output. Using jCE as default...");
 			try {
 				algorithm = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
-			} catch (Exception ex){
-				ex.printStackTrace();
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 				return;
 			}
 		}
@@ -260,11 +263,9 @@ public class DBResultTable implements ActionListener{
 	}
 
 	private void outputSelection() {
-		StringBuffer output = new StringBuffer();
-		output.append(String.format("Lead: %d, %d. ",
-				table.getSelectionModel().getLeadSelectionIndex(),
-				table.getColumnModel().getSelectionModel().
-				getLeadSelectionIndex()));
+		StringBuilder output = new StringBuilder();
+		output.append(String.format("Lead: %d, %d. ", table.getSelectionModel().getLeadSelectionIndex(),
+				table.getColumnModel().getSelectionModel().getLeadSelectionIndex()));
 		output.append("Rows:");
 		for (int c : table.getSelectedRows()) {
 			output.append(String.format(" %d", c));
@@ -275,44 +276,20 @@ public class DBResultTable implements ActionListener{
 			output.append(String.format(" %d", c));
 		}
 
-		System.out.println(output.toString());
+		logger.info(output.toString());
 	}
 
-	private class RowListener implements ListSelectionListener {
-		@Override
-		public void valueChanged(ListSelectionEvent event) {
-			if (event.getValueIsAdjusting()) {
-				return;
-			}
-			int row = table.getSelectionModel().getLeadSelectionIndex();
-			String name1 = (String)table.getValueAt(row, 0);
-			String name2 = (String)table.getValueAt(row, 1);
+	private void showAlignment(String name1, String name2) {
 
-			if ( name1.equals(oldName1) && oldName2.equals(name2)){
-				return;
-			}
-			System.out.println("recreating alignment of: " + name1 + " " + name2 + " using " + algorithmName);
-			outputSelection();
-			showAlignment(name1,name2);
-			oldName1 = name1;
-			oldName2 = name2;
-
-
-		}
-	}
-
-	private void showAlignment( String name1, String name2){
-
-
-		if ( algorithm == null) {
+		if (algorithm == null) {
 			initAlgorithm(null);
 		}
 
 		try {
 			Structure structure1 = null;
-			if ( name1.equals("CUSTOM")) {
+			if ("CUSTOM".equals(name1)) {
 				// user uploaded a custom PDB file...
-				structure1 = loadCustomStructure(userPath,userChain);
+				structure1 = loadCustomStructure(userPath, userChain);
 			} else {
 				structure1 = cache.getStructure(name1);
 			}
@@ -330,33 +307,29 @@ public class DBResultTable implements ActionListener{
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
+			StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
+			// String result = afpChain.toFatcat(ca1, ca2);
 
-			StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain,ca1,ca2);
+			// String rot = afpChain.toRotMat();
 
-			//String result = afpChain.toFatcat(ca1, ca2);
+			DisplayAFP.showAlignmentPanel(afpChain, ca1, ca2, jmol);
 
-			//String rot = afpChain.toRotMat();
-
-			DisplayAFP.showAlignmentPanel(afpChain, ca1,ca2,jmol);
-
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
-	private Structure loadCustomStructure(String userPath2, String userChain2) throws StructureException{
+	private Structure loadCustomStructure(String userPath2, String userChain2) throws StructureException {
 		StructureIOFile reader = new PDBFileReader();
 		Structure s = null;
 		try {
 			s = reader.getStructure(userPath2);
-		} catch (IOException  e){
+		} catch (IOException e) {
 
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new StructureException(e);
 		}
-
 
 		return StructureTools.getReducedStructure(s, userChain2);
 	}
@@ -364,9 +337,31 @@ public class DBResultTable implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-
-
 	}
 
+	private class RowListener implements ListSelectionListener {
+		private final Logger logger1 = LoggerFactory.getLogger(RowListener.class);
+
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			if (event.getValueIsAdjusting()) {
+				return;
+			}
+			int row = table.getSelectionModel().getLeadSelectionIndex();
+			String name1 = (String) table.getValueAt(row, 0);
+			String name2 = (String) table.getValueAt(row, 1);
+
+			if (name1.equals(oldName1) && oldName2.equals(name2)) {
+				return;
+			}
+			logger1.info(new StringBuilder().append("recreating alignment of: ").append(name1).append(" ").append(name2)
+					.append(" using ").append(algorithmName).toString());
+			outputSelection();
+			showAlignment(name1, name2);
+			oldName1 = name1;
+			oldName2 = name2;
+
+		}
+	}
 
 }

@@ -28,29 +28,26 @@ import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.StructurePairAligner;
 import org.biojava.nbio.structure.gui.BiojavaJmol;
 import org.biojava.nbio.structure.gui.util.AlignedPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class JmolAlignedPositionListener implements AlignmentPositionListener {
 
-
-public class JmolAlignedPositionListener implements AlignmentPositionListener{
-
+	private static final Logger logger = LoggerFactory.getLogger(JmolAlignedPositionListener.class);
 	BiojavaJmol parent;
 	Atom[] ca1;
 	Atom[] ca2;
 	StructurePairAligner structurePairAligner;
 
-	public JmolAlignedPositionListener(BiojavaJmol parent, StructurePairAligner alig){
+	public JmolAlignedPositionListener(BiojavaJmol parent, StructurePairAligner alig) {
 		this.parent = parent;
 		structurePairAligner = alig;
 	}
-
-
 
 	public void setStructure1(Structure structure1) {
 
 		ca1 = structurePairAligner.getAlignmentAtoms(structure1);
 	}
-
-
 
 	public void setStructure2(Structure structure2) {
 
@@ -60,53 +57,52 @@ public class JmolAlignedPositionListener implements AlignmentPositionListener{
 	@Override
 	public void mouseOverPosition(AlignedPosition p) {
 
-		//System.out.println("mouseoverposition " + p);
+		// System.out.println("mouseoverposition " + p);
 
 		int p1 = p.getPos1();
 		int p2 = p.getPos2();
 		String s = "select ";
 
-		if ((p1 > ca1.length) || (p2 > ca2.length)){
-			System.err.println("requsting atom out of bounds! " );
+		if ((p1 > ca1.length) || (p2 > ca2.length)) {
+			logger.error("requsting atom out of bounds! ");
 			return;
 		}
 
-		String pdbpos1 ="";
+		String pdbpos1 = "";
 		String pdbpos2 = "";
 
-		if ( p1 >-1) {
+		if (p1 > -1) {
 			Atom a = ca1[p1];
 			Group parent = a.getGroup();
 			Chain c = parent.getChain();
 			pdbpos1 = parent.getResidueNumber().toString();
-			//System.out.printlng"chainid 1 is >"+c.getName()+"<");
-			if (! c.getChainID().equals( " ")) {
+			// System.out.printlng"chainid 1 is >"+c.getName()+"<");
+			if (!" ".equals(c.getChainID())) {
 				pdbpos1 += ":" + c.getChainID();
 			}
 
-
-			//System.out.println("1:" + parent);
-			s += pdbpos1 +"/1";
+			// System.out.println("1:" + parent);
+			s += pdbpos1 + "/1";
 		}
 
-		if ( p2 >-1) {
+		if (p2 > -1) {
 			Atom a = ca2[p2];
 			Group parent = a.getGroup();
 			Chain c = parent.getChain();
 			pdbpos2 = parent.getResidueNumber().toString();
-			//System.out.println("2:" + parent);
-			//System.out.println("chainid 2 is >"+c.getName()+"<");
-			if (! c.getChainID().equals( " ")) {
+			// System.out.println("2:" + parent);
+			// System.out.println("chainid 2 is >"+c.getName()+"<");
+			if (!" ".equals(c.getChainID())) {
 				pdbpos2 += ":" + c.getChainID();
 			}
-			if ( p1 > -1)
-				s +=",";
-			s += pdbpos2 +"/2";
+			if (p1 > -1) {
+				s += ",";
+			}
+			s += pdbpos2 + "/2";
 		}
-		s+="; set display selected;";
-		//System.out.println(s);
+		s += "; set display selected;";
+		// System.out.println(s);
 		parent.evalString(s);
-
 
 	}
 
@@ -118,7 +114,6 @@ public class JmolAlignedPositionListener implements AlignmentPositionListener{
 
 	@Override
 	public void rangeSelected(AlignedPosition start, AlignedPosition end) {
-
 
 	}
 
@@ -134,14 +129,10 @@ public class JmolAlignedPositionListener implements AlignmentPositionListener{
 
 	}
 
-
-
 	@Override
 	public void toggleSelection(AlignedPosition p) {
 		// TODO Auto-generated method stub
 
 	}
-
-
 
 }

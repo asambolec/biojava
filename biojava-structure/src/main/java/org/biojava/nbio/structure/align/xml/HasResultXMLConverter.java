@@ -39,19 +39,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class HasResultXMLConverter
-{
+public class HasResultXMLConverter {
 
+	private static final Logger logger = LoggerFactory.getLogger(HasResultXMLConverter.class);
 
-
-
-	/** return flag if the server has a result
+	/**
+	 * return flag if the server has a result
 	 *
 	 * @param hasResult
 	 * @return flag if there is a result
 	 */
-	public String toXML(boolean hasResult) throws IOException{
+	public String toXML(boolean hasResult) throws IOException {
 		StringWriter swriter = new StringWriter();
 
 		PrintWriter writer = new PrintWriter(swriter);
@@ -68,9 +69,8 @@ public class HasResultXMLConverter
 
 		boolean hasResult = false;
 
-		try
-		{
-			//Convert string to XML document
+		try {
+			// Convert string to XML document
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = factory.newDocumentBuilder();
 			InputSource inStream = new InputSource();
@@ -80,59 +80,53 @@ public class HasResultXMLConverter
 			// normalize text representation
 			doc.getDocumentElement().normalize();
 
-
-			//Element rootElement = doc.getDocumentElement();
+			// Element rootElement = doc.getDocumentElement();
 
 			NodeList listOfAlignments = doc.getElementsByTagName("alignment");
-			//int numArrays = listOfAlignments.getLength();
-			//System.out.println("got " + numArrays + " alignment results.");
+			// int numArrays = listOfAlignments.getLength();
+			// System.out.println("got " + numArrays + " alignment results.");
 			// go over the blocks
 
+			for (int afpPos = 0; afpPos < listOfAlignments.getLength(); afpPos++) {
 
-			for(int afpPos=0; afpPos<listOfAlignments.getLength() ; afpPos++)
-			{
+				Node rootElement = listOfAlignments.item(afpPos);
 
-				Node rootElement       = listOfAlignments.item(afpPos);
-
-				String flag = getAttribute(rootElement,"hasResult");
-				//System.out.println("got flag from server:" + flag);
-				if (flag.equals("true"))
+				String flag = getAttribute(rootElement, "hasResult");
+				// System.out.println("got flag from server:" + flag);
+				if ("true".equals(flag)) {
 					hasResult = true;
+				}
 
 			}
-		}
-		catch (SAXParseException err)
-		{
-			System.out.println ("** Parsing error" + ", line "
-					+ err.getLineNumber () + ", uri " + err.getSystemId ());
-			System.out.println(" " + err.getMessage ());
-		}
-		catch (SAXException e)
-		{
-			Exception x = e.getException ();
-			((x == null) ? e : x).printStackTrace ();
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace ();
+		} catch (SAXParseException err) {
+			logger.info(new StringBuilder().append("** Parsing error").append(", line ").append(err.getLineNumber())
+					.append(", uri ").append(err.getSystemId()).toString(), err);
+			logger.info(" " + err.getMessage(), err);
+		} catch (SAXException e) {
+			Exception x = e.getException();
+			((x == null) ? e : x).printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 
 		return hasResult;
 	}
 
-
-	private static String getAttribute(Node node, String attr){
-		if( ! node.hasAttributes())
+	private static String getAttribute(Node node, String attr) {
+		if (!node.hasAttributes()) {
 			return null;
+		}
 
 		NamedNodeMap atts = node.getAttributes();
 
-		if ( atts == null)
+		if (atts == null) {
 			return null;
+		}
 
 		Node att = atts.getNamedItem(attr);
-		if ( att == null)
+		if (att == null) {
 			return null;
+		}
 
 		String value = att.getTextContent();
 

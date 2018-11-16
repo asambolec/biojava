@@ -49,11 +49,13 @@ import org.biojava.nbio.structure.align.multiple.util.MultipleAlignmentWriter;
 import org.biojava.nbio.structure.align.util.AFPAlignmentDisplay;
 import org.biojava.nbio.structure.gui.events.AlignmentPositionListener;
 import org.biojava.nbio.structure.gui.util.AlignedPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A JPanel that can display the sequence alignment of a
- * {@link MultipleAlignment} in a nice way and interact with Jmol by
- * selecting the aligned atoms of the  sequence selection.
+ * {@link MultipleAlignment} in a nice way and interact with Jmol by selecting
+ * the aligned atoms of the sequence selection.
  * <p>
  * Coloring options include: sequence similarity, by Block or by Structure.
  * Colors are connected with the JmolPanel using the same pattelete.
@@ -65,42 +67,51 @@ import org.biojava.nbio.structure.gui.util.AlignedPosition;
  * @since 4.1.0
  *
  */
-public class MultipleAligPanel extends JPrintPanel
-implements AlignmentPositionListener, WindowListener {
+public class MultipleAligPanel extends JPrintPanel implements AlignmentPositionListener, WindowListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(MultipleAligPanel.class);
 
 	private static final long serialVersionUID = -6892229111166263764L;
 
-	private MultipleAlignment multAln;
-	private List<String> alnSeq; //sequence alignment
-	private List<Integer> mapSeqToStruct;  //mapping from sequence to structure
+	private static final Color COLOR_EQUAL = Color.decode("#6A93D4");
 
-	int size; 			//number of structures
-	int length; 		//number of aligned positions in sequence alignment
+	private static final Color COLOR_SIMILAR = Color.decode("#D460CF");
+
+	private MultipleAlignment multAln;
+
+	private List<String> alnSeq; // sequence alignment
+
+	private List<Integer> mapSeqToStruct; // mapping from sequence to structure
+
+	int size; // number of structures
+
+	int length; // number of aligned positions in sequence alignment
 
 	private Font seqFont;
+
 	private Font eqFont;
 
 	private AbstractAlignmentJmol jmol;
+
 	private MultipleAligPanelMouseMotionListener mouseMoLi;
+
 	private MultipleAlignmentCoordManager coordManager;
 
 	private BitSet selection;
+
 	private boolean selectionLocked;
 
-	private boolean colorBySimilarity=false;
-	private boolean colorByAlignmentBlock=false;
+	private boolean colorBySimilarity = false;
 
-	private static final Color COLOR_EQUAL   = Color.decode("#6A93D4");
-	private static final Color COLOR_SIMILAR = Color.decode("#D460CF");
+	private boolean colorByAlignmentBlock = false;
 
 	/**
 	 * Default constructor. Empty MultipleAligPanel instance.
 	 */
-	public MultipleAligPanel(){
-		super();
+	public MultipleAligPanel() {
 		this.setBackground(Color.white);
-		seqFont = new Font("SansSerif",Font.PLAIN,12);
-		eqFont = new Font("SansSerif",Font.BOLD,12);
+		seqFont = new Font("SansSerif", Font.PLAIN, 12);
+		eqFont = new Font("SansSerif", Font.BOLD, 12);
 
 		mouseMoLi = new MultipleAligPanelMouseMotionListener(this);
 		this.addMouseMotionListener(mouseMoLi);
@@ -114,36 +125,36 @@ implements AlignmentPositionListener, WindowListener {
 	}
 
 	/**
-	 * Constructor using an afpChain and the atom arrays for pairwise
-	 * alignments. The AFPChain is converted into a MultipleAlignment.
+	 * Constructor using an afpChain and the atom arrays for pairwise alignments.
+	 * The AFPChain is converted into a MultipleAlignment.
 	 *
 	 * @param afpChain
 	 * @param ca1
 	 * @param ca2
 	 * @throws StructureException
 	 */
-	public MultipleAligPanel(AFPChain afpChain, Atom[] ca1, Atom[] ca2,
-			AbstractAlignmentJmol jmol) throws StructureException {
+	public MultipleAligPanel(AFPChain afpChain, Atom[] ca1, Atom[] ca2, AbstractAlignmentJmol jmol)
+			throws StructureException {
 
 		this();
 
 		String algorithm = afpChain.getAlgorithmName();
 		boolean flex = false;
-		if (algorithm != null){
-			if (algorithm.contains("flexible")) flex = true;
+		if (algorithm != null) {
+			if (algorithm.contains("flexible")) {
+				flex = true;
+			}
 		}
 
-		//Convert the apfChain into a MultipleAlignment object
-		MultipleAlignmentEnsembleImpl ensemble =
-				new MultipleAlignmentEnsembleImpl(afpChain, ca1, ca2, flex);
+		// Convert the apfChain into a MultipleAlignment object
+		MultipleAlignmentEnsembleImpl ensemble = new MultipleAlignmentEnsembleImpl(afpChain, ca1, ca2, flex);
 		this.multAln = ensemble.getMultipleAlignment(0);
 
-		//Create the sequence alignment and the structure-sequence mapping.
-		this.mapSeqToStruct = new ArrayList<Integer>();
-		this.alnSeq = MultipleAlignmentTools.getSequenceAlignment(
-				this.multAln, this.mapSeqToStruct);
+		// Create the sequence alignment and the structure-sequence mapping.
+		this.mapSeqToStruct = new ArrayList<>();
+		this.alnSeq = MultipleAlignmentTools.getSequenceAlignment(this.multAln, this.mapSeqToStruct);
 
-		//Initialize other memeber variables of the panel
+		// Initialize other memeber variables of the panel
 		this.size = multAln.size();
 		this.length = alnSeq.get(0).length();
 
@@ -161,10 +172,9 @@ implements AlignmentPositionListener, WindowListener {
 		this();
 		this.multAln = msa;
 
-		//Create the sequence alignment and the structure-sequence mapping.
-		this.mapSeqToStruct = new ArrayList<Integer>();
-		this.alnSeq = MultipleAlignmentTools.getSequenceAlignment(
-				this.multAln, this.mapSeqToStruct);
+		// Create the sequence alignment and the structure-sequence mapping.
+		this.mapSeqToStruct = new ArrayList<>();
+		this.alnSeq = MultipleAlignmentTools.getSequenceAlignment(this.multAln, this.mapSeqToStruct);
 
 		this.size = multAln.size();
 		this.length = this.alnSeq.get(0).length();
@@ -177,11 +187,11 @@ implements AlignmentPositionListener, WindowListener {
 		return coordManager;
 	}
 
-	public void addAlignmentPositionListener(AlignmentPositionListener li){
+	public void addAlignmentPositionListener(AlignmentPositionListener li) {
 		mouseMoLi.addAligPosListener(li);
 	}
 
-	public void destroy(){
+	public void destroy() {
 
 		multAln = null;
 		alnSeq = null;
@@ -191,17 +201,15 @@ implements AlignmentPositionListener, WindowListener {
 	}
 
 	@Override
-	public void paintComponent(Graphics g){
+	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
 
 		Graphics2D g2D = (Graphics2D) g;
 
-		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		int startpos = 0;
 		int endpos = length;
@@ -210,76 +218,85 @@ implements AlignmentPositionListener, WindowListener {
 		g2D.drawString(summary, 20, coordManager.getSummaryPos());
 
 		Color significantCol = Color.black;
-		//if (multAln.isSignificantResult()) significantCol = Color.green;
+		// if (multAln.isSignificantResult()) significantCol = Color.green;
 
 		g2D.setPaint(significantCol);
-		Rectangle sig = new Rectangle(10,10,10,10);
+		Rectangle sig = new Rectangle(10, 10, 10, 10);
 		g2D.fill(sig);
 
-		for (int i = startpos; i < endpos; i++){
+		for (int i = startpos; i < endpos; i++) {
 
 			boolean isGapped = false;
 			g2D.setFont(seqFont);
 
-			if (mapSeqToStruct.get(i)!=-1) g2D.setFont(eqFont);
-			else isGapped = true;
+			if (mapSeqToStruct.get(i) != -1) {
+				g2D.setFont(eqFont);
+			} else {
+				isGapped = true;
+			}
 
-			//Loop through every structure to get all the points
-			List<Point> points = new ArrayList<Point>();
-			for (int str=0; str<size; str++) points.add(
-					coordManager.getPanelPos(str,i));
+			// Loop through every structure to get all the points
+			List<Point> points = new ArrayList<>();
+			for (int str = 0; str < size; str++) {
+				points.add(coordManager.getPanelPos(str, i));
+			}
 			Point p1 = points.get(0);
-			Point p2 = points.get(points.size()-1);
+			Point p2 = points.get(points.size() - 1);
 
-			for (int str=0; str<size; str++){
+			for (int str = 0; str < size; str++) {
 
 				char c = alnSeq.get(str).charAt(i);
 				Color bg = jmol.getColorPalette().getColorPalette(size)[str];
 
-				//Color only if the position is aligned
-				if (!isGapped){
-					//Color by sequence similarity (equal or similar)
-					if (colorBySimilarity){
+				// Color only if the position is aligned
+				if (!isGapped) {
+					// Color by sequence similarity (equal or similar)
+					if (colorBySimilarity) {
 						boolean equal = true;
 						boolean similar = true;
 						char c1 = '-';
-						for (int st=0; st<size-1; st++){
+						for (int st = 0; st < size - 1; st++) {
 							if (alnSeq.get(st).charAt(i) != '-') {
 								c1 = alnSeq.get(st).charAt(i);
 							}
-							char c2 = alnSeq.get(st+1).charAt(i);
-							//If any position is a gap continue
-							if (c1=='-' || c2=='-' ||
-									Character.isLowerCase(c1) ||
-									Character.isLowerCase(c2)) {
+							char c2 = alnSeq.get(st + 1).charAt(i);
+							// If any position is a gap continue
+							if (c1 == '-' || c2 == '-' || Character.isLowerCase(c1) || Character.isLowerCase(c2)) {
 								continue;
 							}
-							if (equal && c1 == c2)
+							if (equal && c1 == c2) {
 								continue;
-							else equal = false;
-							if (AFPAlignmentDisplay.aaScore(c1, c2) > 0)
+							} else {
+								equal = false;
+							}
+							if (AFPAlignmentDisplay.aaScore(c1, c2) > 0) {
 								continue;
-							else similar = false; break;
+							} else {
+								similar = false;
+							}
+							break;
 						}
-						if (equal) bg = COLOR_EQUAL;
-						else if (similar) bg = COLOR_SIMILAR;
-						else bg = Color.LIGHT_GRAY;
+						if (equal) {
+							bg = COLOR_EQUAL;
+						} else if (similar) {
+							bg = COLOR_SIMILAR;
+						} else {
+							bg = Color.LIGHT_GRAY;
+						}
 					}
-					//Color by alignment block the same way as in the Jmol
-					else if (colorByAlignmentBlock){
-						int blockNr = MultipleAlignmentTools.
-								getBlockForSequencePosition(
-										multAln,mapSeqToStruct,i);
-						bg = jmol.getColorPalette().getColorPalette(
-								multAln.getBlocks().size())[blockNr];
+					// Color by alignment block the same way as in the Jmol
+					else if (colorByAlignmentBlock) {
+						int blockNr = MultipleAlignmentTools.getBlockForSequencePosition(multAln, mapSeqToStruct, i);
+						bg = jmol.getColorPalette().getColorPalette(multAln.getBlocks().size())[blockNr];
 					}
-					if (isSelected(i)) bg = Color.YELLOW;
+					if (isSelected(i)) {
+						bg = Color.YELLOW;
+					}
 
-					if (Character.isUpperCase(c) && c!='-'){
+					if (Character.isUpperCase(c) && c != '-') {
 						g2D.setPaint(bg);
-						Rectangle rec = new Rectangle(points.get(str).x-1,
-								points.get(str).y-11, (p2.x-p1.x)+12,
-								(p2.y-p1.y)/size);
+						Rectangle rec = new Rectangle(points.get(str).x - 1, points.get(str).y - 11, (p2.x - p1.x) + 12,
+								(p2.y - p1.y) / size);
 						g2D.fill(rec);
 					}
 				}
@@ -290,45 +307,41 @@ implements AlignmentPositionListener, WindowListener {
 			}
 		}
 
-		int nrLines = (length-1) /
-				(MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH);
+		int nrLines = (length - 1) / (MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH);
 
-		for (int i = 0 ; i < nrLines+1 ; i++){
+		for (int i = 0; i < nrLines + 1; i++) {
 
 			// draw legend at i
-			for (int str=0; str<size; str++){
+			for (int str = 0; str < size; str++) {
 
-				Point p1 = coordManager.getLegendPosition(i,str);
+				Point p1 = coordManager.getLegendPosition(i, str);
 
-				int aligPos = i *
-						MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH;
+				int aligPos = i * MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH;
 				Atom a1 = null;
-				while (a1==null &&
-						aligPos < Math.min((i+1)*MultipleAlignmentCoordManager.
-								DEFAULT_LINE_LENGTH-1,length)){
-					a1 = MultipleAlignmentTools.getAtomForSequencePosition(
-							multAln, mapSeqToStruct, str, aligPos);
+				while (a1 == null && aligPos < Math.min((i + 1) * MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH - 1,
+						length)) {
+					a1 = MultipleAlignmentTools.getAtomForSequencePosition(multAln, mapSeqToStruct, str, aligPos);
 					aligPos++;
 				}
-				String label1 = JmolTools.getPdbInfo(a1,false);
-				g2D.drawString(label1, p1.x,p1.y);
+				String label1 = JmolTools.getPdbInfo(a1, false);
+				g2D.drawString(label1, p1.x, p1.y);
 
-				Point p3 = coordManager.getEndLegendPosition(i,str);
+				Point p3 = coordManager.getEndLegendPosition(i, str);
 
-				aligPos = (i*MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH+
-						MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH - 1);
-				if (aligPos > length) aligPos = length-1;
+				aligPos = (i * MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH
+						+ MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH - 1);
+				if (aligPos > length) {
+					aligPos = length - 1;
+				}
 				Atom a3 = null;
-				while (a3==null && aligPos > Math.max(i*
-						MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH,0)){
-					a3 = MultipleAlignmentTools.getAtomForSequencePosition(
-							multAln, mapSeqToStruct, str, aligPos);
+				while (a3 == null && aligPos > Math.max(i * MultipleAlignmentCoordManager.DEFAULT_LINE_LENGTH, 0)) {
+					a3 = MultipleAlignmentTools.getAtomForSequencePosition(multAln, mapSeqToStruct, str, aligPos);
 					aligPos--;
 				}
 
-				String label3 = JmolTools.getPdbInfo(a3,false);
+				String label3 = JmolTools.getPdbInfo(a3, false);
 
-				g2D.drawString(label3, p3.x,p3.y);
+				g2D.drawString(label3, p3.x, p3.y);
 			}
 		}
 	}
@@ -340,7 +353,9 @@ implements AlignmentPositionListener, WindowListener {
 	@Override
 	public void mouseOverPosition(AlignedPosition p) {
 
-		if (!selectionLocked) selection.clear();
+		if (!selectionLocked) {
+			selection.clear();
+		}
 
 		selection.set(p.getPos1());
 		updateJmolDisplay();
@@ -349,29 +364,32 @@ implements AlignmentPositionListener, WindowListener {
 
 	private void updateJmolDisplay() {
 
-		if (jmol == null) return;
+		if (jmol == null) {
+			return;
+		}
 
-		StringBuffer cmd = new StringBuffer("select ");
+		StringBuilder cmd = new StringBuilder("select ");
 		int nrSelected = 0;
-		for (int i=0; i<length; i++){
-			if (selection.get(i)){
-				for (int str=0; str<size; str++){
-					Atom a = MultipleAlignmentTools.getAtomForSequencePosition(
-							multAln, mapSeqToStruct,str,i);
+		for (int i = 0; i < length; i++) {
+			if (selection.get(i)) {
+				for (int str = 0; str < size; str++) {
+					Atom a = MultipleAlignmentTools.getAtomForSequencePosition(multAln, mapSeqToStruct, str, i);
 					if (a != null) {
 						cmd.append(JmolTools.getPdbInfo(a));
-						cmd.append("/"+(str+1)+", ");
+						cmd.append(new StringBuilder().append("/").append(str + 1).append(", ").toString());
 					}
 				}
 				nrSelected++;
 			}
 		}
-		if (nrSelected == 0) cmd.append(" none;");
-		else cmd.append(" none; set display selected;");
-		//System.out.println(cmd.toString());
+		if (nrSelected == 0) {
+			cmd.append(" none;");
+		} else {
+			cmd.append(" none; set display selected;");
+		}
+		// System.out.println(cmd.toString());
 		jmol.evalString(cmd.toString());
 	}
-
 
 	@Override
 	public void positionSelected(AlignedPosition p) {
@@ -381,8 +399,10 @@ implements AlignmentPositionListener, WindowListener {
 	@Override
 	public void rangeSelected(AlignedPosition start, AlignedPosition end) {
 
-		if (!selectionLocked) selection.clear();
-		selection.set(start.getPos1(), end.getPos1()+1);
+		if (!selectionLocked) {
+			selection.clear();
+		}
+		selection.set(start.getPos1(), end.getPos1() + 1);
 		updateJmolDisplay();
 		this.repaint();
 	}
@@ -412,10 +432,12 @@ implements AlignmentPositionListener, WindowListener {
 	}
 
 	@Override
-	public void windowActivated(WindowEvent e) {}
+	public void windowActivated(WindowEvent e) {
+	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {
+	}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
@@ -423,41 +445,45 @@ implements AlignmentPositionListener, WindowListener {
 	}
 
 	@Override
-	public void windowDeactivated(WindowEvent e) {}
+	public void windowDeactivated(WindowEvent e) {
+	}
 
 	@Override
-	public void windowDeiconified(WindowEvent e) {}
+	public void windowDeiconified(WindowEvent e) {
+	}
 
 	@Override
-	public void windowIconified(WindowEvent e) {}
+	public void windowIconified(WindowEvent e) {
+	}
 
 	@Override
-	public void windowOpened(WindowEvent e) {}
+	public void windowOpened(WindowEvent e) {
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-		if ( cmd.equals(MenuCreator.PRINT)) {
+		if (cmd.equals(MenuCreator.PRINT)) {
 			super.actionPerformed(e);
-		} else if (cmd.equals(MenuCreator.FASTA_FORMAT)){
+		} else if (cmd.equals(MenuCreator.FASTA_FORMAT)) {
 			String result = MultipleAlignmentWriter.toFASTA(multAln);
 			MultipleAlignmentJmolDisplay.showAlignmentImage(multAln, result);
-		} else if ( cmd.equals(MenuCreator.PAIRS_ONLY)) {
+		} else if (cmd.equals(MenuCreator.PAIRS_ONLY)) {
 			String result = MultipleAlignmentWriter.toAlignedResidues(multAln);
 			MultipleAlignmentJmolDisplay.showAlignmentImage(multAln, result);
-		} else if (cmd.equals(MenuCreator.FATCAT_TEXT)){
+		} else if (cmd.equals(MenuCreator.FATCAT_TEXT)) {
 			String result = MultipleAlignmentWriter.toFatCat(multAln);
 			MultipleAlignmentJmolDisplay.showAlignmentImage(multAln, result);
-		} else if (cmd.equals(MenuCreator.SELECT_EQR)){
+		} else if (cmd.equals(MenuCreator.SELECT_EQR)) {
 			selectEQR();
-		} else if ( cmd.equals(MenuCreator.SIMILARITY_COLOR)){
+		} else if (cmd.equals(MenuCreator.SIMILARITY_COLOR)) {
 			colorBySimilarity(true);
-		} else if (cmd.equals(MenuCreator.EQR_COLOR)){
+		} else if (cmd.equals(MenuCreator.EQR_COLOR)) {
 			colorBySimilarity(false);
-		} else if ( cmd.equals(MenuCreator.FATCAT_BLOCK)){
+		} else if (cmd.equals(MenuCreator.FATCAT_BLOCK)) {
 			colorByAlignmentBlock();
 		} else {
-			System.err.println("Unknown command:" + cmd);
+			logger.error("Unknown command:" + cmd);
 		}
 	}
 
@@ -465,8 +491,10 @@ implements AlignmentPositionListener, WindowListener {
 
 		selection.clear();
 
-		for (int pos=0; pos<length; pos++){
-			if (mapSeqToStruct.get(pos)!=-1) selection.flip(pos);
+		for (int pos = 0; pos < length; pos++) {
+			if (mapSeqToStruct.get(pos) != -1) {
+				selection.flip(pos);
+			}
 		}
 		mouseMoLi.triggerSelectionLocked(true);
 		updateJmolDisplay();
@@ -488,13 +516,16 @@ implements AlignmentPositionListener, WindowListener {
 	public List<Atom[]> getAtomArrays() {
 		return multAln.getAtomArrays();
 	}
-	public MultipleAlignment getMultipleAlignment(){
+
+	public MultipleAlignment getMultipleAlignment() {
 		return multAln;
 	}
-	public List<String> getAlnSequences(){
+
+	public List<String> getAlnSequences() {
 		return alnSeq;
 	}
-	public List<Integer> getMapSeqToStruct(){
+
+	public List<Integer> getMapSeqToStruct() {
 		return mapSeqToStruct;
 	}
 }

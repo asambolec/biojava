@@ -27,14 +27,14 @@ import java.awt.*;
 public class GradientPanel extends JPanel {
 	private static final long serialVersionUID = -6387922432121206731L;
 	private ContinuousColorMapper mapper;
-	private double min, max;
-
+	private double min;
+	private double max;
 
 	public GradientPanel(ContinuousColorMapper mapper, double min, double max) {
 		this.min = min;
 		this.max = max;
 		this.mapper = mapper;
-		this.setPreferredSize(new Dimension(100,20));
+		this.setPreferredSize(new Dimension(100, 20));
 	}
 
 	@Override
@@ -44,8 +44,8 @@ public class GradientPanel extends JPanel {
 		int h = getHeight();
 
 		g2.setStroke(new BasicStroke(1.0f));
-		for(int i=0;i<w;i++) {
-			double val = (max-min)*i/w+min;
+		for (int i = 0; i < w; i++) {
+			double val = (max - min) * i / w + min;
 			g2.setColor(mapper.getColor(val));
 			g2.drawLine(i, 0, i, h);
 		}

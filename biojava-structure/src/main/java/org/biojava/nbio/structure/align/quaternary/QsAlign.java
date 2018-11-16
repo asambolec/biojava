@@ -68,23 +68,18 @@ public class QsAlign {
 
 	private static final Logger logger = LoggerFactory.getLogger(QsAlign.class);
 
-	public static QsAlignResult align(Structure s1, Structure s2,
-			SubunitClustererParameters cParams, QsAlignParameters aParams)
-			throws StructureException {
+	public static QsAlignResult align(Structure s1, Structure s2, SubunitClustererParameters cParams,
+			QsAlignParameters aParams) throws StructureException {
 		return align(
-				SubunitExtractor.extractSubunits(s1,
-						cParams.getAbsoluteMinimumSequenceLength(),
-						cParams.getMinimumSequenceLengthFraction(),
-						cParams.getMinimumSequenceLength()),
-				SubunitExtractor.extractSubunits(s2,
-						cParams.getAbsoluteMinimumSequenceLength(),
-						cParams.getMinimumSequenceLengthFraction(),
-						cParams.getMinimumSequenceLength()), cParams, aParams);
+				SubunitExtractor.extractSubunits(s1, cParams.getAbsoluteMinimumSequenceLength(),
+						cParams.getMinimumSequenceLengthFraction(), cParams.getMinimumSequenceLength()),
+				SubunitExtractor.extractSubunits(s2, cParams.getAbsoluteMinimumSequenceLength(),
+						cParams.getMinimumSequenceLengthFraction(), cParams.getMinimumSequenceLength()),
+				cParams, aParams);
 	}
 
-	public static QsAlignResult align(List<Subunit> s1, List<Subunit> s2,
-			SubunitClustererParameters cParams, QsAlignParameters aParams)
-			throws StructureException {
+	public static QsAlignResult align(List<Subunit> s1, List<Subunit> s2, SubunitClustererParameters cParams,
+			QsAlignParameters aParams) throws StructureException {
 
 		QsAlignResult result = new QsAlignResult(s1, s2);
 
@@ -94,17 +89,19 @@ public class QsAlign {
 		List<SubunitCluster> c2 = SubunitClusterer.cluster(s2, cParams).getClusters();
 
 		// STEP 2: match each subunit cluster between groups O(N^2*L^2) - inter
-		Map<Integer, Integer> clusterMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> clusterMap = new HashMap<>();
 		for (int i = 0; i < c1.size(); i++) {
 			for (int j = 0; j < c2.size(); j++) {
 
-				if (clusterMap.keySet().contains(i))
+				if (clusterMap.keySet().contains(i)) {
 					break;
-				if (clusterMap.values().contains(j))
+				}
+				if (clusterMap.values().contains(j)) {
 					continue;
+				}
 
 				// Use structural alignment to match the subunit clusters
-				if (c1.get(i).mergeStructure(c2.get(j),cParams)) {
+				if (c1.get(i).mergeStructure(c2.get(j), cParams)) {
 					clusterMap.put(i, j);
 				}
 			}
@@ -123,25 +120,26 @@ public class QsAlign {
 			// Take a cluster match as reference
 			int index1 = 0;
 			int index2 = clust1.size() - clust2.size();
-			Map<Integer, Integer> subunitMap = new HashMap<Integer, Integer>();
+			Map<Integer, Integer> subunitMap = new HashMap<>();
 			subunitMap.put(index1, index2);
 
 			// Map cluster id to their subunit matching
-			Map<Integer, Map<Integer, Integer>> clustSubunitMap = new HashMap<Integer, Map<Integer, Integer>>();
+			Map<Integer, Map<Integer, Integer>> clustSubunitMap = new HashMap<>();
 			clustSubunitMap.put(globalKey, subunitMap);
 
 			// Change order of key set so that globalKey is first
-			List<Integer> keySet = new ArrayList<Integer>(clusterMap.keySet());
+			List<Integer> keySet = new ArrayList<>(clusterMap.keySet());
 			keySet.remove((Integer) globalKey);
 			keySet.add(0, globalKey);
 
 			for (int key : clusterMap.keySet()) {
 
 				// Recover subunitMap if it is the reference, new one otherwise
-				if (key == globalKey)
+				if (key == globalKey) {
 					subunitMap = clustSubunitMap.get(key);
-				else
-					subunitMap = new HashMap<Integer, Integer>();
+				} else {
+					subunitMap = new HashMap<>();
+				}
 
 				// Obtain the clusters of each subunit group
 				clust1 = c1.get(key);
@@ -154,14 +152,15 @@ public class QsAlign {
 				for (int i = 0; i < index2; i++) {
 					for (int j = index2; j < clust1.size(); j++) {
 
-						if (subunitMap.keySet().contains(i))
+						if (subunitMap.keySet().contains(i)) {
 							break;
-						if (subunitMap.values().contains(j))
+						}
+						if (subunitMap.values().contains(j)) {
 							continue;
+						}
 
 						// Obtain cumulative transformation matrix
-						Matrix4d transform = getTransformForClusterSubunitMap(
-								c1, clustSubunitMap);
+						Matrix4d transform = getTransformForClusterSubunitMap(c1, clustSubunitMap);
 
 						// Obtain Atom arrays of the subunit pair to match
 						Atom[] atoms1 = clust1.getAlignedAtomsSubunit(i);
@@ -175,10 +174,11 @@ public class QsAlign {
 						// 1- Check that the distance fulfills maximum
 						double dCentroid = Calc.getDistance(centr1, centr2);
 						if (dCentroid > aParams.getdCutoff()) {
-							logger.debug(String.format("Subunit matching %d "
-									+ "vs %d of cluster %d could not be "
-									+ "matched, because centroid distance is "
-									+ "%.2f", index1, index2, key, dCentroid));
+							logger.debug(String.format(
+									new StringBuilder().append("Subunit matching %d ")
+											.append("vs %d of cluster %d could not be ")
+											.append("matched, because centroid distance is ").append("%.2f").toString(),
+									index1, index2, key, dCentroid));
 							continue;
 						}
 
@@ -187,31 +187,30 @@ public class QsAlign {
 						Calc.transform(atoms2c, transform);
 
 						// 2- Check the orientation metric condition
-						double qOrient = UnitQuaternions.orientationAngle(
-								Calc.atomsToPoints(atoms1),
+						double qOrient = UnitQuaternions.orientationAngle(Calc.atomsToPoints(atoms1),
 								Calc.atomsToPoints(atoms2c), false);
-						qOrient = Math.min(Math.abs(2*Math.PI - qOrient), qOrient);
+						qOrient = Math.min(Math.abs(2 * Math.PI - qOrient), qOrient);
 						if (qOrient > aParams.getMaxOrientationAngle()) {
-							logger.debug(String.format("Subunit matching %d "
-									+ "vs %d of cluster %d could not be "
-									+ "matched, because orientation metric is "
-									+ "%.2f", i, j, key, qOrient));
+							logger.debug(String.format(new StringBuilder().append("Subunit matching %d ")
+									.append("vs %d of cluster %d could not be ")
+									.append("matched, because orientation metric is ").append("%.2f").toString(), i, j,
+									key, qOrient));
 							continue;
 						}
 
 						// 3- Check the RMSD condition
 						double rmsd = Calc.rmsd(atoms1, atoms2c);
 						if (rmsd > aParams.getMaxRmsd()) {
-							logger.debug(String.format("Subunit matching %d "
-									+ "vs %d of cluster %d could not be "
-									+ "matched, because RMSD is %.2f", i,
-									j, key, rmsd));
+							logger.debug(String.format(new StringBuilder().append("Subunit matching %d ")
+									.append("vs %d of cluster %d could not be ").append("matched, because RMSD is %.2f")
+									.toString(), i, j, key, rmsd));
 							continue;
 						}
 
-						logger.info(String.format("Subunit matching %d vs %d"
-								+ " of cluster %d with centroid distance %.2f"
-								+ ", orientation metric %.2f and RMSD %.2f",
+						logger.info(String.format(
+								new StringBuilder().append("Subunit matching %d vs %d")
+										.append(" of cluster %d with centroid distance %.2f")
+										.append(", orientation metric %.2f and RMSD %.2f").toString(),
 								i, j, key, dCentroid, qOrient, rmsd));
 
 						subunitMap.put(i, j);
@@ -220,25 +219,23 @@ public class QsAlign {
 
 				clustSubunitMap.put(key, subunitMap);
 			}
-			
+
 			logger.info("Cluster Subunit Map: " + clustSubunitMap.toString());
 
 			// Unfold the nested map into subunit map and alignment
-			subunitMap = new HashMap<Integer, Integer>();
-			List<Integer> alignRes1 = new ArrayList<Integer>();
-			List<Integer> alignRes2 = new ArrayList<Integer>();
-			List<Atom> atomArray1 = new ArrayList<Atom>();
-			List<Atom> atomArray2 = new ArrayList<Atom>();
+			subunitMap = new HashMap<>();
+			List<Integer> alignRes1 = new ArrayList<>();
+			List<Integer> alignRes2 = new ArrayList<>();
+			List<Atom> atomArray1 = new ArrayList<>();
+			List<Atom> atomArray2 = new ArrayList<>();
 
 			for (int key : clustSubunitMap.keySet()) {
 
 				// Obtain the cluster and the alignment in it
 				SubunitCluster cluster = c1.get(key);
-				List<List<Integer>> clusterEqrs = cluster
-						.getMultipleAlignment().getBlock(0).getAlignRes();
+				List<List<Integer>> clusterEqrs = cluster.getMultipleAlignment().getBlock(0).getAlignRes();
 
-				for (Entry<Integer, Integer> pair : clustSubunitMap.get(key)
-						.entrySet()) {
+				for (Entry<Integer, Integer> pair : clustSubunitMap.get(key).entrySet()) {
 
 					int i = pair.getKey();
 					int j = pair.getValue();
@@ -248,16 +245,12 @@ public class QsAlign {
 					int orig2 = s2.indexOf(cluster.getSubunits().get(j));
 
 					// Append rescaled aligned residue indices
-					for (Integer eqr : clusterEqrs.get(i))
-						alignRes1.add(eqr + atomArray1.size());
-					for (Integer eqr : clusterEqrs.get(j))
-						alignRes2.add(eqr + atomArray2.size());
+					clusterEqrs.get(i).forEach(eqr -> alignRes1.add(eqr + atomArray1.size()));
+					clusterEqrs.get(j).forEach(eqr -> alignRes2.add(eqr + atomArray2.size()));
 
 					// Apend atoms to the arrays
-					atomArray1.addAll(Arrays.asList(s1.get(orig1)
-							.getRepresentativeAtoms()));
-					atomArray2.addAll(Arrays.asList(s2.get(orig2)
-							.getRepresentativeAtoms()));
+					atomArray1.addAll(Arrays.asList(s1.get(orig1).getRepresentativeAtoms()));
+					atomArray2.addAll(Arrays.asList(s2.get(orig2).getRepresentativeAtoms()));
 
 					subunitMap.put(orig1, orig2);
 				}
@@ -266,15 +259,14 @@ public class QsAlign {
 			// Evaluate the goodness of the match with an alignment object
 			MultipleAlignment msa = new MultipleAlignmentImpl();
 			msa.setEnsemble(new MultipleAlignmentEnsembleImpl());
-			msa.getEnsemble().setAtomArrays(
-					Arrays.asList(new Atom[][] {
-							atomArray1.toArray(new Atom[atomArray1.size()]),
+			msa.getEnsemble()
+					.setAtomArrays(Arrays.asList(new Atom[][] { atomArray1.toArray(new Atom[atomArray1.size()]),
 							atomArray2.toArray(new Atom[atomArray2.size()]) }));
 
 			// Fill in the alignment information
 			BlockSet bs = new BlockSetImpl(msa);
 			Block b = new BlockImpl(bs);
-			List<List<Integer>> alignRes = new ArrayList<List<Integer>>(2);
+			List<List<Integer>> alignRes = new ArrayList<>(2);
 			alignRes.add(alignRes1);
 			alignRes.add(alignRes2);
 			b.setAlignRes(alignRes);
@@ -294,8 +286,7 @@ public class QsAlign {
 				if (result.getAlignment() == null) {
 					result.setSubunitMap(subunitMap);
 					result.setAlignment(msa);
-				} else if (msa.getScore(MultipleAlignmentScorer.RMSD) < result
-						.getRmsd()) {
+				} else if (msa.getScore(MultipleAlignmentScorer.RMSD) < result.getRmsd()) {
 					result.setSubunitMap(subunitMap);
 					result.setAlignment(msa);
 					logger.info("Better result found: " + result.toString());
@@ -309,73 +300,60 @@ public class QsAlign {
 
 	/**
 	 * Returns a pair of Atom arrays corresponding to the alignment of subunit
-	 * matchings, in order of appearance. Superposition of the two Atom sets
-	 * gives the transformation of the complex.
+	 * matchings, in order of appearance. Superposition of the two Atom sets gives
+	 * the transformation of the complex.
 	 * <p>
 	 * Utility method to cumulative calculate the alignment Atoms.
 	 * 
-	 * @param clusters
-	 *            List of SubunitClusters
-	 * @param clusterSubunitMap
-	 *            map from cluster id to subunit matching
+	 * @param clusters          List of SubunitClusters
+	 * @param clusterSubunitMap map from cluster id to subunit matching
 	 * @return pair of atom arrays to be superposed
 	 */
-	private static Pair<Atom[]> getAlignedAtomsForClusterSubunitMap(
-			List<SubunitCluster> clusters,
+	private static Pair<Atom[]> getAlignedAtomsForClusterSubunitMap(List<SubunitCluster> clusters,
 			Map<Integer, Map<Integer, Integer>> clusterSubunitMap) {
 
-		List<Atom> atomArray1 = new ArrayList<Atom>();
-		List<Atom> atomArray2 = new ArrayList<Atom>();
+		List<Atom> atomArray1 = new ArrayList<>();
+		List<Atom> atomArray2 = new ArrayList<>();
 
 		// For each cluster of subunits
-		for (int key : clusterSubunitMap.keySet()) {
+		clusterSubunitMap.keySet().stream().mapToInt(Integer::valueOf).forEach(key -> {
 
 			// Obtain the cluster and the alignment in it
 			SubunitCluster cluster = clusters.get(key);
 
 			// For each subunit matching in the cluster
-			for (Entry<Integer, Integer> pair : clusterSubunitMap.get(key)
-					.entrySet()) {
+			clusterSubunitMap.get(key).entrySet().forEach(pair -> {
 
 				int i = pair.getKey();
 				int j = pair.getValue();
 
 				// Apend atoms to the arrays
-				atomArray1.addAll(Arrays.asList(cluster
-						.getAlignedAtomsSubunit(i)));
-				atomArray2.addAll(Arrays.asList(cluster
-						.getAlignedAtomsSubunit(j)));
-			}
+				atomArray1.addAll(Arrays.asList(cluster.getAlignedAtomsSubunit(i)));
+				atomArray2.addAll(Arrays.asList(cluster.getAlignedAtomsSubunit(j)));
+			});
 
-		}
-		return new Pair<Atom[]>(
-				atomArray1.toArray(new Atom[atomArray1.size()]),
+		});
+		return new Pair<>(atomArray1.toArray(new Atom[atomArray1.size()]),
 				atomArray2.toArray(new Atom[atomArray2.size()]));
 	}
 
 	/**
-	 * Returns the transformation matrix corresponding to the alignment of
-	 * subunit matchings.
+	 * Returns the transformation matrix corresponding to the alignment of subunit
+	 * matchings.
 	 * <p>
 	 * Utility method to cumulative calculate the alignment transformation.
 	 * 
-	 * @param clusters
-	 *            List of SubunitClusters
-	 * @param clusterSubunitMap
-	 *            map from cluster id to subunit matching
+	 * @param clusters          List of SubunitClusters
+	 * @param clusterSubunitMap map from cluster id to subunit matching
 	 * @return transformation matrix
 	 * @throws StructureException
 	 */
-	private static Matrix4d getTransformForClusterSubunitMap(
-			List<SubunitCluster> clusters,
-			Map<Integer, Map<Integer, Integer>> clusterSubunitMap)
-			throws StructureException {
+	private static Matrix4d getTransformForClusterSubunitMap(List<SubunitCluster> clusters,
+			Map<Integer, Map<Integer, Integer>> clusterSubunitMap) throws StructureException {
 
-		Pair<Atom[]> pair = getAlignedAtomsForClusterSubunitMap(clusters,
-				clusterSubunitMap);
+		Pair<Atom[]> pair = getAlignedAtomsForClusterSubunitMap(clusters, clusterSubunitMap);
 
-		return SuperPositions.superpose(Calc.atomsToPoints(pair.getFirst()), 
-				Calc.atomsToPoints(pair.getSecond()));
+		return SuperPositions.superpose(Calc.atomsToPoints(pair.getFirst()), Calc.atomsToPoints(pair.getSecond()));
 
 	}
 }

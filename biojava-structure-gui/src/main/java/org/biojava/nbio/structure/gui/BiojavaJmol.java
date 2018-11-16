@@ -24,7 +24,6 @@
 
 package org.biojava.nbio.structure.gui;
 
-
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.gui.jmol.JmolPanel;
 import org.biojava.nbio.structure.gui.util.MenuCreator;
@@ -33,9 +32,11 @@ import org.biojava.nbio.structure.io.PDBFileReader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** A class that provides a simple GUI for Jmol
+/**
+ * A class that provides a simple GUI for Jmol
  *
  * @author Andreas Prlic
  * @since 1.6
@@ -43,19 +44,117 @@ import java.awt.event.*;
  *
  *
  */
-public class BiojavaJmol  {
+public class BiojavaJmol {
 
-	public static final String viewer       = "org.jmol.api.JmolSimpleViewer";
-	public static final String adapter      = "org.jmol.api.JmolAdapter";
+	private static final Logger logger = LoggerFactory.getLogger(BiojavaJmol.class);
+	public static final String viewer = "org.jmol.api.JmolSimpleViewer";
+	public static final String adapter = "org.jmol.api.JmolAdapter";
 	public static final String smartAdapter = "org.jmol.adapter.smarter.SmarterJmolAdapter";
 
 	Structure structure;
 
 	JmolPanel jmolPanel;
-	JFrame frame ;
+	JFrame frame;
 
+	public BiojavaJmol() {
 
-	public static void main(String[] args){
+		frame = new JFrame();
+
+		JMenuBar menu = MenuCreator.initMenu();
+
+		frame.setJMenuBar(menu);
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				frame.dispose();
+				// System.exit(0);
+			}
+		});
+
+		Container contentPane = frame.getContentPane();
+
+		Box vBox = Box.createVerticalBox();
+
+		jmolPanel = new JmolPanel();
+
+		jmolPanel.setPreferredSize(new Dimension(500, 500));
+		vBox.add(jmolPanel);
+
+		JTextField field = new JTextField();
+
+		field.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+		field.setText("enter RASMOL like command...");
+		org.biojava.nbio.structure.align.gui.jmol.RasmolCommandListener listener = new org.biojava.nbio.structure.align.gui.jmol.RasmolCommandListener(
+				jmolPanel, field);
+
+		field.addActionListener(listener);
+		field.addMouseListener(listener);
+		field.addKeyListener(listener);
+		vBox.add(field);
+
+		/// COMBO BOXES
+		Box hBox1 = Box.createHorizontalBox();
+		hBox1.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+
+		String[] styles = new String[] { "Cartoon", "Backbone", "CPK", "Ball and Stick", "Ligands",
+				"Ligands and Pocket" };
+		JComboBox style = new JComboBox(styles);
+
+		hBox1.add(new JLabel("Style"));
+		hBox1.add(style);
+		vBox.add(hBox1);
+
+		style.addActionListener(jmolPanel);
+
+		String[] colorModes = new String[] { "Secondary Structure", "By Chain", "Rainbow", "By Element",
+				"By Amino Acid", "Hydrophobicity" };
+		JComboBox colors = new JComboBox(colorModes);
+		colors.addActionListener(jmolPanel);
+		hBox1.add(Box.createGlue());
+		hBox1.add(new JLabel("Color"));
+		hBox1.add(colors);
+
+		// Check boxes
+		Box hBox2 = Box.createHorizontalBox();
+		hBox2.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+
+		JButton resetDisplay = new JButton("Reset Display");
+
+		resetDisplay.addActionListener((ActionEvent e) -> {
+			logger.info("reset!!");
+			jmolPanel.executeCmd("restore STATE state_1");
+
+		});
+
+		hBox2.add(resetDisplay);
+		hBox2.add(Box.createGlue());
+
+		JCheckBox toggleSelection = new JCheckBox("Show Selection");
+		toggleSelection.addItemListener((ItemEvent e) -> {
+			boolean showSelection = (e.getStateChange() == ItemEvent.SELECTED);
+
+			if (showSelection) {
+				jmolPanel.executeCmd("set display selected");
+			} else {
+				jmolPanel.executeCmd("set display off");
+			}
+
+		});
+
+		hBox2.add(toggleSelection);
+
+		hBox2.add(Box.createGlue());
+		vBox.add(hBox2);
+
+		// finish up
+		contentPane.add(vBox);
+		frame.pack();
+		frame.setVisible(true);
+
+	}
+
+	public static void main(String[] args) {
 		try {
 
 			PDBFileReader pdbr = new PDBFileReader();
@@ -74,146 +173,29 @@ public class BiojavaJmol  {
 			jmolPanel.evalString("select * ; color chain;");
 			jmolPanel.evalString("select *; spacefill off; wireframe off; backbone 0.4;  ");
 			jmolPanel.evalString("save STATE state_1");
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
-
-
-
-	public BiojavaJmol() {
-
-		frame = new JFrame();
-
-		JMenuBar menu = MenuCreator.initMenu();
-
-		frame.setJMenuBar(menu);
-
-		frame.addWindowListener( new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				frame.dispose();
-				//System.exit(0);
-			}
-		});
-
-		Container contentPane = frame.getContentPane();
-
-		Box vBox = Box.createVerticalBox();
-
-		jmolPanel = new JmolPanel();
-
-		jmolPanel.setPreferredSize(new Dimension(500,500));
-		vBox.add(jmolPanel);
-
-
-		JTextField field = new JTextField();
-
-		field.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		field.setText("enter RASMOL like command...");
-		org.biojava.nbio.structure.align.gui.jmol.RasmolCommandListener listener = new org.biojava.nbio.structure.align.gui.jmol.RasmolCommandListener(jmolPanel,field) ;
-
-		field.addActionListener(listener);
-		field.addMouseListener(listener);
-		field.addKeyListener(listener);
-		vBox.add(field);
-
-
-		/// COMBO BOXES
-		Box hBox1 = Box.createHorizontalBox();
-		hBox1.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-
-
-		String[] styles = new String[] { "Cartoon", "Backbone", "CPK", "Ball and Stick", "Ligands","Ligands and Pocket"};
-		JComboBox style = new JComboBox(styles);
-
-		hBox1.add(new JLabel("Style"));
-		hBox1.add(style);
-		vBox.add(hBox1);
-
-
-		style.addActionListener(jmolPanel);
-
-		String[] colorModes = new String[] { "Secondary Structure", "By Chain", "Rainbow", "By Element", "By Amino Acid", "Hydrophobicity" };
-		JComboBox colors = new JComboBox(colorModes);
-		colors.addActionListener(jmolPanel);
-		hBox1.add(Box.createGlue());
-		hBox1.add(new JLabel("Color"));
-		hBox1.add(colors);
-
-		// Check boxes
-		Box hBox2 = Box.createHorizontalBox();
-		hBox2.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-
-
-		JButton resetDisplay = new JButton("Reset Display");
-
-		resetDisplay.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("reset!!");
-				jmolPanel.executeCmd("restore STATE state_1");
-
-			}
-		});
-
-		hBox2.add(resetDisplay); hBox2.add(Box.createGlue());
-
-		JCheckBox toggleSelection = new JCheckBox("Show Selection");
-		toggleSelection.addItemListener(
-			    new ItemListener() {
-
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						  boolean showSelection = (e.getStateChange() == ItemEvent.SELECTED);
-
-						  if (showSelection){
-							  jmolPanel.executeCmd("set display selected");
-						  } else {
-							  jmolPanel.executeCmd("set display off");
-						  }
-
-					}
-				}
-			);
-
-
-
-		hBox2.add(toggleSelection);
-
-		hBox2.add(Box.createGlue());
-		vBox.add(hBox2);
-
-
-		// finish up
-		contentPane.add(vBox);
-		frame.pack();
-		frame.setVisible(true);
-
-
-	}
-
-
-
-	/** returns true if Jmol can be found in the classpath, otherwise false.
+	/**
+	 * returns true if Jmol can be found in the classpath, otherwise false.
 	 *
 	 * @return true/false depending if Jmol can be found
 	 */
-	public static boolean jmolInClassPath(){
+	public static boolean jmolInClassPath() {
 		try {
 			Class.forName(viewer);
-		} catch (ClassNotFoundException e){
-			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 		return true;
 	}
 
-	public void evalString(String rasmolScript){
-		if ( jmolPanel == null ){
-			System.err.println("please install Jmol first");
+	public void evalString(String rasmolScript) {
+		if (jmolPanel == null) {
+			logger.error("please install Jmol first");
 			return;
 		}
 		jmolPanel.evalString(rasmolScript);
@@ -221,8 +203,8 @@ public class BiojavaJmol  {
 
 	public void setStructure(Structure s) {
 
-		if ( jmolPanel == null ){
-			System.err.println("please install Jmol first");
+		if (jmolPanel == null) {
+			logger.error("please install Jmol first");
 			return;
 		}
 
@@ -232,13 +214,13 @@ public class BiojavaJmol  {
 		// just convert the structure to a PDB file
 
 		String pdb = s.toPDB();
-		//System.out.println(s.isNmr());
+		// System.out.println(s.isNmr());
 
-		//System.out.println(pdb);
+		// System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
-		//viewer.openFile("/Path/To/PDB/1tim.pdb");
+		// viewer.openFile("/Path/To/PDB/1tim.pdb");
 
-		//System.out.println(pdb);
+		// System.out.println(pdb);
 		jmolPanel.openStringInline(pdb);
 
 		// send the PDB file to Jmol.
@@ -246,19 +228,15 @@ public class BiojavaJmol  {
 		// access the biojava structure object, but they require more
 		// code. See the SPICE code repository for how to do this.
 
-
-
-
 	}
 
-	public void setTitle(String label){
+	public void setTitle(String label) {
 		frame.setTitle(label);
 		frame.repaint();
 	}
 
-	public JFrame getFrame(){
+	public JFrame getFrame() {
 		return frame;
 	}
-
 
 }

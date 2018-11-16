@@ -33,12 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
 public class AAIndexFileParser {
 	int scale = -1;
 
-	Map<String,SubstitutionMatrix<AminoAcidCompound>> matrices;
+	Map<String, SubstitutionMatrix<AminoAcidCompound>> matrices;
 
 	ScaledSubstitutionMatrix currentMatrix;
 	String currentRows;
@@ -47,16 +45,18 @@ public class AAIndexFileParser {
 	private short[][] matrix;
 	short max;
 	short min;
-	private List<AminoAcidCompound> rows, cols;
+	private List<AminoAcidCompound> rows;
+
+	private List<AminoAcidCompound> cols;
 	boolean inMatrix;
-	boolean symmetricMatrix ;
+	boolean symmetricMatrix;
 
-
-	public AAIndexFileParser(){
-		matrices  = new HashMap<String, SubstitutionMatrix<AminoAcidCompound>>();
+	public AAIndexFileParser() {
+		matrices = new HashMap<>();
 	}
 
-	/** parse an inputStream that points to an AAINDEX database file
+	/**
+	 * parse an inputStream that points to an AAINDEX database file
 	 *
 	 * @param inputStream
 	 * @throws IOException
@@ -70,27 +70,28 @@ public class AAIndexFileParser {
 		min = Short.MAX_VALUE;
 		inMatrix = false;
 
-		BufferedReader buf = new BufferedReader (new InputStreamReader (inputStream));
+		BufferedReader buf = new BufferedReader(new InputStreamReader(inputStream));
 		String line = null;
 		line = buf.readLine();
 
-		while (  line != null ) {
+		while (line != null) {
 
-			if ( line.startsWith("//")) {
+			if (line.startsWith("//")) {
 				finalizeMatrix();
 				inMatrix = false;
 
-			} else if ( line.startsWith("H ")){
+			} else if (line.startsWith("H ")) {
 				// a new matric!
 				newMatrix(line);
-			} else if ( line.startsWith("D ")) {
+			} else if (line.startsWith("D ")) {
 				currentMatrix.setDescription(line.substring(2));
-			} else if ( line.startsWith("M ")) {
+			} else if (line.startsWith("M ")) {
 				initMatrix(line);
 				inMatrix = true;
-			} else if ( line.startsWith("  ")){
-				if ( inMatrix)
+			} else if (line.startsWith("  ")) {
+				if (inMatrix) {
 					processScores(line);
+				}
 			}
 
 			line = buf.readLine();
@@ -98,8 +99,7 @@ public class AAIndexFileParser {
 
 	}
 
-
-	//  process a line such as >    -0.3     1.6     0.7     0.8    -2.6     3.0<
+	// process a line such as > -0.3 1.6 0.7 0.8 -2.6 3.0<
 	private void processScores(String line) {
 
 		String[] values = line.trim().split(" +");
@@ -107,23 +107,20 @@ public class AAIndexFileParser {
 		// increment the current row we are talking about
 		currentRowPos++;
 
+		for (int i = 0; i < values.length; i++) {
 
-
-		for ( int i =0 ; i < values.length ; i++){
-
-			if ( values[i].endsWith(".")) {
+			if (values[i].endsWith(".")) {
 				values[i] = values[i] + "0";
 			}
 
 			// special case: MEHP950101
-			if (values[i].equals("-")) {
+			if ("-".equals(values[i])) {
 				values[i] = "0";
 			}
 
-			if ( scale == -1 ) {
+			if (scale == -1) {
 				scale = determineScale(values[0]);
 			}
-
 
 			Float score = Float.parseFloat(values[i]);
 			score = scale * score;
@@ -132,8 +129,9 @@ public class AAIndexFileParser {
 
 			matrix[currentRowPos][i] = s;
 
-			if ( values.length < cols.size() || ( symmetricMatrix)){
-				//System.out.println(values.length + " " + cols.size() + " " + currentRowPos + " " + i + " " +  line);
+			if (values.length < cols.size() || (symmetricMatrix)) {
+				// System.out.println(values.length + " " + cols.size() + " " + currentRowPos +
+				// " " + i + " " + line);
 
 				matrix[i][currentRowPos] = s;
 
@@ -141,11 +139,12 @@ public class AAIndexFileParser {
 
 			}
 
-			if ( score > max)
+			if (score > max) {
 				max = s;
-			if ( score < min)
+			}
+			if (score < min) {
 				min = s;
-
+			}
 
 		}
 	}
@@ -154,21 +153,23 @@ public class AAIndexFileParser {
 
 		String[] spl = value.split("\\.");
 
-		if (spl.length <= 1)
+		if (spl.length <= 1) {
 			return 1;
+		}
 
 		String digits = spl[1];
 
-		return (int)Math.round(Math.pow(10, digits.length()));
+		return (int) Math.round(Math.pow(10, digits.length()));
 
 	}
 
-	// process a line of type >M rows = ARNDCQEGHILKMFPSTWYV, cols = ARNDCQEGHILKMFPSTWYV<
+	// process a line of type >M rows = ARNDCQEGHILKMFPSTWYV, cols =
+	// ARNDCQEGHILKMFPSTWYV<
 	private void initMatrix(String line) {
 		String[] spl = line.split(" ");
 
 		// trim off the final , character
-		currentRows = spl[3].substring(0, spl[3].length()-1);
+		currentRows = spl[3].substring(0, spl[3].length() - 1);
 		currentCols = spl[6];
 		currentRowPos = -1;
 
@@ -177,33 +178,27 @@ public class AAIndexFileParser {
 
 		matrix = new short[nrRows][nrCols];
 
-		rows = new ArrayList<AminoAcidCompound>();
-		cols = new ArrayList<AminoAcidCompound>();
+		rows = new ArrayList<>();
+		cols = new ArrayList<>();
 
-
-		//System.out.println(">" + currentRows+"<");
+		// System.out.println(">" + currentRows+"<");
 		AminoAcidCompoundSet compoundSet = AminoAcidCompoundSet.getAminoAcidCompoundSet();
-		for ( int i = 0 ; i < currentRows.length() ; i ++){
+		for (int i = 0; i < currentRows.length(); i++) {
 			char c = currentRows.charAt(i);
 			AminoAcidCompound aa = compoundSet.getCompoundForString(String.valueOf(c));
 
 			rows.add(aa);
 		}
 
-		for ( int i = 0 ; i < currentCols.length() ; i ++){
+		for (int i = 0; i < currentCols.length(); i++) {
 			char c = currentRows.charAt(i);
 			AminoAcidCompound aa = compoundSet.getCompoundForString(String.valueOf(c));
 
 			cols.add(aa);
 		}
 
-
-
-
-
 		currentMatrix.setScale(scale);
 	}
-
 
 	private void newMatrix(String line) {
 		symmetricMatrix = false;
@@ -212,8 +207,7 @@ public class AAIndexFileParser {
 		currentMatrix = new ScaledSubstitutionMatrix();
 		currentMatrix.setName(line.substring(2));
 
-
-		//System.out.println("new Matrix " + currentMatrix.getName());
+		// System.out.println("new Matrix " + currentMatrix.getName());
 	}
 
 	//

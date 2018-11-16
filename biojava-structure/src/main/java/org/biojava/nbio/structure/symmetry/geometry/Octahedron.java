@@ -25,15 +25,14 @@ import javax.vecmath.Point3d;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class Octahedron implements Polyhedron {
-	private static double TETRAHEDRAL_ANGLE = Math.acos(-1.0/3.0);
-	private static int[] lineLoop1 = {2,4,3,5,2,1,3,0,5,1,4,0,2};
+	private static double tetrahedralAngle = Math.acos(-1.0 / 3.0);
+	private static int[] lineLoop1 = { 2, 4, 3, 5, 2, 1, 3, 0, 5, 1, 4, 0, 2 };
 	private double cirumscribedRadius = 1.0;
 
 	/**
-	 * Returns the radius of a circumscribed sphere, that goes
-	 * through all vertices
+	 * Returns the radius of a circumscribed sphere, that goes through all vertices
+	 * 
 	 * @return the cirumscribedRadius
 	 */
 	@Override
@@ -42,16 +41,18 @@ public class Octahedron implements Polyhedron {
 	}
 
 	/**
-	 * Set the radius of a circumscribed sphere, that goes
-	 * through all vertices
+	 * Set the radius of a circumscribed sphere, that goes through all vertices
+	 * 
 	 * @param cirumscribedRadius the cirumscribedRadius to set
 	 */
 	public void setCirumscribedRadius(double cirumscribedRadius) {
 		this.cirumscribedRadius = cirumscribedRadius;
 	}
+
 	/**
-	 * Returns the radius of an inscribed sphere, that is tangent to each
-	 * of the octahedron's faces
+	 * Returns the radius of an inscribed sphere, that is tangent to each of the
+	 * octahedron's faces
+	 * 
 	 * @return the inscribedRadius
 	 */
 	public double getInscribedRadius() {
@@ -60,8 +61,9 @@ public class Octahedron implements Polyhedron {
 	}
 
 	/**
-	 * Sets the radius of an inscribed sphere, that is tangent to each
-	 * of the octahedron's faces
+	 * Sets the radius of an inscribed sphere, that is tangent to each of the
+	 * octahedron's faces
+	 * 
 	 * @param inscribedRadius the inscribedRadius to set
 	 */
 	public void setInscribedRadius(double radius) {
@@ -70,8 +72,8 @@ public class Octahedron implements Polyhedron {
 	}
 
 	/**
-	 * Returns the radius of a sphere, that is tangent to each
-	 * of the octahedron's edges
+	 * Returns the radius of a sphere, that is tangent to each of the octahedron's
+	 * edges
 	 *
 	 * @return the midRadius
 	 */
@@ -81,8 +83,9 @@ public class Octahedron implements Polyhedron {
 	}
 
 	/**
-	 * Sets the radius of radius of a sphere, that is tangent to each
-	 * of the octahedron's edges
+	 * Sets the radius of radius of a sphere, that is tangent to each of the
+	 * octahedron's edges
+	 * 
 	 * @param midRadius the midRadius to set
 	 */
 	public void setMidRadius(double radius) {
@@ -92,6 +95,7 @@ public class Octahedron implements Polyhedron {
 
 	/**
 	 * Returns the vertices of an n-fold polygon of given radius and center
+	 * 
 	 * @param n
 	 * @param radius
 	 * @param center
@@ -100,12 +104,12 @@ public class Octahedron implements Polyhedron {
 	@Override
 	public Point3d[] getVertices() {
 		Point3d[] octahedron = new Point3d[6];
-	    octahedron[0] = new Point3d(-cirumscribedRadius, 0, 0);
-	    octahedron[1] = new Point3d( cirumscribedRadius, 0, 0);
-	    octahedron[2] = new Point3d(0, -cirumscribedRadius, 0);
-	    octahedron[3] = new Point3d(0,  cirumscribedRadius, 0);
-	    octahedron[4] = new Point3d(0, 0, -cirumscribedRadius);
-	    octahedron[5] = new Point3d(0, 0,  cirumscribedRadius);
+		octahedron[0] = new Point3d(-cirumscribedRadius, 0, 0);
+		octahedron[1] = new Point3d(cirumscribedRadius, 0, 0);
+		octahedron[2] = new Point3d(0, -cirumscribedRadius, 0);
+		octahedron[3] = new Point3d(0, cirumscribedRadius, 0);
+		octahedron[4] = new Point3d(0, 0, -cirumscribedRadius);
+		octahedron[5] = new Point3d(0, 0, cirumscribedRadius);
 
 		return octahedron;
 	};
@@ -116,15 +120,18 @@ public class Octahedron implements Polyhedron {
 	}
 
 	public Point3d getC4Axis(double scale) {
-		return new Point3d(0, 0, cirumscribedRadius*scale);
+		return new Point3d(0, 0, cirumscribedRadius * scale);
 	}
+
 	public Point3d getC3Axis(double scale) {
-		double s = 1/Math.sqrt(1 + Math.sqrt(2));
-		return new Point3d(cirumscribedRadius*scale*s, cirumscribedRadius*scale*s, cirumscribedRadius*scale*s);
+		double s = 1 / Math.sqrt(1 + Math.sqrt(2));
+		return new Point3d(cirumscribedRadius * scale * s, cirumscribedRadius * scale * s,
+				cirumscribedRadius * scale * s);
 	}
+
 	public Point3d getC2Axis(double scale) {
-		double s = 1/Math.sqrt(2);
-		return new Point3d(cirumscribedRadius*scale*s, cirumscribedRadius*scale*s, 0);
+		double s = 1 / Math.sqrt(2);
+		return new Point3d(cirumscribedRadius * scale * s, cirumscribedRadius * scale * s, 0);
 	}
 
 	@Override
@@ -136,13 +143,17 @@ public class Octahedron implements Polyhedron {
 	public String getViewName(int index) {
 		String name;
 		switch (index) {
-		case 0:  name = "4-fold axis vertex-centered";
-		break;
-		case 1:  name = "3-fold axis face-centered";
-		break;
-		case 2:  name = "2-fold axis edge-centered";
-		break;
-		default: throw new IllegalArgumentException("getViewMatrix: index out of range:" + index);
+		case 0:
+			name = "4-fold axis vertex-centered";
+			break;
+		case 1:
+			name = "3-fold axis face-centered";
+			break;
+		case 2:
+			name = "2-fold axis edge-centered";
+			break;
+		default:
+			throw new IllegalArgumentException("getViewMatrix: index out of range:" + index);
 		}
 		return name;
 	}
@@ -155,13 +166,13 @@ public class Octahedron implements Polyhedron {
 			m.setIdentity(); // C4 vertex-centered
 			break;
 		case 1:
-			m.rotX(-0.5 * TETRAHEDRAL_ANGLE); // C3 face-centered  2.0*Math.PI/3
+			m.rotX(-0.5 * tetrahedralAngle); // C3 face-centered 2.0*Math.PI/3
 			Matrix3d m1 = new Matrix3d();
-			m1.rotZ(Math.PI/4);
+			m1.rotZ(Math.PI / 4);
 			m.mul(m1);
 			break;
 		case 2:
-			m.rotY(Math.PI/4); // side face-centered
+			m.rotY(Math.PI / 4); // side face-centered
 			break;
 		default:
 			throw new IllegalArgumentException("getViewMatrix: index out of range:" + index);

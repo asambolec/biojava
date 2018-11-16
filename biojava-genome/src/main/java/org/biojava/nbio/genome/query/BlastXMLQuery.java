@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.genome.query;
 
-
 import org.biojava.nbio.core.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +46,10 @@ public class BlastXMLQuery {
 	}
 
 	public LinkedHashMap<String, ArrayList<String>> getHitsQueryDef(double maxEScore) throws Exception {
-		LinkedHashMap<String, ArrayList<String>> hitsHashMap = new LinkedHashMap<String, ArrayList<String>>();
+		LinkedHashMap<String, ArrayList<String>> hitsHashMap = new LinkedHashMap<>();
 		logger.info("Query for hits");
-		ArrayList<Element> elementList = XMLHelper.selectElements(blastDoc.getDocumentElement(), "BlastOutput_iterations/Iteration[Iteration_hits]");
+		ArrayList<Element> elementList = XMLHelper.selectElements(blastDoc.getDocumentElement(),
+				"BlastOutput_iterations/Iteration[Iteration_hits]");
 		logger.info("{} hits", elementList.size());
 
 		for (Element element : elementList) {
@@ -69,7 +69,7 @@ public class BlastXMLQuery {
 					if (evalue <= maxEScore) {
 						ArrayList<String> hits = hitsHashMap.get(querydef);
 						if (hits == null) {
-							hits = new ArrayList<String>();
+							hits = new ArrayList<>();
 							hitsHashMap.put(querydef, hits);
 						}
 						hits.add(hitaccession);
@@ -83,7 +83,8 @@ public class BlastXMLQuery {
 
 	public static void main(String[] args) {
 		try {
-			BlastXMLQuery blastXMLQuery = new BlastXMLQuery("/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/c1-454Scaffolds-hits-uniprot_fungi.xml");
+			BlastXMLQuery blastXMLQuery = new BlastXMLQuery(
+					"/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/c1-454Scaffolds-hits-uniprot_fungi.xml");
 			LinkedHashMap<String, ArrayList<String>> hits = blastXMLQuery.getHitsQueryDef(1E-10);
 			logger.info("Hits: {}", hits);
 		} catch (Exception e) {

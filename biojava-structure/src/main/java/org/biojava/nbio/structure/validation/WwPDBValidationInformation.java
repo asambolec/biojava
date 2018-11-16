@@ -25,7 +25,6 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
@@ -34,11 +33,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -57,11 +58,7 @@ import java.util.List;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-	"entry",
-	"modelledSubgroup",
-	"programs"
-})
+@XmlType(name = "", propOrder = { "entry", "modelledSubgroup", "programs" })
 @XmlRootElement(name = "wwPDB-validation-information")
 public class WwPDBValidationInformation implements Serializable {
 
@@ -77,9 +74,7 @@ public class WwPDBValidationInformation implements Serializable {
 	/**
 	 * Gets the value of the entry property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link Entry }
+	 * @return possible object is {@link Entry }
 	 *
 	 */
 	public Entry getEntry() {
@@ -89,9 +84,7 @@ public class WwPDBValidationInformation implements Serializable {
 	/**
 	 * Sets the value of the entry property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link Entry }
+	 * @param value allowed object is {@link Entry }
 	 *
 	 */
 	public void setEntry(Entry value) {
@@ -102,15 +95,16 @@ public class WwPDBValidationInformation implements Serializable {
 	 * Gets the value of the modelledSubgroup property.
 	 *
 	 * <p>
-	 * This accessor method returns a reference to the live list,
-	 * not a snapshot. Therefore any modification you make to the
-	 * returned list will be present inside the JAXB object.
-	 * This is why there is not a <CODE>set</CODE> method for the modelledSubgroup property.
+	 * This accessor method returns a reference to the live list, not a snapshot.
+	 * Therefore any modification you make to the returned list will be present
+	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
+	 * for the modelledSubgroup property.
 	 *
 	 * <p>
 	 * For example, to add a new item, do as follows:
+	 * 
 	 * <pre>
-	 *    getModelledSubgroup().add(newItem);
+	 * getModelledSubgroup().add(newItem);
 	 * </pre>
 	 *
 	 *
@@ -122,7 +116,7 @@ public class WwPDBValidationInformation implements Serializable {
 	 */
 	public List<ModelledSubgroup> getModelledSubgroup() {
 		if (modelledSubgroup == null) {
-			modelledSubgroup = new ArrayList<ModelledSubgroup>();
+			modelledSubgroup = new ArrayList<>();
 		}
 		return this.modelledSubgroup;
 	}
@@ -130,9 +124,7 @@ public class WwPDBValidationInformation implements Serializable {
 	/**
 	 * Gets the value of the programs property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link Programs }
+	 * @return possible object is {@link Programs }
 	 *
 	 */
 	public Programs getPrograms() {
@@ -142,9 +134,7 @@ public class WwPDBValidationInformation implements Serializable {
 	/**
 	 * Sets the value of the programs property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link Programs }
+	 * @param value allowed object is {@link Programs }
 	 *
 	 */
 	public void setPrograms(Programs value) {

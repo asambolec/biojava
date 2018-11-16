@@ -21,7 +21,6 @@
  */
 package org.biojava.nbio.structure.gui.util;
 
-
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.StructureTools;
@@ -39,45 +38,33 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-/** A JPanel to upload 2 custom PDB files.
+/**
+ * A JPanel to upload 2 custom PDB files.
  *
  * @author Andreas Prlic
  * @since 1.7
  */
-public class PDBUploadPanel
-extends JPanel
-implements StructurePairSelector {
+public class PDBUploadPanel extends JPanel implements StructurePairSelector {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-
-
 	private static final Logger logger = LoggerFactory.getLogger(PDBUploadPanel.class);
 
-
-
-	private JComboBox fileType ;
+	private JComboBox fileType;
 
 	JTextField filePath1;
 	JTextField filePath2;
 	JTextField chain1;
 	JTextField chain2;
 
-	public static JComboBox getFileFormatSelect(){
-		JComboBox fileType = new JComboBox();
-			fileType = new JComboBox(new String[] {UserConfiguration.PDB_FORMAT,UserConfiguration.MMCIF_FORMAT});
-			fileType.setSelectedIndex(0);
-			fileType.setMaximumSize(new Dimension(10,50));
-
-		return fileType;
-	}
-	public PDBUploadPanel(){
+	public PDBUploadPanel() {
 		this(true);
 	}
-	public PDBUploadPanel(boolean show2boxes){
+
+	public PDBUploadPanel(boolean show2boxes) {
 		Box vBox = Box.createVerticalBox();
 
 		filePath1 = new JTextField(20);
@@ -85,12 +72,13 @@ implements StructurePairSelector {
 		chain1 = new JTextField(1);
 		chain2 = new JTextField(1);
 
-		JPanel p1 = getLocalFilePanel(1,filePath1,chain1);
-		JPanel p2 = getLocalFilePanel(2,filePath2,chain2);
+		JPanel p1 = getLocalFilePanel(1, filePath1, chain1);
+		JPanel p2 = getLocalFilePanel(2, filePath2, chain2);
 
 		vBox.add(p1);
-		if ( show2boxes)
+		if (show2boxes) {
 			vBox.add(p2);
+		}
 
 		JLabel ftype = new JLabel("File format:");
 		Box hBox = Box.createHorizontalBox();
@@ -105,35 +93,43 @@ implements StructurePairSelector {
 		this.add(vBox);
 	}
 
+	public static JComboBox getFileFormatSelect() {
+		JComboBox fileType = new JComboBox();
+		fileType = new JComboBox(new String[] { UserConfiguration.PDB_FORMAT, UserConfiguration.MMCIF_FORMAT });
+		fileType.setSelectedIndex(0);
+		fileType.setMaximumSize(new Dimension(10, 50));
 
-	public String getFilePath1(){
+		return fileType;
+	}
+
+	public String getFilePath1() {
 		return filePath1.getText();
 	}
 
-	public String getChain1(){
+	public String getChain1() {
 		return chain1.getText();
 	}
 
 	@Override
-	public Structure getStructure1() throws StructureException{
+	public Structure getStructure1() throws StructureException {
 
-		return getStructure(filePath1,chain1);
+		return getStructure(filePath1, chain1);
 	}
 
 	@Override
-	public Structure getStructure2() throws StructureException{
+	public Structure getStructure2() throws StructureException {
 
-		return getStructure(filePath2,chain2);
+		return getStructure(filePath2, chain2);
 	}
 
-	private Structure getStructure(JTextField filePath,JTextField chainId) throws StructureException{
-		//PDBFileReader reader = new PDBFileReader();
+	private Structure getStructure(JTextField filePath, JTextField chainId) throws StructureException {
+		// PDBFileReader reader = new PDBFileReader();
 
 		StructureIOFile reader = null;
-		String fileFormat = (String)fileType.getSelectedItem();
-		if ( fileFormat.equals(UserConfiguration.PDB_FORMAT)){
+		String fileFormat = (String) fileType.getSelectedItem();
+		if (fileFormat.equals(UserConfiguration.PDB_FORMAT)) {
 			reader = new PDBFileReader();
-		} else if ( fileFormat.equals(UserConfiguration.MMCIF_FORMAT)){
+		} else if (fileFormat.equals(UserConfiguration.MMCIF_FORMAT)) {
 			reader = new MMCIFFileReader();
 		} else {
 			throw new StructureException("Unkown file format " + fileFormat);
@@ -144,9 +140,9 @@ implements StructurePairSelector {
 		Structure s = null;
 		try {
 			s = reader.getStructure(f);
-		} catch (IOException  e){
+		} catch (IOException e) {
 			logger.warn(e.getMessage());
-			//e.printStackTrace();
+			// e.printStackTrace();
 			throw new StructureException(e);
 		}
 
@@ -155,18 +151,19 @@ implements StructurePairSelector {
 		String fileURL = "";
 		try {
 
-			URL u ;
+			URL u;
 
-			if ( chainId.getText() == null || chainId.getText().equals("")){
+			if (chainId.getText() == null || "".equals(chainId.getText())) {
 
 				u = f.toURI().toURL();
 			} else {
-				u = new URL(f.toURI().toURL().toString() + "?chainId=" + chainId.getText());
+				u = new URL(new StringBuilder().append(f.toURI().toURL().toString()).append("?chainId=")
+						.append(chainId.getText()).toString());
 			}
-			fileURL = u.toString() ;
+			fileURL = u.toString();
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		reduced.setPDBCode(fileURL);
@@ -175,14 +172,12 @@ implements StructurePairSelector {
 
 	}
 
-
-
-	private JPanel getLocalFilePanel(int pos ,JTextField filePath, JTextField  chainId){
+	private JPanel getLocalFilePanel(int pos, JTextField filePath, JTextField chainId) {
 
 		JPanel panel = new JPanel();
-		//panel.setBorder(BorderFactory.createLineBorder(Color.black));
+		// panel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		JLabel l01 = new JLabel("File "+pos+":");
+		JLabel l01 = new JLabel(new StringBuilder().append("File ").append(pos).append(":").toString());
 		panel.add(l01);
 
 		panel.add(filePath);
@@ -190,7 +185,8 @@ implements StructurePairSelector {
 		JButton chooser = new JButton(action3);
 		panel.add(chooser);
 
-		JLabel chainLabel = new JLabel("Chain "+pos+": (optional)");
+		JLabel chainLabel = new JLabel(
+				new StringBuilder().append("Chain ").append(pos).append(": (optional)").toString());
 		panel.add(chainLabel);
 		panel.add(chainId);
 
@@ -199,29 +195,30 @@ implements StructurePairSelector {
 	}
 }
 
-class ChooseAction extends AbstractAction{
+class ChooseAction extends AbstractAction {
 
+	public static final long serialVersionUID = 0l;
 	JTextField textField;
-	public ChooseAction (JTextField textField){
+
+	public ChooseAction(JTextField textField) {
 		super("Choose");
 		this.textField = textField;
 	}
-	public static final long serialVersionUID = 0l;
+
 	// This method is called when the button is pressed
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		// Perform action...
 		final JFileChooser fc = new JFileChooser();
 
-		//		In response to a button click:
+		// In response to a button click:
 		int returnVal = fc.showOpenDialog(null);
-		if ( returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = fc.getSelectedFile();
-			textField.setText(file.getAbsolutePath());
-			textField.repaint();
-
-
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
 		}
+		File file = fc.getSelectedFile();
+		textField.setText(file.getAbsolutePath());
+		textField.repaint();
 
 	}
 }

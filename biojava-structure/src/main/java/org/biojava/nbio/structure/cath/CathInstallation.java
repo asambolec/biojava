@@ -41,30 +41,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author Daniel Asarnow
  */
-public class CathInstallation implements CathDatabase{
+public class CathInstallation implements CathDatabase {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CathInstallation.class);
-	
+
 	public static final String DEFAULT_VERSION = CathFactory.DEFAULT_VERSION;
 
-	public static final String domainListFileName = "cath-domain-list-v%s.txt"; 
+	public static final String domainListFileName = "cath-domain-list-v%s.txt";
 	public static final String domainDescriptionFileName = "cath-domain-description-file-v%s.txt";
 	public static final String nodeListFileName = "cath-names-v%s.txt";
 	public static final String domallFileName = "cath-domain-boundaries-v%s.txt";
-	
-	public static final String CATH_DOWNLOAD_URL                     = "http://download.cathdb.info/cath/releases/";
-	public static final String CATH_DOWNLOAD_ALL_RELEASES_DIR        = "all-releases";
+
+	public static final String CATH_DOWNLOAD_URL = "http://download.cathdb.info/cath/releases/";
+	public static final String CATH_DOWNLOAD_ALL_RELEASES_DIR = "all-releases";
 	public static final String CATH_DOWNLOAD_CLASSIFICATION_DATA_DIR = "cath-classification-data";
 
 	public static final String NEWLINE = System.getProperty("line.separator");;
 	public static final String FILESPLIT = System.getProperty("file.separator");;
 
-	
 	private String cathVersion;
 
 	private String cathDownloadUrl;
-	
-	private String cacheLocation ;
+
+	private String cacheLocation;
 
 	private AtomicBoolean installedDomainList;
 	private AtomicBoolean installedDomainDescription;
@@ -78,8 +77,6 @@ public class CathInstallation implements CathDatabase{
 	private Map<String, CathDomain> domainMap;
 	private Map<String, CathNode> cathTree;
 	private Map<String, List<CathFragment>> fragmentMap;
-
-
 
 	public CathInstallation(String cacheLocation, boolean usingCDDF, boolean parseCF) {
 		setCacheLocation(cacheLocation);
@@ -95,11 +92,13 @@ public class CathInstallation implements CathDatabase{
 		cathVersion = DEFAULT_VERSION;
 		cathDownloadUrl = CATH_DOWNLOAD_URL;
 
-		pdbMap = new HashMap<String, List<CathDomain>>();
-		domainMap = new HashMap<String ,CathDomain>();
-		cathTree = new HashMap<String, CathNode>();
+		pdbMap = new HashMap<>();
+		domainMap = new HashMap<>();
+		cathTree = new HashMap<>();
 
-		if (parseCathFragments) fragmentMap = new HashMap<String,List<CathFragment>>();
+		if (parseCathFragments) {
+			fragmentMap = new HashMap<>();
+		}
 
 	}
 
@@ -126,15 +125,17 @@ public class CathInstallation implements CathDatabase{
 	public String getDomallFileName() {
 		return cacheLocation + buildFileName(domallFileName);
 	}
-	
+
 	private String buildFileName(String fileNameTemplate) {
 		return String.format(fileNameTemplate, cathVersion);
 	}
-	
+
 	private String buildUrl(String remoteFileName) {
-		String remoteFileNameWithVer =  buildFileName(remoteFileName);
+		String remoteFileNameWithVer = buildFileName(remoteFileName);
 		String releasesDir = CATH_DOWNLOAD_ALL_RELEASES_DIR;
-		return cathDownloadUrl + releasesDir + "/v" + cathVersion + "/" + CATH_DOWNLOAD_CLASSIFICATION_DATA_DIR + "/" + remoteFileNameWithVer;
+		return new StringBuilder().append(cathDownloadUrl).append(releasesDir).append("/v").append(cathVersion)
+				.append("/").append(CATH_DOWNLOAD_CLASSIFICATION_DATA_DIR).append("/").append(remoteFileNameWithVer)
+				.toString();
 	}
 
 	public String getCathDownloadUrl() {
@@ -150,7 +151,9 @@ public class CathInstallation implements CathDatabase{
 	}
 
 	public void setCacheLocation(String cacheLocation) {
-		if ( !cacheLocation.endsWith(FILESPLIT) ) cacheLocation += FILESPLIT;
+		if (!cacheLocation.endsWith(FILESPLIT)) {
+			cacheLocation += FILESPLIT;
+		}
 		this.cacheLocation = cacheLocation;
 	}
 
@@ -205,11 +208,11 @@ public class CathInstallation implements CathDatabase{
 			ensureDomallInstalled();
 		}
 		ensureNodeListInstalled();
-		List<CathDomain> matches = new ArrayList<CathDomain>();
+		List<CathDomain> matches = new ArrayList<>();
 		CathNode node;
-		for ( String nodeId : cathTree.keySet() ) {
-			if ( (node = cathTree.get(nodeId)).getCategory() == category ) {
-				matches.add( domainMap.get( node.getRepresentative() ) );
+		for (String nodeId : cathTree.keySet()) {
+			if ((node = cathTree.get(nodeId)).getCategory() == category) {
+				matches.add(domainMap.get(node.getRepresentative()));
 			}
 		}
 		return matches;
@@ -222,22 +225,21 @@ public class CathInstallation implements CathDatabase{
 		} else {
 			ensureDomallInstalled();
 		}
-		List<CathDomain> matches = new ArrayList<CathDomain>();
-		for ( String k : domainMap.keySet() ) {
-			if ( domainMap.get(k).getCATH().startsWith(query) ) {
-				matches.add( domainMap.get(k) );
-			}
-		}
+		List<CathDomain> matches = new ArrayList<>();
+		domainMap.keySet().stream().filter(k -> domainMap.get(k).getCATH().startsWith(query))
+				.forEach(k -> matches.add(domainMap.get(k)));
 		return matches;
 	}
 
 	@Override
 	public List<CathNode> getTree(CathDomain domain) {
-		CathNode node = getCathNode( domain.getCATH() );
-		List<CathNode> tree = new ArrayList<CathNode>();
+		CathNode node = getCathNode(domain.getCATH());
+		List<CathNode> tree = new ArrayList<>();
 		while (node != null) {
-			node = getCathNode( node.getParentId() );
-			if (node != null) tree.add(node);
+			node = getCathNode(node.getParentId());
+			if (node != null) {
+				tree.add(node);
+			}
 		}
 		Collections.reverse(tree);
 		return tree;
@@ -246,17 +248,15 @@ public class CathInstallation implements CathDatabase{
 	@Override
 	public List<CathDomain> filterByNodeName(String query) {
 		ensureNodeListInstalled();
-		List<CathNode> matchingNodes = new ArrayList<CathNode>();
+		List<CathNode> matchingNodes = new ArrayList<>();
 		CathNode node;
-		for ( String nodeId : cathTree.keySet() ) {
-			if ( (node = cathTree.get(nodeId) ).getDescription().startsWith(query) ) {
+		for (String nodeId : cathTree.keySet()) {
+			if ((node = cathTree.get(nodeId)).getDescription().startsWith(query)) {
 				matchingNodes.add(node);
 			}
 		}
-		List<CathDomain> matches = new ArrayList<CathDomain>();
-		for (CathNode n : matchingNodes) {
-			matches.addAll(getDomainsByNodeId(n.getNodeId()));
-		}
+		List<CathDomain> matches = new ArrayList<>();
+		matchingNodes.forEach(n -> matches.addAll(getDomainsByNodeId(n.getNodeId())));
 		return matches;
 	}
 
@@ -267,12 +267,9 @@ public class CathInstallation implements CathDatabase{
 		} else {
 			ensureDomallInstalled();
 		}
-		List<CathDomain> matches = new ArrayList<CathDomain>();
-		for ( String k : domainMap.keySet() ) {
-			if ( domainMap.get(k).getName().startsWith(query) ) {
-				matches.add( domainMap.get(k) );
-			}
-		}
+		List<CathDomain> matches = new ArrayList<>();
+		domainMap.keySet().stream().filter(k -> domainMap.get(k).getName().startsWith(query))
+				.forEach(k -> matches.add(domainMap.get(k)));
 		return matches;
 	}
 
@@ -295,7 +292,7 @@ public class CathInstallation implements CathDatabase{
 			ensureDomallInstalled();
 		}
 
-	  // cath IDs in lower case...
+		// cath IDs in lower case...
 		return pdbMap.get(pdbId.toLowerCase());
 	}
 
@@ -326,19 +323,20 @@ public class CathInstallation implements CathDatabase{
 		} else {
 			ensureDomallInstalled();
 		}
-		List<CathDomain> domains = new ArrayList<CathDomain>();
-		for (String domainName : domainMap.keySet()) {
-			CathDomain description = domainMap.get(domainName);
-			if ( description.getCATH().startsWith(nodeId) ) {
+		List<CathDomain> domains = new ArrayList<>();
+		domainMap.keySet().stream().map(domainMap::get).forEach(description -> {
+			if (description.getCATH().startsWith(nodeId)) {
 				domains.add(description);
 			}
-		}
+		});
 		return domains;
 	}
 
 	@Override
 	public List<CathFragment> getFragmentsByPdbId(String pdbId) {
-		if ( useCathDomainDescriptionFile || !parseCathFragments ) return null;
+		if (useCathDomainDescriptionFile || !parseCathFragments) {
+			return null;
+		}
 		ensureDomallInstalled();
 		return fragmentMap.get(pdbId);
 	}
@@ -346,46 +344,50 @@ public class CathInstallation implements CathDatabase{
 	private void parseCathDomainList() throws IOException {
 		File file = new File(getDomainListFileName());
 		InputStreamProvider ips = new InputStreamProvider();
-		BufferedReader buffer = new BufferedReader (new InputStreamReader(ips.getInputStream(file)));
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(ips.getInputStream(file)));
 		parseCathDomainList(buffer);
 	}
 
-	private void parseCathDomainList(BufferedReader bufferedReader) throws IOException{
+	private void parseCathDomainList(BufferedReader bufferedReader) throws IOException {
 		String line;
-	 //   int counter = 0;
-		while ( (line = bufferedReader.readLine()) != null ) {
-			if ( line.startsWith("#") ) continue;
+		// int counter = 0;
+		while ((line = bufferedReader.readLine()) != null) {
+			if (line.startsWith("#")) {
+				continue;
+			}
 			CathDomain cathDomain = parseCathListFileLine(line);
-		   // counter++;
+			// counter++;
 
-			String pdbId = cathDomain.getPdbIdAndChain().substring(0,4); // includes chain letter
+			String pdbId = cathDomain.getPdbIdAndChain().substring(0, 4); // includes chain letter
 
 			List<CathDomain> domainList;
-			if ( pdbMap.containsKey(pdbId)){
+			if (pdbMap.containsKey(pdbId)) {
 				domainList = pdbMap.get(pdbId);
 			} else {
-				domainList = new ArrayList<CathDomain>();
-				pdbMap.put(pdbId,domainList);
+				domainList = new ArrayList<>();
+				pdbMap.put(pdbId, domainList);
 			}
 
 			domainList.add(cathDomain);
 
-			domainMap.put( cathDomain.getDomainName(), cathDomain );
+			domainMap.put(cathDomain.getDomainName(), cathDomain);
 		}
 	}
 
 	private void parseCathNames() throws IOException {
 		File file = new File(getNodeListFileName());
 		InputStreamProvider ips = new InputStreamProvider();
-		BufferedReader buffer = new BufferedReader (new InputStreamReader(ips.getInputStream(file)));
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(ips.getInputStream(file)));
 		parseCathNames(buffer);
 	}
 
-	private void parseCathNames(BufferedReader bufferedReader) throws IOException{
+	private void parseCathNames(BufferedReader bufferedReader) throws IOException {
 		String line;
-		//int counter = 0;
-		while ( (line = bufferedReader.readLine()) != null ) {
-			if ( line.startsWith("#") ) continue;
+		// int counter = 0;
+		while ((line = bufferedReader.readLine()) != null) {
+			if (line.startsWith("#")) {
+				continue;
+			}
 			CathNode cathNode = parseCathNamesFileLine(line);
 			cathTree.put(cathNode.getNodeId(), cathNode);
 		}
@@ -394,15 +396,15 @@ public class CathInstallation implements CathDatabase{
 	private void parseCathDomainDescriptionFile() throws IOException {
 		File file = new File(getDomainDescriptionFileName());
 		InputStreamProvider ips = new InputStreamProvider();
-		BufferedReader buffer = new BufferedReader (new InputStreamReader(ips.getInputStream(file)));
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(ips.getInputStream(file)));
 		parseCathDomainDescriptionFile(buffer);
 	}
 
-	private void parseCathDomainDescriptionFile(BufferedReader bufferedReader) throws IOException{
+	private void parseCathDomainDescriptionFile(BufferedReader bufferedReader) throws IOException {
 		String line;
 		DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-		//int counter = 0;
-		CathDomain cathDescription = null; //TODO initialize these or catch NPE
+		// int counter = 0;
+		CathDomain cathDescription = null; // TODO initialize these or catch NPE
 		StringBuilder name = null;
 		StringBuilder source = null;
 		StringBuilder seqh = null;
@@ -411,101 +413,102 @@ public class CathInstallation implements CathDatabase{
 		CathSegment segment = null;
 		StringBuilder sseqh = null;
 		StringBuilder sseqs = null;
-		while ( (line = bufferedReader.readLine()) != null ) {
-			if ( line.startsWith("#") ) continue;
-			if ( line.startsWith("FORMAT") ) {
+		while ((line = bufferedReader.readLine()) != null) {
+			if (line.startsWith("#")) {
+				continue;
+			}
+			if (line.startsWith("FORMAT")) {
 				cathDescription = new CathDomain();
-				cathDescription.setFormat( line.substring(10) );
+				cathDescription.setFormat(line.substring(10));
 
 				name = new StringBuilder();
 				source = new StringBuilder();
 				seqh = new StringBuilder();
 				seqs = new StringBuilder();
 
-			} else if ( line.startsWith("DOMAIN") ) {
-				cathDescription.setDomainName( line.substring(10) );
-			} else if ( line.startsWith("VERSION") ) {
-				cathDescription.setVersion( line.substring(10) );
-			} else if ( line.startsWith("VERDATE") ) {
+			} else if (line.startsWith("DOMAIN")) {
+				cathDescription.setDomainName(line.substring(10));
+			} else if (line.startsWith("VERSION")) {
+				cathDescription.setVersion(line.substring(10));
+			} else if (line.startsWith("VERDATE")) {
 				try {
-					cathDescription.setDate( dateFormat.parse( line.substring(10) ) );
+					cathDescription.setDate(dateFormat.parse(line.substring(10)));
 				} catch (ParseException e) {
 					LOGGER.error(e.getMessage(), e);
 				}
-			} else if ( line.startsWith("NAME") ) {
-				name.append( line.substring(10) );
-			} else if ( line.startsWith("SOURCE") ) {
-				source.append( line.substring(10) );
-			} else if ( line.startsWith("CATHCODE") ) {
-				cathDescription.setCATH( line.substring(10) );
-			} else if ( line.startsWith("DLENGTH") ) {
-				cathDescription.setLength( Integer.parseInt( line.substring(10) ) );
-			} else if ( line.startsWith("DSEQH") ) {
-				seqh.append( line.substring(10) );
-			} else if ( line.startsWith("DSEQS") ) {
-				seqs = seqs.append( line.substring(10) );
-			} else if ( line.startsWith("NSEGMENTS") ) {
-				segments = new ArrayList<CathSegment>();
-			} else if ( line.startsWith("SEGMENT") ) {
+			} else if (line.startsWith("NAME")) {
+				name.append(line.substring(10));
+			} else if (line.startsWith("SOURCE")) {
+				source.append(line.substring(10));
+			} else if (line.startsWith("CATHCODE")) {
+				cathDescription.setCATH(line.substring(10));
+			} else if (line.startsWith("DLENGTH")) {
+				cathDescription.setLength(Integer.parseInt(line.substring(10)));
+			} else if (line.startsWith("DSEQH")) {
+				seqh.append(line.substring(10));
+			} else if (line.startsWith("DSEQS")) {
+				seqs = seqs.append(line.substring(10));
+			} else if (line.startsWith("NSEGMENTS")) {
+				segments = new ArrayList<>();
+			} else if (line.startsWith("SEGMENT")) {
 				segment = new CathSegment();
 				sseqh = new StringBuilder();
 				sseqs = new StringBuilder();
-			} else if ( line.startsWith("SRANGE") ) {
-				int startStart = line.indexOf("=",10) + 1;
-				int startStop = line.indexOf(" ",10);
-				int stopStart = line.indexOf("=",startStop) + 1;
-//                Integer start = Integer.parseInt( line.substring(startStart,startStop) );
-//                Integer stop = Integer.parseInt( line.substring(stopStart, line.length()) );
-				segment.setStart( line.substring(startStart,startStop) );
-				segment.setStop( line.substring(stopStart) );
-			} else if ( line.startsWith("SLENGTH") ) {
-				segment.setLength( Integer.parseInt( line.substring(10) ) );
-			} else if ( line.startsWith("SSEQH") ) {
-				sseqh.append( line.substring(10) );
-			} else if ( line.startsWith("SSEQS") ) {
-				sseqs.append( line.substring(10) );
-			} else if ( line.startsWith("ENDSEG") ) {
-				segments.add( segment );
-				segment.setSegmentId( segments.size() );
-				segment.setSequenceHeader( sseqh.toString() );
-				segment.setSequence( sseqs.toString() );
-			} else if ( line.startsWith("//") ) {
-				cathDescription.setName( name.toString() );
-				cathDescription.setSource( source.toString() );
-				cathDescription.setSequenceHeader( seqh.toString() );
-				cathDescription.setSequence( seqs.toString() );
+			} else if (line.startsWith("SRANGE")) {
+				int startStart = line.indexOf("=", 10) + 1;
+				int startStop = line.indexOf(" ", 10);
+				int stopStart = line.indexOf("=", startStop) + 1;
+				// Integer start = Integer.parseInt( line.substring(startStart,startStop) );
+				// Integer stop = Integer.parseInt( line.substring(stopStart, line.length()) );
+				segment.setStart(line.substring(startStart, startStop));
+				segment.setStop(line.substring(stopStart));
+			} else if (line.startsWith("SLENGTH")) {
+				segment.setLength(Integer.parseInt(line.substring(10)));
+			} else if (line.startsWith("SSEQH")) {
+				sseqh.append(line.substring(10));
+			} else if (line.startsWith("SSEQS")) {
+				sseqs.append(line.substring(10));
+			} else if (line.startsWith("ENDSEG")) {
+				segments.add(segment);
+				segment.setSegmentId(segments.size());
+				segment.setSequenceHeader(sseqh.toString());
+				segment.setSequence(sseqs.toString());
+			} else if (line.startsWith("//")) {
+				cathDescription.setName(name.toString());
+				cathDescription.setSource(source.toString());
+				cathDescription.setSequenceHeader(seqh.toString());
+				cathDescription.setSequence(seqs.toString());
 				cathDescription.setSegments(segments);
-				//counter++;
+				// counter++;
 
-				String pdbId = cathDescription.getPdbIdAndChain().substring(0,4); // includes chain letter
+				String pdbId = cathDescription.getPdbIdAndChain().substring(0, 4); // includes chain letter
 				List<CathDomain> domainList;
-				if ( pdbMap.containsKey(pdbId)){
+				if (pdbMap.containsKey(pdbId)) {
 					domainList = pdbMap.get(pdbId);
 				} else {
-					domainList = new ArrayList<CathDomain>();
-					pdbMap.put(pdbId,domainList);
+					domainList = new ArrayList<>();
+					pdbMap.put(pdbId, domainList);
 				}
 
 				domainList.add(cathDescription);
 
-				domainMap.put( cathDescription.getDomainName(), cathDescription );
+				domainMap.put(cathDescription.getDomainName(), cathDescription);
 
 			}
 		}
-//        transposeDomainData();
+		// transposeDomainData();
 	}
 
-/*    private void transposeDomainData() {
-		ensureDomainListInstalled();
-		for (String k : domainMap.keySet() ) {
-			cathMap.get(k).getDomain().setResolution(domainMap.get(k).getResolution());
-			cathMap.get(k).getDomain().setSOLID(domainMap.get(k).getSOILD());
-		}
-	}*/
+	/*
+	 * private void transposeDomainData() { ensureDomainListInstalled(); for (String
+	 * k : domainMap.keySet() ) {
+	 * cathMap.get(k).getDomain().setResolution(domainMap.get(k).getResolution());
+	 * cathMap.get(k).getDomain().setSOLID(domainMap.get(k).getSOILD()); } }
+	 */
 
 	private CathDomain parseCathListFileLine(String line) {
 		CathDomain cathDomain = new CathDomain();
-		String [] token = line.split("\\s+");
+		String[] token = line.split("\\s+");
 		cathDomain.setDomainName(token[0]);
 		cathDomain.setClassId(Integer.parseInt(token[1]));
 		cathDomain.setArchitectureId(Integer.parseInt(token[2]));
@@ -523,32 +526,38 @@ public class CathInstallation implements CathDatabase{
 
 	private CathNode parseCathNamesFileLine(String line) {
 		CathNode cathNode = new CathNode();
-		String[] token = line.split("\\s+",3);
-		cathNode.setNodeId( token[0] );
+		String[] token = line.split("\\s+", 3);
+		cathNode.setNodeId(token[0]);
 		int idx = token[0].lastIndexOf(".");
-		if ( idx == -1 ) idx = token[0].length();
-		cathNode.setParentId( token[0].substring( 0, idx ) );
-		cathNode.setRepresentative( token[1] );
-		cathNode.setDescription( token[2].replace(":","") );
+		if (idx == -1) {
+			idx = token[0].length();
+		}
+		cathNode.setParentId(token[0].substring(0, idx));
+		cathNode.setRepresentative(token[1]);
+		cathNode.setDescription(token[2].replace(":", ""));
 		return cathNode;
 	}
 
-	private void parseCathDomall() throws IOException{
+	private void parseCathDomall() throws IOException {
 		File file = new File(getDomallFileName());
 		InputStreamProvider ips = new InputStreamProvider();
-		BufferedReader buffer = new BufferedReader (new InputStreamReader(ips.getInputStream(file)));
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(ips.getInputStream(file)));
 		parseCathDomall(buffer);
 	}
 
-	private void parseCathDomall(BufferedReader bufferedReader) throws IOException{
+	private void parseCathDomall(BufferedReader bufferedReader) throws IOException {
 		String line;
-		while ( ((line = bufferedReader.readLine()) != null) ) {
-			if ( line.startsWith("#") ) continue;
-			if ( line.length() == 0 ) continue;
+		while (((line = bufferedReader.readLine()) != null)) {
+			if (line.startsWith("#")) {
+				continue;
+			}
+			if (line.isEmpty()) {
+				continue;
+			}
 			String[] token = line.split("\\s+");
 			String chainId = token[0];
-			Integer numberOfDomains = Integer.parseInt( token[1].substring(1) );
-			Integer numberOfFragments = Integer.parseInt( token[2].substring(1) );
+			Integer numberOfDomains = Integer.parseInt(token[1].substring(1));
+			Integer numberOfFragments = Integer.parseInt(token[2].substring(1));
 			int domIdx = 3;
 			int segIdx;
 			Integer sstop;
@@ -556,17 +565,18 @@ public class CathInstallation implements CathDatabase{
 			Integer fstart;
 			Integer fstop;
 			Integer flength;
-			for (int i=1; i<=numberOfDomains; i++) {
+			for (int i = 1; i <= numberOfDomains; i++) {
 				DecimalFormat df = new DecimalFormat("00");
 				String domainId;
 				CathDomain domain;
 
-//                This logic is necessary because singular domains may be labeled with 00 or 01.
-//                If there is more than one domain, they are always numbered from 01.
-				if (numberOfDomains==1) {
+				// This logic is necessary because singular domains may be labeled with 00 or
+				// 01.
+				// If there is more than one domain, they are always numbered from 01.
+				if (numberOfDomains == 1) {
 					domainId = chainId + "00";
 					domain = domainMap.get(domainId);
-					if (domain==null) {
+					if (domain == null) {
 						domainId = chainId + "01";
 						domain = domainMap.get(domainId);
 					}
@@ -575,28 +585,30 @@ public class CathInstallation implements CathDatabase{
 					domain = domainMap.get(domainId);
 				}
 
-				Integer numberOfSegments = Integer.parseInt( token[domIdx] );
+				Integer numberOfSegments = Integer.parseInt(token[domIdx]);
 
-				if ( domain == null ) {
-					domIdx += 6*numberOfSegments + 1;
+				if (domain == null) {
+					domIdx += 6 * numberOfSegments + 1;
 					continue;
 				}
 
-				List<CathSegment> segments = new ArrayList<CathSegment>(numberOfSegments);
+				List<CathSegment> segments = new ArrayList<>(numberOfSegments);
 				segIdx = 1; // Offset from domIdx.
-				for (int j=1; j<=numberOfSegments; j++) {
+				for (int j = 1; j <= numberOfSegments; j++) {
 					CathSegment segment = new CathSegment();
 					segment.setSegmentId(j);
-//                    String chainLetter = token[domIdx+segIdx]; // Redundant unless some domains cross chain boundaries.
-					sstart = Integer.parseInt( token[domIdx + segIdx + 1] );
+					// String chainLetter = token[domIdx+segIdx]; // Redundant unless some domains
+					// cross chain boundaries.
+					sstart = Integer.parseInt(token[domIdx + segIdx + 1]);
 					String sstartInsertion = token[domIdx + segIdx + 2];
-					sstartInsertion = sstartInsertion.equals("-") ? "" : sstartInsertion;
-//                    String chainLetter = token[domIdx+segIdx+4]; // Redundant unless some segments cross chain boundaries.
+					sstartInsertion = "-".equals(sstartInsertion) ? "" : sstartInsertion;
+					// String chainLetter = token[domIdx+segIdx+4]; // Redundant unless some
+					// segments cross chain boundaries.
 					segment.setStart(sstart + sstartInsertion);
 
-					sstop = Integer.parseInt( token[domIdx + segIdx + 4] );
+					sstop = Integer.parseInt(token[domIdx + segIdx + 4]);
 					String sstopInsertion = token[domIdx + segIdx + 5];
-					sstopInsertion = sstopInsertion.equals("-") ? "" : sstopInsertion;
+					sstopInsertion = "-".equals(sstopInsertion) ? "" : sstopInsertion;
 
 					segment.setStart(sstart + sstartInsertion);
 					segment.setStop(sstop + sstopInsertion);
@@ -606,39 +618,42 @@ public class CathInstallation implements CathDatabase{
 					segIdx += 6;
 				}
 				domain.setSegments(segments);
-				domIdx += 6*numberOfSegments + 1;
+				domIdx += 6 * numberOfSegments + 1;
 			}
 			if (parseCathFragments) {
-			List<CathFragment> fragments = new ArrayList<CathFragment>(numberOfFragments);
-				for (int i=1; i<=numberOfFragments; i++) {
+				List<CathFragment> fragments = new ArrayList<>(numberOfFragments);
+				for (int i = 1; i <= numberOfFragments; i++) {
 					CathFragment fragment = new CathFragment();
 					fragment.setFragmentId(i);
-//                    String chainLetter = token[domIdx]; // Redundant unless some fragments cross chain boundaries.
-					fstart = Integer.parseInt( token[domIdx+1] );
+					// String chainLetter = token[domIdx]; // Redundant unless some fragments cross
+					// chain boundaries.
+					fstart = Integer.parseInt(token[domIdx + 1]);
 					String fstartInsertion = token[domIdx + 2];
-					fstartInsertion = fstartInsertion.equals("-") ? "" : fstartInsertion;
+					fstartInsertion = "-".equals(fstartInsertion) ? "" : fstartInsertion;
 					fragment.setStart(fstart + fstartInsertion);
-//                    String chainLetter = token[domIdx+3]; // Redundant unless some fragments cross chain boundaries.
-					fstop = Integer.parseInt( token[domIdx+4] );
+					// String chainLetter = token[domIdx+3]; // Redundant unless some fragments
+					// cross chain boundaries.
+					fstop = Integer.parseInt(token[domIdx + 4]);
 					String fstopInsertion = token[domIdx + 5];
-					fstopInsertion = fstopInsertion.equals("-") ? "" : fstopInsertion;
+					fstopInsertion = "-".equals(fstopInsertion) ? "" : fstopInsertion;
 					fragment.setStop(fstop + fstopInsertion);
-					flength = Integer.parseInt( token[domIdx + 6].replaceAll("[^0-9]","") );
+					flength = Integer.parseInt(token[domIdx + 6].replaceAll("[^0-9]", ""));
 					fragment.setLength(flength);
 					fragments.add(fragment);
 					domIdx += 7;
 				}
 				fragmentMap.put(chainId, fragments);
 			}
-//            if ( domIdx != token.length ); // Problems.
+			// if ( domIdx != token.length ); // Problems.
 		}
 	}
 
-	protected void downloadFileFromRemote(URL remoteURL, File localFile) throws IOException{
-//        System.out.println("downloading " + remoteURL + " to: " + localFile);
+	protected void downloadFileFromRemote(URL remoteURL, File localFile) throws IOException {
+		// System.out.println("downloading " + remoteURL + " to: " + localFile);
 
 		long timeS = System.currentTimeMillis();
-		File tempFile  = File.createTempFile(FileDownloadUtils.getFilePrefix(localFile), "."+ FileDownloadUtils.getFileExtension(localFile));
+		File tempFile = File.createTempFile(FileDownloadUtils.getFilePrefix(localFile),
+				"." + FileDownloadUtils.getFileExtension(localFile));
 
 		FileOutputStream out = new FileOutputStream(tempFile);
 
@@ -651,36 +666,37 @@ public class CathInstallation implements CathDatabase{
 		in.close();
 		out.close();
 
-		FileDownloadUtils.copy(tempFile,localFile);
+		FileDownloadUtils.copy(tempFile, localFile);
 
 		// delete the tmp file
 		tempFile.delete();
 
-		long size =  localFile.length();
+		long size = localFile.length();
 
 		double disp = size / 1024.0;
 		String unit = " kB";
-		if ( disp > 1024 ) {
+		if (disp > 1024) {
 			unit = " MB";
-			disp = disp / 1024.0;
+			disp /= 1024.0;
 		}
 		long timeE = System.currentTimeMillis();
-		LOGGER.info("Downloaded file {} ({}) to local file {} in {} sec.", remoteURL, String.format("%.1f",disp) + unit, localFile, (timeE - timeS)/1000);
+		LOGGER.info("Downloaded file {} ({}) to local file {} in {} sec.", remoteURL,
+				String.format("%.1f", disp) + unit, localFile, (timeE - timeS) / 1000);
 	}
 
-	private boolean domainDescriptionFileAvailable(){
+	private boolean domainDescriptionFileAvailable() {
 		String fileName = getDomainDescriptionFileName();
 		File f = new File(fileName);
 		return f.exists();
 	}
 
-	private boolean domainListFileAvailable(){
+	private boolean domainListFileAvailable() {
 		String fileName = getDomainListFileName();
 		File f = new File(fileName);
 		return f.exists();
 	}
 
-	private boolean nodeListFileAvailable(){
+	private boolean nodeListFileAvailable() {
 		String fileName = getNodeListFileName();
 		File f = new File(fileName);
 		return f.exists();
@@ -688,19 +704,19 @@ public class CathInstallation implements CathDatabase{
 
 	private boolean domallFileAvailable() {
 		String fileName = getDomallFileName();
-		File f= new File(fileName);
+		File f = new File(fileName);
 		return f.exists();
 	}
 
-	protected void downloadDomainListFile() throws IOException{
+	protected void downloadDomainListFile() throws IOException {
 		String remoteFilename = domainListFileName;
-		URL url = new URL(buildUrl(remoteFilename)); 
+		URL url = new URL(buildUrl(remoteFilename));
 		String localFileName = getDomainListFileName();
 		File localFile = new File(localFileName);
 		downloadFileFromRemote(url, localFile);
 	}
 
-	protected void downloadDomainDescriptionFile() throws IOException{
+	protected void downloadDomainDescriptionFile() throws IOException {
 		String remoteFilename = domainDescriptionFileName;
 		URL url = new URL(buildUrl(remoteFilename));
 		String localFileName = getDomainDescriptionFileName();
@@ -708,7 +724,7 @@ public class CathInstallation implements CathDatabase{
 		downloadFileFromRemote(url, localFile);
 	}
 
-	protected void downloadNodeListFile() throws IOException{
+	protected void downloadNodeListFile() throws IOException {
 		String remoteFilename = nodeListFileName;
 		URL url = new URL(buildUrl(remoteFilename));
 		String localFileName = getNodeListFileName();
@@ -724,13 +740,15 @@ public class CathInstallation implements CathDatabase{
 		downloadFileFromRemote(url, localFile);
 	}
 
-	public void ensureDomainListInstalled(){
-		if ( installedDomainList.get() ) return;
+	public void ensureDomainListInstalled() {
+		if (installedDomainList.get()) {
+			return;
+		}
 
-		if ( ! domainListFileAvailable() ){
+		if (!domainListFileAvailable()) {
 			try {
 				downloadDomainListFile();
-			} catch (Exception e){
+			} catch (Exception e) {
 				LOGGER.error("Could not download CATH domain list file. Error: {}", e.getMessage());
 				installedDomainList.set(false);
 				return;
@@ -739,7 +757,7 @@ public class CathInstallation implements CathDatabase{
 
 		try {
 			parseCathDomainList();
-		} catch (Exception e){
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			installedDomainList.set(false);
 			return;
@@ -747,13 +765,15 @@ public class CathInstallation implements CathDatabase{
 		installedDomainList.set(true);
 	}
 
-	public void ensureDomainDescriptionInstalled(){
-		if ( installedDomainDescription.get() ) return;
+	public void ensureDomainDescriptionInstalled() {
+		if (installedDomainDescription.get()) {
+			return;
+		}
 
-		if ( ! domainDescriptionFileAvailable() ){
+		if (!domainDescriptionFileAvailable()) {
 			try {
 				downloadDomainDescriptionFile();
-			} catch (Exception e){
+			} catch (Exception e) {
 				LOGGER.error("Could not download CATH domain description file. Error: {}", e.getMessage());
 				installedDomainDescription.set(false);
 				return;
@@ -762,7 +782,7 @@ public class CathInstallation implements CathDatabase{
 
 		try {
 			parseCathDomainDescriptionFile();
-		} catch (Exception e){
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			installedDomainDescription.set(false);
 			return;
@@ -770,13 +790,15 @@ public class CathInstallation implements CathDatabase{
 		installedDomainDescription.set(true);
 	}
 
-	public void ensureNodeListInstalled(){
-		if ( installedNodeList.get() ) return;
+	public void ensureNodeListInstalled() {
+		if (installedNodeList.get()) {
+			return;
+		}
 
-		if ( ! nodeListFileAvailable() ){
+		if (!nodeListFileAvailable()) {
 			try {
 				downloadNodeListFile();
-			} catch (Exception e){
+			} catch (Exception e) {
 				LOGGER.error("Could not download CATH node list file. Error: {}", e.getMessage());
 				installedNodeList.set(false);
 				return;
@@ -785,7 +807,7 @@ public class CathInstallation implements CathDatabase{
 
 		try {
 			parseCathNames();
-		} catch (Exception e){
+		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			installedNodeList.set(false);
 			return;
@@ -796,14 +818,16 @@ public class CathInstallation implements CathDatabase{
 	public void ensureDomallInstalled() {
 		ensureDomainListInstalled();
 
-		if ( !installedDomainList.get() ) {
+		if (!installedDomainList.get()) {
 			installedDomall.set(false);
 			return;
 		}
 
-		if ( installedDomall.get() ) return;
+		if (installedDomall.get()) {
+			return;
+		}
 
-		if ( ! domallFileAvailable() ){
+		if (!domallFileAvailable()) {
 			try {
 				downloadDomallFile();
 			} catch (Exception e) {
@@ -826,6 +850,5 @@ public class CathInstallation implements CathDatabase{
 	public void setCathVersion(String cathVersion) {
 		this.cathVersion = cathVersion;
 	}
-	
 
 }

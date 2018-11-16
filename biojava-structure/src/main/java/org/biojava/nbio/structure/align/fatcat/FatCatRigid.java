@@ -31,17 +31,15 @@ import org.biojava.nbio.structure.align.ce.ConfigStrucAligParams;
 import org.biojava.nbio.structure.align.fatcat.calc.FatCatParameters;
 import org.biojava.nbio.structure.align.model.AFPChain;
 
-
-public class FatCatRigid extends FatCat implements StructureAlignment{
+public class FatCatRigid extends FatCat implements StructureAlignment {
 
 	public static final String algorithmName = "jFatCat_rigid";
 
 	FatCatParameters params;
 
-	public FatCatRigid(){
-		super();
+	public FatCatRigid() {
 		params = new FatCatParameters();
-	    params.setMaxTra(0);
+		params.setMaxTra(0);
 	}
 
 	@Override
@@ -49,23 +47,22 @@ public class FatCatRigid extends FatCat implements StructureAlignment{
 
 		AFPChain afpChain = alignRigid(ca1, ca2, params);
 		afpChain.setAlgorithmName(algorithmName);
-		afpChain.setVersion(VERSION+"");
+		afpChain.setVersion(VERSION + "");
 		return afpChain;
 	}
 
 	@Override
-	public AFPChain align(Atom[] ca1, Atom[] ca2, Object param)
-	throws StructureException {
+	public AFPChain align(Atom[] ca1, Atom[] ca2, Object param) throws StructureException {
 
-		if ( ! (param instanceof FatCatParameters)){
+		if (!(param instanceof FatCatParameters)) {
 			throw new IllegalArgumentException("FatCat algorithm needs FatCatParameters object as argument.");
 		}
 
 		params = (FatCatParameters) param;
 
-		AFPChain afpChain= alignRigid(ca1, ca2, params);
+		AFPChain afpChain = alignRigid(ca1, ca2, params);
 		afpChain.setAlgorithmName(algorithmName);
-		afpChain.setVersion(VERSION+"");
+		afpChain.setVersion(VERSION + "");
 		return afpChain;
 	}
 
@@ -82,27 +79,27 @@ public class FatCatRigid extends FatCat implements StructureAlignment{
 	}
 
 	@Override
-	public String getVersion(){
-		return VERSION+"";
+	public String getVersion() {
+		return VERSION + "";
 	}
 
-//	public StructureAlignmentJmol display(AFPChain afpChain, Atom[] ca1,
-//			Atom[] ca2, List<Group> hetatms, List<Group> nucs,
-//			List<Group> hetatms2, List<Group> nucs2) throws StructureException {
-//
-//		StructureAlignmentJmol gui =  super.display(afpChain, ca1, ca2, hetatms, nucs, hetatms2, nucs2);
-//		gui.setTitle(getAlgorithmName() + " : " + afpChain.getName1() + " vs. " + afpChain.getName2());
-//		return gui;
-//	}
+	// public StructureAlignmentJmol display(AFPChain afpChain, Atom[] ca1,
+	// Atom[] ca2, List<Group> hetatms, List<Group> nucs,
+	// List<Group> hetatms2, List<Group> nucs2) throws StructureException {
+	//
+	// StructureAlignmentJmol gui = super.display(afpChain, ca1, ca2, hetatms, nucs,
+	// hetatms2, nucs2);
+	// gui.setTitle(getAlgorithmName() + " : " + afpChain.getName1() + " vs. " +
+	// afpChain.getName2());
+	// return gui;
+	// }
 
 	@Override
 	public void setParameters(ConfigStrucAligParams parameters) {
-		if (! (parameters instanceof FatCatParameters)){
+		if (!(parameters instanceof FatCatParameters)) {
 			throw new IllegalArgumentException("Provided parameters are not of type FatCatParameters!");
 		}
 		params = (FatCatParameters) parameters;
 	}
-
-
 
 }

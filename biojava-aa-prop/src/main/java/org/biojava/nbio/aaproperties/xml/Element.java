@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * One way to model the elements
+ * 
  * @author pvtroshin
  *
  */
@@ -67,13 +68,14 @@ public class Element {
 	 */
 	private Map<String, Isotope> name2Isotope;
 
-	public Element(){}
+	public Element() {
+	}
 
-	public Element(String name, String symbol, int atomicNumber, List<Isotope> isotopes, double mass){
-		if(atomicNumber <= 0){
+	public Element(String name, String symbol, int atomicNumber, List<Isotope> isotopes, double mass) {
+		if (atomicNumber <= 0) {
 			throw new Error("Atomic number of Elements must be > 0.");
 		}
-		if(mass <= 0){
+		if (mass <= 0) {
 			throw new Error("Mass of Elements must be > 0.");
 		}
 		this.setName(name);
@@ -84,15 +86,16 @@ public class Element {
 	}
 
 	@Override
-	public String toString(){
-		return symbol + ", " + name + ", " + atomicNumber;
+	public String toString() {
+		return new StringBuilder().append(symbol).append(", ").append(name).append(", ").append(atomicNumber)
+				.toString();
 	}
 
-	public void setMass(double mass){
+	public void setMass(double mass) {
 		this.mass = mass;
 	}
 
-	public double getMass(){
+	public double getMass() {
 		return this.mass;
 	}
 
@@ -100,7 +103,7 @@ public class Element {
 		this.name = name;
 	}
 
-	public String getName(){
+	public String getName() {
 		return this.name;
 	}
 
@@ -112,19 +115,15 @@ public class Element {
 		this.atomicNumber = atomicNumber;
 	}
 
-
 	public List<Isotope> getIsotopes() {
 		return isotope;
 	}
 
-
 	public void setIsotopes(List<Isotope> isotopes) {
 		this.isotope = isotopes;
-		this.name2Isotope = new HashMap<String, Isotope>();
-		if(isotopes != null){
-			for(Isotope i:isotopes){
-				name2Isotope.put(i.getName(), i);
-			}
+		this.name2Isotope = new HashMap<>();
+		if (isotopes != null) {
+			isotopes.forEach(i -> name2Isotope.put(i.getName(), i));
 		}
 	}
 }

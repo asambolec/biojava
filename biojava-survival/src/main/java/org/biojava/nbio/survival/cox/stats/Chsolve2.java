@@ -34,7 +34,8 @@ public class Chsolve2 {
 	 * @param test
 	 */
 	static public void process(double[][] matrix, int n, double[][] y, int test) {
-		int i, j;
+		int i;
+		int j;
 		double temp;
 
 		/*

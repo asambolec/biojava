@@ -26,13 +26,12 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
 
-
-
 /**
- * A list of FeatureI objects implemented using a Java ArrayList; corresponds to a GFF file.
- * This class is implemented entirely using FeatureI objects, so everything here will work
- * correctly if you choose to implement your own feature class -- there are no dependencies
- * on JavaGene's native Feature class.
+ * A list of FeatureI objects implemented using a Java ArrayList; corresponds to
+ * a GFF file. This class is implemented entirely using FeatureI objects, so
+ * everything here will work correctly if you choose to implement your own
+ * feature class -- there are no dependencies on JavaGene's native Feature
+ * class.
  *
  *
  * @author Hanno Hinsch, Carmelo Foti
@@ -40,8 +39,8 @@ import java.util.Map.Entry;
 @SuppressWarnings("serial")
 public class FeatureList extends ArrayList<FeatureI> {
 
-	 Map<String, Map<String,List<FeatureI>>> featindex = new HashMap<String,Map<String,List<FeatureI>>>();
-	Location mLocation;			//genomic location (union of feature locations)
+	Map<String, Map<String, List<FeatureI>>> featindex = new HashMap<>();
+	Location mLocation; // genomic location (union of feature locations)
 
 	/**
 	 * Construct an empty list.
@@ -51,8 +50,7 @@ public class FeatureList extends ArrayList<FeatureI> {
 	}
 
 	/**
-	 * Construct a new list containing the same features
-	 * as the specified list.
+	 * Construct a new list containing the same features as the specified list.
 	 *
 	 * @param features An existing list or collection of FeatureI objects.
 	 */
@@ -64,8 +62,8 @@ public class FeatureList extends ArrayList<FeatureI> {
 	}
 
 	/**
-	 * Add specified feature to the end of the list. Updates the bounding location of the
-	 * feature list, if needed.
+	 * Add specified feature to the end of the list. Updates the bounding location
+	 * of the feature list, if needed.
 	 *
 	 * @param feature The FeatureI object to add.
 	 * @return True if the feature was added.
@@ -77,22 +75,21 @@ public class FeatureList extends ArrayList<FeatureI> {
 		} else if (null != feature.location()) {
 			mLocation = mLocation.union(feature.location().plus());
 		}
-		for (Entry<String, String> entry : feature.getAttributes().entrySet()){
-			if (featindex.containsKey(entry.getKey())){
-				Map<String,List<FeatureI>> feat = featindex.get(entry.getKey());
-				if (feat==null){
-					feat= new HashMap<String,List<FeatureI>>();
-				}
-				List<FeatureI> features = feat.get(entry.getValue());
-				if (features==null){
-					features = new ArrayList<FeatureI>();
-				}
-				features.add(feature);
-				feat.put(entry.getValue(), features);
-				featindex.put(entry.getKey(), feat);
-				//featindex.put(key, value)
-			}
-		}
+		feature.getAttributes().entrySet().stream().filter(entry -> featindex.containsKey(entry.getKey()))
+				.forEach(entry -> {
+					Map<String, List<FeatureI>> feat = featindex.get(entry.getKey());
+					if (feat == null) {
+						feat = new HashMap<>();
+					}
+					List<FeatureI> features = feat.get(entry.getValue());
+					if (features == null) {
+						features = new ArrayList<>();
+					}
+					features.add(feature);
+					feat.put(entry.getValue(), features);
+					featindex.put(entry.getKey(), feat);
+					// featindex.put(key, value)
+				});
 
 		return super.add(feature);
 	}
@@ -103,17 +100,15 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 * @param list The collection of FeatureI objects.
 	 */
 	public void add(Collection<FeatureI> list) {
-		for (FeatureI f : list) {
-			add(f);
-		}
+		list.forEach(this::add);
 	}
 
 	/**
-	 * The union of all locations of all features in this list, mapped to the positive strand.
-	 * If an added feature is on the negative strand, its positive strand image is added
-	 * to the union.
-	 * The bounding location is not updated when a feature is removed from the list, so
-	 * it is not guaranteed to be the minimal bounding location.
+	 * The union of all locations of all features in this list, mapped to the
+	 * positive strand. If an added feature is on the negative strand, its positive
+	 * strand image is added to the union. The bounding location is not updated when
+	 * a feature is removed from the list, so it is not guaranteed to be the minimal
+	 * bounding location.
 	 *
 	 * @return A location that is the union of all feature locations in the list.
 	 */
@@ -122,11 +117,11 @@ public class FeatureList extends ArrayList<FeatureI> {
 	}
 
 	/**
-	 * Check size of gaps between successive features in list. The features in
-	 * the list are assumed to be appropriately ordered.
+	 * Check size of gaps between successive features in list. The features in the
+	 * list are assumed to be appropriately ordered.
 	 *
-	 * @param gapLength The minimum gap length to consider. Use a gapLength
-	 * of 0 to check if features are contiguous.
+	 * @param gapLength The minimum gap length to consider. Use a gapLength of 0 to
+	 *                  check if features are contiguous.
 	 * @return True if list has any gaps equal to or greater than gapLength.
 	 */
 	public boolean hasGaps(int gapLength) {
@@ -142,17 +137,14 @@ public class FeatureList extends ArrayList<FeatureI> {
 		return false;
 	}
 
-
-
-
 	/**
-	 * Concatenate successive portions of the specified sequence
-	 * using the feature locations in the list. The list is assumed to be appropriately
-	 * ordered.
+	 * Concatenate successive portions of the specified sequence using the feature
+	 * locations in the list. The list is assumed to be appropriately ordered.
 	 *
 	 * @param sequence The source sequence from which portions should be selected.
 	 * @return The spliced data.
-	 * @throws IllegalStateException Out of order or overlapping FeatureI locations detected.
+	 * @throws IllegalStateException Out of order or overlapping FeatureI locations
+	 *                               detected.
 	 *
 	 */
 	public String splice(DNASequence sequence) {
@@ -175,46 +167,44 @@ public class FeatureList extends ArrayList<FeatureI> {
 	}
 
 	/**
-	 * Create a collection of all unique group ids in the list, as defined
-	 * by the group() method of the features. For example, if the
-	 * features are from a GFF1 file, then each group id identifies a particular gene,
-	 * and this method returns a collection of all gene ids.
+	 * Create a collection of all unique group ids in the list, as defined by the
+	 * group() method of the features. For example, if the features are from a GFF1
+	 * file, then each group id identifies a particular gene, and this method
+	 * returns a collection of all gene ids.
 	 *
-	 * @return A collection (suitable for iteration using Java's "for" loop) of all the
-	 * group ids found in this list. The order of the values is undefined; it will not match
-	 * the order of features in the list.
+	 * @return A collection (suitable for iteration using Java's "for" loop) of all
+	 *         the group ids found in this list. The order of the values is
+	 *         undefined; it will not match the order of features in the list.
 	 */
 	public Collection<String> groupValues() {
-		Set<String> set = new HashSet<String>();
-		for (FeatureI f : this) {
-			//enter in a set -- removes duplicates
-			set.add(f.group());
-		}
+		Set<String> set = new HashSet<>();
+		// enter in a set -- removes duplicates
+		this.forEach(f -> set.add(f.group()));
 
 		return set;
 	}
 
 	/**
-	 * Create a collection of the unique values for the specified key.
-	 * Example: For GTF files, using the "gene_id" key will give the names of all
-	 * the genes in this list.
+	 * Create a collection of the unique values for the specified key. Example: For
+	 * GTF files, using the "gene_id" key will give the names of all the genes in
+	 * this list.
 	 *
-	 * @return A collection (suitable for iteration using Java's "for" loop) of all the
-	 * values found for this key. The order of the values is undefined; it will not match
-	 * the order of features in the list.
+	 * @return A collection (suitable for iteration using Java's "for" loop) of all
+	 *         the values found for this key. The order of the values is undefined;
+	 *         it will not match the order of features in the list.
 	 */
 	public Collection<String> attributeValues(String key) {
-		if (featindex.containsKey(key)){
+		if (featindex.containsKey(key)) {
 			Map<String, List<FeatureI>> map = featindex.get(key);
 			Collection<String> result = map.keySet();
-			if (result == null) result = new HashSet<String>();
+			if (result == null) {
+				result = new HashSet<>();
+			}
 			return Collections.unmodifiableCollection(result);
 		}
-		LinkedHashMap<String, String> hash = new LinkedHashMap<String, String>();
-		for (FeatureI f : this) {
-			//enter as a key -- removes duplicates
-			hash.put(f.getAttribute(key), null);
-		}
+		LinkedHashMap<String, String> hash = new LinkedHashMap<>();
+		// enter as a key -- removes duplicates
+		this.forEach(f -> hash.put(f.getAttribute(key), null));
 
 		return Collections.unmodifiableCollection(hash.keySet());
 	}
@@ -228,61 +218,53 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 */
 	public FeatureList selectByGroup(String groupid) {
 		FeatureList list = new FeatureList();
-		for (FeatureI f : this) {
-			if (f.group().equals(groupid)) {
-				list.add(f);
-			}
-		}
+		this.stream().filter(f -> f.group().equals(groupid)).forEach(list::add);
 
 		return list;
 	}
 
 	/**
 	 * Create a list of all features that are of the specified type, as defined by
-	 * the type() method of the features.
-	 * This might be, for example, "exon" or "CDS".
+	 * the type() method of the features. This might be, for example, "exon" or
+	 * "CDS".
 	 *
 	 * @param type The type to match.
 	 * @return A list of features of the specified type.
 	 */
 	public FeatureList selectByType(String type) {
 		FeatureList list = new FeatureList();
-		for (FeatureI f : this) {
-			if (f.type().equals(type)) {
-				list.add(f);
-			}
-		}
+		this.stream().filter(f -> f.type().equals(type)).forEach(list::add);
 
 		return list;
 	}
 
 	/**
-	 * Create a list of all features that include the specified attribute key/value pair.
-	 * This method now properly supports adding the index before or after adding the features.
-	 * Adding features, then then index, then more features is still not supported.
+	 * Create a list of all features that include the specified attribute key/value
+	 * pair. This method now properly supports adding the index before or after
+	 * adding the features. Adding features, then then index, then more features is
+	 * still not supported.
 	 *
-	 * @param key The key to consider.
+	 * @param key   The key to consider.
 	 * @param value The value to consider.
 	 * @return A list of features that include the key/value pair.
 	 */
 	public FeatureList selectByAttribute(String key, String value) {
-		if (featindex.containsKey(key)){
-			Map<String,List<FeatureI>> featuresmap = featindex.get(key);
-			if (featuresmap==null) return new FeatureList();
-			List<FeatureI> list = featuresmap.get(value);
-			if (list == null){
+		if (featindex.containsKey(key)) {
+			Map<String, List<FeatureI>> featuresmap = featindex.get(key);
+			if (featuresmap == null) {
 				return new FeatureList();
 			}
-			return  new FeatureList(list);
+			List<FeatureI> list = featuresmap.get(value);
+			if (list == null) {
+				return new FeatureList();
+			}
+			return new FeatureList(list);
 		}
 		FeatureList list = new FeatureList();
-		for (FeatureI f : this) {
-			if (f.hasAttribute(key, value)) {
-				list.add(f);
-			}
-		}
+		this.stream().filter(f -> f.hasAttribute(key, value)).forEach(list::add);
 		return list;
 	}
+
 	/**
 	 * Create a list of all features that include the specified attribute key.
 	 *
@@ -291,73 +273,67 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 */
 	public FeatureList selectByAttribute(String key) {
 		FeatureList list = new FeatureList();
-		if (featindex.containsKey(key)){
-			Map<String, List<FeatureI>> featsmap =featindex.get(key);
-			if(null != featsmap) {
-				for (List<FeatureI> feats: featsmap.values()){
-					list.addAll(Collections.unmodifiableCollection(feats));
-				}
+		if (featindex.containsKey(key)) {
+			Map<String, List<FeatureI>> featsmap = featindex.get(key);
+			if (null != featsmap) {
+				featsmap.values().forEach(feats -> list.addAll(Collections.unmodifiableCollection(feats)));
 				return list;
 			}
 		}
 
-		for (FeatureI f : this) {
-			if (f.hasAttribute(key)) {
-				list.add(f);
-			}
-		}
+		this.stream().filter(f -> f.hasAttribute(key)).forEach(list::add);
 		return list;
 	}
 
 	/**
-	 * Create a list of all features that include the specified key/value pair in their userMap().
+	 * Create a list of all features that include the specified key/value pair in
+	 * their userMap().
 	 *
-	 * @param key The key to consider.
+	 * @param key   The key to consider.
 	 * @param value The value to consider.
 	 * @return A list of features that include the key/value pair.
 	 */
 	public FeatureList selectByUserData(String key, Object value) {
 		FeatureList list = new FeatureList();
-		for (FeatureI f : this) {
+		this.forEach(f -> {
 			Object o = f.userData().get(key);
 			if (o != null && o.equals(value)) {
 				list.add(f);
 			}
-		}
+		});
 		return list;
 	}
+
 	/**
-	 * Create a list of all features that include the specified key in their userMap().
+	 * Create a list of all features that include the specified key in their
+	 * userMap().
 	 *
 	 * @param key The key to consider.
 	 * @return A list of features that include the key.
 	 */
 	public FeatureList selectByUserData(String key) {
 		FeatureList list = new FeatureList();
-		for (FeatureI f : this) {
-			if (f.userData().containsKey(key)) {
-				list.add(f);
-			}
-		}
+		this.stream().filter(f -> f.userData().containsKey(key)).forEach(list::add);
 		return list;
 	}
 
 	/**
-	 * Create a list of all features that overlap the specified location on the specified
-	 * sequence.
+	 * Create a list of all features that overlap the specified location on the
+	 * specified sequence.
 	 *
-	 * @param seqname The sequence name. Only features with this sequence name will be checked for overlap.
-	 * @param location The location to check.
-	 * @param useBothStrands If true, locations are mapped to their positive strand image
-	 * before being checked for overlap. If false, only features whose locations are
-	 * on the same strand as the specified location will be considered for inclusion.
+	 * @param seqname        The sequence name. Only features with this sequence
+	 *                       name will be checked for overlap.
+	 * @param location       The location to check.
+	 * @param useBothStrands If true, locations are mapped to their positive strand
+	 *                       image before being checked for overlap. If false, only
+	 *                       features whose locations are on the same strand as the
+	 *                       specified location will be considered for inclusion.
 	 * @return The new list of features that overlap the location.
 	 */
-	public FeatureList selectOverlapping(String seqname, Location location, boolean useBothStrands)
-			throws Exception {
+	public FeatureList selectOverlapping(String seqname, Location location, boolean useBothStrands) throws Exception {
 		FeatureList list = new FeatureList();
 
-		for (FeatureI feature : this) {
+		this.forEach(feature -> {
 			boolean overlaps = false;
 			if (feature.seqname().equals(seqname)) {
 				if (location.isSameStrand(feature.location())) {
@@ -369,24 +345,28 @@ public class FeatureList extends ArrayList<FeatureI> {
 			if (overlaps) {
 				list.add(feature);
 			}
-		}
+		});
 		return list;
 	}
 
 	/**
-	 * Create a list of all features that do not overlap the specified location on the specified sequence.
+	 * Create a list of all features that do not overlap the specified location on
+	 * the specified sequence.
 	 *
-	 * @param seqname The sequence name. Only features with this sequence name will be checked for overlap.
-	 * @param location The location to check.
-	 * @param useBothStrands If true, locations are mapped to their positive strand image
-	 * before being checked for overlap. If false, all features whose locations are
-	 * on the opposite strand from the specified location will be considered non-overlapping.
+	 * @param seqname        The sequence name. Only features with this sequence
+	 *                       name will be checked for overlap.
+	 * @param location       The location to check.
+	 * @param useBothStrands If true, locations are mapped to their positive strand
+	 *                       image before being checked for overlap. If false, all
+	 *                       features whose locations are on the opposite strand
+	 *                       from the specified location will be considered
+	 *                       non-overlapping.
 	 * @return The new list of features that do not overlap the location.
 	 */
 	public FeatureList omitOverlapping(String seqname, Location location, boolean useBothStrands) {
 		FeatureList list = new FeatureList();
 
-		for (FeatureI feature : this) {
+		this.forEach(feature -> {
 			boolean overlaps = false;
 			if (feature.seqname().equals(seqname)) {
 				if (location.isSameStrand(feature.location())) {
@@ -399,7 +379,7 @@ public class FeatureList extends ArrayList<FeatureI> {
 			if (!overlaps) {
 				list.add(feature);
 			}
-		}
+		});
 
 		return list;
 	}
@@ -411,42 +391,36 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 * @return True if at least one feature has the attribute key.
 	 */
 	public boolean hasAttribute(String key) {
-		if (featindex.containsKey(key)){
+		if (featindex.containsKey(key)) {
 			Map<String, List<FeatureI>> mappa = featindex.get(key);
-			if (mappa!= null && mappa.size()>0)return true;
-			return false;
-		}
-		for (FeatureI f : this) {
-			if (f.hasAttribute(key)) {
+			if (mappa != null && mappa.size() > 0) {
 				return true;
 			}
+			return false;
 		}
-
-		return false;
+		return this.stream().anyMatch(f -> f.hasAttribute(key));
 	}
 
 	/**
 	 * Check if any feature in list has the specified attribute key/value pair.
 	 *
-	 * @param key The attribute key to consider.
+	 * @param key   The attribute key to consider.
 	 * @param value The attribute value to consider.
 	 * @return True if at least one feature has the key/value pair.
 	 */
 	public boolean hasAttribute(String key, String value) {
-		if (featindex.containsKey(key)){
+		if (featindex.containsKey(key)) {
 			Map<String, List<FeatureI>> mappa = featindex.get(key);
-			if (mappa == null) return false;
-			if (mappa.containsKey(value)) return true;
+			if (mappa == null) {
+				return false;
+			}
+			if (mappa.containsKey(value)) {
+				return true;
+			}
 			return false;
 		}
 
-		for (FeatureI f : this) {
-			if (f.hasAttribute(key, value)) {
-				return true;
-			}
-		}
-
-		return false;
+		return this.stream().anyMatch(f -> f.hasAttribute(key, value));
 	}
 
 	/**
@@ -456,38 +430,22 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder  s = new StringBuilder("FeatureList: >>\n");
-		for (FeatureI f : this) {
-			s.append( f.seqname() + ":" + f.toString() + "\n");
-		}
+		StringBuilder s = new StringBuilder("FeatureList: >>\n");
+		this.forEach(f -> s.append(
+				new StringBuilder().append(f.seqname()).append(":").append(f.toString()).append("\n").toString()));
 
 		s.append("\n<<\n");
 		return s.toString();
 	}
 
 	/**
-	 * used by sort routine
-	 */
-	private class FeatureComparator implements Comparator<FeatureI>, Serializable {
-        private static final long serialVersionUID = 1;
-
-		@Override
-		public int compare(FeatureI a, FeatureI b) {
-			if (a.seqname().equals(b.seqname()) && a.location().isSameStrand(b.location())) {
-				return a.location().start() - b.location().start();		//sort on start
-			} else {
-				throw new IndexOutOfBoundsException("Cannot compare/sort features whose locations are on opposite strands or with different seqname().\r\n" + a.toString() + "\r\n" + b.toString() );
-			}
-		}
-	}
-
-	/**
-	 * Create a new list that is ordered by the starting index of the features' locations. All locations
-	 * must be on the same strand of the same sequence.
+	 * Create a new list that is ordered by the starting index of the features'
+	 * locations. All locations must be on the same strand of the same sequence.
 	 *
 	 * @return An ordered list.
-	 * @throws IndexOutOfBoundsException Cannot compare/sort features whose locations are on opposite strands, or
-	 * whose seqnames differ.
+	 * @throws IndexOutOfBoundsException Cannot compare/sort features whose
+	 *                                   locations are on opposite strands, or whose
+	 *                                   seqnames differ.
 	 */
 	public FeatureList sortByStart() {
 		FeatureI[] array = toArray(new FeatureI[1]);
@@ -499,19 +457,38 @@ public class FeatureList extends ArrayList<FeatureI> {
 
 	/**
 	 * Add a list of attributes that will be used as indexes for queries
-	 * @param indexes  the List containing the attribute_id
+	 * 
+	 * @param indexes the List containing the attribute_id
 	 */
 	public void addIndexes(List<String> indexes) {
-		for (String index : indexes){
-			addIndex(index);
-		}
+		indexes.forEach(this::addIndex);
 
 	}
+
 	/**
 	 * Add an attribute that will be used as index for queries
+	 * 
 	 * @param index an attribute_id
 	 */
 	public void addIndex(String index) {
 		featindex.put(index, null);
+	}
+
+	/**
+	 * used by sort routine
+	 */
+	private class FeatureComparator implements Comparator<FeatureI>, Serializable {
+		private static final long serialVersionUID = 1;
+
+		@Override
+		public int compare(FeatureI a, FeatureI b) {
+			if (a.seqname().equals(b.seqname()) && a.location().isSameStrand(b.location())) {
+				return a.location().start() - b.location().start(); // sort on start
+			} else {
+				throw new IndexOutOfBoundsException(new StringBuilder().append(
+						"Cannot compare/sort features whose locations are on opposite strands or with different seqname().\r\n")
+						.append(a.toString()).append("\r\n").append(b.toString()).toString());
+			}
+		}
 	}
 }

@@ -23,22 +23,21 @@
 
 package org.biojava.nbio.core.sequence;
 
-
 /**
  * Used to map the start codon feature on a gene
+ * 
  * @author Scooter Willis
  */
 public class StartCodonSequence extends DNASequence {
-public DNASequence parentGeneSequence = null;
+	public DNASequence parentGeneSequence = null;
 
-
-	public StartCodonSequence(TranscriptSequence parentGeneSequence, int begin, int end){
+	public StartCodonSequence(TranscriptSequence parentGeneSequence, int begin, int end) {
 		this.parentGeneSequence = parentGeneSequence;
 		setBioBegin(begin);
 		setBioEnd(end);
 	}
 
-		@Override
+	@Override
 	public int getLength() {
 		return Math.abs(this.getBioEnd() - this.getBioBegin()) + 1;
 	}

@@ -40,30 +40,29 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.*;
 
-
 /**
  * Fully re-factored and enhanced version of RONN.
  *
- * This class does the calculation and contains the main for the command line client.
+ * This class does the calculation and contains the main for the command line
+ * client.
  *
  * @author Peter Troshin
  * @version 1.0
  * @since 3.0.2
-
- * TODO refactor
+ * 
+ *        TODO refactor
  */
 public final class ORonn implements Callable<ORonn> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ORonn.class);
 
-	private static final DateFormat DATE_FORMAT = DateFormat
-			.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.US);
+	private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG,
+			Locale.US);
 
 	private static final NumberFormat nformat = NumberFormat.getInstance();
 	static {
 		ORonn.nformat.setMaximumFractionDigits(2);
 	}
-
 
 	static final byte NUMBER_OF_MODELS = 10;
 	private final FastaSequence sequence;
@@ -77,10 +76,7 @@ public final class ORonn implements Callable<ORonn> {
 	// This gets initialized after calling a call method!
 	private float[] cummulativeScore;
 
-
-	ORonn(final FastaSequence sequence, final ModelLoader mloader,
-			final InputParameters params) throws NumberFormatException,
-			IOException {
+	ORonn(final FastaSequence sequence, final ModelLoader mloader, final InputParameters params) throws IOException {
 		this.sequence = sequence;
 		this.mloader = mloader;
 		out = params.getOutputWriter();
@@ -90,9 +86,10 @@ public final class ORonn implements Callable<ORonn> {
 		disorder = params.getDisorder();
 		timer = new Timer(TimeUnit.MILLISECONDS);
 	}
-	//This constructor is for API calls where the caller collects the results directly
-	ORonn(final FastaSequence sequence, final ModelLoader mloader) throws NumberFormatException,
-	IOException {
+
+	// This constructor is for API calls where the caller collects the results
+	// directly
+	ORonn(final FastaSequence sequence, final ModelLoader mloader) throws IOException {
 		this.sequence = sequence;
 		this.mloader = mloader;
 		out = new PrintWriter(new NullOutputStream());
@@ -104,13 +101,12 @@ public final class ORonn implements Callable<ORonn> {
 
 	void writeResults(final float[] meanScores, final char[] seqs) {
 
-		synchronized (out)
-		{
+		synchronized (out) {
 			out.println(">" + sequence.getId());
 			if (layout == ResultLayout.VERTICAL) {
 				for (int i = 0; i < meanScores.length; i++) {
 					out.printf("%c\t%.2f%n", seqs[i], meanScores[i]);
-					//out.printf("%c\t%f%n", seqs[i], meanScores[i]);
+					// out.printf("%c\t%f%n", seqs[i], meanScores[i]);
 				}
 			} else {
 				final StringBuilder seqLine = new StringBuilder();
@@ -136,7 +132,7 @@ public final class ORonn implements Callable<ORonn> {
 	}
 
 	@Override
-	public ORonn call() throws NumberFormatException, IOException {
+	public ORonn call() throws IOException {
 		final String seq = sequence.getSequence();
 		// Calculate for each model
 		for (int m = 0; m < ORonn.NUMBER_OF_MODELS; m++) {
@@ -148,11 +144,10 @@ public final class ORonn implements Callable<ORonn> {
 
 		final char[] ch = seq.toCharArray();
 		final float[] meanScores = getMeanScores();
-		assert meanScores.length == seq.length() : "Scores are not calculated for "
-				+ "all residues!";
+		assert meanScores.length == seq.length() : "Scores are not calculated for " + "all residues!";
 		writeResults(meanScores, ch);
-		stat.println(timer.getTotalTime() + "ms prediction completed for "
-				+ sequence.getId());
+		stat.println(new StringBuilder().append(timer.getTotalTime()).append("ms prediction completed for ")
+				.append(sequence.getId()).toString());
 		return this;
 	}
 
@@ -163,8 +158,8 @@ public final class ORonn implements Callable<ORonn> {
 			return;
 		}
 		if (cummulativeScore.length != scores.length) {
-			throw new IllegalArgumentException("Expected "
-					+ cummulativeScore.length + " but get " + scores.length);
+			throw new IllegalArgumentException(new StringBuilder().append("Expected ").append(cummulativeScore.length)
+					.append(" but get ").append(scores.length).toString());
 		}
 		for (int i = 0; i < scores.length; i++) {
 			cummulativeScore[i] += scores[i];
@@ -179,43 +174,25 @@ public final class ORonn implements Callable<ORonn> {
 		return meanScores;
 	}
 
-	/**
-	 *
-	 * @author pvtroshin
-	 *
-	 * VERTICAL - where the letters	of the sequence and corresponding disorder values are
-	 * output in two column layout.
-	 *
-	 * HORIZONTAL where the disorder values are provided under the letters of the
-	 * sequence. Letters and values separated by tabulation in	this case.
-	 *
-	 */
-	static enum ResultLayout {
-		VERTICAL, HORIZONTAL
-	}
-
 	static void printUsage() {
 		logger.error(RonnConstraint.HELP_MESSAGE);
 	}
 
-	static boolean isValidSequenceForRonn(final FastaSequence fsequence,
-			final PrintWriter stat) {
+	static boolean isValidSequenceForRonn(final FastaSequence fsequence, final PrintWriter stat) {
 		boolean valid = true;
 		String message = "";
 		if (!ORonn.isValidSequence(fsequence)) {
-			message = "IGNORING sequence "
-					+ fsequence.getId()
-					+ " as its too short. Minimum sequence length for disorder prediction is "
-					+ (RonnConstraint.MIN_SEQUENCE_LENGTH + 1) + " characters!";
+			message = new StringBuilder().append("IGNORING sequence ").append(fsequence.getId())
+					.append(" as its too short. Minimum sequence length for disorder prediction is ")
+					.append(RonnConstraint.MIN_SEQUENCE_LENGTH + 1).append(" characters!").toString();
 			stat.println(message);
 			logger.warn(message);
 			valid = false;
 		}
 		final String sequence = fsequence.getSequence();
-		if (!(SequenceUtil.isProteinSequence(sequence) || SequenceUtil
-				.isAmbiguosProtein(sequence))) {
-			message = "IGNORING sequence " + fsequence.getId()
-					+ " as it is not a protein sequence!";
+		if (!(SequenceUtil.isProteinSequence(sequence) || SequenceUtil.isAmbiguosProtein(sequence))) {
+			message = new StringBuilder().append("IGNORING sequence ").append(fsequence.getId())
+					.append(" as it is not a protein sequence!").toString();
 			stat.println(message);
 			logger.warn(message);
 			valid = false;
@@ -227,40 +204,38 @@ public final class ORonn implements Callable<ORonn> {
 
 		String message = "";
 		if (!ORonn.isValidSequence(fsequence)) {
-			message = "IGNORING sequence "
-					+ fsequence.getId()
-					+ " as its too short. Minimum sequence length for disorder prediction is "
-					+ (RonnConstraint.MIN_SEQUENCE_LENGTH + 1) + " characters!";
+			message = new StringBuilder().append("IGNORING sequence ").append(fsequence.getId())
+					.append(" as its too short. Minimum sequence length for disorder prediction is ")
+					.append(RonnConstraint.MIN_SEQUENCE_LENGTH + 1).append(" characters!").toString();
 			throw new IllegalArgumentException(message);
 		}
 		final String sequence = fsequence.getSequence();
 
-		if ( SequenceUtil.isAmbiguosProtein(sequence)){
+		if (SequenceUtil.isAmbiguosProtein(sequence)) {
 			logger.warn("Sequence is ambiguous!");
 		}
 
-		if (!(SequenceUtil.isProteinSequence(sequence) )){
+		if (!(SequenceUtil.isProteinSequence(sequence))) {
 			logger.warn("Does not look like a protein sequence!");
 		}
 
-		if (!(SequenceUtil.isProteinSequence(sequence) || SequenceUtil
-				.isAmbiguosProtein(sequence))) {
-			message = "IGNORING sequence " + fsequence.getId()
-					+ " as it is not a protein sequence!";
-			throw new IllegalArgumentException(message);
+		if (SequenceUtil.isProteinSequence(sequence) || SequenceUtil.isAmbiguosProtein(sequence)) {
+			return;
 		}
+		message = new StringBuilder().append("IGNORING sequence ").append(fsequence.getId())
+				.append(" as it is not a protein sequence!").toString();
+		throw new IllegalArgumentException(message);
 	}
 
-	private static InputParameters parseArguments(final String[] args)
-			throws IOException {
+	private static InputParameters parseArguments(final String[] args) throws IOException {
 		final InputParameters prms = new InputParameters();
-		for (int i = 0; i < args.length; i++) {
-			final String prm = args[i].trim().toLowerCase();
+		for (String arg : args) {
+			final String prm = arg.trim().toLowerCase();
 			if (prm.startsWith(InputParameters.inputKey)) {
-				prms.setFilePrm(args[i], InputParameters.inputKey);
+				prms.setFilePrm(arg, InputParameters.inputKey);
 			}
 			if (prm.startsWith(InputParameters.outputKey)) {
-				prms.setFilePrm(args[i], InputParameters.outputKey);
+				prms.setFilePrm(arg, InputParameters.outputKey);
 			}
 			if (prm.startsWith(InputParameters.disorderKey)) {
 				prms.setDisorder(prm);
@@ -269,7 +244,7 @@ public final class ORonn implements Callable<ORonn> {
 				prms.setFormat(prm);
 			}
 			if (prm.startsWith(InputParameters.statKey)) {
-				prms.setFilePrm(args[i], InputParameters.statKey);
+				prms.setFilePrm(arg, InputParameters.statKey);
 			}
 			if (prm.startsWith(InputParameters.threadKey)) {
 				prms.setThreadNum(prm);
@@ -279,8 +254,7 @@ public final class ORonn implements Callable<ORonn> {
 		return prms;
 	}
 
-	public static void main(final String[] args) throws NumberFormatException,
-	IOException {
+	public static void main(final String[] args) throws IOException {
 
 		if ((args.length == 0) || (args.length > 5)) {
 			ORonn.printUsage();
@@ -289,23 +263,21 @@ public final class ORonn implements Callable<ORonn> {
 		final InputParameters prms = ORonn.parseArguments(args);
 
 		final PrintWriter stat = prms.getStatWriter();
-		stat.println("Using parameters: \n[" + prms + "]");
+		stat.println(new StringBuilder().append("Using parameters: \n[").append(prms).append("]").toString());
 
 		if (prms.getInput() == null) {
 			logger.error("Input is not defined! ");
 			ORonn.printUsage();
 			System.exit(1);
 		}
-		stat.println("Calculation started: "
-				+ ORonn.DATE_FORMAT.format(new Date()));
+		stat.println("Calculation started: " + ORonn.DATE_FORMAT.format(new Date()));
 
 		final Timer timer = new Timer();
 		// The stream is closed after reading inside readFasta
-		final List<FastaSequence> sequences = SequenceUtil
-				.readFasta(new FileInputStream(prms.getInput()));
-		stat.println(timer.getStepTime(TimeUnit.MILLISECONDS)
-				+ "ms input file loaded");
-		stat.println("Input file has " + sequences.size() + " sequences");
+		final List<FastaSequence> sequences = SequenceUtil.readFasta(new FileInputStream(prms.getInput()));
+		stat.println(timer.getStepTime(TimeUnit.MILLISECONDS) + "ms input file loaded");
+		stat.println(
+				new StringBuilder().append("Input file has ").append(sequences.size()).append(" sequences").toString());
 
 		final ModelLoader mloader = new ModelLoader();
 		mloader.loadModels();
@@ -320,21 +292,21 @@ public final class ORonn implements Callable<ORonn> {
 		} else {
 			// Run predictions in parallel
 			stat.print("Running preditions in parallel - ");
-			stat.println("Using " + prms.getThreadNum() + " threads");
+			stat.println(
+					new StringBuilder().append("Using ").append(prms.getThreadNum()).append(" threads").toString());
 			ORonn.predictParallel(sequences, prms, mloader);
 		}
 
-		stat.println("Total calculation time: " + timer.getTotalTime() + "s ");
-		stat.println("Calculation completed: "
-				+ ORonn.DATE_FORMAT.format(new Date()));
+		stat.println(new StringBuilder().append("Total calculation time: ").append(timer.getTotalTime()).append("s ")
+				.toString());
+		stat.println("Calculation completed: " + ORonn.DATE_FORMAT.format(new Date()));
 		stat.close();
 		out.flush();
 		out.close();
 	}
 
-	static void predictSerial(final List<FastaSequence> fsequences,
-			final InputParameters prms, final ModelLoader mloader)
-					throws NumberFormatException, IOException {
+	static void predictSerial(final List<FastaSequence> fsequences, final InputParameters prms,
+			final ModelLoader mloader) throws IOException {
 		for (final FastaSequence sequence : fsequences) {
 			if (!ORonn.isValidSequenceForRonn(sequence, prms.getStatWriter())) {
 				continue;
@@ -344,17 +316,13 @@ public final class ORonn implements Callable<ORonn> {
 		}
 	}
 
-
-	static void predictParallel(final List<FastaSequence> fsequences,
-			final InputParameters prms, final ModelLoader mloader)
-					throws NumberFormatException, IOException {
+	static void predictParallel(final List<FastaSequence> fsequences, final InputParameters prms,
+			final ModelLoader mloader) throws IOException {
 		final PrintWriter stat = prms.getStatWriter();
 
 		// Do parallel execution
-		final ExecutorService executor = new ThreadPoolExecutor(prms
-				.getThreadNum(), prms.getThreadNum(), 0L, TimeUnit.SECONDS,
-				new SynchronousQueue<Runnable>(),
-				new ThreadPoolExecutor.CallerRunsPolicy());
+		final ExecutorService executor = new ThreadPoolExecutor(prms.getThreadNum(), prms.getThreadNum(), 0L,
+				TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadPoolExecutor.CallerRunsPolicy());
 		try {
 			for (final FastaSequence sequence : fsequences) {
 				if (!ORonn.isValidSequenceForRonn(sequence, stat)) {
@@ -362,27 +330,42 @@ public final class ORonn implements Callable<ORonn> {
 				}
 				final ORonn ronn = new ORonn(sequence, mloader, prms);
 				/*
-				 * To get stack traces from tasks one need to obtain a Future
-				 * from this method and call its get() method. Otherwise some
-				 * task may end up with exception but unnoticed
+				 * To get stack traces from tasks one need to obtain a Future from this method
+				 * and call its get() method. Otherwise some task may end up with exception but
+				 * unnoticed
 				 */
 				executor.submit(ronn);
 			}
 			executor.shutdown();
-			final int timeOut = (fsequences.size() < 60) ? 60 : fsequences
-					.size();
-			stat.println("All task submitted. Waiting for complition for "
-					+ "maximum of " + timeOut + " minutes");
+			final int timeOut = (fsequences.size() < 60) ? 60 : fsequences.size();
+			stat.println(new StringBuilder().append("All task submitted. Waiting for complition for ")
+					.append("maximum of ").append(timeOut).append(" minutes").toString());
 			executor.awaitTermination(timeOut, TimeUnit.MINUTES);
 		} catch (final InterruptedException e) {
-			logger.error("Execution is terminated! "
-					+ "Terminated by either by the system or the timeout. "
-					+ "Maximum of 1 minute is allowed for one sequence analisys! "
-					+ "If it took longer to complite this analysis "
-					+ "the program is terminated.", e);
+			logger.error(new StringBuilder().append("Execution is terminated! ")
+					.append("Terminated by either by the system or the timeout. ")
+					.append("Maximum of 1 minute is allowed for one sequence analisys! ")
+					.append("If it took longer to complite this analysis ").append("the program is terminated.")
+					.toString(), e);
 		} finally {
 			executor.shutdownNow();
 		}
+	}
+
+	/**
+	 *
+	 * @author pvtroshin
+	 *
+	 *         VERTICAL - where the letters of the sequence and corresponding
+	 *         disorder values are output in two column layout.
+	 *
+	 *         HORIZONTAL where the disorder values are provided under the letters
+	 *         of the sequence. Letters and values separated by tabulation in this
+	 *         case.
+	 *
+	 */
+	static enum ResultLayout {
+		VERTICAL, HORIZONTAL
 	}
 
 } // class end

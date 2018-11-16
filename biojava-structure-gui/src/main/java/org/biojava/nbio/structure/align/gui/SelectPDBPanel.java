@@ -40,38 +40,41 @@ import org.biojava.nbio.structure.align.util.UserConfiguration;
 import org.biojava.nbio.structure.align.webstart.WebStartMain;
 import org.biojava.nbio.structure.gui.util.StructurePairSelector;
 
-
-/** A Panel that allows user to specify PDB & chain ID, as well as sub-ranges
+/**
+ * A Panel that allows user to specify PDB & chain ID, as well as sub-ranges
  *
  * @author Andreas
  *
  */
-public class SelectPDBPanel
-extends JPanel
-implements StructurePairSelector{
-
-	boolean debug = true;
-
-	JTextField f1;
-	JTextField f2;
-	JTextField c1;
-	JTextField c2;
-	JTextField r1;
-	JTextField r2;
-
-	UserConfiguration config;
-	JTabbedPane configPane;
+public class SelectPDBPanel extends JPanel implements StructurePairSelector {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4002475313717172193L;
 
+	boolean debug = true;
 
+	JTextField f1;
 
-	public SelectPDBPanel(){
+	JTextField f2;
+
+	JTextField c1;
+
+	JTextField c2;
+
+	JTextField r1;
+
+	JTextField r2;
+
+	UserConfiguration config;
+
+	JTabbedPane configPane;
+
+	public SelectPDBPanel() {
 		this(true);
 	}
+
 	public SelectPDBPanel(boolean show2PDBs) {
 
 		Box vBox = Box.createVerticalBox();
@@ -82,26 +85,26 @@ implements StructurePairSelector{
 		hBox1.add(help);
 		vBox.add(hBox1);
 
-
-		//pdbDir = new JTextField(20);
+		// pdbDir = new JTextField(20);
 
 		int pdbfSize = 4;
 
 		f1 = new JTextField(pdbfSize);
 		c1 = new JTextField(1);
 		r1 = new JTextField(5);
-		Box p1 = getPDBFilePanel(1,f1,c1,r1);
+		Box p1 = getPDBFilePanel(1, f1, c1, r1);
 		vBox.add(p1);
 
 		f2 = new JTextField(pdbfSize);
 		c2 = new JTextField(1);
 		r2 = new JTextField(5);
-		Box p2 = getPDBFilePanel(2, f2,c2,r2);
+		Box p2 = getPDBFilePanel(2, f2, c2, r2);
 
-		if ( show2PDBs)
+		if (show2PDBs) {
 			vBox.add(p2);
+		}
 
-		//vBox.setBorder(BorderFactory.createLineBorder(Color.black));
+		// vBox.setBorder(BorderFactory.createLineBorder(Color.black));
 		this.add(vBox);
 	}
 
@@ -111,33 +114,35 @@ implements StructurePairSelector{
 		String range = r1.getText().trim();
 
 		// Prefer range over chain
-		if( ! range.isEmpty() ) {
+		if (!range.isEmpty()) {
 			return new SubstructureIdentifier(pdbId, ResidueRange.parseMultiple(range));
-		} else if ( ! chainId.isEmpty() ){
+		} else if (!chainId.isEmpty()) {
 			return new SubstructureIdentifier(pdbId, ResidueRange.parseMultiple(chainId));
 		}
 		return new SubstructureIdentifier(pdbId);
 	}
+
 	public StructureIdentifier getName2() {
 		String pdbId = f2.getText().trim();
 		String chainId = c2.getText().trim();
 		String range = r2.getText().trim();
 
 		// Prefer range over chain
-		if( ! range.isEmpty() ) {
+		if (!range.isEmpty()) {
 			return new SubstructureIdentifier(pdbId, ResidueRange.parseMultiple(range));
-		} else if ( ! chainId.isEmpty() ){
+		} else if (!chainId.isEmpty()) {
 			return new SubstructureIdentifier(pdbId, ResidueRange.parseMultiple(chainId));
 		}
 		return new SubstructureIdentifier(pdbId);
 	}
+
 	@Override
-	public Structure getStructure1() throws StructureException, IOException{
+	public Structure getStructure1() throws StructureException, IOException {
 		return getStructure(getName1());
 	}
 
 	@Override
-	public Structure getStructure2() throws StructureException, IOException{
+	public Structure getStructure2() throws StructureException, IOException {
 		return getStructure(getName2());
 	}
 
@@ -147,64 +152,58 @@ implements StructurePairSelector{
 		return cache.getStructure(name);
 	}
 
-	private Box getPDBFilePanel(int pos ,JTextField f, JTextField c, JTextField r){
+	private Box getPDBFilePanel(int pos, JTextField f, JTextField c, JTextField r) {
 
-		//JPanel panel = new JPanel();
-		//panel.setBorder(BorderFactory.createLineBorder(Color.black));
+		// JPanel panel = new JPanel();
+		// panel.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		JLabel l01 = new JLabel("PDB code ");
 
-		//panel.add(l01);
+		// panel.add(l01);
 		Box hBox = Box.createHorizontalBox();
 		hBox.add(Box.createGlue());
 		hBox.add(l01);
 
 		JLabel l11 = new JLabel(pos + ":");
-		f.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		f.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 		f.setToolTipText("Provide 4-character PDB code here. Example: 4hhb");
 		hBox.add(l11);
 		hBox.add(Box.createVerticalGlue());
 		hBox.add(f, BorderLayout.CENTER);
 		hBox.add(Box.createGlue());
 
-		//panel.add(hBox11);
+		// panel.add(hBox11);
 
-		//Box hBox21 = Box.createHorizontalBox();
-		JLabel l21 = new JLabel("Chain" + pos + ":");
+		// Box hBox21 = Box.createHorizontalBox();
+		JLabel l21 = new JLabel(new StringBuilder().append("Chain").append(pos).append(":").toString());
 		hBox.add(l21);
 
-		c.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-		//hBox.add(Box.createGlue());
+		c.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
+		// hBox.add(Box.createGlue());
 		hBox.add(c, BorderLayout.CENTER);
 
 		String msg1 = "Both chainID and range specification are optional. If both are provided, range has preference.";
 		l21.setToolTipText(msg1);
 		c.setToolTipText(msg1);
 
-		JLabel rangeL = new JLabel(" Range " + pos + ":");
+		JLabel rangeL = new JLabel(new StringBuilder().append(" Range ").append(pos).append(":").toString());
 		hBox.add(Box.createGlue());
 		hBox.add(rangeL);
-		r.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		r.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 
 		// set help text:
-		String msg ="Syntax example: A:407-495,A:582-686";
+		String msg = "Syntax example: A:407-495,A:582-686";
 		rangeL.setToolTipText(msg);
 		r.setToolTipText(msg);
 
-		//hBox.add(Box.createGlue());
-		hBox.add(r,BorderLayout.CENTER);
+		// hBox.add(Box.createGlue());
+		hBox.add(r, BorderLayout.CENTER);
 
-		//hBox21.add(Box.createGlue());
+		// hBox21.add(Box.createGlue());
 
-		//panel.add(hBox21);
-
-
+		// panel.add(hBox21);
 
 		return hBox;
 	}
-
-
-
-
 
 }

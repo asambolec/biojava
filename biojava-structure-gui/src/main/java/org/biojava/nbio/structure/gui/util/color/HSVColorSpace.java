@@ -31,6 +31,19 @@ import java.awt.color.ColorSpace;
 public class HSVColorSpace extends ColorSpace {
 
 	private static final long serialVersionUID = 8324413992279510075L;
+	private static HSVColorSpace hsvSpace;
+	/**
+	 * The HSV color space
+	 */
+	public static final int CS_HSV = 1007;
+
+	/**
+	 * @param type
+	 * @param numcomponents
+	 */
+	public HSVColorSpace() {
+		super(ColorSpace.TYPE_HSV, 3);
+	}
 
 	public static void main(String[] args) {
 		HSVColorSpace csHSV = new HSVColorSpace();
@@ -40,51 +53,37 @@ public class HSVColorSpace extends ColorSpace {
 		float[] hsvComp;
 
 		c = Color.RED;
-		rgbComp = c.getColorComponents(csRGB,null);
+		rgbComp = c.getColorComponents(csRGB, null);
 		hsvComp = c.getColorComponents(csHSV, null);
-		assert(rgbComp.length == 3);
-		assert(hsvComp.length == 3);
-		System.out.format("RED\tRGB[%f %f %f] HSV[%f %f %f]\n",
-				rgbComp[0], rgbComp[1], rgbComp[2],
-				hsvComp[0], hsvComp[1], hsvComp[2] );
-
+		assert (rgbComp.length == 3);
+		assert (hsvComp.length == 3);
+		System.out.format("RED\tRGB[%f %f %f] HSV[%f %f %f]\n", rgbComp[0], rgbComp[1], rgbComp[2], hsvComp[0],
+				hsvComp[1], hsvComp[2]);
 
 		c = Color.WHITE;
-		rgbComp = c.getColorComponents(csRGB,null);
+		rgbComp = c.getColorComponents(csRGB, null);
 		hsvComp = c.getColorComponents(csHSV, null);
-		System.out.format("WHITE\tRGB[%f %f %f] HSV[%f %f %f]\n",
-				rgbComp[0], rgbComp[1], rgbComp[2],
-				hsvComp[0], hsvComp[1], hsvComp[2] );
+		System.out.format("WHITE\tRGB[%f %f %f] HSV[%f %f %f]\n", rgbComp[0], rgbComp[1], rgbComp[2], hsvComp[0],
+				hsvComp[1], hsvComp[2]);
 
 		c = Color.BLACK;
-		rgbComp = c.getColorComponents(csRGB,null);
+		rgbComp = c.getColorComponents(csRGB, null);
 		hsvComp = c.getColorComponents(csHSV, null);
-		System.out.format("BLACK\tRGB[%f %f %f] HSV[%f %f %f]\n",
-				rgbComp[0], rgbComp[1], rgbComp[2],
-				hsvComp[0], hsvComp[1], hsvComp[2] );
+		System.out.format("BLACK\tRGB[%f %f %f] HSV[%f %f %f]\n", rgbComp[0], rgbComp[1], rgbComp[2], hsvComp[0],
+				hsvComp[1], hsvComp[2]);
 
 		c = Color.GRAY;
-		rgbComp = c.getColorComponents(csRGB,null);
+		rgbComp = c.getColorComponents(csRGB, null);
 		hsvComp = c.getColorComponents(csHSV, null);
-		System.out.format("GRAY\tRGB[%f %f %f] HSV[%f %f %f]\n",
-				rgbComp[0], rgbComp[1], rgbComp[2],
-				hsvComp[0], hsvComp[1], hsvComp[2] );
+		System.out.format("GRAY\tRGB[%f %f %f] HSV[%f %f %f]\n", rgbComp[0], rgbComp[1], rgbComp[2], hsvComp[0],
+				hsvComp[1], hsvComp[2]);
 
 		c = Color.CYAN;
-		rgbComp = c.getColorComponents(csRGB,null);
+		rgbComp = c.getColorComponents(csRGB, null);
 		hsvComp = c.getColorComponents(csHSV, null);
-		System.out.format("CYAN\tRGB[%f %f %f] HSV[%f %f %f]\n",
-				rgbComp[0], rgbComp[1], rgbComp[2],
-				hsvComp[0], hsvComp[1], hsvComp[2] );
+		System.out.format("CYAN\tRGB[%f %f %f] HSV[%f %f %f]\n", rgbComp[0], rgbComp[1], rgbComp[2], hsvComp[0],
+				hsvComp[1], hsvComp[2]);
 
-
-	}
-	/**
-	 * @param type
-	 * @param numcomponents
-	 */
-	public HSVColorSpace() {
-		super(ColorSpace.TYPE_HSV, 3);
 	}
 
 	/**
@@ -106,9 +105,9 @@ public class HSVColorSpace extends ColorSpace {
 	 */
 	@Override
 	public float[] fromRGB(float[] rgbvalue) {
-		assert(rgbvalue.length==3);
+		assert (rgbvalue.length == 3);
 		Color rgbColor = new Color(rgbvalue[0], rgbvalue[1], rgbvalue[2]);
-		return Color.RGBtoHSB(rgbColor.getRed(),rgbColor.getGreen(),rgbColor.getBlue(), null);
+		return Color.RGBtoHSB(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue(), null);
 	}
 
 	/**
@@ -135,17 +134,12 @@ public class HSVColorSpace extends ColorSpace {
 		return rgbColor.getColorComponents(null);
 	}
 
-	private static HSVColorSpace hsvSpace;
-	/**
-	 * The HSV color space
-	 */
-	public static final int CS_HSV = 1007;
 	public static ColorSpace getInstance(int colorspace) {
 		ColorSpace theColorSpace;
-		switch( colorspace ) {
+		switch (colorspace) {
 		case CS_HSV:
-			synchronized(HSVColorSpace.class) {
-				if(hsvSpace == null) {
+			synchronized (HSVColorSpace.class) {
+				if (hsvSpace == null) {
 					hsvSpace = new HSVColorSpace();
 				}
 				theColorSpace = hsvSpace;

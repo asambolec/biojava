@@ -35,15 +35,15 @@ import javax.vecmath.Point3d;
  */
 public class SuperPositions {
 
-	private static SuperPositionAbstract superposer = new SuperPositionQuat(
-			false);
-	
+	private static SuperPositionAbstract superposer = new SuperPositionQuat(false);
+
 	/** Prevent instantiation */
-	private SuperPositions(){}
+	private SuperPositions() {
+	}
 
 	/**
-	 * Use the {@link SuperPosition#superpose(Point3d[], Point3d[])} method of
-	 * the default static SuperPosition algorithm contained in this Class.
+	 * Use the {@link SuperPosition#superpose(Point3d[], Point3d[])} method of the
+	 * default static SuperPosition algorithm contained in this Class.
 	 */
 	public static Matrix4d superpose(Point3d[] fixed, Point3d[] moved) {
 		superposer.setCentered(false);
@@ -51,9 +51,9 @@ public class SuperPositions {
 	}
 
 	/**
-	 * Use the {@link SuperPosition#superpose(Point3d[], Point3d[])} method of
-	 * the default static SuperPosition algorithm contained in this Class,
-	 * assuming that the point arrays are centered at the origin.
+	 * Use the {@link SuperPosition#superpose(Point3d[], Point3d[])} method of the
+	 * default static SuperPosition algorithm contained in this Class, assuming that
+	 * the point arrays are centered at the origin.
 	 */
 	public static Matrix4d superposeAtOrigin(Point3d[] fixed, Point3d[] moved) {
 		superposer.setCentered(true);
@@ -62,22 +62,19 @@ public class SuperPositions {
 
 	/**
 	 * Use the {@link SuperPosition#superposeAndTransform(Point3d[], Point3d[])}
-	 * method of the default static SuperPosition algorithm contained in this
-	 * Class.
+	 * method of the default static SuperPosition algorithm contained in this Class.
 	 */
-	public static Matrix4d superposeAndTransform(Point3d[] fixed,
-			Point3d[] moved) {
+	public static Matrix4d superposeAndTransform(Point3d[] fixed, Point3d[] moved) {
 		superposer.setCentered(false);
 		return superposer.superposeAndTransform(fixed, moved);
 	}
 
 	/**
 	 * Use the {@link SuperPosition#superposeAndTransform(Point3d[], Point3d[])}
-	 * method of the default static SuperPosition algorithm contained in this
-	 * Class, assuming that the point arrays are centered at the origin.
+	 * method of the default static SuperPosition algorithm contained in this Class,
+	 * assuming that the point arrays are centered at the origin.
 	 */
-	public static Matrix4d superposeAndTransformAtOrigin(Point3d[] fixed,
-			Point3d[] moved) {
+	public static Matrix4d superposeAndTransformAtOrigin(Point3d[] fixed, Point3d[] moved) {
 		superposer.setCentered(true);
 		return superposer.superposeAndTransform(fixed, moved);
 	}
@@ -93,14 +90,14 @@ public class SuperPositions {
 
 	/**
 	 * Use the {@link SuperPosition#getRmsd(Point3d[], Point3d[])} method of the
-	 * default static SuperPosition algorithm contained in this Class, assuming
-	 * that the point arrays are centered at the origin.
+	 * default static SuperPosition algorithm contained in this Class, assuming that
+	 * the point arrays are centered at the origin.
 	 */
 	public static double getRmsdAtOrigin(Point3d[] fixed, Point3d[] moved) {
 		superposer.setCentered(true);
 		return superposer.getRmsd(fixed, moved);
 	}
-	
+
 	public static void setDefaultSuperPosition(SuperPositionAbstract defaultAlgorithm) {
 		superposer = defaultAlgorithm;
 	}

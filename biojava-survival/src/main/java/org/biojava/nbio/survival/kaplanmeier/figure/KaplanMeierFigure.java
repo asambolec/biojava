@@ -33,6 +33,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,9 +42,11 @@ import java.util.LinkedHashMap;
  */
 public class KaplanMeierFigure extends JPanel {
 
+	private static final Logger logger = LoggerFactory.getLogger(KaplanMeierFigure.class);
+
 	private static final long serialVersionUID = 1L;
 
-	ArrayList<String> title = new ArrayList<String>();
+	ArrayList<String> title = new ArrayList<>();
 	/**
 	 *
 	 */
@@ -69,18 +73,21 @@ public class KaplanMeierFigure extends JPanel {
 	double maxPercentage = 1.0;
 	FontMetrics fm;
 	KMFigureInfo kmfi = new KMFigureInfo();
-	LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new LinkedHashMap<String, ArrayList<CensorStatus>>();
-	ArrayList<String> lineInfoList = new ArrayList<String>();
+	LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new LinkedHashMap<>();
+	ArrayList<String> lineInfoList = new ArrayList<>();
 	SurvFitInfo sfi = new SurvFitInfo();
 	private String fileName = "";
-	private ArrayList<Double> xAxisTimeValues = new ArrayList<Double>();
-	private ArrayList<Integer> xAxisTimeCoordinates = new ArrayList<Integer>();
+	private ArrayList<Double> xAxisTimeValues = new ArrayList<>();
+	private ArrayList<Integer> xAxisTimeCoordinates = new ArrayList<>();
+
+	DecimalFormat df = new DecimalFormat("#.#");
+
+	Double adjustedPercentIncrement = 0.0;
 
 	/**
 	 *
 	 */
 	public KaplanMeierFigure() {
-		super();
 		setSize(500, 400);
 		setBackground(Color.WHITE);
 	}
@@ -91,12 +98,11 @@ public class KaplanMeierFigure extends JPanel {
 	 * @return
 	 */
 	public ArrayList<String> getGroups() {
-		return new ArrayList<String>(survivalData.keySet());
+		return new ArrayList<>(survivalData.keySet());
 	}
 
 	/**
-	 * To get the median percentile for a particular group pass the value of
-	 * .50.
+	 * To get the median percentile for a particular group pass the value of .50.
 	 *
 	 * @param group
 	 * @param percentile
@@ -151,16 +157,16 @@ public class KaplanMeierFigure extends JPanel {
 
 	/**
 	 *
-	 * @param title Title of figures
+	 * @param title          Title of figures
 	 * @param ci
-	 * @param strataVariable The column that based on value will do a figure
-	 * line
-	 * @param legendMap Map the value in the column to something readable
+	 * @param strataVariable The column that based on value will do a figure line
+	 * @param legendMap      Map the value in the column to something readable
 	 * @param useWeighted
 	 * @throws Exception
 	 */
-	public void setCoxInfo(ArrayList<String> title, CoxInfo ci, String strataVariable, LinkedHashMap<String, String> legendMap, Boolean useWeighted) throws Exception {
-		LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new LinkedHashMap<String, ArrayList<CensorStatus>>();
+	public void setCoxInfo(ArrayList<String> title, CoxInfo ci, String strataVariable,
+			LinkedHashMap<String, String> legendMap, Boolean useWeighted) throws Exception {
+		LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new LinkedHashMap<>();
 		ArrayList<SurvivalInfo> siList = ci.getSurvivalInfoList();
 		int n = 0;
 		int event = 0;
@@ -173,10 +179,10 @@ public class KaplanMeierFigure extends JPanel {
 			}
 			ArrayList<CensorStatus> censorStatusList = survivalData.get(legend);
 			if (censorStatusList == null) {
-				censorStatusList = new ArrayList<CensorStatus>();
+				censorStatusList = new ArrayList<>();
 				survivalData.put(legend, censorStatusList);
 			}
-			CensorStatus cs = new CensorStatus(strata, si.getTime(), si.getStatus() + "");
+			CensorStatus cs = new CensorStatus(strata, si.getTime(), Integer.toString(si.getStatus()));
 			cs.weight = si.getWeight();
 			censorStatusList.add(cs);
 			n++;
@@ -187,15 +193,16 @@ public class KaplanMeierFigure extends JPanel {
 
 		setSurvivalData(title, survivalData, useWeighted);
 		CoxCoefficient cc = ci.getCoefficient(strataVariable);
-		//DecimalFormat df = new DecimalFormat("#.##");
-		String line1 = "HR=" + fmt(cc.getHazardRatio(), 2, 0) + " (CI:" + fmt(cc.getHazardRatioLoCI(), 2, 0) + "-" + fmt(cc.getHazardRatioHiCI(), 2, 0) + ")";
+		// DecimalFormat df = new DecimalFormat("#.##");
+		String line1 = new StringBuilder().append("HR=").append(fmt(cc.getHazardRatio(), 2, 0)).append(" (CI:")
+				.append(fmt(cc.getHazardRatioLoCI(), 2, 0)).append("-").append(fmt(cc.getHazardRatioHiCI(), 2, 0))
+				.append(")").toString();
 		String line2 = "p=" + fmt(cc.getPvalue(), 3, 0);
-	   // String line2 = "logrank P=" + fmt(ci.getScoreLogrankTestpvalue(), 3, 0);
-		String line3 = "n=" + n + " events=" + event;
-//        System.out.println("setCoxInfo=" + cc.pvalue + " " + title);
+		// String line2 = "logrank P=" + fmt(ci.getScoreLogrankTestpvalue(), 3, 0);
+		String line3 = new StringBuilder().append("n=").append(n).append(" events=").append(event).toString();
+		// System.out.println("setCoxInfo=" + cc.pvalue + " " + title);
 
-
-		ArrayList<String> lines = new ArrayList<String>();
+		ArrayList<String> lines = new ArrayList<>();
 		lines.add(line1);
 		lines.add(line2);
 		lines.add(line3);
@@ -216,7 +223,7 @@ public class KaplanMeierFigure extends JPanel {
 		double p = 1.0;
 		for (int i = 0; i < (precision); i++) {
 			dpad = dpad + "0";
-			p = p / 10.0;
+			p /= 10.0;
 		}
 		DecimalFormat df = new DecimalFormat(dpad);
 		if (Math.abs(d) >= p) {
@@ -243,8 +250,8 @@ public class KaplanMeierFigure extends JPanel {
 	}
 
 	/**
-	 * Allow setting of points in the figure where weighted correction has been
-	 * done and percentage has already been calculated.
+	 * Allow setting of points in the figure where weighted correction has been done
+	 * and percentage has already been calculated.
 	 *
 	 * @param title
 	 * @param sfi
@@ -264,7 +271,7 @@ public class KaplanMeierFigure extends JPanel {
 
 		int evenCheck = Math.round(mTime.floatValue());
 		if (evenCheck % 2 == 1) {
-			evenCheck = evenCheck + 1;
+			evenCheck += 1;
 		}
 		this.maxTime = evenCheck;
 
@@ -279,15 +286,16 @@ public class KaplanMeierFigure extends JPanel {
 	}
 
 	/**
-	 * The data will set the max time which will result in off time points for
-	 * tick marks
+	 * The data will set the max time which will result in off time points for tick
+	 * marks
 	 *
 	 * @param title
 	 * @param survivalData
 	 * @param useWeighted
 	 * @throws Exception
 	 */
-	public void setSurvivalData(ArrayList<String> title, LinkedHashMap<String, ArrayList<CensorStatus>> survivalData, Boolean useWeighted) throws Exception {
+	public void setSurvivalData(ArrayList<String> title, LinkedHashMap<String, ArrayList<CensorStatus>> survivalData,
+			Boolean useWeighted) throws Exception {
 		this.setSurvivalData(title, survivalData, null, useWeighted);
 	}
 
@@ -299,11 +307,12 @@ public class KaplanMeierFigure extends JPanel {
 	 * @param useWeighted
 	 * @throws Exception
 	 */
-	public void setSurvivalData(ArrayList<String> title, LinkedHashMap<String, ArrayList<CensorStatus>> survivalData, Double userSetMaxTime, Boolean useWeighted) throws Exception {
+	public void setSurvivalData(ArrayList<String> title, LinkedHashMap<String, ArrayList<CensorStatus>> survivalData,
+			Double userSetMaxTime, Boolean useWeighted) throws Exception {
 		this.title = title;
 		this.survivalData = survivalData;
 		Double mTime = null;
-		ArrayList<String> labels = new ArrayList<String>(survivalData.keySet());
+		ArrayList<String> labels = new ArrayList<>(survivalData.keySet());
 		Collections.sort(labels);
 		for (String legend : labels) {
 			ArrayList<CensorStatus> censorStatusList = survivalData.get(legend);
@@ -317,7 +326,7 @@ public class KaplanMeierFigure extends JPanel {
 
 		int evenCheck = Math.round(mTime.floatValue());
 		if (evenCheck % 2 == 1) {
-			evenCheck = evenCheck + 1;
+			evenCheck += 1;
 		}
 		this.maxTime = evenCheck;
 
@@ -325,7 +334,7 @@ public class KaplanMeierFigure extends JPanel {
 			this.maxTime = userSetMaxTime;
 		}
 
-		//calculate percentages
+		// calculate percentages
 		SurvFitKM survFitKM = new SurvFitKM();
 		sfi = survFitKM.process(survivalData, useWeighted);
 		this.repaint();
@@ -344,25 +353,25 @@ public class KaplanMeierFigure extends JPanel {
 		for (String group : survivalData.keySet()) {
 			ArrayList<CensorStatus> sd = survivalData.get(group);
 			for (CensorStatus cs : sd) {
-				String line = index + "\t" + cs.time + "\t" + cs.censored + "\t" + cs.group + "\r\n";
+				String line = new StringBuilder().append(index).append("\t").append(cs.time).append("\t")
+						.append(cs.censored).append("\t").append(cs.group).append("\r\n").toString();
 				index++;
 				fw.write(line);
 			}
 		}
 		fw.close();
 	}
-	DecimalFormat df = new DecimalFormat("#.#");
 
 	@Override
 	public void paintComponent(Graphics g) // draw graphics in the panel
 	{
-		int width = getWidth();             // width of window in pixels
-		int height = getHeight();           // height of window in pixels
+		int width = getWidth(); // width of window in pixels
+		int height = getHeight(); // height of window in pixels
 		setFigureDimensions();
 		g.setColor(Color.white);
 		g.clearRect(0, 0, width, height);
 
-		super.paintComponent(g);            // call superclass to make panel display correctly
+		super.paintComponent(g); // call superclass to make panel display correctly
 
 		drawLegend(g);
 		drawSurvivalCurves(g);
@@ -382,7 +391,7 @@ public class KaplanMeierFigure extends JPanel {
 
 		for (String line : lineInfoList) {
 			g2.drawString(line, x, y);
-			y = y + fm.getHeight();
+			y += fm.getHeight();
 		}
 
 	}
@@ -392,9 +401,8 @@ public class KaplanMeierFigure extends JPanel {
 		setRenderingHints(g2);
 		g2.setStroke(kmfi.kmStroke);
 
-
 		int colorIndex = 0;
-		ArrayList<String> labels = new ArrayList<String>(sfi.getStrataInfoHashMap().keySet());
+		ArrayList<String> labels = new ArrayList<>(sfi.getStrataInfoHashMap().keySet());
 		Collections.sort(labels);
 
 		LinkedHashMap<String, StrataInfo> strataInfoHashMap = sfi.getStrataInfoHashMap();
@@ -413,16 +421,19 @@ public class KaplanMeierFigure extends JPanel {
 					g2.drawLine(getTimeX(0), getPercentageY(1), getTimeX(p0time), getPercentageY(1));
 					g2.drawLine(getTimeX(p0time), getPercentageY(1), getTimeX(p0time), getPercentageY(p0percentage));
 				}
-				g2.drawLine(getTimeX(p0time), getPercentageY(p0percentage), getTimeX(p1time), getPercentageY(p0percentage));
+				g2.drawLine(getTimeX(p0time), getPercentageY(p0percentage), getTimeX(p1time),
+						getPercentageY(p0percentage));
 
-				g2.drawLine(getTimeX(p1time), getPercentageY(p0percentage), getTimeX(p1time), getPercentageY(p1percentage));
+				g2.drawLine(getTimeX(p1time), getPercentageY(p0percentage), getTimeX(p1time),
+						getPercentageY(p1percentage));
 				// if (si.getStatus().get(i) == 0) {
 				if (i > 0 && si.getNcens().get(i) > 0) {
-					g2.drawLine(getTimeX(p0time), getPercentageY(p0percentage) - 4, getTimeX(p0time), getPercentageY(p0percentage) + 4);
-					g2.drawLine(getTimeX(p0time) - 4, getPercentageY(p0percentage), getTimeX(p0time) + 4, getPercentageY(p0percentage));
+					g2.drawLine(getTimeX(p0time), getPercentageY(p0percentage) - 4, getTimeX(p0time),
+							getPercentageY(p0percentage) + 4);
+					g2.drawLine(getTimeX(p0time) - 4, getPercentageY(p0percentage), getTimeX(p0time) + 4,
+							getPercentageY(p0percentage));
 				}
 			}
-
 
 		}
 
@@ -443,9 +454,8 @@ public class KaplanMeierFigure extends JPanel {
 			colorIndex++;
 			g2.drawLine(x - 20, y - (fm.getHeight() / 3), x - 5, y - (fm.getHeight() / 3));
 			g2.drawString(legend, x, y);
-			y = y + fm.getHeight();
+			y += fm.getHeight();
 		}
-
 
 	}
 
@@ -521,20 +531,6 @@ public class KaplanMeierFigure extends JPanel {
 		return xAxisTimeCoordinates;
 	}
 
-	class PlotInfo {
-
-		double time;
-		double atRisk;
-		double censored;
-		double events;
-		double percentage;
-
-		@Override
-		public String toString() {
-			return time + "\t" + atRisk + "\t" + censored + "\t" + events + "\t" + (atRisk - events) + "\t" + percentage;
-		}
-	}
-
 	/**
 	 * Do higher quality rendering options
 	 *
@@ -578,7 +574,7 @@ public class KaplanMeierFigure extends JPanel {
 		g2.drawString(label, left - 5 - (fm.stringWidth(label)), bottom + titleHeight / 6);
 		g2.drawLine(left - 5, bottom, left, bottom);
 		double d = minPercentage + kmfi.yaxisPercentIncrement;
-		//double graphHeight = top - bottom;
+		// double graphHeight = top - bottom;
 
 		while (d < maxPercentage) {
 			int yvalue = bottom - (int) (d * (bottom - top));
@@ -586,7 +582,7 @@ public class KaplanMeierFigure extends JPanel {
 			g2.drawString(label, left - 5 - (fm.stringWidth(label)), yvalue + titleHeight / 6); //
 
 			g2.drawLine(left - 5, yvalue, left, yvalue);
-			d = d + kmfi.yaxisPercentIncrement;
+			d += kmfi.yaxisPercentIncrement;
 		}
 
 		label = df.format(maxPercentage * 100);
@@ -595,7 +591,6 @@ public class KaplanMeierFigure extends JPanel {
 
 		// Create a rotation transformation for the font.
 		AffineTransform fontAT = new AffineTransform();
-
 
 		// Derive a new font using a rotatation transform
 		fontAT.rotate(270 * java.lang.Math.PI / 180);
@@ -611,8 +606,6 @@ public class KaplanMeierFigure extends JPanel {
 		// put the original font back
 		g2.setFont(f);
 
-
-
 		double timeDistance = maxTime - minTime;
 		double timeIncrement = timeDistance * kmfi.xaxisPercentIncrement;
 		double timeInt = (int) Math.floor(timeIncrement);
@@ -621,11 +614,12 @@ public class KaplanMeierFigure extends JPanel {
 		}
 		adjustedPercentIncrement = timeInt / timeDistance;
 
-		d = adjustedPercentIncrement; //kmfi.xaxisPercentIncrement;
+		d = adjustedPercentIncrement; // kmfi.xaxisPercentIncrement;
 		xAxisTimeValues.clear();
 		xAxisTimeCoordinates.clear();
 
-		//if we don't have time values then use percentage to set time. Not perfect but allows different tics
+		// if we don't have time values then use percentage to set time. Not perfect but
+		// allows different tics
 		if (kmfi.xAxisLabels.isEmpty()) {
 			xAxisTimeValues.add(minTime);
 			xAxisTimeCoordinates.add(left);
@@ -635,8 +629,9 @@ public class KaplanMeierFigure extends JPanel {
 
 				Integer coordinate = left + (int) (d * (right - left));
 				xAxisTimeCoordinates.add(coordinate);
-				//       System.out.println(d + " " + left + " " + right + " " + coordinate + " " + minTime + " " + maxTime);
-				d = d + adjustedPercentIncrement; //kmfi.xaxisPercentIncrement;
+				// System.out.println(d + " " + left + " " + right + " " + coordinate + " " +
+				// minTime + " " + maxTime);
+				d += adjustedPercentIncrement; // kmfi.xaxisPercentIncrement;
 			}
 		} else {
 			minTime = kmfi.xAxisLabels.get(0);
@@ -667,9 +662,9 @@ public class KaplanMeierFigure extends JPanel {
 		g2.drawLine(left, bottom, right, bottom);
 
 		// draw xAxis legend
-		g2.drawString(kmfi.xAxisLegend, getSize().width / 2 - (fm.stringWidth(kmfi.xAxisLegend) / 2), bottom + 2 * fm.getHeight() + 10);
+		g2.drawString(kmfi.xAxisLegend, getSize().width / 2 - (fm.stringWidth(kmfi.xAxisLegend) / 2),
+				bottom + 2 * fm.getHeight() + 10);
 	}
-	Double adjustedPercentIncrement = 0.0;
 
 	/**
 	 * Get the percentage increment for the time axis
@@ -685,10 +680,9 @@ public class KaplanMeierFigure extends JPanel {
 	 */
 	private void setFigureDimensions() {
 		fm = getFontMetrics(getFont());
-		titleHeight = kmfi.titleHeight;//fm.getHeight();
+		titleHeight = kmfi.titleHeight;// fm.getHeight();
 		xAxisLabelHeight = titleHeight;
-		labelWidth = Math.max(fm.stringWidth(df.format(minPercentage)),
-				fm.stringWidth(df.format(maxPercentage))) + 5;
+		labelWidth = Math.max(fm.stringWidth(df.format(minPercentage)), fm.stringWidth(df.format(maxPercentage))) + 5;
 		top = kmfi.padding + titleHeight;
 		bottom = this.getHeight() - kmfi.padding - xAxisLabelHeight;
 		left = kmfi.padding + labelWidth + yaxisLabel;
@@ -715,12 +709,13 @@ public class KaplanMeierFigure extends JPanel {
 
 		this.paint(graphics2D);
 
-		BufferedImage imageNumRisk = new BufferedImage(numbersAtRiskPanel.getWidth(), numbersAtRiskPanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage imageNumRisk = new BufferedImage(numbersAtRiskPanel.getWidth(), numbersAtRiskPanel.getHeight(),
+				BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics2DNumRisk = imageNumRisk.createGraphics();
 		numbersAtRiskPanel.paint(graphics2DNumRisk);
 
-
-		BufferedImage image = new BufferedImage(numbersAtRiskPanel.getWidth(), numbersAtRiskPanel.getHeight() + this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(numbersAtRiskPanel.getWidth(),
+				numbersAtRiskPanel.getHeight() + this.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = image.createGraphics();
 
 		g.drawImage(imageKM, 0, 0, null);
@@ -729,7 +724,7 @@ public class KaplanMeierFigure extends JPanel {
 		try {
 			ImageIO.write(image, "png", new File(fileName));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error(ex.getMessage(), ex);
 		}
 
 	}
@@ -750,7 +745,7 @@ public class KaplanMeierFigure extends JPanel {
 		try {
 			ImageIO.write(image, "png", new File(fileName));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error(ex.getMessage(), ex);
 		}
 
 	}
@@ -763,45 +758,42 @@ public class KaplanMeierFigure extends JPanel {
 		try {
 
 			KaplanMeierFigure kaplanMeierFigure = new KaplanMeierFigure();
-			LinkedHashMap<String, ArrayList<CensorStatus>> survivalDataHashMap = new LinkedHashMap<String, ArrayList<CensorStatus>>();
+			LinkedHashMap<String, ArrayList<CensorStatus>> survivalDataHashMap = new LinkedHashMap<>();
 
-//            if (false) { //http://sph.bu.edu/otlt/MPH-Modules/BS/BS704_Survival/
-//                ArrayList<CensorStatus> graph1 = new ArrayList<CensorStatus>();
-//                graph1.add(new CensorStatus("A", 24.0, "0"));
-//                graph1.add(new CensorStatus("A", 3.0, "1"));
-//                graph1.add(new CensorStatus("A", 11.0, "0"));
-//                graph1.add(new CensorStatus("A", 19.0, "0"));
-//                graph1.add(new CensorStatus("A", 24.0, "0"));
-//                graph1.add(new CensorStatus("A", 13.0, "0"));
-//
-//                graph1.add(new CensorStatus("A", 14.0, "1"));
-//                graph1.add(new CensorStatus("A", 2.0, "0"));
-//                graph1.add(new CensorStatus("A", 18.0, "0"));
-//                graph1.add(new CensorStatus("A", 17.0, "0"));
-//                graph1.add(new CensorStatus("A", 24.0, "0"));
-//                graph1.add(new CensorStatus("A", 21.0, "0"));
-//                graph1.add(new CensorStatus("A", 12.0, "0"));
-//
-//                graph1.add(new CensorStatus("A", 1.0, "1"));
-//                graph1.add(new CensorStatus("A", 10.0, "0"));
-//                graph1.add(new CensorStatus("A", 23.0, "1"));
-//                graph1.add(new CensorStatus("A", 6.0, "0"));
-//                graph1.add(new CensorStatus("A", 5.0, "1"));
-//                graph1.add(new CensorStatus("A", 9.0, "0"));
-//                graph1.add(new CensorStatus("A", 17.0, "1"));
-//
-//                survivalDataHashMap.put("Label 1", graph1);
-//
-//
-//
-//            }
-
+			// if (false) { //http://sph.bu.edu/otlt/MPH-Modules/BS/BS704_Survival/
+			// ArrayList<CensorStatus> graph1 = new ArrayList<CensorStatus>();
+			// graph1.add(new CensorStatus("A", 24.0, "0"));
+			// graph1.add(new CensorStatus("A", 3.0, "1"));
+			// graph1.add(new CensorStatus("A", 11.0, "0"));
+			// graph1.add(new CensorStatus("A", 19.0, "0"));
+			// graph1.add(new CensorStatus("A", 24.0, "0"));
+			// graph1.add(new CensorStatus("A", 13.0, "0"));
+			//
+			// graph1.add(new CensorStatus("A", 14.0, "1"));
+			// graph1.add(new CensorStatus("A", 2.0, "0"));
+			// graph1.add(new CensorStatus("A", 18.0, "0"));
+			// graph1.add(new CensorStatus("A", 17.0, "0"));
+			// graph1.add(new CensorStatus("A", 24.0, "0"));
+			// graph1.add(new CensorStatus("A", 21.0, "0"));
+			// graph1.add(new CensorStatus("A", 12.0, "0"));
+			//
+			// graph1.add(new CensorStatus("A", 1.0, "1"));
+			// graph1.add(new CensorStatus("A", 10.0, "0"));
+			// graph1.add(new CensorStatus("A", 23.0, "1"));
+			// graph1.add(new CensorStatus("A", 6.0, "0"));
+			// graph1.add(new CensorStatus("A", 5.0, "1"));
+			// graph1.add(new CensorStatus("A", 9.0, "0"));
+			// graph1.add(new CensorStatus("A", 17.0, "1"));
+			//
+			// survivalDataHashMap.put("Label 1", graph1);
+			//
+			//
+			//
+			// }
 
 			if (true) {
 
-
-
-				ArrayList<CensorStatus> graph1 = new ArrayList<CensorStatus>();
+				ArrayList<CensorStatus> graph1 = new ArrayList<>();
 				graph1.add(new CensorStatus("A", 1.0, "1"));
 				graph1.add(new CensorStatus("A", 1.0, "1"));
 				graph1.add(new CensorStatus("A", 1.0, "1"));
@@ -834,14 +826,13 @@ public class KaplanMeierFigure extends JPanel {
 				graph1.add(new CensorStatus("A", 9.0, "1"));
 				graph1.add(new CensorStatus("A", 9.0, "1"));
 
-
 				graph1.add(new CensorStatus("A", 13.0, "0"));
 				graph1.add(new CensorStatus("A", 13.0, "0"));
 				graph1.add(new CensorStatus("A", 13.0, "1"));
 
 				survivalDataHashMap.put("Label 1", graph1);
 
-				ArrayList<CensorStatus> graph2 = new ArrayList<CensorStatus>();
+				ArrayList<CensorStatus> graph2 = new ArrayList<>();
 				graph2.add(new CensorStatus("A", 1.0, "1"));
 				graph2.add(new CensorStatus("A", 1.0, "1"));
 				graph2.add(new CensorStatus("A", 1.0, "0"));
@@ -874,7 +865,6 @@ public class KaplanMeierFigure extends JPanel {
 				graph2.add(new CensorStatus("A", 9.0, "0"));
 				graph2.add(new CensorStatus("A", 9.0, "1"));
 
-
 				graph2.add(new CensorStatus("A", 10.0, "0"));
 				graph2.add(new CensorStatus("A", 10.0, "0"));
 				graph2.add(new CensorStatus("A", 10.0, "0"));
@@ -882,33 +872,47 @@ public class KaplanMeierFigure extends JPanel {
 				survivalDataHashMap.put("Label 2", graph2);
 			}
 
-			ArrayList<String> figureInfo = new ArrayList<String>();
-			//DecimalFormat dfe = new DecimalFormat("0.00E0");
-			//DecimalFormat df = new DecimalFormat("0.00");
-
-
+			ArrayList<String> figureInfo = new ArrayList<>();
+			// DecimalFormat dfe = new DecimalFormat("0.00E0");
+			// DecimalFormat df = new DecimalFormat("0.00");
 
 			JFrame application = new JFrame();
 			application.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			application.add(kaplanMeierFigure);
 			kaplanMeierFigure.setSize(500, 400);
 
-			application.setSize(500, 400);         // window is 500 pixels wide, 400 high
+			application.setSize(500, 400); // window is 500 pixels wide, 400 high
 			application.setVisible(true);
 
-			ArrayList<String> titles = new ArrayList<String>();
+			ArrayList<String> titles = new ArrayList<>();
 			titles.add("Line 1");
 			titles.add("line 2");
 			kaplanMeierFigure.setSurvivalData(titles, survivalDataHashMap, true);
 
-			//   figureInfo.add("HR=2.1 95% CI(1.8-2.5)");
-			//   figureInfo.add("p-value=.001");
+			// figureInfo.add("HR=2.1 95% CI(1.8-2.5)");
+			// figureInfo.add("p-value=.001");
 			kaplanMeierFigure.setFigureLineInfo(figureInfo);
 
 			kaplanMeierFigure.savePNGKMNumRisk("/Users/Scooter/Downloads/test.png");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	class PlotInfo {
+
+		double time;
+		double atRisk;
+		double censored;
+		double events;
+		double percentage;
+
+		@Override
+		public String toString() {
+			return new StringBuilder().append(time).append("\t").append(atRisk).append("\t").append(censored)
+					.append("\t").append(events).append("\t").append(atRisk - events).append("\t").append(percentage)
+					.toString();
 		}
 	}
 }

@@ -28,15 +28,17 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract reader implementation for FASTQ formatted sequences.
  *
  * @since 3.0.3
  */
-abstract class AbstractFastqReader
-	implements FastqReader
-{
+abstract class AbstractFastqReader implements FastqReader {
+
+	private static final Logger logger = LoggerFactory.getLogger(AbstractFastqReader.class);
 
 	/**
 	 * Return the FASTQ sequence format variant for this reader.
@@ -46,42 +48,31 @@ abstract class AbstractFastqReader
 	protected abstract FastqVariant getVariant();
 
 	@Override
-	public final void parse(final Readable readable, final ParseListener listener)
-		throws IOException
-	{
+	public final void parse(final Readable readable, final ParseListener listener) throws IOException {
 		FastqParser.parse(readable, listener);
 	}
 
 	@Override
-	public final void stream(final Readable readable, final StreamListener listener)
-		throws IOException
-	{
+	public final void stream(final Readable readable, final StreamListener listener) throws IOException {
 		StreamingFastqParser.stream(readable, getVariant(), listener);
 	}
 
 	@Override
-	public final Iterable<Fastq> read(final File file) throws IOException
-	{
-		if (file == null)
-		{
+	public final Iterable<Fastq> read(final File file) throws IOException {
+		if (file == null) {
 			throw new IllegalArgumentException("file must not be null");
 		}
 
 		BufferedReader reader = null;
 		Collect collect = new Collect();
-		try
-		{
+		try {
 			reader = new BufferedReader(new FileReader(file));
 			stream(reader, collect);
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				reader.close();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				// ignore
 			}
 		}
@@ -89,28 +80,21 @@ abstract class AbstractFastqReader
 	}
 
 	@Override
-	public final Iterable<Fastq> read(final URL url) throws IOException
-	{
-		if (url == null)
-		{
+	public final Iterable<Fastq> read(final URL url) throws IOException {
+		if (url == null) {
 			throw new IllegalArgumentException("url must not be null");
 		}
 
 		BufferedReader reader = null;
 		Collect collect = new Collect();
-		try
-		{
+		try {
 			reader = Resources.asCharSource(url, Charset.forName("UTF-8")).openBufferedStream();
 			stream(reader, collect);
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				reader.close();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				// ignore
 			}
 		}
@@ -118,28 +102,21 @@ abstract class AbstractFastqReader
 	}
 
 	@Override
-	public final Iterable<Fastq> read(final InputStream inputStream) throws IOException
-	{
-		if (inputStream == null)
-		{
+	public final Iterable<Fastq> read(final InputStream inputStream) throws IOException {
+		if (inputStream == null) {
 			throw new IllegalArgumentException("inputStream must not be null");
 		}
 
 		BufferedReader reader = null;
 		Collect collect = new Collect();
-		try
-		{
+		try {
 			reader = new BufferedReader(new InputStreamReader(inputStream));
 			stream(reader, collect);
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				reader.close();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				// ignore
 			}
 		}
@@ -149,24 +126,23 @@ abstract class AbstractFastqReader
 	/**
 	 * Collect FASTQ formatted sequences in a list.
 	 */
-	private static final class Collect implements StreamListener
-	{
+	private static final class Collect implements StreamListener {
 		/** List of FASTQ formatted sequences. */
 		private final List<Fastq> result = Lists.newLinkedList();
 
 		@Override
-		public void fastq(final Fastq fastq)
-		{
+		public void fastq(final Fastq fastq) {
 			result.add(fastq);
 		}
 
 		/**
-		 * Return an unmodifiable iterable over the FASTQ formatted sequences collected by this stream listener.
+		 * Return an unmodifiable iterable over the FASTQ formatted sequences collected
+		 * by this stream listener.
 		 *
-		 * @return an unmodifiable iterable over the FASTQ formatted sequences collected by this stream listener
+		 * @return an unmodifiable iterable over the FASTQ formatted sequences collected
+		 *         by this stream listener
 		 */
-		public Iterable<Fastq> getResult()
-		{
+		public Iterable<Fastq> getResult() {
 			return Iterables.unmodifiableIterable(result);
 		}
 	}

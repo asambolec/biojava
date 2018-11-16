@@ -70,14 +70,19 @@ public class TwoBitSequenceReader<C extends NucleotideCompound> extends BitSeque
 	}
 
 	/**
-	 * Extension of the BitArrayWorker which provides the 2bit implementation
-	 * code. This is intended to work with the 4 basic nucelotide types. If you
-	 * require a different version of the encoding used here then extend
-	 * and override as required.
+	 * Extension of the BitArrayWorker which provides the 2bit implementation code.
+	 * This is intended to work with the 4 basic nucelotide types. If you require a
+	 * different version of the encoding used here then extend and override as
+	 * required.
 	 *
 	 * @param <C> Must extend NucleotideCompound
 	 */
 	public static class TwoBitArrayWorker<C extends NucleotideCompound> extends BitArrayWorker<C> {
+
+		/**
+		 * Masking value used for extracting the right most 2 bits from a byte
+		 */
+		private final static byte MASK = (byte) ((int) Math.pow(2, 0) | (int) Math.pow(2, 1));
 
 		public TwoBitArrayWorker(CompoundSet<C> compoundSet, int length) {
 			super(compoundSet, length);
@@ -94,11 +99,6 @@ public class TwoBitSequenceReader<C extends NucleotideCompound> extends BitSeque
 		public TwoBitArrayWorker(String sequence, CompoundSet<C> compoundSet) {
 			super(sequence, compoundSet);
 		}
-
-		/**
-		 * Masking value used for extracting the right most 2 bits from a byte
-		 */
-		private final static byte MASK = (byte) ((int) Math.pow(2, 0) | (int) Math.pow(2, 1));
 
 		@Override
 		protected byte bitMask() {
@@ -138,13 +138,12 @@ public class TwoBitSequenceReader<C extends NucleotideCompound> extends BitSeque
 		@Override
 		protected List<C> generateIndexToCompounds() {
 			CompoundSet<C> cs = getCompoundSet();
-			List<C> result = new ArrayList<C>();
-			result.add( cs.getCompoundForString("T"));
+			List<C> result = new ArrayList<>();
+			result.add(cs.getCompoundForString("T"));
 
-
-			result.add( cs.getCompoundForString("C"));
-			result.add( cs.getCompoundForString("A"));
-			result.add( cs.getCompoundForString("G"));
+			result.add(cs.getCompoundForString("C"));
+			result.add(cs.getCompoundForString("A"));
+			result.add(cs.getCompoundForString("G"));
 			return result;
 		}
 	}

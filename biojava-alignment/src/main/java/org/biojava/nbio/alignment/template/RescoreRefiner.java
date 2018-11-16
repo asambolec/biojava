@@ -29,12 +29,13 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Defines an algorithm which computes a new alignment {@link Profile} by rescoring all pairs in an alignment and
- * realigning.
+ * Defines an algorithm which computes a new alignment {@link Profile} by
+ * rescoring all pairs in an alignment and realigning.
  *
  * @author Mark Chapman
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public interface RescoreRefiner<S extends Sequence<C>, C extends Compound> extends Aligner<S, C> {
 

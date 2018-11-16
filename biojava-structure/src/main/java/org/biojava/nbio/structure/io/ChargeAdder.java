@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A class to add appropriate charge information to a structure.
+ * 
  * @author Anthony Bradley
  *
  */
@@ -48,45 +49,44 @@ public class ChargeAdder {
 	 */
 	public static void addCharges(Structure structure) {
 		// Loop through the models
-		for(int i=0; i<structure.nrModels(); i++){
-			for(Chain c: structure.getChains(i)){
-				for(Group g: c.getAtomGroups()){
-					ChemComp thisChemComp = ChemCompGroupFactory.getChemComp(g.getPDBName());
-					List<ChemCompAtom> chemAtoms = thisChemComp.getAtoms();
-					for(ChemCompAtom chemCompAtom : chemAtoms) {
-						Atom atom = g.getAtom(chemCompAtom.getAtom_id());	
-						String stringCharge = chemCompAtom.getCharge();
-						short shortCharge = 0;
-						if (stringCharge!=null){
-							if(!stringCharge.equals("?")){
-								try{
-									shortCharge = Short.parseShort(stringCharge);
-								}
-								catch(NumberFormatException e){
-									logger.warn("Number format exception. Parsing '"+stringCharge+"' to short");
-								}
+		for (int i = 0; i < structure.nrModels(); i++) {
+			// Now do the same for alt locs
+			structure.getChains(i).forEach(c -> c.getAtomGroups().forEach(g -> {
+				ChemComp thisChemComp = ChemCompGroupFactory.getChemComp(g.getPDBName());
+				List<ChemCompAtom> chemAtoms = thisChemComp.getAtoms();
+				chemAtoms.forEach(chemCompAtom -> {
+					Atom atom = g.getAtom(chemCompAtom.getAtom_id());
+					String stringCharge = chemCompAtom.getCharge();
+					short shortCharge = 0;
+					if (stringCharge != null) {
+						if (!"?".equals(stringCharge)) {
+							try {
+								shortCharge = Short.parseShort(stringCharge);
+							} catch (NumberFormatException e) {
+								logger.error(e.getMessage(), e);
+								logger.warn(new StringBuilder().append("Number format exception. Parsing '")
+										.append(stringCharge).append("' to short").toString());
 							}
-							else{
-								logger.warn("? charge on atom "+chemCompAtom.getAtom_id()+" in group "+thisChemComp.getId());
-							}
+						} else {
+							logger.warn(
+									new StringBuilder().append("? charge on atom ").append(chemCompAtom.getAtom_id())
+											.append(" in group ").append(thisChemComp.getId()).toString());
 						}
-						else{
-							logger.warn("Null charge on atom "+chemCompAtom.getAtom_id()+" in group "+thisChemComp.getId());
-						}
-						if(atom!=null){
-							atom.setCharge(shortCharge);
-						}
-						// Now do the same for alt locs
-						for (Group altLoc : g.getAltLocs()) {
-							Atom altAtom = altLoc.getAtom(chemCompAtom.getAtom_id());
-							if(altAtom!=null){
-								altAtom.setCharge(shortCharge);
-							}
+					} else {
+						logger.warn(new StringBuilder().append("Null charge on atom ").append(chemCompAtom.getAtom_id())
+								.append(" in group ").append(thisChemComp.getId()).toString());
+					}
+					if (atom != null) {
+						atom.setCharge(shortCharge);
+					}
+					for (Group altLoc : g.getAltLocs()) {
+						Atom altAtom = altLoc.getAtom(chemCompAtom.getAtom_id());
+						if (altAtom != null) {
+							altAtom.setCharge(shortCharge);
 						}
 					}
-				}
-
-			}
+				});
+			}));
 		}
 	}
 }

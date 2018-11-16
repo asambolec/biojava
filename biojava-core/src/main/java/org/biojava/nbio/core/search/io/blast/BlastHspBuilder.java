@@ -21,9 +21,8 @@
 package org.biojava.nbio.core.search.io.blast;
 
 /**
- * Designed by Paolo Pavan.
- * You may want to find my contacts on Github and LinkedIn for code info
- * or discuss major changes.
+ * Designed by Paolo Pavan. You may want to find my contacts on Github and
+ * LinkedIn for code info or discuss major changes.
  * https://github.com/paolopavan
  *
  * @author Paolo Pavan
@@ -147,8 +146,11 @@ public class BlastHspBuilder {
 		this.mismatchCount = mismatchCount;
 		return this;
 	}
+
 	public BlastHsp createBlastHsp() {
-		return new BlastHsp(hspNum, hspBitScore, hspScore, hspEvalue, hspQueryFrom, hspQueryTo, hspHitFrom, hspHitTo, hspQueryFrame, hspHitFrame, hspIdentity, hspPositive, hspGaps, hspAlignLen, hspQseq, hspHseq, hspIdentityString, percentageIdentity, mismatchCount);
+		return new BlastHsp(hspNum, hspBitScore, hspScore, hspEvalue, hspQueryFrom, hspQueryTo, hspHitFrom, hspHitTo,
+				hspQueryFrame, hspHitFrame, hspIdentity, hspPositive, hspGaps, hspAlignLen, hspQseq, hspHseq,
+				hspIdentityString, percentageIdentity, mismatchCount);
 	}
 
 }

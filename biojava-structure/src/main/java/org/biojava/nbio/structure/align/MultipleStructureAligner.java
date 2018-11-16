@@ -28,17 +28,18 @@ import org.biojava.nbio.structure.align.ce.ConfigStrucAligParams;
 import org.biojava.nbio.structure.align.multiple.MultipleAlignment;
 
 /**
- * Interface for the Multiple Structure Alignment Algorithms. The Pairwise Alignment Algorithms can also
- * implement this class to be able to return {@link MultipleAlignment} Objects.
+ * Interface for the Multiple Structure Alignment Algorithms. The Pairwise
+ * Alignment Algorithms can also implement this class to be able to return
+ * {@link MultipleAlignment} Objects.
  *
  * @author Aleix Lafita
  *
  */
-public interface MultipleStructureAligner{
+public interface MultipleStructureAligner {
 
 	/**
-	 * Run an alignment while specifying the atoms to be aligned.
-	 * The default parameters for the algorithm are used.
+	 * Run an alignment while specifying the atoms to be aligned. The default
+	 * parameters for the algorithm are used.
 	 *
 	 * @param atomArrays List of Atoms of all the structures
 	 * @return MultipleAlignment object that contains the alignment.

@@ -25,23 +25,29 @@ import java.io.IOException;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.io.mmtf.MmtfActions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to show how to read a Biojava structure using MMTF
+ * 
  * @author Anthony Bradley
  *
  */
 public class DemoMmtfReader {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoMmtfReader.class);
+
 	/**
 	 * Main function to run the demo
+	 * 
 	 * @param args no args to specify
-	 * @throws IOException 
+	 * @throws IOException
 	 * @throws StructureException
 	 */
 	public static void main(String[] args) throws IOException, StructureException {
 		Structure structure = MmtfActions.readFromWeb("4cup");
-		System.out.println(structure.getChains().size());
+		logger.info(String.valueOf(structure.getChains().size()));
 	}
-	
+
 }

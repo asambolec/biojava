@@ -20,7 +20,6 @@
  */
 package demo;
 
-
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.domain.LocalProteinDomainParser;
@@ -29,21 +28,25 @@ import org.biojava.nbio.structure.domain.pdp.Segment;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoDomainsplit {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoDomainsplit.class);
+
+	public static void main(String[] args) {
 
 		DemoDomainsplit split = new DemoDomainsplit();
 
-		//String pdbId = "3gly";
+		// String pdbId = "3gly";
 		String pdbId = "4hhb";
 
 		split.basicLoad(pdbId);
 
 	}
 
-	public void basicLoad(String pdbId){
+	public void basicLoad(String pdbId) {
 
 		try {
 
@@ -55,7 +58,8 @@ public class DemoDomainsplit {
 
 			FileParsingParameters params = new FileParsingParameters();
 
-			// should the ATOM and SEQRES residues be aligned when creating the internal data model?
+			// should the ATOM and SEQRES residues be aligned when creating the internal
+			// data model?
 			params.setAlignSeqRes(true);
 			// should secondary structure get parsed from the file
 			params.setParseSecStruc(false);
@@ -67,20 +71,18 @@ public class DemoDomainsplit {
 
 			Structure struc = cache.getStructure(pdbId);
 
-			System.out.println("structure loaded: " + struc);
+			logger.info("structure loaded: " + struc);
 
 			List<Domain> domains = LocalProteinDomainParser.suggestDomains(struc);
 
-			System.out.println("RESULTS: =====");
-			for ( Domain dom : domains){
-				System.out.println("DOMAIN:" + dom.getSize() + " " +  dom.getScore());
-				List<Segment> segments = dom.getSegments();
-				for ( Segment s : segments){
-					System.out.println("   Segment: " + s);
-				}
-			}
-		} catch (Exception e){
-			e.printStackTrace();
+			logger.info("RESULTS: =====");
+			domains.stream().map(dom -> {
+				logger.info(new StringBuilder().append("DOMAIN:").append(dom.getSize()).append(" ")
+						.append(dom.getScore()).toString());
+				return dom.getSegments();
+			}).flatMap(List::stream).forEach(s -> logger.info("   Segment: " + s));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}

@@ -20,6 +20,8 @@
  */
 package org.biojava.nbio.survival.cox.matrix;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -35,7 +37,7 @@ package org.biojava.nbio.survival.cox.matrix;
  */
 public class Matrix {
 
-
+	private static final Logger logger = LoggerFactory.getLogger(Matrix.class);
 
 	/**
 	 *
@@ -344,7 +346,6 @@ public class Matrix {
 		return y;
 	}
 
-
 	// vector-matrix multiplication (y = x^T A)
 	/**
 	 *
@@ -373,38 +374,38 @@ public class Matrix {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("D");
-		System.out.println("--------------------");
-		double[][] d = {{1, 2, 3}, {4, 5, 6}, {9, 1, 3}};
+		logger.info("D");
+		logger.info("--------------------");
+		double[][] d = { { 1, 2, 3 }, { 4, 5, 6 }, { 9, 1, 3 } };
 		StdArrayIO.print(d);
 		System.out.println();
 
-		System.out.println("I");
-		System.out.println("--------------------");
+		logger.info("I");
+		logger.info("--------------------");
 		double[][] c = Matrix.identity(5);
 		StdArrayIO.print(c);
 		System.out.println();
 
-		System.out.println("A");
-		System.out.println("--------------------");
+		logger.info("A");
+		logger.info("--------------------");
 		double[][] a = Matrix.random(5, 5);
 		StdArrayIO.print(a);
 		System.out.println();
 
-		System.out.println("A^T");
-		System.out.println("--------------------");
+		logger.info("A^T");
+		logger.info("--------------------");
 		double[][] b = Matrix.transpose(a);
 		StdArrayIO.print(b);
 		System.out.println();
 
-		System.out.println("A + A^T");
-		System.out.println("--------------------");
+		logger.info("A + A^T");
+		logger.info("--------------------");
 		double[][] e = Matrix.add(a, b);
 		StdArrayIO.print(e);
 		System.out.println();
 
-		System.out.println("A * A^T");
-		System.out.println("--------------------");
+		logger.info("A * A^T");
+		logger.info("--------------------");
 		double[][] f = Matrix.multiply(a, b);
 		StdArrayIO.print(f);
 		System.out.println();

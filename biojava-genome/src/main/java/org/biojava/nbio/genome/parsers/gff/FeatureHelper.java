@@ -30,25 +30,27 @@ import java.util.LinkedHashMap;
 public class FeatureHelper {
 
 	/**
-	 * Build a list of individual features to allow easy indexing and to avoid iterating through large genome gff3 files
-	 * The index for the returned HashMap is the value of the attribute used to build the index
+	 * Build a list of individual features to allow easy indexing and to avoid
+	 * iterating through large genome gff3 files The index for the returned HashMap
+	 * is the value of the attribute used to build the index
+	 * 
 	 * @param attribute
 	 * @param list
 	 * @return
 	 */
-	static public LinkedHashMap<String,FeatureList> buildFeatureAtrributeIndex(String attribute,FeatureList list){
+	static public LinkedHashMap<String, FeatureList> buildFeatureAtrributeIndex(String attribute, FeatureList list) {
 
-		LinkedHashMap<String,FeatureList> featureHashMap = new LinkedHashMap<String,FeatureList>();
+		LinkedHashMap<String, FeatureList> featureHashMap = new LinkedHashMap<>();
 		FeatureList featureList = list.selectByAttribute(attribute);
-		for(FeatureI feature : featureList){
+		featureList.forEach(feature -> {
 			String value = feature.getAttribute(attribute);
 			FeatureList features = featureHashMap.get(value);
-			if(features == null){
+			if (features == null) {
 				features = new FeatureList();
 				featureHashMap.put(value, features);
 			}
 			features.add(feature);
-		}
+		});
 
 		return featureHashMap;
 	}

@@ -26,14 +26,15 @@ package org.biojava.nbio.core.sequence;
 import java.io.Serializable;
 import java.util.Comparator;
 
-
 /**
- * Sort Exon where it is a little confusing if exons shoud always be ordered left to right
- * where a negative stranded gene should go the other direction. Need to think about this?
+ * Sort Exon where it is a little confusing if exons shoud always be ordered
+ * left to right where a negative stranded gene should go the other direction.
+ * Need to think about this?
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
-public class ExonComparator implements Comparator<ExonSequence>, Serializable{
-    private static final long serialVersionUID = 1;
+public class ExonComparator implements Comparator<ExonSequence>, Serializable {
+	private static final long serialVersionUID = 1;
 
 	@Override
 	public int compare(ExonSequence o1, ExonSequence o2) {

@@ -29,42 +29,47 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Shows the interatomic Distance Matrices of all the Structures aligned in different Frames.
+ * Shows the interatomic Distance Matrices of all the Structures aligned in
+ * different Frames.
  */
-public class MyDistMaxListener implements ActionListener{
+public class MyDistMaxListener implements ActionListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(MyDistMaxListener.class);
 	AbstractAlignmentJmol parent;
 
-	public MyDistMaxListener(AbstractAlignmentJmol parent){
+	public MyDistMaxListener(AbstractAlignmentJmol parent) {
 		this.parent = parent;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent a) {
 
-		System.out.println("Show interatomic Distance Matrices");
+		logger.info("Show interatomic Distance Matrices");
 
 		if (parent.getDistanceMatrices() == null) {
-			System.err.println("Not displaying any alignment currently!");
+			logger.error("Not displaying any alignment currently!");
 			return;
 		}
-		for (int i=0; i<parent.getDistanceMatrices().size(); i++){
-			if (parent.getDistanceMatrices().get(i)!=null)
-				showMatrix(parent.getDistanceMatrices().get(i), "Internal Distances for Structure "+(i+1));
+		for (int i = 0; i < parent.getDistanceMatrices().size(); i++) {
+			if (parent.getDistanceMatrices().get(i) != null) {
+				showMatrix(parent.getDistanceMatrices().get(i), "Internal Distances for Structure " + (i + 1));
+			}
 		}
 	}
 
-	private void showMatrix(Matrix m, String title){
+	private void showMatrix(Matrix m, String title) {
 		ScaleableMatrixPanel smp = new ScaleableMatrixPanel();
 		JFrame frame = new JFrame(title);
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e){
-	            JFrame f = (JFrame) e.getSource();
-	            f.setVisible(false);
-	            f.dispose();
+			public void windowClosing(WindowEvent e) {
+				JFrame f = (JFrame) e.getSource();
+				f.setVisible(false);
+				f.dispose();
 			}
 		});
 

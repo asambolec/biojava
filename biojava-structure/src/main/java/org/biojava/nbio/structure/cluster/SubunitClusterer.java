@@ -40,37 +40,32 @@ import org.slf4j.LoggerFactory;
  */
 public class SubunitClusterer {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SubunitClusterer.class);
+	private static final Logger logger = LoggerFactory.getLogger(SubunitClusterer.class);
 
 	/** Prevent instantiation **/
 	private SubunitClusterer() {
 	}
 
-	public static Stoichiometry cluster(Structure structure,
-			SubunitClustererParameters params) {
-		List<Subunit> subunits = SubunitExtractor.extractSubunits(structure,
-				params.getAbsoluteMinimumSequenceLength(),
-				params.getMinimumSequenceLengthFraction(),
-				params.getMinimumSequenceLength());
+	public static Stoichiometry cluster(Structure structure, SubunitClustererParameters params) {
+		List<Subunit> subunits = SubunitExtractor.extractSubunits(structure, params.getAbsoluteMinimumSequenceLength(),
+				params.getMinimumSequenceLengthFraction(), params.getMinimumSequenceLength());
 		return cluster(subunits, params);
 	}
 
-	public static Stoichiometry cluster(List<Subunit> subunits,
-			SubunitClustererParameters params) {
+	public static Stoichiometry cluster(List<Subunit> subunits, SubunitClustererParameters params) {
 
 		// The collection of clusters to return
-		List<SubunitCluster> clusters = new ArrayList<SubunitCluster>();
+		List<SubunitCluster> clusters = new ArrayList<>();
 
-		if (subunits.size() == 0)
+		if (subunits.size() == 0) {
 			return new Stoichiometry(clusters);
+		}
 
 		// First generate a new cluster for each Subunit
-		for (Subunit s : subunits)
-			clusters.add(new SubunitCluster(s));
+		subunits.forEach(s -> clusters.add(new SubunitCluster(s)));
 
-		if (params.getClustererMethod() == SubunitClustererMethod.SEQUENCE ||
-				params.getClustererMethod() == SubunitClustererMethod.SEQUENCE_STRUCTURE) {
+		if (params.getClustererMethod() == SubunitClustererMethod.SEQUENCE
+				|| params.getClustererMethod() == SubunitClustererMethod.SEQUENCE_STRUCTURE) {
 			// Now merge clusters by SEQUENCE
 			for (int c1 = 0; c1 < clusters.size(); c1++) {
 				for (int c2 = clusters.size() - 1; c2 > c1; c2--) {
@@ -80,15 +75,14 @@ public class SubunitClusterer {
 						}
 
 					} catch (CompoundNotFoundException e) {
-						logger.warn("Could not merge by Sequence. {}",
-								e.getMessage());
+						logger.warn("Could not merge by Sequence. {}", e.getMessage());
 					}
 				}
 			}
 		}
 
-		if (params.getClustererMethod() == SubunitClustererMethod.STRUCTURE ||
-				params.getClustererMethod() == SubunitClustererMethod.SEQUENCE_STRUCTURE) {
+		if (params.getClustererMethod() == SubunitClustererMethod.STRUCTURE
+				|| params.getClustererMethod() == SubunitClustererMethod.SEQUENCE_STRUCTURE) {
 			// Now merge clusters by STRUCTURE
 			for (int c1 = 0; c1 < clusters.size(); c1++) {
 				for (int c2 = clusters.size() - 1; c2 > c1; c2--) {
@@ -105,25 +99,24 @@ public class SubunitClusterer {
 
 		if (params.isInternalSymmetry()) {
 			// Now divide clusters by their INTERNAL SYMMETRY
-			for (int c = 0; c < clusters.size(); c++) {
+			clusters.forEach(cluster -> {
 				try {
-					clusters.get(c).divideInternally(params);
+					cluster.divideInternally(params);
 				} catch (StructureException e) {
-					logger.warn("Error analyzing internal symmetry. {}",
-							e.getMessage());
+					logger.warn("Error analyzing internal symmetry. {}", e.getMessage());
 				}
-			}
+			});
 
 			// After internal symmetry merge again by structural similarity
 			// Use case: C8 propeller with 3 chains with 3+3+2 repeats each
 			for (int c1 = 0; c1 < clusters.size(); c1++) {
 				for (int c2 = clusters.size() - 1; c2 > c1; c2--) {
 					try {
-						if (clusters.get(c1).mergeStructure(clusters.get(c2), params))
+						if (clusters.get(c1).mergeStructure(clusters.get(c2), params)) {
 							clusters.remove(c2);
+						}
 					} catch (StructureException e) {
-						logger.warn("Could not merge by Structure. {}",
-								e.getMessage());
+						logger.warn("Could not merge by Structure. {}", e.getMessage());
 					}
 				}
 			}

@@ -36,19 +36,23 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 /**
- * Implements a simple (naive) {@link Aligner} for a pair of {@link Profile}s.  This is basically an extension of the
- * {@link NeedlemanWunsch} pairwise sequence aligner to pairwise profile alignment using a sum-of-pairs score.
+ * Implements a simple (naive) {@link Aligner} for a pair of {@link Profile}s.
+ * This is basically an extension of the {@link NeedlemanWunsch} pairwise
+ * sequence aligner to pairwise profile alignment using a sum-of-pairs score.
  *
  * @author Mark Chapman
- * @param <S> each {@link Sequence} in the pair of alignment {@link Profile}s is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <S> each {@link Sequence} in the pair of alignment {@link Profile}s is
+ *        of type S
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compound>
 		extends AbstractProfileProfileAligner<S, C> {
 
 	/**
 	 * Before running a profile-profile alignment, data must be sent in via calls to
-	 * {@link #setQuery(Profile)}, {@link #setTarget(Profile)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * {@link #setQuery(Profile)}, {@link #setTarget(Profile)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	public SimpleProfileProfileAligner() {
@@ -57,10 +61,10 @@ public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compou
 	/**
 	 * Prepares for a profile-profile alignment.
 	 *
-	 * @param query the first {@link Profile} of the pair to align
-	 * @param target the second {@link Profile} of the pair to align
+	 * @param query      the first {@link Profile} of the pair to align
+	 * @param target     the second {@link Profile} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public SimpleProfileProfileAligner(Profile<S, C> query, Profile<S, C> target, GapPenalty gapPenalty,
 			SubstitutionMatrix<C> subMatrix) {
@@ -70,10 +74,12 @@ public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compou
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align, still to be calculated
-	 * @param target the second {@link Profile} of the pair to align, still to be calculated
+	 * @param query      the first {@link Profile} of the pair to align, still to be
+	 *                   calculated
+	 * @param target     the second {@link Profile} of the pair to align, still to
+	 *                   be calculated
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public SimpleProfileProfileAligner(Future<ProfilePair<S, C>> query, Future<ProfilePair<S, C>> target,
 			GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
@@ -83,10 +89,11 @@ public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compou
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align
-	 * @param target the second {@link Profile} of the pair to align, still to be calculated
+	 * @param query      the first {@link Profile} of the pair to align
+	 * @param target     the second {@link Profile} of the pair to align, still to
+	 *                   be calculated
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public SimpleProfileProfileAligner(Profile<S, C> query, Future<ProfilePair<S, C>> target, GapPenalty gapPenalty,
 			SubstitutionMatrix<C> subMatrix) {
@@ -96,10 +103,11 @@ public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compou
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align, still to be calculated
-	 * @param target the second {@link Profile} of the pair to align
+	 * @param query      the first {@link Profile} of the pair to align, still to be
+	 *                   calculated
+	 * @param target     the second {@link Profile} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public SimpleProfileProfileAligner(Future<ProfilePair<S, C>> query, Profile<S, C> target, GapPenalty gapPenalty,
 			SubstitutionMatrix<C> subMatrix) {
@@ -110,7 +118,7 @@ public class SimpleProfileProfileAligner<S extends Sequence<C>, C extends Compou
 
 	@Override
 	protected void setProfile(List<Step> sx, List<Step> sy) {
-		profile = pair = new SimpleProfilePair<S, C>(getQuery(), getTarget(), sx, sy);
+		profile = pair = new SimpleProfilePair<>(getQuery(), getTarget(), sx, sy);
 	}
 
 }

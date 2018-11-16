@@ -44,7 +44,7 @@ import java.util.List;
 public class ArrayListSequenceReader<C extends Compound> implements SequenceReader<C> {
 
 	private CompoundSet<C> compoundSet;
-	private ArrayList<C> parsedCompounds = new ArrayList<C>();
+	private ArrayList<C> parsedCompounds = new ArrayList<>();
 
 	private volatile Integer hashcode = null;
 
@@ -52,7 +52,7 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 	 *
 	 */
 	public ArrayListSequenceReader() {
-		//Do nothing
+		// Do nothing
 	}
 
 	/**
@@ -85,7 +85,6 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 		return getSequenceAsString(1, getLength(), Strand.POSITIVE);
 	}
 
-
 	/**
 	 *
 	 * @param begin
@@ -95,7 +94,7 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 	 */
 	public String getSequenceAsString(Integer begin, Integer end, Strand strand) {
 		// TODO Optimise/cache.
-		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<C>();
+		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<>();
 		return sequenceAsStringHelper.getSequenceAsString(this.parsedCompounds, compoundSet, begin, end, strand);
 	}
 
@@ -190,15 +189,17 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 			maxCompundLengthEqual1 = false;
 		}
 		int length = sequence.length();
-		parsedCompounds.ensureCapacity(length); //get the array size correct
+		parsedCompounds.ensureCapacity(length); // get the array size correct
 		for (int i = 0; i < length;) {
 			String compoundStr = null;
 			C compound = null;
-			if (maxCompundLengthEqual1) { // trying to save some steps where typically the answer is 1 so avoid complicated for loop
+			if (maxCompundLengthEqual1) { // trying to save some steps where typically the answer is 1 so avoid
+											// complicated for loop
 				compoundStr = sequence.substring(i, i + 1);
 				compound = compoundSet.getCompoundForString(compoundStr);
 			} else {
-				for (int compoundStrLength = 1; compound == null && compoundStrLength <= maxCompoundLength; compoundStrLength++) {
+				for (int compoundStrLength = 1; compound == null
+						&& compoundStrLength <= maxCompoundLength; compoundStrLength++) {
 					compoundStr = sequence.substring(i, i + compoundStrLength);
 					compound = compoundSet.getCompoundForString(compoundStr);
 				}
@@ -219,9 +220,7 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 	 */
 	public void setContents(List<C> list) {
 		parsedCompounds.clear();
-		for (C c : list) {
-			parsedCompounds.add(c);
-		}
+		list.forEach(parsedCompounds::add);
 	}
 
 	/**
@@ -232,7 +231,7 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 	 */
 	@Override
 	public SequenceView<C> getSubSequence(final Integer bioBegin, final Integer bioEnd) {
-		return new SequenceProxyView<C>(ArrayListSequenceReader.this, bioBegin, bioEnd);
+		return new SequenceProxyView<>(ArrayListSequenceReader.this, bioBegin, bioEnd);
 	}
 
 	/**
@@ -265,7 +264,7 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 
 	@Override
 	public int hashCode() {
-		if(hashcode == null) {
+		if (hashcode == null) {
 			int s = Hashcoder.SEED;
 			s = Hashcoder.hash(s, parsedCompounds);
 			s = Hashcoder.hash(s, compoundSet);
@@ -277,11 +276,10 @@ public class ArrayListSequenceReader<C extends Compound> implements SequenceRead
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object o) {
-		if(Equals.classEqual(this, o)) {
-			ArrayListSequenceReader<C> that = (ArrayListSequenceReader<C>)o;
-			return  Equals.equal(parsedCompounds, that.parsedCompounds) &&
-					Equals.equal(compoundSet, that.compoundSet);
+		if (!Equals.classEqual(this, o)) {
+			return false;
 		}
-		return false;
+		ArrayListSequenceReader<C> that = (ArrayListSequenceReader<C>) o;
+		return Equals.equal(parsedCompounds, that.parsedCompounds) && Equals.equal(compoundSet, that.compoundSet);
 	}
 }

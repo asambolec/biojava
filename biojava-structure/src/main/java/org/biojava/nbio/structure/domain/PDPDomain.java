@@ -34,20 +34,22 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 
 public class PDPDomain implements StructureIdentifier {
 	private static final long serialVersionUID = 6894463080739943026L;
-	
+
+	public static final Pattern PDP_NAME_PATTERN = Pattern.compile("^(?:PDP:)([0-9][a-z0-9]{3})(\\w)(\\w)$",
+			Pattern.CASE_INSENSITIVE);
+
 	private String identifier;
+
 	private SubstructureIdentifier canonical;
-	
-	public static final Pattern PDP_NAME_PATTERN = Pattern.compile("^(?:PDP:)([0-9][a-z0-9]{3})(\\w)(\\w)$",Pattern.CASE_INSENSITIVE);
 
 	public PDPDomain(String pdpDomainName, List<ResidueRange> ranges) {
 		this.identifier = pdpDomainName;
 		Matcher matcher = PDP_NAME_PATTERN.matcher(identifier);
-		if(!matcher.matches()) {
+		if (!matcher.matches()) {
 			throw new IllegalArgumentException("Malformed PDP domain name");
 		}
 		String pdbId = matcher.group(1);
-		this.canonical = new SubstructureIdentifier(pdbId,ranges);
+		this.canonical = new SubstructureIdentifier(pdbId, ranges);
 	}
 
 	@Override
@@ -75,8 +77,7 @@ public class PDPDomain implements StructureIdentifier {
 	}
 
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-			IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		return canonical.loadStructure(cache);
 	}
 }

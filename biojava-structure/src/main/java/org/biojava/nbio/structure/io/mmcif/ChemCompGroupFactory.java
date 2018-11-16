@@ -33,28 +33,29 @@ import org.biojava.nbio.structure.io.mmcif.model.ChemComp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class ChemCompGroupFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(ChemCompGroupFactory.class);
 
 	private static ChemCompProvider chemCompProvider = new DownloadChemCompProvider();
 
-	private static SoftHashMap<String, ChemComp> cache = new SoftHashMap<String, ChemComp>(0);
+	private static SoftHashMap<String, ChemComp> cache = new SoftHashMap<>(0);
 
-	public static ChemComp getChemComp(String recordName){
+	public static ChemComp getChemComp(String recordName) {
 
 		recordName = recordName.toUpperCase().trim();
 
 		// we are using the cache, to avoid hitting the file system too often.
 		ChemComp cc = cache.get(recordName);
-		if ( cc != null) {
-			logger.debug("Chem comp "+cc.getThree_letter_code()+" read from cache");
+		if (cc != null) {
+			logger.debug(new StringBuilder().append("Chem comp ").append(cc.getThree_letter_code())
+					.append(" read from cache").toString());
 			return cc;
 		}
 
 		// not cached, get the chem comp from the provider
-		logger.debug("Chem comp "+recordName+" read from provider "+chemCompProvider.getClass().getCanonicalName());
+		logger.debug(new StringBuilder().append("Chem comp ").append(recordName).append(" read from provider ")
+				.append(chemCompProvider.getClass().getCanonicalName()).toString());
 		cc = chemCompProvider.getChemComp(recordName);
 
 		// Note that this also caches null or empty responses
@@ -63,25 +64,24 @@ public class ChemCompGroupFactory {
 	}
 
 	/**
-	 * The new ChemCompProvider will be set in the static variable,
-	 * so this provider will be used from now on until it is changed
-	 * again. Note that this change can have unexpected behavior of
-	 * code executed afterwards.
+	 * The new ChemCompProvider will be set in the static variable, so this provider
+	 * will be used from now on until it is changed again. Note that this change can
+	 * have unexpected behavior of code executed afterwards.
 	 * <p>
-	 * Changing the provider does not reset the cache, so Chemical
-	 * Component definitions already downloaded from previous providers
-	 * will be used. To reset the cache see {@link #getCache()).
+	 * Changing the provider does not reset the cache, so Chemical Component
+	 * definitions already downloaded from previous providers will be used. To reset
+	 * the cache see {@link #getCache()).
 	 *
 	 * @param provider
 	 */
 	public static void setChemCompProvider(ChemCompProvider provider) {
-		logger.debug("Setting new chem comp provider to "+provider.getClass().getCanonicalName());
+		logger.debug("Setting new chem comp provider to " + provider.getClass().getCanonicalName());
 		chemCompProvider = provider;
 		// clear cache
 		cache.clear();
 	}
 
-	public static ChemCompProvider getChemCompProvider(){
+	public static ChemCompProvider getChemCompProvider() {
 		return chemCompProvider;
 	}
 
@@ -92,41 +92,41 @@ public class ChemCompGroupFactory {
 
 		Group g = null;
 
+		ChemComp cc = getChemComp(recordName);
 
-		ChemComp cc =  getChemComp(recordName);
-
-		if ( cc == null)
+		if (cc == null) {
 			return null;
+		}
 
-		if ( PolymerType.PROTEIN_ONLY.contains( cc.getPolymerType() ) ){
+		if (PolymerType.PROTEIN_ONLY.contains(cc.getPolymerType())) {
 			AminoAcid aa = new AminoAcidImpl();
 
 			String one_letter = cc.getOne_letter_code();
-			if ( one_letter == null || one_letter.equals("X") || one_letter.equals("?") || one_letter.length()==0){
+			if (one_letter == null || "X".equals(one_letter) || "?".equals(one_letter) || one_letter.isEmpty()) {
 				String parent = cc.getMon_nstd_parent_comp_id();
-				if ( parent != null && parent.length() == 3){
-					String parentid = cc.getMon_nstd_parent_comp_id() ;
+				if (parent != null && parent.length() == 3) {
+					String parentid = cc.getMon_nstd_parent_comp_id();
 					ChemComp parentCC = getChemComp(parentid);
 					one_letter = parentCC.getOne_letter_code();
 				}
 			}
 
-			if ( one_letter == null || one_letter.length()==0 || one_letter.equals("?")) {
-				// e.g. problem with PRR, which probably should have a parent of ALA, but as of 20110127 does not.
-				logger.warn("Problem with chemical component: " + recordName + "  Did not find one letter code! Setting it to 'X'");
+			if (one_letter == null || one_letter.isEmpty() || "?".equals(one_letter)) {
+				// e.g. problem with PRR, which probably should have a parent of ALA, but as of
+				// 20110127 does not.
+				logger.warn(new StringBuilder().append("Problem with chemical component: ").append(recordName)
+						.append("  Did not find one letter code! Setting it to 'X'").toString());
 				aa.setAminoType('X');
 
-			} else  {
+			} else {
 				aa.setAminoType(one_letter.charAt(0));
 			}
 
-
 			g = aa;
-		} else if ( PolymerType.POLYNUCLEOTIDE_ONLY.contains(cc.getPolymerType())) {
+		} else if (PolymerType.POLYNUCLEOTIDE_ONLY.contains(cc.getPolymerType())) {
 			NucleotideImpl nuc = new NucleotideImpl();
 
 			g = nuc;
-
 
 		} else {
 
@@ -135,23 +135,25 @@ public class ChemCompGroupFactory {
 
 		g.setChemComp(cc);
 
-
 		return g;
 	}
 
-
-	public  static String getOneLetterCode(ChemComp cc){
+	public static String getOneLetterCode(ChemComp cc) {
 		String oneLetter = cc.getOne_letter_code();
-		if ( oneLetter == null || oneLetter.equals("X") || oneLetter.equals("?")) {
-			String parentId = cc.getMon_nstd_parent_comp_id() ;
-			if ( parentId == null)
+		if (oneLetter == null || "X".equals(oneLetter) || "?".equals(oneLetter)) {
+			String parentId = cc.getMon_nstd_parent_comp_id();
+			if (parentId == null) {
 				return oneLetter;
-			// cases like OIM have multiple parents (comma separated), we shouldn't try grab a chemcomp for those strings
-			if (parentId.length()>3) 
-				return oneLetter;			
+			}
+			// cases like OIM have multiple parents (comma separated), we shouldn't try grab
+			// a chemcomp for those strings
+			if (parentId.length() > 3) {
+				return oneLetter;
+			}
 			ChemComp parentCC = ChemCompGroupFactory.getChemComp(parentId);
-			if ( parentCC == null)
+			if (parentCC == null) {
 				return oneLetter;
+			}
 			oneLetter = parentCC.getOne_letter_code();
 		}
 		return oneLetter;

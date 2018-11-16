@@ -29,56 +29,55 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.core.util.InputStreamProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-
-/** Example for how to load protein structures (from PDB files).
+/**
+ * Example for how to load protein structures (from PDB files).
  *
  * @author Andreas Prlic
  *
  */
-public class DemoLoadStructure
-{
+public class DemoLoadStructure {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoLoadStructure.class);
 
-		DemoLoadStructure demo  = new DemoLoadStructure();
+	public static void main(String[] args) {
+
+		DemoLoadStructure demo = new DemoLoadStructure();
 
 		demo.loadStructureIO();
 
-		//demo.basicLoad();
+		// demo.basicLoad();
 
-		//demo.loadStructureFromCache();
+		// demo.loadStructureFromCache();
 	}
 
-	public void loadStructureIO(){
+	public void loadStructureIO() {
 		try {
 			Structure s1 = StructureIO.getStructure("1gav");
-			System.out.println(s1.getPDBCode() + " asym unit has nr atoms:");
-			System.out.println(StructureTools.getNrAtoms(s1));
-
+			logger.info(s1.getPDBCode() + " asym unit has nr atoms:");
+			logger.info(String.valueOf(StructureTools.getNrAtoms(s1)));
 
 			Chain chain1 = s1.getChainByIndex(0);
 
-			System.out.println("First chain: " + chain1);
+			logger.info("First chain: " + chain1);
 
-			System.out.println("Chain " + chain1.getName() + " has the following sequence mismatches:");
-			for (SeqMisMatch mm : chain1.getSeqMisMatches()){
-				System.out.println(mm);
-			}
+			logger.info(new StringBuilder().append("Chain ").append(chain1.getName())
+					.append(" has the following sequence mismatches:").toString());
+			chain1.getSeqMisMatches().forEach(mm -> logger.info(String.valueOf(mm)));
 
 			Structure s2 = StructureIO.getBiologicalAssembly("1gav");
-			System.out.println(s2.getPDBCode() + " biological assembly has nr atoms:");
-			System.out.println(StructureTools.getNrAtoms(s2));
+			logger.info(s2.getPDBCode() + " biological assembly has nr atoms:");
+			logger.info(String.valueOf(StructureTools.getNrAtoms(s2)));
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-
-	public void basicLoad(){
+	public void basicLoad() {
 		try {
 
 			PDBFileReader reader = new PDBFileReader();
@@ -90,7 +89,8 @@ public class DemoLoadStructure
 
 			FileParsingParameters params = new FileParsingParameters();
 
-			// should the ATOM and SEQRES residues be aligned when creating the internal data model?
+			// should the ATOM and SEQRES residues be aligned when creating the internal
+			// data model?
 			params.setAlignSeqRes(true);
 
 			// should secondary structure get parsed from the file
@@ -100,52 +100,51 @@ public class DemoLoadStructure
 
 			Structure structure = reader.getStructureById("4hhb");
 
-			System.out.println(structure);
+			logger.info(String.valueOf(structure));
 
 			Chain c = structure.getPolyChainByPDB("C");
 
+			logger.info(String.valueOf(c));
 
-			System.out.print(c);
+			logger.info(String.valueOf(c.getEntityInfo()));
 
-			System.out.println(c.getEntityInfo());
-
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-	public void loadStructureFromCache(){
+	public void loadStructureFromCache() {
 		String pdbId = "4hhb";
 		String chainName = "4hhb.A";
 		String entityName = "4hhb:0";
 
 		// we can set a flag if the file should be cached in memory
-		// this will enhance IO massively if the same files have to be accessed over and over again.
+		// this will enhance IO massively if the same files have to be accessed over and
+		// over again.
 		// since this is a soft cache, no danger of memory leak
-		// this is actually not necessary to provide, since the default is "true" if the AtomCache is being used.
+		// this is actually not necessary to provide, since the default is "true" if the
+		// AtomCache is being used.
 		System.setProperty(InputStreamProvider.CACHE_PROPERTY, "true");
 
 		AtomCache cache = new AtomCache();
 
 		try {
-			System.out.println("======================");
+			logger.info("======================");
 			Structure s = cache.getStructure(pdbId);
 
-			System.out.println("Full Structure:" + s);
+			logger.info("Full Structure:" + s);
 
 			Atom[] ca = cache.getAtoms(chainName);
-			System.out.println("got " + ca.length + " CA atoms");
+			logger.info(new StringBuilder().append("got ").append(ca.length).append(" CA atoms").toString());
 
 			Structure firstEntity = cache.getStructure(entityName);
-			System.out.println("First entity: " + firstEntity);
+			logger.info("First entity: " + firstEntity);
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
-
 
 }

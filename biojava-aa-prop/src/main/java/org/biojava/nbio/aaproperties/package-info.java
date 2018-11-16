@@ -19,7 +19,8 @@
  *
  */
 /**
- * Set of classes that responsible for providing APIs and Command Prompt access to generate some basic physico-chemical properties of protein sequences.
+ * Set of classes that responsible for providing APIs and Command Prompt access
+ * to generate some basic physico-chemical properties of protein sequences.
  *
  * @author Koh Chuan Hock
  *
@@ -27,4 +28,3 @@
  * @since 3.0.2
  */
 package org.biojava.nbio.aaproperties;
-

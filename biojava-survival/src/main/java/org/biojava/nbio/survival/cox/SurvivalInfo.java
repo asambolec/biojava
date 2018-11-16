@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
- * Data class to represent a single sample where time and event/censor status is required
- * Additionally each variable and data associated with that variable.
- * The code handles figuring out if a variables is continuous or categorical. If categorical will
- * convert to numerical values.
+ * Data class to represent a single sample where time and event/censor status is
+ * required Additionally each variable and data associated with that variable.
+ * The code handles figuring out if a variables is continuous or categorical. If
+ * categorical will convert to numerical values.
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
@@ -36,21 +36,22 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	private String id = "";
 	private double time;
 	private int status;
-	private int order = 0; //not really used but included to keep track of original position if sorting.
-	private double offset = 0; //offsets for linear predictor ????
-	private double weight = 1; //used to set weight of survivor for over sampling.
+	private int order = 0; // not really used but included to keep track of original position if sorting.
+	private double offset = 0; // offsets for linear predictor ????
+	private double weight = 1; // used to set weight of survivor for over sampling.
 	private int strata = 0; // this should be a boolean but leaving as an int
 	private double score = 0.0;
 	private double linearPredictor = 0.0;
 	private double residual = 0.0;
 	private String clusterValue = "";
 
-	LinkedHashMap<String,Double> residualVariableMap = new LinkedHashMap<String,Double>();
+	LinkedHashMap<String, Double> residualVariableMap = new LinkedHashMap<>();
 
-	LinkedHashMap<String, Double> data = new LinkedHashMap<String, Double>();
-	//    LinkedHashMap<String, Double> discreteData = new LinkedHashMap<String, Double>();
-	LinkedHashMap<String, String> unknownDataType = new LinkedHashMap<String, String>();
-	LinkedHashMap<String, String> originalMetaData = new LinkedHashMap<String,String>();
+	LinkedHashMap<String, Double> data = new LinkedHashMap<>();
+	// LinkedHashMap<String, Double> discreteData = new LinkedHashMap<String,
+	// Double>();
+	LinkedHashMap<String, String> unknownDataType = new LinkedHashMap<>();
+	LinkedHashMap<String, String> originalMetaData = new LinkedHashMap<>();
 
 	/**
 	 *
@@ -74,10 +75,10 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 		status = e;
 
 		data = d;
-		for(String key : d.keySet()){
+		d.keySet().forEach(key -> {
 			Double value = d.get(key);
-			originalMetaData.put(key, value + "");
-		}
+			originalMetaData.put(key, Double.toString(value));
+		});
 	}
 
 	/**
@@ -95,13 +96,14 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 		originalMetaData.put(variable, String.valueOf(d));
 	}
 
-
 	/**
-	 * Set the residual value for the variable for this sample. Called from CoxScore.java
+	 * Set the residual value for the variable for this sample. Called from
+	 * CoxScore.java
+	 * 
 	 * @param variable
 	 * @param value
 	 */
-	public void setResidualVariable(String variable, Double value){
+	public void setResidualVariable(String variable, Double value) {
 		residualVariableMap.put(variable, value);
 	}
 
@@ -110,7 +112,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @param variable
 	 * @return
 	 */
-	public Double getResidualVariable(String variable){
+	public Double getResidualVariable(String variable) {
 		return residualVariableMap.get(variable);
 
 	}
@@ -120,7 +122,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @param variable
 	 * @return
 	 */
-	public String getUnknownDataTypeVariable(String variable){
+	public String getUnknownDataTypeVariable(String variable) {
 		return unknownDataType.get(variable);
 	}
 
@@ -129,7 +131,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @param variable
 	 * @return
 	 */
-	public String getOriginalMetaData(String variable){
+	public String getOriginalMetaData(String variable) {
 		return originalMetaData.get(variable);
 	}
 
@@ -148,7 +150,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @param variable
 	 * @param value
 	 */
-	public void updateContinousVariable(String variable, Double value){
+	public void updateContinousVariable(String variable, Double value) {
 		data.put(variable, value);
 	}
 
@@ -158,7 +160,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @param value
 	 */
 	public void addContinuousVariable(String variable, Double value) {
-		originalMetaData.put(variable, value + "");
+		originalMetaData.put(variable, Double.toString(value));
 		data.put(variable, value);
 	}
 
@@ -177,29 +179,25 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 * @return
 	 */
 	public ArrayList<String> getGroupCategories(String groupName) {
-		ArrayList<String> groupNameList = new ArrayList<String>();
-		for (String key : data.keySet()) {
-			if (key.startsWith(groupName + "_")) {
-				groupNameList.add(key);
-			}
-		}
+		ArrayList<String> groupNameList = new ArrayList<>();
+		data.keySet().stream().filter(key -> key.startsWith(groupName + "_")).forEach(groupNameList::add);
 		return groupNameList;
 	}
 
-//    public void addDiscreteVariable(String variable, double value) {
-//        discreteData.put(variable, value);
-//    }
+	// public void addDiscreteVariable(String variable, double value) {
+	// discreteData.put(variable, value);
+	// }
 
-//    public Double getDiscreteVariable(String variable) {
-//        return discreteData.get(variable);
-//    }
+	// public Double getDiscreteVariable(String variable) {
+	// return discreteData.get(variable);
+	// }
 
 	/**
 	 *
 	 * @return
 	 */
-	public ArrayList<String> getDataVariables(){
-		ArrayList<String> v = new ArrayList<String>();
+	public ArrayList<String> getDataVariables() {
+		ArrayList<String> v = new ArrayList<>();
 		v.addAll(data.keySet());
 		v.addAll(unknownDataType.keySet());
 
@@ -210,7 +208,7 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 	 *
 	 * @return
 	 */
-	public int getNumberVariables(){
+	public int getNumberVariables() {
 		return data.size();
 	}
 
@@ -227,16 +225,17 @@ public class SurvivalInfo implements Comparable<SurvivalInfo> {
 
 	@Override
 	public String toString() {
-		return "t=" + time + " e=" + status + " o=" + order;
+		return new StringBuilder().append("t=").append(time).append(" e=").append(status).append(" o=").append(order)
+				.toString();
 	}
-	//    double CompNum4Sort(double[] a, double[] b) {
-	//(time - time - (status -status) /1024)
-	//    return (a[0] - b[0] - (a[1] - b[1]) / 1024);
+	// double CompNum4Sort(double[] a, double[] b) {
+	// (time - time - (status -status) /1024)
+	// return (a[0] - b[0] - (a[1] - b[1]) / 1024);
 	// }
 
 	@Override
 	public int compareTo(SurvivalInfo o) {
-		//    return (int) (this.time - o.time - (this.status - o.status) / 1024);
+		// return (int) (this.time - o.time - (this.status - o.status) / 1024);
 		if (time < o.time) {
 			return -1;
 		} else if (time > o.time) {

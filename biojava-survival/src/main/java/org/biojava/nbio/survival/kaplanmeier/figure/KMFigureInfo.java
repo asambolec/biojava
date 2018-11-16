@@ -24,6 +24,8 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,6 +33,7 @@ import java.util.Properties;
  */
 public class KMFigureInfo {
 
+	private static final Logger logger = LoggerFactory.getLogger(KMFigureInfo.class);
 	/**
 	 *
 	 */
@@ -50,7 +53,7 @@ public class KMFigureInfo {
 	/**
 	 *
 	 */
-	public double timeScale = 1.0; //multiplier to change time from days to months etc
+	public double timeScale = 1.0; // multiplier to change time from days to months etc
 	/**
 	 *
 	 */
@@ -86,10 +89,13 @@ public class KMFigureInfo {
 	/**
 	 *
 	 */
-	public Color[] legendColor = {Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.ORANGE, Color.YELLOW, Color.MAGENTA, Color.PINK};
-	public ArrayList<Double> xAxisLabels = new ArrayList<Double>();//new ArrayList<Double>(Arrays.asList(0.0, 5.0, 10.0, 15.0, 20.0));
+	public Color[] legendColor = { Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.ORANGE, Color.YELLOW,
+			Color.MAGENTA, Color.PINK };
+	public ArrayList<Double> xAxisLabels = new ArrayList<>();// new ArrayList<Double>(Arrays.asList(0.0, 5.0, 10.0,
+																// 15.0, 20.0));
 	public String xAxisLegend = "";
 	public String yAxisLegend = "";
+
 	public Color getColor(int index) {
 		return legendColor[index];
 	}
@@ -126,6 +132,7 @@ public class KMFigureInfo {
 					Double v = Double.parseDouble(d.trim());
 					xAxisLabels.add(v);
 				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -134,7 +141,7 @@ public class KMFigureInfo {
 			xAxisLegend = properties.getProperty("xAxisLegend");
 		}
 
-				if (properties.containsKey("yAxisLegend")) {
+		if (properties.containsKey("yAxisLegend")) {
 			yAxisLegend = properties.getProperty("yAxisLegend");
 		}
 	}

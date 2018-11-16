@@ -27,7 +27,9 @@ package org.biojava.nbio.structure.gui.util.color;
  *
  * For instance, to map [0^2, 10^2] to a rainbow gradient, use
  *
- * new LogColorMapper(GradientMapper.getGradientMapper(GradientMapper.RAINBOW_GRADIENT, 0, 10))
+ * new
+ * LogColorMapper(GradientMapper.getGradientMapper(GradientMapper.RAINBOW_GRADIENT,
+ * 0, 10))
  *
  * @author Spencer Bliven
  *
@@ -36,6 +38,7 @@ public class SqrtColorMapper extends ContinuousColorMapperTransform {
 
 	/**
 	 * Creates a new SqrtColorMapper.
+	 * 
 	 * @param sqrtspaceMapper
 	 */
 	public SqrtColorMapper(ContinuousColorMapper sqrtspaceMapper) {
@@ -43,8 +46,8 @@ public class SqrtColorMapper extends ContinuousColorMapperTransform {
 	}
 
 	/**
-	 * Return sqrt(value).
-	 * If value is negative, return the color corresponding to negative infinity.
+	 * Return sqrt(value). If value is negative, return the color corresponding to
+	 * negative infinity.
 	 *
 	 * @param value Value to be mapped
 	 * @return sqrt(value), or NEGATIVE_INFINITY
@@ -53,8 +56,9 @@ public class SqrtColorMapper extends ContinuousColorMapperTransform {
 	@Override
 	public double transform(double value) {
 		double sqrtValue = Double.NEGATIVE_INFINITY;
-		if(value >= 0)
+		if (value >= 0) {
 			sqrtValue = Math.sqrt(value);
+		}
 
 		return sqrtValue;
 	}

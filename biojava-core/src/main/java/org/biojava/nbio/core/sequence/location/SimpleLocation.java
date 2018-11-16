@@ -33,8 +33,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Very basic implementation of the Location interface which defines a series
- * of simple constructors.
+ * Very basic implementation of the Location interface which defines a series of
+ * simple constructors.
  *
  * @author ayates
  * @author Paolo Pavan
@@ -96,7 +96,8 @@ public class SimpleLocation extends AbstractLocation {
 		super(start, end, strand, false, false, subLocations);
 	}
 
-	public SimpleLocation(Point start, Point end, Strand strand, boolean circular, boolean betweenBases, List<Location> subLocations) {
+	public SimpleLocation(Point start, Point end, Strand strand, boolean circular, boolean betweenBases,
+			List<Location> subLocations) {
 		super(start, end, strand, circular, betweenBases, subLocations);
 	}
 }

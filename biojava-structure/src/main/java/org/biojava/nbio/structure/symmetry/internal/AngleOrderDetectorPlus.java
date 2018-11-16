@@ -45,8 +45,7 @@ public class AngleOrderDetectorPlus implements OrderDetector {
 	private boolean normalizeError;
 
 	/**
-	 * @param error
-	 *            maximum angular error, in radians
+	 * @param error maximum angular error, in radians
 	 */
 	public AngleOrderDetectorPlus(double angleError) {
 		this(8, angleError, false);
@@ -59,10 +58,8 @@ public class AngleOrderDetectorPlus implements OrderDetector {
 
 	/**
 	 *
-	 * @param maxOrder
-	 *            maximum order to consider
-	 * @param error
-	 *            maximum angular error, in radians
+	 * @param maxOrder maximum order to consider
+	 * @param error    maximum angular error, in radians
 	 */
 	public AngleOrderDetectorPlus(int maxOrder, double angleError) {
 		this(maxOrder, angleError, false);
@@ -72,32 +69,26 @@ public class AngleOrderDetectorPlus implements OrderDetector {
 	 * Determine order by finding the order (up to the maxOrder) which has the
 	 * closest rotation angle to the observed rotation.
 	 *
-	 * If normalized is false, then the error is taken to be the absolute error
-	 * from the closest ideal angle (in radians). If normalized is true, error
-	 * is taken to be relative to the fundamental rotation for a given order.
-	 * For instance, for an error of .25, C2 order would be accepted for angles
-	 * within .25*pi radians of 0 or pi, while C3 order would be acceptable
-	 * within .25*2pi/3 radians of 0, 2pi/3, or 4pi/3. In the normalized case,
-	 * numbers between 0 and .5 are sensible for error.
+	 * If normalized is false, then the error is taken to be the absolute error from
+	 * the closest ideal angle (in radians). If normalized is true, error is taken
+	 * to be relative to the fundamental rotation for a given order. For instance,
+	 * for an error of .25, C2 order would be accepted for angles within .25*pi
+	 * radians of 0 or pi, while C3 order would be acceptable within .25*2pi/3
+	 * radians of 0, 2pi/3, or 4pi/3. In the normalized case, numbers between 0 and
+	 * .5 are sensible for error.
 	 *
-	 * @param maxOrder
-	 *            maximum order to consider
-	 * @param error
-	 *            maximum angular error
-	 * @param normalize
-	 *            indicates whether error should be normalized by the order
+	 * @param maxOrder  maximum order to consider
+	 * @param error     maximum angular error
+	 * @param normalize indicates whether error should be normalized by the order
 	 */
-	public AngleOrderDetectorPlus(int maxOrder, double angleError,
-			boolean normalize) {
-		super();
+	public AngleOrderDetectorPlus(int maxOrder, double angleError, boolean normalize) {
 		this.maxOrder = maxOrder;
 		this.error = angleError;
 		this.normalizeError = normalize;
 	}
 
 	@Override
-	public int calculateOrder(AFPChain afpChain, Atom[] ca)
-			throws RefinerFailedException {
+	public int calculateOrder(AFPChain afpChain, Atom[] ca) throws RefinerFailedException {
 		final double tol = 1e-6; // tolerance to floating point errors
 		try {
 			RotationAxis axis = new RotationAxis(afpChain);
@@ -109,8 +100,9 @@ public class AngleOrderDetectorPlus implements OrderDetector {
 				// Triangle wave starting at 0 with period 2pi/order
 				double delta = abs(abs(theta * order / (2 * PI) - .5) % 1.0 - .5);
 				// Triangle waves have amplitude 1, so need to un-normalize
-				if (!normalizeError)
+				if (!normalizeError) {
 					delta *= 2 * PI / order;
+				}
 
 				if (delta < bestDelta - tol) {
 					bestOrder = order;
@@ -125,9 +117,9 @@ public class AngleOrderDetectorPlus implements OrderDetector {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[maxOrder=" + maxOrder
-				+ ", error=" + error + ", normalizeError=" + normalizeError
-				+ "]";
+		return new StringBuilder().append(getClass().getSimpleName()).append("[maxOrder=").append(maxOrder)
+				.append(", error=").append(error).append(", normalizeError=").append(normalizeError).append("]")
+				.toString();
 	}
 
 }

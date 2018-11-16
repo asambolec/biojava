@@ -58,15 +58,15 @@ import java.util.List;
  */
 public class DemoQuatSymmetryJmol {
 
-	public static void main(String[] args) throws IOException,
-			StructureException {
+	public static void main(String[] args) throws IOException, StructureException {
 
 		String name = "2vml";
 
 		// Download the biological assembly
 		AtomCache cache = new AtomCache();
 		cache.setUseMmCif(true);
-		Structure structure = cache.getStructure("BIO:" + name + ":1");
+		Structure structure = cache
+				.getStructure(new StringBuilder().append("BIO:").append(name).append(":1").toString());
 
 		QuatSymmetryParameters sp = new QuatSymmetryParameters();
 		SubunitClustererParameters cp = new SubunitClustererParameters();
@@ -75,39 +75,38 @@ public class DemoQuatSymmetryJmol {
 		cp.setSequenceCoverageThreshold(0.9);
 
 		// Calculate and display the global symmetry
-		QuatSymmetryResults globalSymmetry = QuatSymmetryDetector
-				.calcGlobalSymmetry(structure, sp, cp);
+		QuatSymmetryResults globalSymmetry = QuatSymmetryDetector.calcGlobalSymmetry(structure, sp, cp);
 		showResults(structure, name, globalSymmetry);
 
 		// Calculate and displaythe local symmetry
-		List<QuatSymmetryResults> localSymmetry = QuatSymmetryDetector
-				.calcLocalSymmetries(structure, sp, cp);
+		List<QuatSymmetryResults> localSymmetry = QuatSymmetryDetector.calcLocalSymmetries(structure, sp, cp);
 
-		for (QuatSymmetryResults result : localSymmetry)
-			showResults(structure, name, result);
+		localSymmetry.forEach(result -> showResults(structure, name, result));
 
 	}
 
-	private static void showResults(Structure s, String name,
-			QuatSymmetryResults results) {
+	private static void showResults(Structure s, String name, QuatSymmetryResults results) {
 
-		String title = name + ": " + results.getStoichiometry()
-				+ ", " + results.getSymmetry();
+		String title = new StringBuilder().append(name).append(": ").append(results.getStoichiometry()).append(", ")
+				.append(results.getSymmetry()).toString();
 
-		if (results.isPseudoStoichiometric())
+		if (results.isPseudoStoichiometric()) {
 			title += ", pseudosymmetric";
+		}
 
-		if (results.isLocal())
+		if (results.isLocal()) {
 			title += ", local";
+		}
 
-		String script = "set defaultStructureDSSP true; set measurementUnits ANGSTROMS;  select all;  spacefill off; wireframe off; "
-				+ "backbone off; cartoon on; color cartoon structure; color structure;  select ligand;wireframe 0.16;spacefill 0.5; "
-				+ "color cpk ; select all; model 0;set antialiasDisplay true; autobond=false;save STATE state_1;";
+		String script = new StringBuilder().append(
+				"set defaultStructureDSSP true; set measurementUnits ANGSTROMS;  select all;  spacefill off; wireframe off; ")
+				.append("backbone off; cartoon on; color cartoon structure; color structure;  select ligand;wireframe 0.16;spacefill 0.5; ")
+				.append("color cpk ; select all; model 0;set antialiasDisplay true; autobond=false;save STATE state_1;")
+				.toString();
 
 		AxisAligner aligner = AxisAligner.getInstance(results);
 
-		JmolSymmetryScriptGenerator scriptGenerator = JmolSymmetryScriptGeneratorPointGroup
-				.getInstance(aligner, "g");
+		JmolSymmetryScriptGenerator scriptGenerator = JmolSymmetryScriptGeneratorPointGroup.getInstance(aligner, "g");
 
 		script += scriptGenerator.getOrientationWithZoom(0);
 		script += scriptGenerator.drawPolyhedron();

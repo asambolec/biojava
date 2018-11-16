@@ -44,32 +44,29 @@ import java.util.List;
  */
 public class MultipleAlignmentDisplay {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(MultipleAlignmentDisplay.class);
+	private static final Logger logger = LoggerFactory.getLogger(MultipleAlignmentDisplay.class);
 
 	/**
-	 * New structures are downloaded if they were not cached in the alignment
-	 * and they are entirely transformed here with the superposition information
-	 * in the Multiple Alignment.
+	 * New structures are downloaded if they were not cached in the alignment and
+	 * they are entirely transformed here with the superposition information in the
+	 * Multiple Alignment.
 	 *
 	 * @param multAln
 	 * @return list of transformed AtomArrays
 	 * @throws StructureException
 	 */
-	public static List<Atom[]> getRotatedAtoms(MultipleAlignment multAln)
-			throws StructureException {
+	public static List<Atom[]> getRotatedAtoms(MultipleAlignment multAln) throws StructureException {
 
 		int size = multAln.size();
 
 		List<Atom[]> atomArrays = multAln.getAtomArrays();
 		for (int i = 0; i < size; i++) {
-			if (atomArrays.get(i).length < 1)
-				throw new StructureException(
-						"Length of atoms arrays is too short! Size: "
-								+ atomArrays.get(i).length);
+			if (atomArrays.get(i).length < 1) {
+				throw new StructureException("Length of atoms arrays is too short! Size: " + atomArrays.get(i).length);
+			}
 		}
 
-		List<Atom[]> rotatedAtoms = new ArrayList<Atom[]>();
+		List<Atom[]> rotatedAtoms = new ArrayList<>();
 
 		// TODO implement independent BlockSet superposition of the structure
 		List<Matrix4d> transf = multAln.getBlockSet(0).getTransformations();
@@ -93,9 +90,8 @@ public class MultipleAlignmentDisplay {
 			// -SB 2015-06
 
 			// Assume all atoms are from the same structure
-			Structure displayS = atomArrays.get(i)[0].getGroup().getChain()
-					.getStructure().clone();
-			
+			Structure displayS = atomArrays.get(i)[0].getGroup().getChain().getStructure().clone();
+
 			// Get all the atoms and include ligands and hetatoms
 			Atom[] rotCA = StructureTools.getRepresentativeAtomArray(displayS);
 			List<Group> hetatms = StructureTools.getUnalignedGroups(rotCA);

@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-/** The default provider for AAINDEX loads substitution matrices from the AAINDEX file in the resources directory
+/**
+ * The default provider for AAINDEX loads substitution matrices from the AAINDEX
+ * file in the resources directory
  *
  * @author Andreas Prlic
  *
@@ -38,10 +40,9 @@ public class DefaultAAIndexProvider implements AAIndexProvider {
 
 	private final static Logger logger = LoggerFactory.getLogger(DefaultAAIndexProvider.class);
 
-	Map<String,SubstitutionMatrix<AminoAcidCompound>> matrices;
+	Map<String, SubstitutionMatrix<AminoAcidCompound>> matrices;
 
-	public DefaultAAIndexProvider(){
-
+	public DefaultAAIndexProvider() {
 
 		InputStream inStream = getInputStreamToAAindexFile();
 
@@ -49,7 +50,7 @@ public class DefaultAAIndexProvider implements AAIndexProvider {
 
 		try {
 			parser.parse(inStream);
-		} catch (IOException e){
+		} catch (IOException e) {
 			logger.error("Exception: ", e);
 		}
 
@@ -64,8 +65,8 @@ public class DefaultAAIndexProvider implements AAIndexProvider {
 
 	}
 
-	public InputStream getInputStreamToAAindexFile(){
-		 return SubstitutionMatrixHelper.class.getResourceAsStream(String.format("/matrices/AAINDEX.txt"));
+	public InputStream getInputStreamToAAindexFile() {
+		return SubstitutionMatrixHelper.class.getResourceAsStream(String.format("/matrices/AAINDEX.txt"));
 	}
 
 }

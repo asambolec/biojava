@@ -35,39 +35,35 @@ import javax.vecmath.Point3d;
 public interface SuperPosition {
 
 	/**
-	 * Obtain the superposition matrix that minimizes the RMSD between two
-	 * arrays of equivalent points.
+	 * Obtain the superposition matrix that minimizes the RMSD between two arrays of
+	 * equivalent points.
 	 * <p>
-	 * The two point arrays have to be of the same length and the order of
-	 * points have to be the same, so that a specific position in the one array
-	 * is equivalent to the same position in the other array.
+	 * The two point arrays have to be of the same length and the order of points
+	 * have to be the same, so that a specific position in the one array is
+	 * equivalent to the same position in the other array.
 	 * 
-	 * @param fixed
-	 *            point array as reference, onto which the other point array is
-	 *            superposed. Original coordinates will not be modified.
-	 * @param moved
-	 *            point array to which the resulting transformation matrix is
-	 *            applied. Original coordinates will not be modified.
+	 * @param fixed point array as reference, onto which the other point array is
+	 *              superposed. Original coordinates will not be modified.
+	 * @param moved point array to which the resulting transformation matrix is
+	 *              applied. Original coordinates will not be modified.
 	 * @return transformation matrix as a Matrix4d to superpose moved onto fixed
 	 *         point arrays
 	 */
 	public Matrix4d superpose(Point3d[] fixed, Point3d[] moved);
 
 	/**
-	 * Transform an array of points so that the coordinates of its points
-	 * minimize the RMSD to the other array of equivalent points, and return the
+	 * Transform an array of points so that the coordinates of its points minimize
+	 * the RMSD to the other array of equivalent points, and return the
 	 * transformation matrix applied.
 	 * <p>
-	 * The two point arrays have to be of the same length and the order of
-	 * points have to be the same, so that a specific position in the one array
-	 * is equivalent to the same position in the other array.
+	 * The two point arrays have to be of the same length and the order of points
+	 * have to be the same, so that a specific position in the one array is
+	 * equivalent to the same position in the other array.
 	 * 
-	 * @param fixed
-	 *            point array as reference, onto which the other point array is
-	 *            superposed. Original coordinates will not be modified.
-	 * @param moved
-	 *            point array to which the resulting transformation matrix is
-	 *            applied. Original coordinates will be transformed.
+	 * @param fixed point array as reference, onto which the other point array is
+	 *              superposed. Original coordinates will not be modified.
+	 * @param moved point array to which the resulting transformation matrix is
+	 *              applied. Original coordinates will be transformed.
 	 * @return transformation matrix as a Matrix4d to superpose moved onto fixed
 	 *         point arrays
 	 */
@@ -78,19 +74,17 @@ public interface SuperPosition {
 	 * superposed.
 	 * <p>
 	 * This is equivalent to first superposing the point arrays with
-	 * {@link SuperPosition#superposeAndTransform(Point3d[], Point3d[])} and
-	 * then calculating the RMSD of the superposed point arrays with
-	 * {@link CalcPoint#rmsd(Point3d[], Point3d[])}, but it will be faster when
-	 * the transformation matrix is not needed.
+	 * {@link SuperPosition#superposeAndTransform(Point3d[], Point3d[])} and then
+	 * calculating the RMSD of the superposed point arrays with
+	 * {@link CalcPoint#rmsd(Point3d[], Point3d[])}, but it will be faster when the
+	 * transformation matrix is not needed.
 	 * <p>
-	 * The two point arrays have to be of the same length and the order of
-	 * points have to be the same, so that a specific position in the one array
-	 * is equivalent to the same position in the other array.
+	 * The two point arrays have to be of the same length and the order of points
+	 * have to be the same, so that a specific position in the one array is
+	 * equivalent to the same position in the other array.
 	 * 
-	 * @param x
-	 *            an array of points. Original coordinates will not be modified.
-	 * @param y
-	 *            an array of points. Original coordinates will not be modified.
+	 * @param x an array of points. Original coordinates will not be modified.
+	 * @param y an array of points. Original coordinates will not be modified.
 	 * @return the minimum RMSD between the equivalent point arrays (after
 	 *         superposition)
 	 */

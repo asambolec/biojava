@@ -44,8 +44,7 @@ public enum ModificationCategory {
 	CROSS_LINK_6("crosslink6", "A cross-link of six residues"),
 	CROSS_LINK_7("crosslink7", "A cross-link of seven residues"),
 	CROSS_LINK_8_OR_LARGE("crosslink8 or large", "A cross-link of eight or more residues"), // 8 or high
-	UNDEFINED("undefined", "Undefined category")
-	;
+	UNDEFINED("undefined", "Undefined category");
 
 	ModificationCategory(String label, String desc) {
 		this.label = label;
@@ -80,14 +79,9 @@ public enum ModificationCategory {
 	 * @return true if it is a CrossLink; false, otherwise.
 	 */
 	public boolean isCrossLink() {
-		return this == CROSS_LINK_1
-			|| this == CROSS_LINK_2
-			|| this == CROSS_LINK_3
-			|| this == CROSS_LINK_4
-			|| this == CROSS_LINK_5
-			|| this == CROSS_LINK_6
-			|| this == CROSS_LINK_7
-			|| this == CROSS_LINK_8_OR_LARGE;
+		return this == CROSS_LINK_1 || this == CROSS_LINK_2 || this == CROSS_LINK_3 || this == CROSS_LINK_4
+				|| this == CROSS_LINK_5 || this == CROSS_LINK_6 || this == CROSS_LINK_7
+				|| this == CROSS_LINK_8_OR_LARGE;
 	}
 
 	/**
@@ -108,8 +102,8 @@ public enum ModificationCategory {
 
 	private static Map<String, ModificationCategory> mapLabelCat;
 	static {
-		mapLabelCat = new HashMap<String, ModificationCategory>();
-		for (ModificationCategory cat:ModificationCategory.values()) {
+		mapLabelCat = new HashMap<>();
+		for (ModificationCategory cat : ModificationCategory.values()) {
 			mapLabelCat.put(cat.label, cat);
 		}
 	}

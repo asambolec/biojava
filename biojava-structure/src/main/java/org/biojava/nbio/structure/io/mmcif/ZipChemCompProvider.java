@@ -44,159 +44,196 @@ import org.biojava.nbio.structure.io.mmcif.model.ChemComp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** This chemical component provider retrieves and caches chemical component definition files from a
- * zip archive specified in its construction.  If the archive does not contain the record, an attempt is
- * made to download it using DownloadChemCompProvider. The downloaded file is then added to the archive.
+/**
+ * This chemical component provider retrieves and caches chemical component
+ * definition files from a zip archive specified in its construction. If the
+ * archive does not contain the record, an attempt is made to download it using
+ * DownloadChemCompProvider. The downloaded file is then added to the archive.
  *
- * The class is thread-safe and the same ZipChemCompProvider should be used by all threads to prevent
- * simultaneous read or write to the zip archive.  A zip archive will be created if missing.
+ * The class is thread-safe and the same ZipChemCompProvider should be used by
+ * all threads to prevent simultaneous read or write to the zip archive. A zip
+ * archive will be created if missing.
  *
  * @author edlunde
  * @author larsonm
- * @since 12/05/12
- * updated 3/5/2016 for Java 7 ZipFileSystem
+ * @since 12/05/12 updated 3/5/2016 for Java 7 ZipFileSystem
  */
-public class ZipChemCompProvider implements ChemCompProvider{
+public class ZipChemCompProvider implements ChemCompProvider {
 	private static final Logger s_logger = LoggerFactory.getLogger(ZipChemCompProvider.class);
 
-	private final Path m_tempDir;  // Base path where $m_zipRootDir/ will be downloaded to.
-	private final Path m_zipRootDir;
-	private final Path m_zipFile;
-	private final DownloadChemCompProvider m_dlProvider;
+	private final Path mTempDir; // Base path where $m_zipRootDir/ will be downloaded to.
+	private final Path mZipRootDir;
+	private final Path mZipFile;
+	private final DownloadChemCompProvider mDlProvider;
 
-	private boolean m_removeCif;
+	private boolean mRemoveCif;
 
-	// Missing IDs from library that cannot be download added here to prevent delays.
-	private Set<String> unavailable = new HashSet<String>();
+	// Missing IDs from library that cannot be download added here to prevent
+	// delays.
+	private Set<String> unavailable = new HashSet<>();
 
 	/**
-	 * ZipChemCompProvider is a Chemical Component provider that stores chemical components
-	 * in a zip archive.  Missing chemical components are downloaded and appended to the
-	 * archive.  If non-existent a new zip archive will be created.
+	 * ZipChemCompProvider is a Chemical Component provider that stores chemical
+	 * components in a zip archive. Missing chemical components are downloaded and
+	 * appended to the archive. If non-existent a new zip archive will be created.
 	 *
-	 * @param chemicalComponentDictionaryFile : path to zip archive for chemical components.
-	 * @param tempDir : path for temporary directory, (null) defaults to path in property "java.io.tmpdir".
+	 * @param chemicalComponentDictionaryFile : path to zip archive for chemical
+	 *                                        components.
+	 * @param tempDir                         : path for temporary directory, (null)
+	 *                                        defaults to path in property
+	 *                                        "java.io.tmpdir".
 	 * @throws IOException
 	 */
 	public ZipChemCompProvider(String chemicalComponentDictionaryFile, String tempDir) throws IOException {
-		this.m_zipFile = Paths.get(chemicalComponentDictionaryFile);
+		this.mZipFile = Paths.get(chemicalComponentDictionaryFile);
 
 		// Use a default temporary directory if not passed a value.
-		if (tempDir == null || tempDir.equals("")) {
-			this.m_tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+		if (tempDir == null || "".equals(tempDir)) {
+			this.mTempDir = Paths.get(System.getProperty("java.io.tmpdir"));
 		} else {
-			this.m_tempDir = Paths.get(tempDir);
+			this.mTempDir = Paths.get(tempDir);
 		}
 
-		this.m_zipRootDir = Paths.get("chemcomp");
+		this.mZipRootDir = Paths.get("chemcomp");
 
 		// Setup an instance of the download chemcomp provider.
-		this.m_dlProvider = new DownloadChemCompProvider(m_tempDir.toString());
-		this.m_removeCif = true;
+		this.mDlProvider = new DownloadChemCompProvider(mTempDir.toString());
+		this.mRemoveCif = true;
 		initializeZip();
 	}
 
 	// See comments in addToZipFileSystem for why initialization is required with
 	// ZipFileSystems - due to URI issues in Java7.
 	private void initializeZip() throws IOException {
-		s_logger.info("Using chemical component dictionary: " + m_zipFile.toString());
-		final File f = m_zipFile.toFile();
-		if (!f.exists()) {
-			s_logger.info("Creating missing zip archive: " + m_zipFile.toString());
-			FileOutputStream fo = new FileOutputStream(f);
-			ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(fo));
-			try {
-				zip.putNextEntry(new ZipEntry("chemcomp/"));
-				zip.closeEntry();
-			} finally {
-				zip.close();
-			}
+		s_logger.info("Using chemical component dictionary: " + mZipFile.toString());
+		final File f = mZipFile.toFile();
+		if (f.exists()) {
+			return;
+		}
+		s_logger.info("Creating missing zip archive: " + mZipFile.toString());
+		FileOutputStream fo = new FileOutputStream(f);
+		ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(fo));
+		try {
+			zip.putNextEntry(new ZipEntry("chemcomp/"));
+			zip.closeEntry();
+		} finally {
+			zip.close();
 		}
 	}
 
 	/**
-	 * Remove downloaded .cif.gz after adding to zip archive?
-	 * Default is true.
+	 * Remove downloaded .cif.gz after adding to zip archive? Default is true.
+	 * 
 	 * @param doRemove
 	 */
 	public void setRemoveCif(boolean doRemove) {
-		m_removeCif = doRemove;
+		mRemoveCif = doRemove;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.biojava.nbio.structure.io.mmcif.ChemCompProvider#getChemComp(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.biojava.nbio.structure.io.mmcif.ChemCompProvider#getChemComp(java.lang.
+	 * String)
 	 *
 	 * @param recordName : three letter PDB name for a residue
-	 * @return ChemComp from .zip or ChemComp from repository.  Will return empty ChemComp when unable to find a residue and will return null if not provided a valid recordName.
+	 * 
+	 * @return ChemComp from .zip or ChemComp from repository. Will return empty
+	 * ChemComp when unable to find a residue and will return null if not provided a
+	 * valid recordName.
 	 */
 	@Override
 	public ChemComp getChemComp(String recordName) {
-		if (null == recordName) return null;
+		if (null == recordName) {
+			return null;
+		}
 
-		// handle non-existent ChemComp codes and do not repeatedly attempt to add these.
+		// handle non-existent ChemComp codes and do not repeatedly attempt to add
+		// these.
 		for (String str : unavailable) {
-			if (recordName.equals(str)) return getEmptyChemComp(recordName);
+			if (recordName.equals(str)) {
+				return getEmptyChemComp(recordName);
+			}
 		}
 
 		// Try to pull from zip, if fail then download.
 		ChemComp cc = getFromZip(recordName);
 		if (cc == null) {
-			s_logger.info("File "+recordName+" not found in archive. Attempting download from PDB.");
+			s_logger.info(new StringBuilder().append("File ").append(recordName)
+					.append(" not found in archive. Attempting download from PDB.").toString());
 			cc = downloadAndAdd(recordName);
 		}
 
-		// If a null record or an empty chemcomp, return a default ChemComp and blacklist.
-		if (cc == null || (null == cc.getName() && cc.getAtoms().size() == 0)) {
-			s_logger.info("Unable to find or download " + recordName + " - excluding from future searches.");
-			unavailable.add(recordName);
-			return getEmptyChemComp(recordName);
+		// If a null record or an empty chemcomp, return a default ChemComp and
+		// blacklist.
+		if (!(cc == null || (null == cc.getName() && cc.getAtoms().size() == 0))) {
+			return cc;
 		}
-		return cc;
+		s_logger.info(new StringBuilder().append("Unable to find or download ").append(recordName)
+				.append(" - excluding from future searches.").toString());
+		unavailable.add(recordName);
+		return getEmptyChemComp(recordName);
 	}
 
-	/** Use DownloadChemCompProvider to grab a gzipped cif record from the PDB.
-	 *  Zip all downloaded cif.gz files into the dictionary.
+	/**
+	 * Use DownloadChemCompProvider to grab a gzipped cif record from the PDB. Zip
+	 * all downloaded cif.gz files into the dictionary.
 	 *
-	 * @param recordName is the three-letter chemical component code (i.e. residue name).
+	 * @param recordName is the three-letter chemical component code (i.e. residue
+	 *                   name).
 	 * @return ChemComp matching recordName
 	 */
-	private ChemComp downloadAndAdd(String recordName){
-		final ChemComp cc = m_dlProvider.getChemComp(recordName);
+	private ChemComp downloadAndAdd(String recordName) {
+		final ChemComp cc = mDlProvider.getChemComp(recordName);
 
-		// final File [] files = finder(m_tempDir.resolve("chemcomp").toString(), "cif.gz");
-		final File [] files = new File[1];
-		Path cif = m_tempDir.resolve("chemcomp").resolve(recordName + ".cif.gz");
+		// final File [] files = finder(m_tempDir.resolve("chemcomp").toString(),
+		// "cif.gz");
+		final File[] files = new File[1];
+		Path cif = mTempDir.resolve("chemcomp").resolve(recordName + ".cif.gz");
 		files[0] = cif.toFile();
 		if (files[0] != null) {
-			addToZipFileSystem(m_zipFile, files, m_zipRootDir);
-			if (m_removeCif) for (File f : files) f.delete();
+			addToZipFileSystem(mZipFile, files, mZipRootDir);
+			if (mRemoveCif) {
+				for (File f : files) {
+					f.delete();
+				}
+			}
 		}
 		return cc;
 	}
 
 	/**
 	 * Cleanup chemical component (.cif.gz) files downloaded to tmpdir.
+	 * 
 	 * @param tempdir : path to temporary directory for chemical components
 	 */
 	public static void purgeTempFiles(String tempdir) {
-		if (tempdir == null) return;
+		if (tempdir == null) {
+			return;
+		}
 
-		s_logger.info("Removing: "+tempdir);
+		s_logger.info("Removing: " + tempdir);
 		Path dlPath = Paths.get(tempdir).resolve("chemcomp");
 		File[] chemCompOutFiles = finder(dlPath.toString(), "cif.gz");
-		if (null != chemCompOutFiles) for (File f : chemCompOutFiles) f.delete();
+		if (null != chemCompOutFiles) {
+			for (File f : chemCompOutFiles) {
+				f.delete();
+			}
+		}
 		dlPath.toFile().delete();
 	}
 
 	/**
 	 * Return an empty ChemComp group for a three-letter resName.
+	 * 
 	 * @param resName
 	 * @return
 	 */
-	private ChemComp getEmptyChemComp(String resName){
+	private ChemComp getEmptyChemComp(String resName) {
 		String pdbName = ""; // Empty string is default
 		if (null != resName && resName.length() >= 3) {
-			pdbName = resName.substring(0,3);
+			pdbName = resName.substring(0, 3);
 		}
 		final ChemComp comp = new ChemComp();
 		comp.setOne_letter_code("?");
@@ -208,41 +245,43 @@ public class ZipChemCompProvider implements ChemCompProvider{
 
 	/**
 	 * Return File(s) in dirName that match suffix.
+	 * 
 	 * @param dirName
 	 * @param suffix
 	 * @return
 	 */
-	static private File[] finder( String dirName, final String suffix){
+	static private File[] finder(String dirName, final String suffix) {
 		if (null == dirName || null == suffix) {
 			return null;
 		}
 
 		final File dir = new File(dirName);
-		return dir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String filename)
-			{ return filename.endsWith(suffix); }
-		} );
+		return dir.listFiles((File dir1, String filename) -> filename.endsWith(suffix));
 	}
 
 	/**
-	 * This is synchronized, along with addToFileSystem to prevent simulatenous reading/writing.
+	 * This is synchronized, along with addToFileSystem to prevent simulatenous
+	 * reading/writing.
+	 * 
 	 * @param recordName to find in zipfile.
 	 * @return ChemComp if found or null if missing.
 	 */
 	private synchronized ChemComp getFromZip(String recordName) {
 		ChemComp cc = null;
-		if (!m_zipFile.toFile().exists()) return cc;
-		final String filename = "chemcomp/" + recordName+".cif.gz";
+		if (!mZipFile.toFile().exists()) {
+			return cc;
+		}
+		final String filename = new StringBuilder().append("chemcomp/").append(recordName).append(".cif.gz").toString();
 
 		// try with resources block to read from the filesystem.
-		try (FileSystem fs = FileSystems.newFileSystem(m_zipFile, null)) {
+		try (FileSystem fs = FileSystems.newFileSystem(mZipFile, null)) {
 			Path cif = fs.getPath(filename);
 
 			if (Files.exists(cif)) {
 				final InputStream zipStream = Files.newInputStream(cif);
 				final InputStream inputStream = new GZIPInputStream(zipStream);
-				s_logger.debug("reading " + recordName + " from " + m_zipFile);
+				s_logger.debug(new StringBuilder().append("reading ").append(recordName).append(" from ")
+						.append(mZipFile).toString());
 				final MMcifParser parser = new SimpleMMcifParser();
 				final ChemCompConsumer consumer = new ChemCompConsumer();
 				parser.addMMcifConsumer(consumer);
@@ -260,37 +299,34 @@ public class ZipChemCompProvider implements ChemCompProvider{
 	}
 
 	/**
-	 * Add an array of files to a zip archive.
-	 * Synchronized to prevent simultaneous reading/writing.
+	 * Add an array of files to a zip archive. Synchronized to prevent simultaneous
+	 * reading/writing.
 	 *
-	 * @param zipFile is a destination zip archive
-	 * @param files is an array of files to be added
+	 * @param zipFile           is a destination zip archive
+	 * @param files             is an array of files to be added
 	 * @param pathWithinArchive is the path within the archive to add files to
 	 * @return true if successfully appended these files.
 	 */
 	private synchronized boolean addToZipFileSystem(Path zipFile, File[] files, Path pathWithinArchive) {
 		boolean ret = false;
 
-		/* URIs in Java 7 cannot have spaces, must use Path instead
-		 * and so, cannot use the properties map to describe need to create
-		 * a new zip archive.  ZipChemCompProvider.initilizeZip to creates the
-		 * missing zip file */
+		/*
+		 * URIs in Java 7 cannot have spaces, must use Path instead and so, cannot use
+		 * the properties map to describe need to create a new zip archive.
+		 * ZipChemCompProvider.initilizeZip to creates the missing zip file
+		 */
 
 		/*
-		// convert the filename to a URI
-		String uriString = "jar:file:" + zipFile.toUri().getPath();
-		final URI uri = URI.create(uriString);
-
-		// if filesystem doesn't exist, create one.
-		final Map<String, String> env = new HashMap<>();
-		// Create a new zip if one isn't present.
-		if (!zipFile.toFile().exists()) {
-			System.out.println("Need to create " + zipFile.toString());
-		}
-		env.put("create", String.valueOf(!zipFile.toFile().exists()));
-		// Specify the encoding as UTF -8
-		env.put("encoding", "UTF-8");
-		*/
+		 * // convert the filename to a URI String uriString = "jar:file:" +
+		 * zipFile.toUri().getPath(); final URI uri = URI.create(uriString);
+		 * 
+		 * // if filesystem doesn't exist, create one. final Map<String, String> env =
+		 * new HashMap<>(); // Create a new zip if one isn't present. if
+		 * (!zipFile.toFile().exists()) { System.out.println("Need to create " +
+		 * zipFile.toString()); } env.put("create",
+		 * String.valueOf(!zipFile.toFile().exists())); // Specify the encoding as UTF
+		 * -8 env.put("encoding", "UTF-8");
+		 */
 
 		// Copy in each file.
 		try (FileSystem zipfs = FileSystems.newFileSystem(zipFile, null)) {
@@ -299,8 +335,7 @@ public class ZipChemCompProvider implements ChemCompProvider{
 				if (!f.isDirectory() && f.exists()) {
 					Path externalFile = f.toPath();
 					Path pathInZipFile = zipfs.getPath(pathWithinArchive.resolve(f.getName()).toString());
-					Files.copy(externalFile, pathInZipFile,
-							StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(externalFile, pathInZipFile, StandardCopyOption.REPLACE_EXISTING);
 				}
 			}
 			ret = true;

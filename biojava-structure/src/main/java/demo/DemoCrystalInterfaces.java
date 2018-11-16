@@ -20,7 +20,6 @@
  */
 package demo;
 
-
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
@@ -34,16 +33,16 @@ import org.biojava.nbio.structure.StructureIO;
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Vector3d;
 import java.util.List;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoCrystalInterfaces {
 
-
+	private static final Logger logger = LoggerFactory.getLogger(DemoCrystalInterfaces.class);
 	private static final double BSATOASA_CUTOFF = 0.95;
 	private static final double MIN_ASA_FOR_SURFACE = 5;
-	private static final int CONSIDER_COFACTORS = 40; // minimum number of atoms for a cofactor to be considered, if -1 all ignored
-
+	private static final int CONSIDER_COFACTORS = 40; // minimum number of atoms for a cofactor to be considered, if -1
+														// all ignored
 
 	private static final double CUTOFF = 5.5;
 
@@ -55,12 +54,10 @@ public class DemoCrystalInterfaces {
 
 	private static final double CLASH_DISTANCE = 1.5;
 
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-
 
 		String pdbCode = "1smt";
 
@@ -75,62 +72,66 @@ public class DemoCrystalInterfaces {
 
 		Structure structure = StructureIO.getStructure(pdbCode);
 
-
-		System.out.println(structure.getPDBCode());
-
+		logger.info(structure.getPDBCode());
 
 		SpaceGroup sg = structure.getCrystallographicInfo().getSpaceGroup();
 
-		if (sg!=null) {
-			System.out.println(sg.getShortSymbol()+" ("+sg.getId()+")");
-			System.out.println("Symmetry operators: "+sg.getNumOperators());
+		if (sg != null) {
+			logger.info(new StringBuilder().append(sg.getShortSymbol()).append(" (").append(sg.getId()).append(")")
+					.toString());
+			logger.info("Symmetry operators: " + sg.getNumOperators());
 		}
-		System.out.println("Calculating possible interfaces... (using "+NTHREADS+" CPUs for ASA calculation)");
+		logger.info(new StringBuilder().append("Calculating possible interfaces... (using ").append(NTHREADS)
+				.append(" CPUs for ASA calculation)").toString());
 		long start = System.currentTimeMillis();
 
 		CrystalBuilder cb = new CrystalBuilder(structure);
-
 
 		StructureInterfaceList interfaces = cb.getUniqueInterfaces(CUTOFF);
 		interfaces.calcAsas(N_SPHERE_POINTS, NTHREADS, CONSIDER_COFACTORS);
 		interfaces.removeInterfacesBelowArea(MIN_AREA_TO_KEEP);
 		List<StructureInterfaceCluster> clusters = interfaces.getClusters();
 
-
-		//interfaces.initialiseClusters(pdb, CLUSTERING_CUTOFF, MINATOMS_CLUSTERING, "CA");
+		// interfaces.initialiseClusters(pdb, CLUSTERING_CUTOFF, MINATOMS_CLUSTERING,
+		// "CA");
 
 		long end = System.currentTimeMillis();
-		long total = (end-start)/1000;
-		System.out.println("Total time for interface calculation: "+total+"s");
+		long total = (end - start) / 1000;
+		logger.info(new StringBuilder().append("Total time for interface calculation: ").append(total).append("s")
+				.toString());
 
-		System.out.println("Total number of interfaces found: "+interfaces.size());
+		logger.info("Total number of interfaces found: " + interfaces.size());
 
-		for (int i=0;i<interfaces.size();i++) {
-			StructureInterface interf = interfaces.get(i+1);
+		for (int i = 0; i < interfaces.size(); i++) {
+			StructureInterface interf = interfaces.get(i + 1);
 
 			String infiniteStr = "";
-			if (interf.isInfinite()) infiniteStr = " -- INFINITE interface";
-			System.out.println("\n##Interface "+(i+1)+" "+
-					interf.getCrystalIds().getFirst()+"-"+
-					interf.getCrystalIds().getSecond()+infiniteStr);
+			if (interf.isInfinite()) {
+				infiniteStr = " -- INFINITE interface";
+			}
+			logger.info(new StringBuilder().append("\n##Interface ").append(i + 1).append(" ")
+					.append(interf.getCrystalIds().getFirst()).append("-").append(interf.getCrystalIds().getSecond())
+					.append(infiniteStr).toString());
 			// warning if more than 10 clashes found at interface
 			List<AtomContact> clashing = interf.getContacts().getContactsWithinDistance(CLASH_DISTANCE);
-			if (clashing.size()>10)
-				System.out.println(clashing.size()+" CLASHES!!!");
+			if (clashing.size() > 10) {
+				logger.info(clashing.size() + " CLASHES!!!");
+			}
 
 			CrystalTransform transf1 = interf.getTransforms().getFirst();
 			CrystalTransform transf2 = interf.getTransforms().getSecond();
 
-			System.out.println("Transf1: "+SpaceGroup.getAlgebraicFromMatrix(transf1.getMatTransform())+
-					". Transf2: "+SpaceGroup.getAlgebraicFromMatrix(transf2.getMatTransform()));
-
+			logger.info(new StringBuilder().append("Transf1: ")
+					.append(SpaceGroup.getAlgebraicFromMatrix(transf1.getMatTransform())).append(". Transf2: ")
+					.append(SpaceGroup.getAlgebraicFromMatrix(transf2.getMatTransform())).toString());
 
 			String screwStr = "";
 			if (transf2.getTransformType().isScrew()) {
-				Vector3d screwTransl =
-						transf2.getTranslScrewComponent();
-				screwStr = " -- "+transf2.getTransformType().getShortName()+" with translation "+
-				String.format("(%5.2f,%5.2f,%5.2f)",screwTransl.x,screwTransl.y,screwTransl.z);
+				Vector3d screwTransl = transf2.getTranslScrewComponent();
+				screwStr = new StringBuilder().append(" -- ").append(transf2.getTransformType().getShortName())
+						.append(" with translation ")
+						.append(String.format("(%5.2f,%5.2f,%5.2f)", screwTransl.x, screwTransl.y, screwTransl.z))
+						.toString();
 
 			}
 
@@ -138,34 +139,34 @@ public class DemoCrystalInterfaces {
 				int foldType = sg.getAxisFoldType(transf2.getTransformId());
 				AxisAngle4d axisAngle = sg.getRotAxisAngle(transf2.getTransformId());
 
-				System.out.println(" "+foldType+"-fold on axis "+String.format("(%5.2f,%5.2f,%5.2f)",axisAngle.x,axisAngle.y,axisAngle.z)+screwStr);
+				logger.info(new StringBuilder().append(" ").append(foldType).append("-fold on axis ")
+						.append(String.format("(%5.2f,%5.2f,%5.2f)", axisAngle.x, axisAngle.y, axisAngle.z))
+						.append(screwStr).toString());
 			}
 
-			System.out.println("Number of contacts: "+interf.getContacts().size());
-			//System.out.println("Number of contacting atoms (from both molecules): "+interf.getNumAtomsInContact());
+			logger.info("Number of contacts: " + interf.getContacts().size());
+			// System.out.println("Number of contacting atoms (from both molecules):
+			// "+interf.getNumAtomsInContact());
 			Pair<List<Group>> cores = interf.getCoreResidues(BSATOASA_CUTOFF, MIN_ASA_FOR_SURFACE);
-			System.out.println("Number of core residues at "+String.format("%4.2f", BSATOASA_CUTOFF)+
-					" bsa to asa cutoff: "+
-					cores.getFirst().size()+" "+
-					cores.getSecond().size());
-			System.out.printf("Interface area: %8.2f\n",interf.getTotalArea());
+			logger.info(new StringBuilder().append("Number of core residues at ")
+					.append(String.format("%4.2f", BSATOASA_CUTOFF)).append(" bsa to asa cutoff: ")
+					.append(cores.getFirst().size()).append(" ").append(cores.getSecond().size()).toString());
+			logger.info("Interface area: %8.2f\n", interf.getTotalArea());
 
 			if (interf.isIsologous()) {
-				System.out.println("Isologous");
+				logger.info("Isologous");
 			} else {
-				System.out.println("Heterologous");
+				logger.info("Heterologous");
 			}
 
 		}
 
-		System.out.println("Interface clusters (one per line): ");
-		for (StructureInterfaceCluster cluster:clusters) {
-			System.out.print(cluster.getId()+": ");
-			for (StructureInterface member:cluster.getMembers()) {
-				System.out.print(member.getId()+" ");
-			}
+		logger.info("Interface clusters (one per line): ");
+		clusters.forEach(cluster -> {
+			logger.info(cluster.getId() + ": ");
+			cluster.getMembers().forEach(member -> logger.info(member.getId() + " "));
 			System.out.println();
-		}
+		});
 
 	}
 

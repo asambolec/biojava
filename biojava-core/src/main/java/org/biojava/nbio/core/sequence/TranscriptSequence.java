@@ -33,16 +33,18 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 
 /**
- * This is the sequence if you want to go from a gene sequence to a protein sequence. Need to start with a
- * ChromosomeSequence then getting a GeneSequence and then a TranscriptSequence
+ * This is the sequence if you want to go from a gene sequence to a protein
+ * sequence. Need to start with a ChromosomeSequence then getting a GeneSequence
+ * and then a TranscriptSequence
+ * 
  * @author Scooter Willis
  */
 public class TranscriptSequence extends DNASequence {
 
 	private final static Logger logger = LoggerFactory.getLogger(TranscriptSequence.class);
 
-	private final ArrayList<CDSSequence> cdsSequenceList = new ArrayList<CDSSequence>();
-	private final LinkedHashMap<String, CDSSequence> cdsSequenceHashMap = new LinkedHashMap<String, CDSSequence>();
+	private final ArrayList<CDSSequence> cdsSequenceList = new ArrayList<>();
+	private final LinkedHashMap<String, CDSSequence> cdsSequenceHashMap = new LinkedHashMap<>();
 	private StartCodonSequence startCodonSequence = null;
 	private StopCodonSequence stopCodonSequence = null;
 	private GeneSequence parentGeneSequence = null;
@@ -51,7 +53,7 @@ public class TranscriptSequence extends DNASequence {
 	 *
 	 * @param parentDNASequence
 	 * @param begin
-	 * @param end inclusive of end
+	 * @param end               inclusive of end
 	 */
 	public TranscriptSequence(GeneSequence parentDNASequence, int begin, int end) {
 		setParentSequence(parentDNASequence);
@@ -62,7 +64,7 @@ public class TranscriptSequence extends DNASequence {
 
 	}
 
-		@Override
+	@Override
 	public int getLength() {
 		return Math.abs(this.getBioEnd() - this.getBioBegin()) + 1;
 	}
@@ -76,6 +78,7 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Remove a CDS or coding sequence from the transcript sequence
+	 * 
 	 * @param accession
 	 * @return
 	 */
@@ -92,6 +95,7 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Get the CDS sequences that have been added to the TranscriptSequences
+	 * 
 	 * @return
 	 */
 	public LinkedHashMap<String, CDSSequence> getCDSSequences() {
@@ -100,17 +104,18 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Add a Coding Sequence region with phase to the transcript sequence
+	 * 
 	 * @param accession
 	 * @param begin
 	 * @param end
-	 * @param phase 0,1,2
+	 * @param phase     0,1,2
 	 * @return
 	 */
 	public CDSSequence addCDS(AccessionID accession, int begin, int end, int phase) throws Exception {
 		if (cdsSequenceHashMap.containsKey(accession.getID())) {
 			throw new Exception("Duplicate accesion id " + accession.getID());
 		}
-		CDSSequence cdsSequence = new CDSSequence(this, begin, end, phase); //sense should be the same as parent
+		CDSSequence cdsSequence = new CDSSequence(this, begin, end, phase); // sense should be the same as parent
 		cdsSequence.setAccession(accession);
 		cdsSequenceList.add(cdsSequence);
 		Collections.sort(cdsSequenceList, new CDSComparator());
@@ -121,27 +126,28 @@ public class TranscriptSequence extends DNASequence {
 	/**
 	 * http://www.sequenceontology.org/gff3.shtml
 	 * http://biowiki.org/~yam/bioe131/GFF.ppt
+	 * 
 	 * @return
 	 */
 	/**
-	 * Return a list of protein sequences based on each CDS sequence
-	 * where the phase shift between two CDS sequences is assigned to the
-	 * CDS sequence that starts the triplet. This can be used to map
-	 * a CDS/exon region of a protein sequence back to the DNA sequence
-	 * If you have a protein sequence and a predicted gene you can take the
-	 * predict CDS protein sequences and align back to the protein sequence.
-	 * If you have errors in mapping the predicted protein CDS regions to
-	 * an the known protein sequence then you can identify possible errors
-	 * in the prediction
+	 * Return a list of protein sequences based on each CDS sequence where the phase
+	 * shift between two CDS sequences is assigned to the CDS sequence that starts
+	 * the triplet. This can be used to map a CDS/exon region of a protein sequence
+	 * back to the DNA sequence If you have a protein sequence and a predicted gene
+	 * you can take the predict CDS protein sequences and align back to the protein
+	 * sequence. If you have errors in mapping the predicted protein CDS regions to
+	 * an the known protein sequence then you can identify possible errors in the
+	 * prediction
 	 *
 	 * @return
 	 */
 	public ArrayList<ProteinSequence> getProteinCDSSequences() {
-		ArrayList<ProteinSequence> proteinSequenceList = new ArrayList<ProteinSequence>();
+		ArrayList<ProteinSequence> proteinSequenceList = new ArrayList<>();
 		for (int i = 0; i < cdsSequenceList.size(); i++) {
 			CDSSequence cdsSequence = cdsSequenceList.get(i);
 			String codingSequence = cdsSequence.getCodingSequence();
-			//          logger.debug("CDS {} {} = {}", getStrand(), cdsSequence.getPhase(), codingSequence);
+			// logger.debug("CDS {} {} = {}", getStrand(), cdsSequence.getPhase(),
+			// codingSequence);
 			if (this.getStrand() == Strand.NEGATIVE) {
 				if (cdsSequence.phase == 1) {
 					codingSequence = codingSequence.substring(1, codingSequence.length());
@@ -176,14 +182,14 @@ public class TranscriptSequence extends DNASequence {
 				}
 			}
 
-
-			//    logger.debug("Coding Sequence: {}", codingSequence);
+			// logger.debug("Coding Sequence: {}", codingSequence);
 
 			DNASequence dnaCodingSequence = null;
 			try {
 				dnaCodingSequence = new DNASequence(codingSequence.toUpperCase());
 			} catch (CompoundNotFoundException e) {
-				// if I understand this should not happen, please correct if I'm wrong - JD 2014-10-24
+				// if I understand this should not happen, please correct if I'm wrong - JD
+				// 2014-10-24
 				logger.error("Could not create DNA coding sequence, {}. This is most likely a bug.", e.getMessage());
 			}
 			RNASequence rnaCodingSequence = dnaCodingSequence.getRNASequence(TranscriptionEngine.getDefault());
@@ -197,19 +203,19 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Get the stitched together CDS sequences then maps to the cDNA
+	 * 
 	 * @return
 	 */
 	public DNASequence getDNACodingSequence() {
 		StringBuilder sb = new StringBuilder();
-		for (CDSSequence cdsSequence : cdsSequenceList) {
-			sb.append(cdsSequence.getCodingSequence());
-		}
+		cdsSequenceList.forEach(cdsSequence -> sb.append(cdsSequence.getCodingSequence()));
 
 		DNASequence dnaSequence = null;
 		try {
 			dnaSequence = new DNASequence(sb.toString().toUpperCase());
 		} catch (CompoundNotFoundException e) {
-			// if I understand this should not happen, please correct if I'm wrong - JD 2014-10-24
+			// if I understand this should not happen, please correct if I'm wrong - JD
+			// 2014-10-24
 			logger.error("Could not create DNA coding sequence, {}. This is most likely a bug.", e.getMessage());
 		}
 		dnaSequence.setAccession(new AccessionID(this.getAccession().getID()));
@@ -218,6 +224,7 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Get the protein sequence
+	 * 
 	 * @return
 	 */
 	public ProteinSequence getProteinSequence() {
@@ -226,6 +233,7 @@ public class TranscriptSequence extends DNASequence {
 
 	/**
 	 * Get the protein sequence with user defined TranscriptEngine
+	 * 
 	 * @param engine
 	 * @return
 	 */

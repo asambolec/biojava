@@ -38,16 +38,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Calculate and assign the secondary structure (SS) to the
- * Groups of a Structure object. This object also stores the result
- * of the calculation.
+ * Calculate and assign the secondary structure (SS) to the Groups of a
+ * Structure object. This object also stores the result of the calculation.
  * <p>
- * The rules for SS calculation are the ones defined by DSSP:
- * Kabsch,W. and Sander,C. (1983) Biopolymers 22, 2577-2637.
- * Original DSSP article see at:
- * <a href="http://www.cmbi.kun.nl/gv/dssp/dssp.pdf">dssp.pdf</a>.
- * Some parts are also taken from: T.E.Creighton, Proteins -
- * Structure and Molecular Properties, 2nd Edition, Freeman 1994.
+ * The rules for SS calculation are the ones defined by DSSP: Kabsch,W. and
+ * Sander,C. (1983) Biopolymers 22, 2577-2637. Original DSSP article see at:
+ * <a href="http://www.cmbi.kun.nl/gv/dssp/dssp.pdf">dssp.pdf</a>. Some parts
+ * are also taken from: T.E.Creighton, Proteins - Structure and Molecular
+ * Properties, 2nd Edition, Freeman 1994.
  *
  * @author Andreas Prlic
  * @author Aleix Lafita
@@ -57,16 +55,15 @@ import java.util.Map;
 public class SecStrucCalc {
 
 	/**
-	 * DSSP assigns helices one residue shorter at each end, because the
-	 * residues at (i-1) and (i+n+1) are not assigned helix type although
-	 * they contain a consistent turn (H-bond). If this parameter
-	 * is true, the helices will be the length of the original DSSP
-	 * convention. If it is false, they will be two residue longer.
+	 * DSSP assigns helices one residue shorter at each end, because the residues at
+	 * (i-1) and (i+n+1) are not assigned helix type although they contain a
+	 * consistent turn (H-bond). If this parameter is true, the helices will be the
+	 * length of the original DSSP convention. If it is false, they will be two
+	 * residue longer.
 	 */
 	private static final boolean DSSP_HELICES = true;
 
-	private static final Logger logger =
-			LoggerFactory.getLogger(SecStrucCalc.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecStrucCalc.class);
 
 	/** min distance between two residues */
 	public static final double MINDIST = 0.5;
@@ -78,19 +75,21 @@ public class SecStrucCalc {
 	public static final double MAX_PEPTIDE_BOND_LENGTH = 2.5;
 
 	/** Minimal H-bond energy in cal/mol */
-	public static final int HBONDLOWENERGY  = -9900;
+	public static final int HBONDLOWENERGY = -9900;
 
 	/** higher limit for H-bond energy */
 	public static final double HBONDHIGHENERGY = -500.0;
 
-	/** constant for electrostatic energy
+	/**
+	 * constant for electrostatic energy
+	 * 
 	 * <pre>
 	 *      f  *  q1 *   q2  *  scale
 	 * Q = -332 * 0.42 * 0.20 * 1000.0
-	 *</pre>
+	 * </pre>
 	 *
-	 * q1 and q2 are partial charges which are placed on the C,O
-	 * (+q1,-q1) and N,H (-q2,+q2)
+	 * q1 and q2 are partial charges which are placed on the C,O (+q1,-q1) and N,H
+	 * (-q2,+q2)
 	 */
 	public static final double Q = -27888.0;
 
@@ -102,36 +101,35 @@ public class SecStrucCalc {
 	// Added by Anthony - to speed up intergroup calculations
 	private AtomContactSet contactSet;
 	private Map<ResidueNumber, Integer> indResMap;
-	public SecStrucCalc(){
-		ladders = new ArrayList<Ladder>();
-		bridges = new ArrayList<BetaBridge>();
+
+	public SecStrucCalc() {
+		ladders = new ArrayList<>();
+		bridges = new ArrayList<>();
 	}
 
-
 	/**
-	 * Predicts the secondary structure of this Structure object,
-	 * using a DSSP implementation.
+	 * Predicts the secondary structure of this Structure object, using a DSSP
+	 * implementation.
 	 *
-	 * @param s Structure to predict the SS
+	 * @param s      Structure to predict the SS
 	 * @param assign sets the SS information to the Groups of s
 	 * @return a List of SS annotation objects
 	 */
-	public List<SecStrucState> calculate(Structure s, boolean assign)
-			throws StructureException {
+	public List<SecStrucState> calculate(Structure s, boolean assign) throws StructureException {
 
-		List<SecStrucState> secstruc = new ArrayList<SecStrucState>();
-		for(int i=0; i<s.nrModels(); i++) {
+		List<SecStrucState> secstruc = new ArrayList<>();
+		for (int i = 0; i < s.nrModels(); i++) {
 			// Reinitialise the global vars
-			ladders = new ArrayList<Ladder>();
-			bridges = new ArrayList<BetaBridge>();
+			ladders = new ArrayList<>();
+			bridges = new ArrayList<>();
 			groups = initGroupArray(s, i);
 			// Initialise the contact set for this structure
 			initContactSet();
 			if (groups.length < 5) {
 				// not enough groups to do anything
-				throw new StructureException("Not enough backbone groups in the"
-						+ " Structure to calculate the secondary structure ("
-						+ groups.length+" given, minimum 5)" );
+				throw new StructureException(new StringBuilder().append("Not enough backbone groups in the")
+						.append(" Structure to calculate the secondary structure (").append(groups.length)
+						.append(" given, minimum 5)").toString());
 			}
 
 			calculateHAtoms();
@@ -142,12 +140,13 @@ public class SecStrucCalc {
 			detectBends();
 			detectStrands();
 
-			for (SecStrucGroup sg : groups){
-				SecStrucState ss = (SecStrucState)
-						sg.getProperty(Group.SEC_STRUC);
+			for (SecStrucGroup sg : groups) {
+				SecStrucState ss = (SecStrucState) sg.getProperty(Group.SEC_STRUC);
 				// Add to return list and assign to original if flag is true
 				secstruc.add(ss);
-				if (assign) sg.getOriginal().setProperty(Group.SEC_STRUC, ss);
+				if (assign) {
+					sg.getOriginal().setProperty(Group.SEC_STRUC, ss);
+				}
 			}
 		}
 		return secstruc;
@@ -162,16 +161,15 @@ public class SecStrucCalc {
 		atoms = new Atom[groups.length];
 		// Remake this local var
 		indResMap = new HashMap<>();
-		for (int i=0 ; i < groups.length ; i++){
+		for (int i = 0; i < groups.length; i++) {
 			SecStrucGroup one = groups[i];
 			indResMap.put(one.getResidueNumber(), i);
 			atoms[i] = one.getCA();
 		}
 		Grid grid = new Grid(CA_MIN_DIST);
-		if(atoms.length==0){
+		if (atoms.length == 0) {
 			contactSet = new AtomContactSet(CA_MIN_DIST);
-		}
-		else{
+		} else {
 			grid.addAtoms(atoms);
 			contactSet = grid.getAtomContacts();
 		}
@@ -182,40 +180,39 @@ public class SecStrucCalc {
 	 */
 	private void detectStrands() {
 
-		//Find all the beta bridges of the structure
+		// Find all the beta bridges of the structure
 		findBridges();
-		//Create Ladders
+		// Create Ladders
 		createLadders();
 
-		//Detect beta bulges between ladders
+		// Detect beta bulges between ladders
 		connectLadders();
 
-		//AND store SS assignments for Sheets, Strands and Bridges
+		// AND store SS assignments for Sheets, Strands and Bridges
 		updateSheets();
 	}
 
+	private void createLadders() {
 
-	private void createLadders(){
-
-		for (BetaBridge b : bridges){
+		for (BetaBridge b : bridges) {
 			boolean found = false;
-			for (Ladder ladder : ladders){
+			for (Ladder ladder : ladders) {
 				if (shouldExtendLadder(ladder, b)) {
 					found = true;
-					ladder.to++; //we go forward in this direction
-					switch(b.type){
+					ladder.to++; // we go forward in this direction
+					switch (b.type) {
 					case parallel:
-						ladder.lto++; //increment second strand
+						ladder.lto++; // increment second strand
 						break;
 					case antiparallel:
-						ladder.lfrom--; //decrement second strand
+						ladder.lfrom--; // decrement second strand
 						break;
 					}
 					break;
 				}
 			}
-			if (!found){
-				//Create new ladder with a single Bridge
+			if (!found) {
+				// Create new ladder with a single Bridge
 				Ladder l = new Ladder();
 				l.from = b.partner1;
 				l.to = b.partner1;
@@ -227,12 +224,11 @@ public class SecStrucCalc {
 		}
 	}
 
-
 	private void updateSheets() {
 
 		logger.debug(" got {} ladders!", ladders.size());
 
-		for (Ladder ladder : ladders){
+		for (Ladder ladder : ladders) {
 			logger.debug(ladder.toString());
 
 			for (int lcount = ladder.from; lcount <= ladder.to; lcount++) {
@@ -241,57 +237,55 @@ public class SecStrucCalc {
 				SecStrucType stype = state.getType();
 
 				int diff = ladder.from - lcount;
-				int l2count = ladder.lfrom - diff ;
+				int l2count = ladder.lfrom - diff;
 
 				SecStrucState state2 = getSecStrucState(l2count);
 				SecStrucType stype2 = state2.getType();
 
-				if ( ladder.from != ladder.to ) {
+				if (ladder.from != ladder.to) {
 					setSecStrucType(lcount, SecStrucType.extended);
 					setSecStrucType(l2count, SecStrucType.extended);
-				}
-				else {
-					if ( !stype.isHelixType() &&
-							( !stype.equals(SecStrucType.extended)))
-						setSecStrucType(lcount,SecStrucType.bridge);
+				} else {
+					if (!stype.isHelixType() && (stype != SecStrucType.extended)) {
+						setSecStrucType(lcount, SecStrucType.bridge);
+					}
 
-					if ( ! stype2.isHelixType() &&
-							(! stype2.equals(SecStrucType.extended)))
-						setSecStrucType(l2count,SecStrucType.bridge);
+					if (!stype2.isHelixType() && (stype2 != SecStrucType.extended)) {
+						setSecStrucType(l2count, SecStrucType.bridge);
+					}
 				}
 			}
 
 			// Check if two ladders are connected. both sides are 'E'
 
-			if (ladder.connectedTo == 0) continue;
+			if (ladder.connectedTo == 0) {
+				continue;
+			}
 			Ladder conladder = ladders.get(ladder.connectedTo);
 
-			if (ladder.btype.equals(BridgeType.antiparallel)) {
+			/* set one side */
+			/* set other side */
+			/* set one side */
+			/* set other side */
+			if (ladder.btype == BridgeType.antiparallel) {
 				/* set one side */
-				for (int lcount = ladder.from; lcount <= conladder.to;
-						lcount++) {
+				for (int lcount = ladder.from; lcount <= conladder.to; lcount++) {
 					setSecStrucType(lcount, SecStrucType.extended);
 
 				}
 				/* set other side */
-				for (int lcount = conladder.lto;
-						lcount <= ladder.lfrom;
-						lcount++) {
+				for (int lcount = conladder.lto; lcount <= ladder.lfrom; lcount++) {
 					setSecStrucType(lcount, SecStrucType.extended);
 				}
 
 			} else {
 				/* set one side */
-				for ( int lcount = ladder.from;
-						lcount <= conladder.to;
-						lcount++) {
+				for (int lcount = ladder.from; lcount <= conladder.to; lcount++) {
 
 					setSecStrucType(lcount, SecStrucType.extended);
 				}
 				/* set other side */
-				for ( int lcount =  ladder.lfrom;
-						lcount <= conladder.lto;
-						lcount++) {
+				for (int lcount = ladder.lfrom; lcount <= conladder.lto; lcount++) {
 
 					setSecStrucType(lcount, SecStrucType.extended);
 				}
@@ -301,11 +295,11 @@ public class SecStrucCalc {
 
 	private void connectLadders() {
 
-		for (int i = 0 ; i < ladders.size(); i++) {
-			for ( int j = i ; j < ladders.size(); j++){
+		for (int i = 0; i < ladders.size(); i++) {
+			for (int j = i; j < ladders.size(); j++) {
 				Ladder l1 = ladders.get(i);
 				Ladder l2 = ladders.get(j);
-				if (hasBulge(l1,l2)) {
+				if (hasBulge(l1, l2)) {
 					l1.connectedTo = j;
 					l2.connectedFrom = i;
 					logger.debug("Bulge from {} to {}", i, j);
@@ -313,40 +307,33 @@ public class SecStrucCalc {
 			}
 		}
 
-
 	}
 
 	/**
-	 * For beta structures, we define explicitly: a bulge-linked
-	 * ladder consists of two (perfect) ladder or bridges of the
-	 * same type connected by at most one extra residue on one
-	 * strand and at most four extra residues on the other strand,
-	 * all residues in bulge-linked ladders are marked "E,"
-	 * including the extra residues.
+	 * For beta structures, we define explicitly: a bulge-linked ladder consists of
+	 * two (perfect) ladder or bridges of the same type connected by at most one
+	 * extra residue on one strand and at most four extra residues on the other
+	 * strand, all residues in bulge-linked ladders are marked "E," including the
+	 * extra residues.
 	 */
 	private boolean hasBulge(Ladder l1, Ladder l2) {
 
-		boolean bulge = ((l1.btype.equals(l2.btype)) &&
-				(l2.from - l1.to < 6) &&
-				(l1.to < l2.from) &&
-				(l2.connectedTo == 0));
+		boolean bulge = ((l1.btype == l2.btype) && (l2.from - l1.to < 6) && (l1.to < l2.from) && (l2.connectedTo == 0));
 
-		if (!bulge) return bulge;
+		if (!bulge) {
+			return bulge;
+		}
 
-		switch(l1.btype){
+		switch (l1.btype) {
 		case parallel:
-			bulge = ( (l2.lfrom - l1.lto > 0) &&
-					((( l2.lfrom -l1.lto < 6) &&
-							(l2.from - l1.to < 3)) ||
-							( l2.lfrom - l1.lto <3)));
+			bulge = ((l2.lfrom - l1.lto > 0)
+					&& (((l2.lfrom - l1.lto < 6) && (l2.from - l1.to < 3)) || (l2.lfrom - l1.lto < 3)));
 
 			break;
 
 		case antiparallel:
-			bulge = ( (l1.lfrom - l2.lto > 0) &&
-					(((l1.lfrom -l2.lto < 6) &&
-							( l2.from - l1.to < 3)) ||
-							(l1.lfrom - l2.lto < 3)));
+			bulge = ((l1.lfrom - l2.lto > 0)
+					&& (((l1.lfrom - l2.lto < 6) && (l2.from - l1.to < 3)) || (l1.lfrom - l2.lto < 3)));
 
 			break;
 		}
@@ -356,13 +343,14 @@ public class SecStrucCalc {
 
 	private void registerBridge(int i, int j, BridgeType btype) {
 
-		BetaBridge bridge = new BetaBridge(i,j,btype);
+		BetaBridge bridge = new BetaBridge(i, j, btype);
 
 		boolean b1 = getSecStrucState(i).addBridge(bridge);
 		boolean b2 = getSecStrucState(j).addBridge(bridge);
 
-		if (!b1 && !b2)
+		if (!b1 && !b2) {
 			logger.warn("Ignoring Bridge between residues {} and {}. DSSP assignment might differ.", i, j);
+		}
 
 		bridges.add(bridge);
 	}
@@ -370,182 +358,173 @@ public class SecStrucCalc {
 	/**
 	 * Conditions to extend a ladder with a given beta Bridge:
 	 * <li>The bridge and ladder are of the same type.
-	 * <li>The smallest bridge residue is sequential to the first
-	 * 		strand ladder.
-	 * <li>The second bridge residue is either sequential (parallel)
-	 * 		or previous (antiparallel) to the second strand of the ladder
-	 * </li>
+	 * <li>The smallest bridge residue is sequential to the first strand ladder.
+	 * <li>The second bridge residue is either sequential (parallel) or previous
+	 * (antiparallel) to the second strand of the ladder</li>
+	 * 
 	 * @param ladder the ladder candidate to extend
-	 * @param b the beta bridge that would extend the ladder
+	 * @param b      the beta bridge that would extend the ladder
 	 * @return true if the bridge b extends the ladder
 	 */
 	private boolean shouldExtendLadder(Ladder ladder, BetaBridge b) {
 
-		//Only extend if they are of the same type
-		boolean sameType = b.type.equals(ladder.btype);
-		if (!sameType) return false;
+		// Only extend if they are of the same type
+		boolean sameType = b.type == ladder.btype;
+		if (!sameType) {
+			return false;
+		}
 
-		//Only extend if residue 1 is sequential to ladder strand
-		boolean sequential = (b.partner1 == ladder.to+1);
-		if (!sequential) return false;
+		// Only extend if residue 1 is sequential to ladder strand
+		boolean sequential = (b.partner1 == ladder.to + 1);
+		if (!sequential) {
+			return false;
+		}
 
-		switch(b.type){
+		switch (b.type) {
 		case parallel:
-			//Residue 2 should be sequential to second strand
-			if (b.partner2 == ladder.lto+1) return true;
+			// Residue 2 should be sequential to second strand
+			if (b.partner2 == ladder.lto + 1) {
+				return true;
+			}
 			break;
 		case antiparallel:
-			//Residue 2 should be previous to second strand
-			if (b.partner2 == ladder.lfrom-1) return true;
+			// Residue 2 should be previous to second strand
+			if (b.partner2 == ladder.lfrom - 1) {
+				return true;
+			}
 			break;
 		}
 		return false;
 	}
 
-
-
-
 	/**
-	 * Two nonoverlapping stretches of three residues each, i-1,i,i+1 and
-	 * j-1,j,j+1, form either a parallel or antiparallel bridge, depending on
-	 * which of two basic patterns is matched. We assign a bridge between
-	 * residues i and j if there are two H bonds characteristic of beta-
-	 * structure; in particular:
+	 * Two nonoverlapping stretches of three residues each, i-1,i,i+1 and j-1,j,j+1,
+	 * form either a parallel or antiparallel bridge, depending on which of two
+	 * basic patterns is matched. We assign a bridge between residues i and j if
+	 * there are two H bonds characteristic of beta- structure; in particular:
 	 * <p>
-	 * Parallel Bridge(i,j) =: [Hbond(i-1,j) and Hbond(j,i+1)]
-	 * 							or [Hbond(j-1,i) and Hbond(i,j+1)]
+	 * Parallel Bridge(i,j) =: [Hbond(i-1,j) and Hbond(j,i+1)] or [Hbond(j-1,i) and
+	 * Hbond(i,j+1)]
 	 * <p>
-	 * Antiparallel Bridge(i,j) =: [Hbond(i,j) and Hbond(j,i)]
-	 * 								or [Hbond(i-1,j+1) and Hbond(j-1,i+1)]
+	 * Antiparallel Bridge(i,j) =: [Hbond(i,j) and Hbond(j,i)] or [Hbond(i-1,j+1)
+	 * and Hbond(j-1,i+1)]
 	 *
 	 * Optimised to use the contact set
 	 */
 	private void findBridges() {
-		// Get the interator of contacts
-		Iterator<AtomContact> myIter = contactSet.iterator();
-		List<Pair<Integer>> outList = new ArrayList<Pair<Integer>>();
+		List<Pair<Integer>> outList = new ArrayList<>();
 
 		// Now iterate through this
-		while(myIter.hasNext()){
-			// Get the next atom contact
-			AtomContact ac = myIter.next();
+		for (AtomContact ac : contactSet) {
 			Group g1 = ac.getPair().getFirst().getGroup();
 			Group g2 = ac.getPair().getSecond().getGroup();
 			// Get the indices
 			int i = indResMap.get(g1.getResidueNumber());
 			int j = indResMap.get(g2.getResidueNumber());
 			// If i>j switch them over
-			if(i>j){
+			if (i > j) {
 				// Switch them over
 				int old = i;
 				i = j;
 				j = old;
 			}
 			// Only these
-			if(j<i+3){
+			if (j < i + 3) {
 				continue;
 			}
 			// If it's the first
-			if(i==0){
+			if (i == 0) {
 				continue;
 			}
-			if(j==0){
+			if (j == 0) {
 				continue;
 			}
 			// If it's the last
-			if(i==groups.length-1){
+			if (i == groups.length - 1) {
 				continue;
 			}
-			if(j==groups.length-1){
+			if (j == groups.length - 1) {
 				continue;
 			}
 
-			Pair<Integer> thisPair = new Pair<Integer>(i,j);
+			Pair<Integer> thisPair = new Pair<>(i, j);
 			outList.add(thisPair);
 		}
 		//
 		Collections.sort(outList, new Comparator<Pair<Integer>>() {
 			@Override
 			public int compare(Pair<Integer> o1, Pair<Integer> o2) {
-				if(o1.getFirst()<o2.getFirst()){
+				if (o1.getFirst() < o2.getFirst()) {
 					return -1;
-				}
-				else if(o1.getFirst()>o2.getFirst()){
+				} else if (o1.getFirst() > o2.getFirst()) {
 					return +1;
-				}
-				else{
-					if(o1.getSecond()<o2.getSecond()){
+				} else {
+					if (o1.getSecond() < o2.getSecond()) {
 						return -1;
-					}
-					else if(o1.getSecond()>o2.getSecond()){
+					} else if (o1.getSecond() > o2.getSecond()) {
 						return 1;
-					}
-					else{
+					} else {
 						return 0;
 					}
 				}
 			}
 		});
 
-
-
-		for(Pair<Integer> p: outList){
+		outList.forEach(p -> {
 			int i = p.getFirst();
 			int j = p.getSecond();
 			BridgeType btype = null;
 			// Now do the bonding
-			if ((isBonded(i-1,j) && isBonded(j,i+1)) ||
-					(isBonded(j-1,i) && isBonded(i,j+1))) {
+			if ((isBonded(i - 1, j) && isBonded(j, i + 1)) || (isBonded(j - 1, i) && isBonded(i, j + 1))) {
 				btype = BridgeType.parallel;
-			}
-			else if ((isBonded(i,j) && isBonded(j,i)) ||
-					(isBonded(i-1,j+1) && (isBonded(j-1,i+1)))) {
+			} else if ((isBonded(i, j) && isBonded(j, i)) || (isBonded(i - 1, j + 1) && (isBonded(j - 1, i + 1)))) {
 				btype = BridgeType.antiparallel;
 			}
-			if (btype != null){
+			if (btype != null) {
 				registerBridge(i, j, btype);
 			}
-		}
-
+		});
 
 	}
 
 	private void detectBends() {
 
-		for (int i = 2 ; i < groups.length-2 ;i++){
+		for (int i = 2; i < groups.length - 2; i++) {
 
-			//Check if all atoms form peptide bonds (backbone discontinuity)
+			// Check if all atoms form peptide bonds (backbone discontinuity)
 			boolean bonded = true;
-			for (int k=0; k<4; k++){
-				int index = i+k-2;
+			for (int k = 0; k < 4; k++) {
+				int index = i + k - 2;
 				Atom C = groups[index].getC();
-				Atom N = groups[index+1].getN();
-				//Peptide bond C-N
-				if (Calc.getDistance(C, N) > MAX_PEPTIDE_BOND_LENGTH){
+				Atom N = groups[index + 1].getN();
+				// Peptide bond C-N
+				if (Calc.getDistance(C, N) > MAX_PEPTIDE_BOND_LENGTH) {
 					bonded = false;
 					break;
 				}
 			}
-			if (!bonded) continue;
+			if (!bonded) {
+				continue;
+			}
 
-			SecStrucGroup im2 = groups[i-2];
+			SecStrucGroup im2 = groups[i - 2];
 			SecStrucGroup g = groups[i];
-			SecStrucGroup ip2 = groups[i+2];
+			SecStrucGroup ip2 = groups[i + 2];
 
 			Atom caim2 = im2.getCA();
-			Atom cag   = g.getCA();
+			Atom cag = g.getCA();
 			Atom caip2 = ip2.getCA();
 
-			//Create vectors ( Ca i to Ca i-2 ) ; ( Ca i to CA i + 2 )
-			Atom caminus2 = Calc.subtract(caim2,cag);
-			Atom caplus2  = Calc.subtract(cag,caip2);
+			// Create vectors ( Ca i to Ca i-2 ) ; ( Ca i to CA i + 2 )
+			Atom caminus2 = Calc.subtract(caim2, cag);
+			Atom caplus2 = Calc.subtract(cag, caip2);
 
 			double angle = Calc.angle(caminus2, caplus2);
 
 			SecStrucState state = getSecStrucState(i);
 			state.setKappa((float) angle);
 
-			//Angles = 360 should be discarded
+			// Angles = 360 should be discarded
 			if (angle > 70.0 && angle < 359.99) {
 				setSecStrucType(i, SecStrucType.bend);
 				state.setBend(true);
@@ -553,7 +532,7 @@ public class SecStrucCalc {
 		}
 	}
 
-	private void calculateDihedralAngles()  {
+	private void calculateDihedralAngles() {
 
 		// dihedral angles
 		// phi: C-N-CA-C
@@ -562,27 +541,25 @@ public class SecStrucCalc {
 		// N-CA-CB-CG1(ILE/VAL), N-CA-CB-SG(CYS)
 		// Omega: CA-C-N-CA
 
-		for (int i=0 ; i < groups.length-1 ;  i++){
+		for (int i = 0; i < groups.length - 1; i++) {
 
 			SecStrucGroup a = groups[i];
-			SecStrucGroup b = groups[i+1];
+			SecStrucGroup b = groups[i + 1];
 
-			Atom a_N   = a.getN();
-			Atom a_CA  = a.getCA();
-			Atom a_C  = a.getC();
+			Atom a_N = a.getN();
+			Atom a_CA = a.getCA();
+			Atom a_C = a.getC();
 
-			Atom b_N  = b.getN();
+			Atom b_N = b.getN();
 			Atom b_CA = b.getCA();
-			Atom b_C  = b.getC();
+			Atom b_C = b.getC();
 
-			double phi = Calc.torsionAngle(a_C,b_N,b_CA,b_C);
-			double psi = Calc.torsionAngle(a_N,a_CA,a_C,b_N);
-			double omega = Calc.torsionAngle(a_CA,a_C,b_N,b_CA);
+			double phi = Calc.torsionAngle(a_C, b_N, b_CA, b_C);
+			double psi = Calc.torsionAngle(a_N, a_CA, a_C, b_N);
+			double omega = Calc.torsionAngle(a_CA, a_C, b_N, b_CA);
 
-			SecStrucState state1 = (SecStrucState)
-					a.getProperty(Group.SEC_STRUC);
-			SecStrucState state2 = (SecStrucState)
-					b.getProperty(Group.SEC_STRUC);
+			SecStrucState state1 = (SecStrucState) a.getProperty(Group.SEC_STRUC);
+			SecStrucState state2 = (SecStrucState) b.getProperty(Group.SEC_STRUC);
 
 			state2.setPhi(phi);
 			state1.setPsi(psi);
@@ -597,24 +574,24 @@ public class SecStrucCalc {
 
 	/**
 	 * Generate a DSSP file format ouput String of this SS prediction.
+	 * 
 	 * @return String in DSSP output file format
 	 */
 	public String printDSSP() {
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		String nl = System.getProperty("line.separator");
 
-		//Header Line
-		buf.append("==== Secondary Structure Definition by BioJava"
-				+ " DSSP implementation, Version October 2015 ===="+nl);
+		// Header Line
+		buf.append(new StringBuilder().append("==== Secondary Structure Definition by BioJava")
+				.append(" DSSP implementation, Version October 2015 ====").append(nl).toString());
 
-		//First line with column definition
-		buf.append("  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     "
-				+ "N-H-->O    O-->H-N    N-H-->O    O-->H-N    "
-				+ "TCO  KAPPA ALPHA  PHI    PSI    "
-				+ "X-CA   Y-CA   Z-CA ");
+		// First line with column definition
+		buf.append(new StringBuilder().append("  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     ")
+				.append("N-H-->O    O-->H-N    N-H-->O    O-->H-N    ").append("TCO  KAPPA ALPHA  PHI    PSI    ")
+				.append("X-CA   Y-CA   Z-CA ").toString());
 
-		for (int i =0 ; i < groups.length ;i++){
+		for (int i = 0; i < groups.length; i++) {
 			buf.append(nl);
 			SecStrucState ss = getSecStrucState(i);
 			buf.append(ss.printDSSPline(i));
@@ -624,30 +601,35 @@ public class SecStrucCalc {
 	}
 
 	/**
-	 * Generate a summary of this SS prediction with information about
-	 * the three types of helix turns in different row sequences.
+	 * Generate a summary of this SS prediction with information about the three
+	 * types of helix turns in different row sequences.
 	 * <p>
-	 * This is similar to the summary output of Jmol, and useful to visualize
-	 * the helix patterns.
+	 * This is similar to the summary output of Jmol, and useful to visualize the
+	 * helix patterns.
 	 *
 	 * @return String helix summary
 	 */
 	public String printHelixSummary() {
 
-		StringBuffer g = new StringBuffer(); //3-10 helix
-		StringBuffer h = new StringBuffer(); //alpha helix
-		StringBuffer i = new StringBuffer(); //pi-helix
-		StringBuffer ss = new StringBuffer(); //SS summary
-		StringBuffer aa = new StringBuffer(); //AA one-letter
+		// 3-10 helix
+		StringBuilder g = new StringBuilder();
+		// alpha helix
+		StringBuilder h = new StringBuilder();
+		// pi-helix
+		StringBuilder i = new StringBuilder();
+		// SS summary
+		StringBuilder ss = new StringBuilder();
+		// AA one-letter
+		StringBuilder aa = new StringBuilder();
 		String nl = System.getProperty("line.separator");
 
-		g.append(	"3 turn: ");
-		h.append(	"4 turn: ");
-		i.append(	"5 turn: ");
-		ss.append(	"SS:     ");
-		aa.append(	"AA:     ");
+		g.append("3 turn: ");
+		h.append("4 turn: ");
+		i.append("5 turn: ");
+		ss.append("SS:     ");
+		aa.append("AA:     ");
 
-		for (int k = 0; k < groups.length; k++){
+		for (int k = 0; k < groups.length; k++) {
 
 			SecStrucState state = getSecStrucState(k);
 			g.append(state.getTurn()[0]);
@@ -657,22 +639,24 @@ public class SecStrucCalc {
 			aa.append(StructureTools.get1LetterCode(groups[k].getPDBName()));
 		}
 
-		return g.toString()+nl+h.toString()+nl+
-				i.toString()+nl+ss.toString()+nl+aa.toString();
+		return new StringBuilder().append(g.toString()).append(nl).append(h.toString()).append(nl).append(i.toString())
+				.append(nl).append(ss.toString()).append(nl).append(aa.toString()).toString();
 	}
 
 	/**
-	 * Generate a FASTA sequence with the SS annotation letters in the
-	 * aminoacid sequence order.
+	 * Generate a FASTA sequence with the SS annotation letters in the aminoacid
+	 * sequence order.
+	 * 
 	 * @return String in FASTA sequence format
 	 */
 	public String printFASTA() {
 
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		String nl = System.getProperty("line.separator");
-		buf.append(">"+groups[0].getChain().getStructure().getIdentifier()+nl);
+		buf.append(new StringBuilder().append(">").append(groups[0].getChain().getStructure().getIdentifier())
+				.append(nl).toString());
 
-		for (int g = 0; g < groups.length; g++){
+		for (int g = 0; g < groups.length; g++) {
 			buf.append(getSecStrucState(g).getType());
 		}
 		return buf.toString();
@@ -680,38 +664,43 @@ public class SecStrucCalc {
 
 	@Override
 	public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result + Arrays.hashCode(atoms);
-	    return result;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(atoms);
+		return result;
 	}
 
 	@Override
-	public boolean equals(Object o){
+	public boolean equals(Object o) {
 
-		if (!(o instanceof SecStrucCalc)) return false;
-		else {
+		if (!(o instanceof SecStrucCalc)) {
+			return false;
+		} else {
 			SecStrucCalc ss = (SecStrucCalc) o;
-			if (groups.length != ss.groups.length) return false;
+			if (groups.length != ss.groups.length) {
+				return false;
+			}
 
-			for (int g=0; g<groups.length; g++){
+			for (int g = 0; g < groups.length; g++) {
 				SecStrucInfo g1 = getSecStrucState(g);
 				SecStrucInfo g2 = ss.getSecStrucState(g);
-				if (!g1.equals(g2)) return false;
+				if (!g1.equals(g2)) {
+					return false;
+				}
 			}
 			return true;
 		}
 	}
 
 	private static SecStrucGroup[] initGroupArray(Structure s, int modelId) {
-		List<SecStrucGroup> groupList = new ArrayList<SecStrucGroup>();
-		// 
-		for ( Chain c : s.getChains(modelId)){
+		List<SecStrucGroup> groupList = new ArrayList<>();
+		//
+		for (Chain c : s.getChains(modelId)) {
 
-			for (Group g : c.getAtomGroups()){
+			for (Group g : c.getAtomGroups()) {
 
-				//We can also calc secstruc if it is a modified amino acid
-				if ( g.hasAminoAtoms()) {
+				// We can also calc secstruc if it is a modified amino acid
+				if (g.hasAminoAtoms()) {
 
 					SecStrucGroup sg = new SecStrucGroup();
 					sg.setResidueNumber(g.getResidueNumber());
@@ -720,21 +709,20 @@ public class SecStrucCalc {
 					sg.setChain(g.getChain());
 
 					Atom N = g.getAtom(StructureTools.N_ATOM_NAME);
-					Atom CA =  g.getAtom(StructureTools.CA_ATOM_NAME);
+					Atom CA = g.getAtom(StructureTools.CA_ATOM_NAME);
 					Atom C = g.getAtom(StructureTools.C_ATOM_NAME);
-					Atom O =  g.getAtom(StructureTools.O_ATOM_NAME);
-					if ( N == null || CA == null || C == null || O == null)
+					Atom O = g.getAtom(StructureTools.O_ATOM_NAME);
+					if (N == null || CA == null || C == null || O == null) {
 						continue;
+					}
 
-					sg.setN((Atom)   N.clone());
+					sg.setN((Atom) N.clone());
 					sg.setCA((Atom) CA.clone());
-					sg.setC((Atom)   C.clone());
-					sg.setO((Atom)  O.clone());
+					sg.setC((Atom) C.clone());
+					sg.setO((Atom) O.clone());
 					sg.setOriginal(g);
 
-					SecStrucState state = new SecStrucState(sg,
-							SecStrucInfo.BIOJAVA_ASSIGNMENT,
-							SecStrucType.coil);
+					SecStrucState state = new SecStrucState(sg, SecStrucInfo.BIOJAVA_ASSIGNMENT, SecStrucType.coil);
 
 					sg.setProperty(Group.SEC_STRUC, state);
 					groupList.add(sg);
@@ -746,40 +734,36 @@ public class SecStrucCalc {
 	}
 
 	/**
-	 * Calculate the coordinates of the H atoms. They are usually
-	 * missing in the PDB files as only few experimental methods allow
-	 * to resolve their location.
+	 * Calculate the coordinates of the H atoms. They are usually missing in the PDB
+	 * files as only few experimental methods allow to resolve their location.
 	 */
 	private void calculateHAtoms() throws StructureException {
 
-		for ( int i = 0 ; i < groups.length-1  ; i++) {
+		for (int i = 0; i < groups.length - 1; i++) {
 
-			SecStrucGroup a  = groups[i];
-			SecStrucGroup b  = groups[i+1];
+			SecStrucGroup a = groups[i];
+			SecStrucGroup b = groups[i + 1];
 
-			if ( !b.hasAtom("H") ) {
-				//Atom H = calc_H(a.getC(), b.getN(), b.getCA());
+			if (!b.hasAtom("H")) {
+				// Atom H = calc_H(a.getC(), b.getN(), b.getCA());
 				Atom H = calcSimple_H(a.getC(), a.getO(), b.getN());
 				b.setH(H);
 			}
 		}
 	}
 
-
-
 	/**
-	 * Calculate the HBonds between different groups.
-	 * see Creighton page 147 f
+	 * Calculate the HBonds between different groups. see Creighton page 147 f
 	 * Modified to use only the contact map
 	 */
 	private void calculateHBonds() {
 		/**
 		 * More efficient method for calculating C-Alpha pairs
 		 */
-		if (groups.length < 5) return;
-		Iterator<AtomContact> otu = contactSet.iterator();
-		while(otu.hasNext()){
-			AtomContact ac = otu.next();
+		if (groups.length < 5) {
+			return;
+		}
+		for (AtomContact ac : contactSet) {
 			Pair<Atom> pair = ac.getPair();
 			Group g1 = pair.getFirst().getGroup();
 			Group g2 = pair.getSecond().getGroup();
@@ -787,22 +771,24 @@ public class SecStrucCalc {
 			int i = indResMap.get(g1.getResidueNumber());
 			int j = indResMap.get(g2.getResidueNumber());
 			// Now check this
-			checkAddHBond(i,j);
-			//"backwards" hbonds are not allowed
-			if (j!=(i+1)) checkAddHBond(j,i);
+			checkAddHBond(i, j);
+			// "backwards" hbonds are not allowed
+			if (j != (i + 1)) {
+				checkAddHBond(j, i);
+			}
 		}
 	}
 
-	private void checkAddHBond(int i, int j){
+	private void checkAddHBond(int i, int j) {
 
 		SecStrucGroup one = groups[i];
 
-		if (one.getPDBName().equals("PRO")){
+		if ("PRO".equals(one.getPDBName())) {
 			logger.debug("Ignore: PRO {}", one.getResidueNumber());
 			return;
 		}
 		if (!one.hasAtom("H")) {
-			logger.debug("Residue {} has no H",one.getResidueNumber());
+			logger.debug("Residue {} has no H", one.getResidueNumber());
 			return;
 		}
 
@@ -811,30 +797,26 @@ public class SecStrucCalc {
 		double energy = 0;
 
 		try {
-			energy = calculateHBondEnergy(one,two);
-		} catch (Exception e){
+			energy = calculateHBondEnergy(one, two);
+		} catch (Exception e) {
 			logger.warn("Energy calculation failed", e);
 			return;
 		}
-		logger.debug("Energy between positions ({},{}): ",i,j,energy);
+		logger.debug("Energy between positions ({},{}): ", i, j, energy);
 
-		trackHBondEnergy(i,j,energy);
+		trackHBondEnergy(i, j, energy);
 	}
 
 	/**
-	 * Calculate HBond energy of two groups in cal/mol
-	 * see Creighton page 147 f
+	 * Calculate HBond energy of two groups in cal/mol see Creighton page 147 f
 	 * <p>
-	 * Jeffrey, George A., An introduction to hydrogen bonding,
-	 * Oxford University Press, 1997.
-	 * categorizes hbonds with donor-acceptor distances of
-	 * 2.2-2.5 &aring; as "strong, mostly covalent",
-	 * 2.5-3.2 &aring; as "moderate, mostly electrostatic",
-	 * 3.2-4.0 &aring; as "weak, electrostatic".
-	 * Energies are given as 40-14, 15-4, and <4 kcal/mol respectively.
+	 * Jeffrey, George A., An introduction to hydrogen bonding, Oxford University
+	 * Press, 1997. categorizes hbonds with donor-acceptor distances of 2.2-2.5
+	 * &aring; as "strong, mostly covalent", 2.5-3.2 &aring; as "moderate, mostly
+	 * electrostatic", 3.2-4.0 &aring; as "weak, electrostatic". Energies are given
+	 * as 40-14, 15-4, and <4 kcal/mol respectively.
 	 */
-	private static double calculateHBondEnergy(SecStrucGroup one,
-			SecStrucGroup two) {
+	private static double calculateHBondEnergy(SecStrucGroup one, SecStrucGroup two) {
 
 		Atom N = one.getN();
 		Atom H = one.getH();
@@ -842,18 +824,17 @@ public class SecStrucCalc {
 		Atom O = two.getO();
 		Atom C = two.getC();
 
-		double dno = Calc.getDistance(O,N);
-		double dhc = Calc.getDistance(C,H);
-		double dho = Calc.getDistance(O,H);
-		double dnc = Calc.getDistance(C,N);
+		double dno = Calc.getDistance(O, N);
+		double dhc = Calc.getDistance(C, H);
+		double dho = Calc.getDistance(O, H);
+		double dnc = Calc.getDistance(C, N);
 
-		logger.debug(" cccc: {} {} {} {} O ({})..N ({}):{}  |  ho:{} - hc:{} + nc:{} - no:{}",
-				one.getResidueNumber(),one.getPDBName(),two.getResidueNumber(),two.getPDBName(),
-				O.getPDBserial(),N.getPDBserial(),dno,dho,dhc,dnc,dno);
+		logger.debug(" cccc: {} {} {} {} O ({})..N ({}):{}  |  ho:{} - hc:{} + nc:{} - no:{}", one.getResidueNumber(),
+				one.getPDBName(), two.getResidueNumber(), two.getPDBName(), O.getPDBserial(), N.getPDBserial(), dno,
+				dho, dhc, dnc, dno);
 
-		//there seems to be a contact!
-		if ( (dno < MINDIST) || (dhc < MINDIST) ||
-				(dnc < MINDIST) || (dno < MINDIST)) {
+		// there seems to be a contact!
+		if ((dno < MINDIST) || (dhc < MINDIST) || (dnc < MINDIST) || (dno < MINDIST)) {
 			return HBONDLOWENERGY;
 		}
 
@@ -862,22 +843,24 @@ public class SecStrucCalc {
 
 		double energy = e1 + e2;
 
-		logger.debug(" N ({}) O({}): {} : {} ",N.getPDBserial(),O.getPDBserial(),(float) dno,energy);
+		logger.debug(" N ({}) O({}): {} : {} ", N.getPDBserial(), O.getPDBserial(), (float) dno, energy);
 
-		//Avoid too strong energy
-		if (energy > HBONDLOWENERGY) return energy;
+		// Avoid too strong energy
+		if (energy > HBONDLOWENERGY) {
+			return energy;
+		}
 
-		return HBONDLOWENERGY ;
+		return HBONDLOWENERGY;
 	}
 
 	/**
-	 * Store Hbonds in the Groups.
-	 * DSSP allows two HBonds per aminoacids to allow bifurcated bonds.
+	 * Store Hbonds in the Groups. DSSP allows two HBonds per aminoacids to allow
+	 * bifurcated bonds.
 	 */
-	private  void trackHBondEnergy(int i, int j, double energy) {
+	private void trackHBondEnergy(int i, int j, double energy) {
 
-		if (groups[i].getPDBName().equals("PRO")) {
-			logger.debug("Ignore: PRO {}",groups[i].getResidueNumber());
+		if ("PRO".equals(groups[i].getPDBName())) {
+			logger.debug("Ignore: PRO {}", groups[i].getResidueNumber());
 			return;
 		}
 
@@ -890,9 +873,9 @@ public class SecStrucCalc {
 		double don1e = stateTwo.getDonor1().getEnergy();
 		double don2e = stateTwo.getDonor2().getEnergy();
 
-		//Acceptor: N-H-->O
+		// Acceptor: N-H-->O
 		if (energy < acc1e) {
-			logger.debug("{} < {}",energy,acc1e);
+			logger.debug("{} < {}", energy, acc1e);
 			stateOne.setAccept2(stateOne.getAccept1());
 
 			HBond bond = new HBond();
@@ -901,8 +884,8 @@ public class SecStrucCalc {
 
 			stateOne.setAccept1(bond);
 
-		} else if ( energy < acc2e ) {
-			logger.debug("{} < {}",energy,acc2e);
+		} else if (energy < acc2e) {
+			logger.debug("{} < {}", energy, acc2e);
 
 			HBond bond = new HBond();
 			bond.setEnergy(energy);
@@ -911,10 +894,9 @@ public class SecStrucCalc {
 			stateOne.setAccept2(bond);
 		}
 
-
-		//The other side of the bond: donor O-->N-H
-		if (energy <  don1e) {
-			logger.debug("{} < {}",energy,don1e);
+		// The other side of the bond: donor O-->N-H
+		if (energy < don1e) {
+			logger.debug("{} < {}", energy, don1e);
 			stateTwo.setDonor2(stateTwo.getDonor1());
 
 			HBond bond = new HBond();
@@ -923,8 +905,8 @@ public class SecStrucCalc {
 
 			stateTwo.setDonor1(bond);
 
-		} else if ( energy < don2e ) {
-			logger.debug("{} < {}",energy,don2e);
+		} else if (energy < don2e) {
+			logger.debug("{} < {}", energy, don2e);
 
 			HBond bond = new HBond();
 			bond.setEnergy(energy);
@@ -937,20 +919,22 @@ public class SecStrucCalc {
 	/**
 	 * Detect helical turn patterns.
 	 */
-	private void calculateTurns(){
+	private void calculateTurns() {
 
-		for (int i = 0 ; i< groups.length; i++){
+		for (int i = 0; i < groups.length; i++) {
 			for (int turn = 3; turn <= 5; turn++) {
 
-				if (i+turn >= groups.length) continue;
+				if (i + turn >= groups.length) {
+					continue;
+				}
 
-				//Check for H bond from NH(i+n) to CO(i)
-				if (isBonded(i, i+turn)) {
-					logger.debug("Turn at ({},{}) turn {}",i,(i+turn),turn);
+				// Check for H bond from NH(i+n) to CO(i)
+				if (isBonded(i, i + turn)) {
+					logger.debug("Turn at ({},{}) turn {}", i, (i + turn), turn);
 					getSecStrucState(i).setTurn('>', turn);
-					getSecStrucState(i+turn).setTurn('<', turn);
-					//Bracketed residues get the helix number
-					for (int j=i+1; j<i+turn; j++){
+					getSecStrucState(i + turn).setTurn('<', turn);
+					// Bracketed residues get the helix number
+					for (int j = i + 1; j < i + turn; j++) {
 						Integer t = turn;
 						char helix = t.toString().charAt(0);
 						getSecStrucState(j).setTurn(helix, turn);
@@ -961,11 +945,10 @@ public class SecStrucCalc {
 	}
 
 	/**
-	 * Test if two groups are forming an H-Bond. The bond tested is
-	 * from the CO of group i to the NH of group j. Acceptor (i) and
-	 * donor (j). The donor of i has to be j, and the acceptor of j
-	 * has to be i.
-	 * DSSP defines H-Bonds if the energy < -500 cal/mol.
+	 * Test if two groups are forming an H-Bond. The bond tested is from the CO of
+	 * group i to the NH of group j. Acceptor (i) and donor (j). The donor of i has
+	 * to be j, and the acceptor of j has to be i. DSSP defines H-Bonds if the
+	 * energy < -500 cal/mol.
 	 *
 	 * @param i group one
 	 * @param j group two
@@ -986,44 +969,39 @@ public class SecStrucCalc {
 		int acc1p = two.getAccept1().getPartner();
 		int acc2p = two.getAccept2().getPartner();
 
-		//Either donor from i is j, or accept from j is i
-		boolean hbond = (don1p == j && don1e < HBONDHIGHENERGY) ||
-				(don2p == j && don2e < HBONDHIGHENERGY) ||
-				(acc1p == i && acc1e < HBONDHIGHENERGY) ||
-				(acc2p == i && acc2e < HBONDHIGHENERGY);
+		// Either donor from i is j, or accept from j is i
+		boolean hbond = (don1p == j && don1e < HBONDHIGHENERGY) || (don2p == j && don2e < HBONDHIGHENERGY)
+				|| (acc1p == i && acc1e < HBONDHIGHENERGY) || (acc2p == i && acc2e < HBONDHIGHENERGY);
 
-		if (hbond){
-			logger.debug("*** H-bond from CO of {} to NH of {}", i, j);
-			return true;
+		if (!hbond) {
+			return false;
 		}
-		return false ;
+		logger.debug("*** H-bond from CO of {} to NH of {}", i, j);
+		return true;
 	}
 
 	/**
-	 * Use unit vectors NC and NCalpha Add them. Calc unit vector and
-	 * substract it from N.
-	 * C coordinates are from amino acid i-1
-	 * N, CA atoms from amino acid i
+	 * Use unit vectors NC and NCalpha Add them. Calc unit vector and substract it
+	 * from N. C coordinates are from amino acid i-1 N, CA atoms from amino acid i
 	 *
 	 * @link http://openbioinformatics.blogspot.com/
-	 * 		2009/08/how-to-calculate-h-atoms-for-nitrogens.html
+	 *       2009/08/how-to-calculate-h-atoms-for-nitrogens.html
 	 */
 	@SuppressWarnings("unused")
-	private static Atom calc_H(Atom C, Atom N, Atom CA)
-			throws StructureException {
+	private static Atom calc_H(Atom C, Atom N, Atom CA) throws StructureException {
 
-		Atom nc  = Calc.subtract(N,C);
-		Atom nca = Calc.subtract(N,CA);
+		Atom nc = Calc.subtract(N, C);
+		Atom nca = Calc.subtract(N, CA);
 
-		Atom u_nc  = Calc.unitVector(nc)   ;
+		Atom u_nc = Calc.unitVector(nc);
 		Atom u_nca = Calc.unitVector(nca);
 
-		Atom added = Calc.add(u_nc,u_nca);
+		Atom added = Calc.add(u_nc, u_nca);
 
 		Atom U = Calc.unitVector(added);
 
 		// according to Creighton distance N-H is 1.03 +/- 0.02A
-		Atom H = Calc.add(N,U);
+		Atom H = Calc.add(N, U);
 
 		H.setName("H");
 		// this atom does not have a pdbserial number ...
@@ -1031,11 +1009,11 @@ public class SecStrucCalc {
 
 	}
 
-	private static Atom calcSimple_H(Atom c, Atom o, Atom n)  {
+	private static Atom calcSimple_H(Atom c, Atom o, Atom n) {
 
-		Atom h = Calc.subtract(c,o);
-		double dist = Calc.getDistance(o,c);
-		//System.out.println(dist);
+		Atom h = Calc.subtract(c, o);
+		double dist = Calc.getDistance(o, c);
+		// System.out.println(dist);
 		double x = n.getX() + h.getX() / dist;
 		double y = n.getY() + h.getY() / dist;
 		double z = n.getZ() + h.getZ() / dist;
@@ -1048,9 +1026,9 @@ public class SecStrucCalc {
 		return h;
 	}
 
-	private void buildHelices(){
-		
-		//Alpha-helix (i+4), 3-10-helix (i+3), Pi-helix (i+5)
+	private void buildHelices() {
+
+		// Alpha-helix (i+4), 3-10-helix (i+3), Pi-helix (i+5)
 		checkSetHelix(4, SecStrucType.helix4);
 		checkSetHelix(3, SecStrucType.helix3);
 		checkSetHelix(5, SecStrucType.helix5);
@@ -1063,20 +1041,20 @@ public class SecStrucCalc {
 		SecStrucType type = SecStrucType.turn;
 
 		for (int idx = 0; idx < 3; idx++) {
-			for (int i = 0; i < groups.length-1; i++) {
+			for (int i = 0; i < groups.length - 1; i++) {
 
 				SecStrucState state = getSecStrucState(i);
 				char[] turn = state.getTurn();
 
-				//Any turn opening matters
+				// Any turn opening matters
 				if (turn[idx] == '>' || turn[idx] == 'X') {
-					//Mark following n residues as turn
-					for (int k=1; k<idx+3; k++){
-						setSecStrucType(i+k, type);
+					// Mark following n residues as turn
+					for (int k = 1; k < idx + 3; k++) {
+						setSecStrucType(i + k, type);
 					}
 					if (!DSSP_HELICES) {
 						setSecStrucType(i, type);
-						setSecStrucType(i+idx+3, type);
+						setSecStrucType(i + idx + 3, type);
 					}
 				}
 			}
@@ -1084,62 +1062,68 @@ public class SecStrucCalc {
 	}
 
 	/**
-	 * A minimal helix is defined by two consecutive n-turns.
-	 * For example, a 4-helix, of minimal length 4 from residues
-	 * i to (i+3), requires turns (of type 4) at residues (i-1) and i.
+	 * A minimal helix is defined by two consecutive n-turns. For example, a
+	 * 4-helix, of minimal length 4 from residues i to (i+3), requires turns (of
+	 * type 4) at residues (i-1) and i.
 	 * <p>
-	 * Note that the orignal DSSP implementation does not assign
-	 * helix type to residue (i-1) and residue (i+n+1), although
-	 * they contain a helix turn. As they state in the original paper,
-	 * "the helices are one residue shorter than they would be according
-	 * to rule 6.3 of IUPAC-IUB".
+	 * Note that the orignal DSSP implementation does not assign helix type to
+	 * residue (i-1) and residue (i+n+1), although they contain a helix turn. As
+	 * they state in the original paper, "the helices are one residue shorter than
+	 * they would be according to rule 6.3 of IUPAC-IUB".
 	 *
 	 * @param n
 	 * @param type
 	 */
-	private void checkSetHelix(int n, SecStrucType type){
+	private void checkSetHelix(int n, SecStrucType type) {
 
 		int idx = n - 3;
 		logger.debug("Set helix {} {} {}", type, n, idx);
 
-		for (int i = 1; i < groups.length-n; i++) {
+		for (int i = 1; i < groups.length - n; i++) {
 
 			SecStrucState state = getSecStrucState(i);
-			SecStrucState previousState = getSecStrucState(i-1);
+			SecStrucState previousState = getSecStrucState(i - 1);
 
-			//Check that no other helix was assgined to this range
-			if (state.getType().compareTo(type) < 0) continue;
-			if (getSecStrucState(i+1).getType().compareTo(type) < 0) continue;
+			// Check that no other helix was assgined to this range
+			if (state.getType().compareTo(type) < 0) {
+				continue;
+			}
+			if (getSecStrucState(i + 1).getType().compareTo(type) < 0) {
+				continue;
+			}
 
 			char turn = state.getTurn()[idx];
 			char pturn = previousState.getTurn()[idx];
 
-			//Two consecutive n-turns present to define a n-helix
-			if ((turn=='>' || turn=='X') && (pturn=='>' || pturn=='X')) {
-				//Mark following n residues as turn
-				for (int k=0; k<n; k++){
-					setSecStrucType(i+k, type);
+			// Two consecutive n-turns present to define a n-helix
+			if ((turn == '>' || turn == 'X') && (pturn == '>' || pturn == 'X')) {
+				// Mark following n residues as turn
+				for (int k = 0; k < n; k++) {
+					setSecStrucType(i + k, type);
 				}
 				if (!DSSP_HELICES) {
-					setSecStrucType(i-1, type);
-					setSecStrucType(i+n, type);
+					setSecStrucType(i - 1, type);
+					setSecStrucType(i + n, type);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Set the new type only if it has more preference than the
-	 * current residue SS type.
+	 * Set the new type only if it has more preference than the current residue SS
+	 * type.
+	 * 
 	 * @param pos
 	 * @param type
 	 */
-	private void setSecStrucType(int pos, SecStrucType type){
+	private void setSecStrucType(int pos, SecStrucType type) {
 		SecStrucState ss = getSecStrucState(pos);
-		if (type.compareTo(ss.getType()) < 0) ss.setType(type);
+		if (type.compareTo(ss.getType()) < 0) {
+			ss.setType(type);
+		}
 	}
 
-	private SecStrucState getSecStrucState(int pos){
+	private SecStrucState getSecStrucState(int pos) {
 		Group g = groups[pos];
 		SecStrucState state = (SecStrucState) g.getProperty(Group.SEC_STRUC);
 		return state;

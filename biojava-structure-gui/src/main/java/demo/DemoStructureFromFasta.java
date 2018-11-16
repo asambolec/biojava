@@ -38,6 +38,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demo of how to use the {@link FastaStructureParser} class to read protein
@@ -48,32 +50,36 @@ import java.io.UnsupportedEncodingException;
  */
 public class DemoStructureFromFasta {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoStructureFromFasta.class);
+
 	@SuppressWarnings("unused")
 	public static void getStructureFromFasta() {
 
 		// Load a test sequence
 		// Normally this would come from a file, eg
 		// File fasta = new File("/path/to/file.fa");
-		String fastaStr =
-			"> 4HHB\n" +
-			"VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGK\n" +
-			"KVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPA\n" +
-			"VHASLDKFLASVSTVLTSKYR\n";
+		String fastaStr = new StringBuilder().append("> 4HHB\n")
+				.append("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGK\n")
+				.append("KVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPA\n")
+				.append("VHASLDKFLASVSTVLTSKYR\n").toString();
 		InputStream fasta;
 		try {
 			fasta = new ByteArrayInputStream(fastaStr.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 
-		// Create a header parser to parse the header lines into valid structure accessions.
-		// The resulting accession can be anything interpretable by AtomCache.getStructure.
+		// Create a header parser to parse the header lines into valid structure
+		// accessions.
+		// The resulting accession can be anything interpretable by
+		// AtomCache.getStructure.
 		// Possible Examples: "4HHB" (whole structure), "d4hhba_" (SCOP domain),
-		//   "4HHB.A:1-15" (residue range)
-		// For this example, the built-in fasta parser will extract the correct accession.
+		// "4HHB.A:1-15" (residue range)
+		// For this example, the built-in fasta parser will extract the correct
+		// accession.
 		SequenceHeaderParserInterface<ProteinSequence, AminoAcidCompound> headerParser;
-		headerParser = new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>();
+		headerParser = new GenericFastaHeaderParser<>();
 
 		// Create AtomCache to fetch structures from the PDB
 		AtomCache cache = new AtomCache();
@@ -84,15 +90,11 @@ public class DemoStructureFromFasta {
 		creator = new ProteinSequenceCreator(aaSet);
 
 		// parse file
-		FastaStructureParser parser = new FastaStructureParser(
-				fasta, headerParser, creator, cache);
+		FastaStructureParser parser = new FastaStructureParser(fasta, headerParser, creator, cache);
 		try {
 			parser.process();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		} catch (StructureException e) {
-			e.printStackTrace();
+		} catch (StructureException | IOException e) {
+			logger.error(e.getMessage(), e);
 			return;
 		}
 
@@ -104,53 +106,48 @@ public class DemoStructureFromFasta {
 
 		// Use it! For example:
 		// Display the structure, highlighting the sequence
-		displayStructure( structures[0], residues[0]);
+		displayStructure(structures[0], residues[0]);
 	}
-
 
 	/**
 	 * Displays the given structure and highlights the given residues.
 	 *
 	 * @param structure The structure to display
-	 * @param residues A list of residues to highlight
+	 * @param residues  A list of residues to highlight
 	 */
-	private static void displayStructure(Structure structure,
-			ResidueNumber[] residues) {
-		//Display each structure
+	private static void displayStructure(Structure structure, ResidueNumber[] residues) {
+		// Display each structure
 		BiojavaJmol jmol = new BiojavaJmol();
 		jmol.setStructure(structure);
 
-		//Highlight non-null atoms
+		// Highlight non-null atoms
 		jmol.evalString("select *; spacefill off; wireframe off; color chain; backbone 0.4;  ");
 		String selectionCmd = buildJmolSelection(residues);
 		jmol.evalString(selectionCmd);
 		jmol.evalString("backbone 1.0; select none;");
 	}
 
-
-
 	/**
 	 * Converts an array of ResidueNumbers into a jMol selection.
 	 *
-	 * <p>For example, "select 11^ :A.CA or 12^ :A.CA;" would select the
-	 * CA atoms of residues 11-12 on chain A.
+	 * <p>
+	 * For example, "select 11^ :A.CA or 12^ :A.CA;" would select the CA atoms of
+	 * residues 11-12 on chain A.
+	 * 
 	 * @param residues Residues to include in the selection. Nulls are ignored.
 	 * @return
 	 */
 	private static String buildJmolSelection(ResidueNumber[] residues) {
 		StringBuilder cmd = new StringBuilder("select ");
-		for(ResidueNumber res : residues) {
-			if(res != null) {
+		for (ResidueNumber res : residues) {
+			if (res != null) {
 				cmd.append(String.format("%d^%s:%s.CA or ", res.getSeqNum(),
-						res.getInsCode()==null?" ":res.getInsCode(),
-								res.getChainName()));
+						res.getInsCode() == null ? " " : res.getInsCode(), res.getChainName()));
 			}
 		}
-		cmd.append("none;");//easier than removing the railing 'or'
+		cmd.append("none;");// easier than removing the railing 'or'
 		return cmd.toString();
 	}
-
-
 
 	public static void main(String[] args) {
 		getStructureFromFasta();

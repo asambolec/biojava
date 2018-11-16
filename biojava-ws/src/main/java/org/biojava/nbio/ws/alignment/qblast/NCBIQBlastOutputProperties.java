@@ -32,8 +32,9 @@ import java.util.Set;
 import static org.biojava.nbio.ws.alignment.qblast.BlastOutputParameterEnum.*;
 
 /**
- * This class wraps a QBlast output parameter {@code Map} by adding several convenient parameter addition methods. Other
- * QBlast URL API parameters should be added using {@link #setOutputOption(BlastOutputParameterEnum, String)}
+ * This class wraps a QBlast output parameter {@code Map} by adding several
+ * convenient parameter addition methods. Other QBlast URL API parameters should
+ * be added using {@link #setOutputOption(BlastOutputParameterEnum, String)}
  *
  * @author Sylvain Foisy, Diploide BioIT
  * @author Gediminas Rimsa
@@ -41,11 +42,11 @@ import static org.biojava.nbio.ws.alignment.qblast.BlastOutputParameterEnum.*;
 public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutputProperties {
 	private static final long serialVersionUID = -9202060390925345163L;
 
-	private Map<BlastOutputParameterEnum, String> param = new HashMap<BlastOutputParameterEnum, String>();
+	private Map<BlastOutputParameterEnum, String> param = new HashMap<>();
 
 	/**
-	 * This constructor builds the parameters for the output of the GET command sent to the QBlast service with default
-	 * values:
+	 * This constructor builds the parameters for the output of the GET command sent
+	 * to the QBlast service with default values:
 	 *
 	 * <pre>
 	 * FORMAT_TYPE = XML;
@@ -62,7 +63,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	}
 
 	/**
-	 * This method forwards to {@link #getOutputOption(BlastOutputParameterEnum)}. Consider using it instead.
+	 * This method forwards to {@link #getOutputOption(BlastOutputParameterEnum)}.
+	 * Consider using it instead.
 	 */
 	@Override
 	public String getOutputOption(String key) {
@@ -70,7 +72,9 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	}
 
 	/**
-	 * This method forwards to {@link #setOutputOption(BlastOutputParameterEnum, String)}. Consider using it instead.
+	 * This method forwards to
+	 * {@link #setOutputOption(BlastOutputParameterEnum, String)}. Consider using it
+	 * instead.
 	 */
 	@Override
 	public void setOutputOption(String key, String val) {
@@ -96,10 +100,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	 */
 	@Override
 	public Set<String> getOutputOptions() {
-		Set<String> result = new HashSet<String>();
-		for (BlastOutputParameterEnum parameter : param.keySet()) {
-			result.add(parameter.name());
-		}
+		Set<String> result = new HashSet<>();
+		param.keySet().forEach(parameter -> result.add(parameter.name()));
 		return result;
 	}
 
@@ -120,8 +122,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	/**
 	 * Sets the stream output format to get from the QBlast service
 	 * <p/>
-	 * If {@code HTML} format is selected, also adds the following parameters (which are removed if another output
-	 * format is chosen):
+	 * If {@code HTML} format is selected, also adds the following parameters (which
+	 * are removed if another output format is chosen):
 	 *
 	 * <pre>
 	 * NOHEADER = true;
@@ -133,7 +135,9 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	 */
 	public void setOutputFormat(BlastOutputFormatEnum formatType) {
 		setOutputOption(FORMAT_TYPE, formatType.name());
-		if (BlastOutputFormatEnum.HTML.equals(formatType)) {
+		// add default parameters associated with HTML
+		// remove default parameters associated with HTML
+		if (BlastOutputFormatEnum.HTML == formatType) {
 			// add default parameters associated with HTML
 			setOutputOption(NOHEADER, "true");
 			setOutputOption(SHOW_OVERVIEW, "false");
@@ -147,7 +151,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	}
 
 	/**
-	 * @return alignment output format - a String with the value of key ALIGNMENT_VIEW
+	 * @return alignment output format - a String with the value of key
+	 *         ALIGNMENT_VIEW
 	 */
 	public String getAlignmentOutputFormat() {
 		return getOutputOption(ALIGNMENT_VIEW);
@@ -163,7 +168,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	}
 
 	/**
-	 * @return number of descriptions fetched - an int with the value of the key DESCRIPTIONS
+	 * @return number of descriptions fetched - an int with the value of the key
+	 *         DESCRIPTIONS
 	 */
 	public int getDescriptionNumber() {
 		return Integer.parseInt(getOutputOption(DESCRIPTIONS));
@@ -179,7 +185,8 @@ public class NCBIQBlastOutputProperties implements RemotePairwiseAlignmentOutput
 	}
 
 	/**
-	 * @return number of alignments fetched - an int with the value of the key ALIGNMENTS
+	 * @return number of alignments fetched - an int with the value of the key
+	 *         ALIGNMENTS
 	 */
 	public int getAlignmentNumber() {
 		return Integer.parseInt(getOutputOption(ALIGNMENTS));

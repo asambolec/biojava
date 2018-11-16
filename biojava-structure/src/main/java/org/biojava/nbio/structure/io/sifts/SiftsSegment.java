@@ -28,8 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SiftsSegment implements Serializable{
-
+public class SiftsSegment implements Serializable {
 
 	/**
 	 *
@@ -41,15 +40,15 @@ public class SiftsSegment implements Serializable{
 
 	List<SiftsResidue> residues;
 
-	public SiftsSegment(){
-		this(null,null,null);
+	public SiftsSegment() {
+		this(null, null, null);
 	}
 
 	public SiftsSegment(String segId, String start, String end) {
 		this.segId = segId;
 		this.start = start;
 		this.end = end;
-		residues = new ArrayList<SiftsResidue>();
+		residues = new ArrayList<>();
 	}
 
 	public String getSegId() {
@@ -81,18 +80,18 @@ public class SiftsSegment implements Serializable{
 
 	}
 
-	public List<SiftsResidue> getResidues(){
+	public List<SiftsResidue> getResidues() {
 		return residues;
 	}
 
-	public void setResidues(List<SiftsResidue> residues){
+	public void setResidues(List<SiftsResidue> residues) {
 		this.residues = residues;
 	}
 
 	@Override
 	public String toString() {
-		return "SiftsSegment [segId=" + segId + ", start=" + start + ", end="
-				+ end + ", residues=" + residues + "]";
+		return new StringBuilder().append("SiftsSegment [segId=").append(segId).append(", start=").append(start)
+				.append(", end=").append(end).append(", residues=").append(residues).append("]").toString();
 	}
 
 	@Override
@@ -100,8 +99,7 @@ public class SiftsSegment implements Serializable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((end == null) ? 0 : end.hashCode());
-		result = prime * result
-				+ ((residues == null) ? 0 : residues.hashCode());
+		result = prime * result + ((residues == null) ? 0 : residues.hashCode());
 		result = prime * result + ((segId == null) ? 0 : segId.hashCode());
 		result = prime * result + ((start == null) ? 0 : start.hashCode());
 		return result;
@@ -109,35 +107,45 @@ public class SiftsSegment implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		SiftsSegment other = (SiftsSegment) obj;
 		if (end == null) {
-			if (other.end != null)
+			if (other.end != null) {
 				return false;
-		} else if (!end.equals(other.end))
+			}
+		} else if (!end.equals(other.end)) {
 			return false;
+		}
 		if (residues == null) {
-			if (other.residues != null)
+			if (other.residues != null) {
 				return false;
-		} else if (!residues.equals(other.residues))
+			}
+		} else if (!residues.equals(other.residues)) {
 			return false;
+		}
 		if (segId == null) {
-			if (other.segId != null)
+			if (other.segId != null) {
 				return false;
-		} else if (!segId.equals(other.segId))
+			}
+		} else if (!segId.equals(other.segId)) {
 			return false;
+		}
 		if (start == null) {
-			if (other.start != null)
+			if (other.start != null) {
 				return false;
-		} else if (!start.equals(other.start))
+			}
+		} else if (!start.equals(other.start)) {
 			return false;
+		}
 		return true;
 	}
-
 
 }

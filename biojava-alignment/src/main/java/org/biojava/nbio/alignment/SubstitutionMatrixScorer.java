@@ -28,15 +28,17 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Scores using a substitution matrix. Specifically, the score is the sum of the substitution matrix entries
- * corresponding to the alignment. Gaps are scored according to the substitution matrix, just as matches and mismatches.
+ * Scores using a substitution matrix. Specifically, the score is the sum of the
+ * substitution matrix entries corresponding to the alignment. Gaps are scored
+ * according to the substitution matrix, just as matches and mismatches.
+ * 
  * @author dmyersturnbull
  *
  * @param <S>
  * @param <C>
  */
 public class SubstitutionMatrixScorer<S extends Sequence<C>, C extends Compound> extends AbstractScorer
-implements PairwiseSequenceScorer<S, C> {
+		implements PairwiseSequenceScorer<S, C> {
 
 	private final SubstitutionMatrix<C> matrix;
 
@@ -45,7 +47,6 @@ implements PairwiseSequenceScorer<S, C> {
 	private double score;
 
 	public SubstitutionMatrixScorer(SequencePair<S, C> pair, SubstitutionMatrix<C> matrix) {
-		super();
 		this.query = pair.getQuery().getOriginalSequence();
 		this.target = pair.getTarget().getOriginalSequence();
 		this.matrix = matrix;
@@ -57,7 +58,8 @@ implements PairwiseSequenceScorer<S, C> {
 	}
 
 	/**
-	 * @return The maximum score the query could be assigned when aligned against any target sequence.
+	 * @return The maximum score the query could be assigned when aligned against
+	 *         any target sequence.
 	 */
 	@Override
 	public double getMaxScore() {
@@ -66,7 +68,9 @@ implements PairwiseSequenceScorer<S, C> {
 		for (C queryC : query.getAsList()) {
 			short max = Short.MIN_VALUE;
 			for (Short value : matrix.getRow(queryC).values()) {
-				if (value > max) max = value;
+				if (value > max) {
+					max = value;
+				}
 			}
 			score += max;
 		}
@@ -74,7 +78,8 @@ implements PairwiseSequenceScorer<S, C> {
 	}
 
 	/**
-	 * @return The minimum score the query could be assigned when aligned against any target sequence.
+	 * @return The minimum score the query could be assigned when aligned against
+	 *         any target sequence.
 	 */
 	@Override
 	public double getMinScore() {
@@ -83,7 +88,9 @@ implements PairwiseSequenceScorer<S, C> {
 		for (C queryC : query.getAsList()) {
 			short min = Short.MAX_VALUE;
 			for (Short value : matrix.getRow(queryC).values()) {
-				if (value < min) min = value;
+				if (value < min) {
+					min = value;
+				}
 			}
 			score += min;
 		}

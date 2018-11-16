@@ -31,39 +31,44 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-
 /**
  * Utility to write each Fasta entry to a unique file
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class SplitFasta {
 
 	private static final Logger logger = LoggerFactory.getLogger(SplitFasta.class);
 
-	public void processNucleotides(File fastaFileName,String uniqueid, File outputDirectory ) throws Exception{
-		if(!outputDirectory.exists())
+	public void processNucleotides(File fastaFileName, String uniqueid, File outputDirectory) throws Exception {
+		if (!outputDirectory.exists()) {
 			outputDirectory.mkdirs();
+		}
 
-		LinkedHashMap<String,DNASequence> dnaSequenceHashMap = FastaReaderHelper.readFastaDNASequence(fastaFileName);
-		for(DNASequence dnaSequence : dnaSequenceHashMap.values()){
+		LinkedHashMap<String, DNASequence> dnaSequenceHashMap = FastaReaderHelper.readFastaDNASequence(fastaFileName);
+		for (DNASequence dnaSequence : dnaSequenceHashMap.values()) {
 			String fileName = outputDirectory.getAbsolutePath() + File.separatorChar;
-			if(uniqueid.length() > 0){
-				fileName = fileName + dnaSequence.getAccession().getID() + ".fna";
-			}else{
-				fileName = fileName + uniqueid + dnaSequence.getAccession().getID() + ".fna";
+			if (uniqueid.length() > 0) {
+				fileName = new StringBuilder().append(fileName).append(dnaSequence.getAccession().getID())
+						.append(".fna").toString();
+			} else {
+				fileName = new StringBuilder().append(fileName).append(uniqueid)
+						.append(dnaSequence.getAccession().getID()).append(".fna").toString();
 			}
-			ArrayList<DNASequence> dnaList = new ArrayList<DNASequence>();
+			ArrayList<DNASequence> dnaList = new ArrayList<>();
 			dnaList.add(dnaSequence);
 			FastaWriterHelper.writeNucleotideSequence(new File(fileName), dnaList);
 		}
 
 	}
 
-		public static void main( String[] args ){
-		try{
+	public static void main(String[] args) {
+		try {
 			SplitFasta splitFasta = new SplitFasta();
-			splitFasta.processNucleotides(new File("/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/454Scaffolds.fna"), "", new File("/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/individual"));
-		}catch(Exception e){
+			splitFasta.processNucleotides(
+					new File("/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/454Scaffolds.fna"), "",
+					new File("/Users/Scooter/scripps/dyadic/analysis/454Scaffolds/individual"));
+		} catch (Exception e) {
 			logger.error("Exception: ", e);
 		}
 	}

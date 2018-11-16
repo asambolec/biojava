@@ -39,7 +39,7 @@ public final class OntoTools {
 	private static final Ontology CORE_ONTOLOGY;
 	private static final OntologyFactory DEFAULT_FACTORY;
 	private static final IntegerOntology CORE_INTEGER;
-	//private static final Ontology CORE_STRING;
+	// private static final Ontology CORE_STRING;
 
 	// public static final Term TYPE;
 	public static final Term RELATION;
@@ -73,28 +73,14 @@ public final class OntoTools {
 	public static final Term PARTIAL_ORDER;
 
 	static {
-		DEFAULT_FACTORY = new OntologyFactory() {
-			@Override
-			public Ontology createOntology(String name, String desc)
-			throws OntologyException {
-				return new Ontology.Impl(name, desc);
-			}
-		};
+		DEFAULT_FACTORY = Ontology.Impl::new;
 
 		try {
 			BufferedReader reader = new BufferedReader(
-				new InputStreamReader(
-					OntoTools.class.getResourceAsStream(
-						"/ontology/core.onto"
-					)
-				)
-			);
+					new InputStreamReader(OntoTools.class.getResourceAsStream("/ontology/core.onto")));
 
 			CORE_INTEGER = new IntegerOntology();
-			CORE_ONTOLOGY = new TabDelimParser().parse(
-							reader,
-							DEFAULT_FACTORY
-			);
+			CORE_ONTOLOGY = new TabDelimParser().parse(reader, DEFAULT_FACTORY);
 
 			// TYPE = CORE_ONTOLOGY.getTerm("type");
 			RELATION = CORE_ONTOLOGY.getTerm("relation");
@@ -134,15 +120,17 @@ public final class OntoTools {
 		}
 	}
 
-
-	private OntoTools() {}
+	private OntoTools() {
+	}
 
 	/**
 	 * Get the Ontology that defines our core "central dogma".
 	 *
-	 * <p>This contains definitions that we have to have, such as <code>any</code>,
+	 * <p>
+	 * This contains definitions that we have to have, such as <code>any</code>,
 	 * <code>predicate</code>, <code>is-a</code> and <code>transient</code>. These
-	 * are our axioms, upon which the default interpreters build.</p>
+	 * are our axioms, upon which the default interpreters build.
+	 * </p>
 	 *
 	 * @return the "core" Ontology
 	 */
@@ -153,8 +141,10 @@ public final class OntoTools {
 	/**
 	 * Get the Ontology that defines integers.
 	 *
-	 * <p>This contains a term for each and every integer. I haven't decided yet
-	 * if it contains terms for arithmatic.</p>
+	 * <p>
+	 * This contains a term for each and every integer. I haven't decided yet if it
+	 * contains terms for arithmatic.
+	 * </p>
 	 *
 	 * @return the integer Ontology
 	 */

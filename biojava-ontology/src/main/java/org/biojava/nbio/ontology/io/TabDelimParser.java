@@ -25,8 +25,8 @@ import org.biojava.nbio.ontology.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parse tab-delimited ontology files into Ontology objects.
@@ -36,8 +36,8 @@ import java.util.StringTokenizer;
  * pure white space can be discarded. Comment lines begin with a hash (#) and
  * can be discarded. The payload lines contain three fields seperated by tabs.
  * These are <code>subject</code>, <code>predicate</code> and
- * <code>object</code>.
- * By convention, the content of each field contains no spaces.
+ * <code>object</code>. By convention, the content of each field contains no
+ * spaces.
  * </p>
  *
  * <p>
@@ -50,8 +50,8 @@ import java.util.StringTokenizer;
  * <p>
  * Term names normally will be just a term name like <code>predicate</code> or
  * <code>person</code>. There are also terms that represent collections of
- * triples. For example, here is the declaration for the 'triple' type in
- * the core ontology.
+ * triples. For example, here is the declaration for the 'triple' type in the
+ * core ontology.
  * </p>
  *
  * <code><pre>
@@ -70,65 +70,59 @@ import java.util.StringTokenizer;
  * three. The 'something' is <code>(triple,has-a,any)	size	3</code> and is
  * short-hand for a collection of triples that state that the source must be
  * <code>triple</code>, the target must be <code>any</code> and the predicate
- * must be <code>has-a</code>. This whole expression states that a triple
- * has exactly three has-a relationships; that is, exactly three properties.
+ * must be <code>has-a</code>. This whole expression states that a triple has
+ * exactly three has-a relationships; that is, exactly three properties.
  * </p>
  *
  * @author Matthew Pocock
  */
 public class TabDelimParser {
+	private static final Logger logger = LoggerFactory.getLogger(TabDelimParser.class);
+
 	/**
-	 * Parse an ontology from a reader.
-	 * The reader will be emptied of text. It is the caller's responsibility to
-	 * close the reader.
+	 * Parse an ontology from a reader. The reader will be emptied of text. It is
+	 * the caller's responsibility to close the reader.
 	 *
-	 * @param in  the BufferedReader to read from
-	 * @param of  an OntologyFactory used to create the Ontology instance
-	 * @return  a new Ontology
-	 * @throws IOException if there is some problem with the buffered reader
+	 * @param in the BufferedReader to read from
+	 * @param of an OntologyFactory used to create the Ontology instance
+	 * @return a new Ontology
+	 * @throws IOException       if there is some problem with the buffered reader
 	 * @throws OntologyException if it was not possible to instantiate a new
-	 *         ontology
+	 *                           ontology
 	 */
-	public Ontology parse(BufferedReader in, OntologyFactory of)
-	throws IOException, OntologyException {
+	public Ontology parse(BufferedReader in, OntologyFactory of) throws IOException, OntologyException {
 		String name = "";
 		String description = "";
 		Ontology onto = null;
 
-		for(
-			String line = in.readLine();
-			line != null;
-			line = in.readLine()
-		) {
+		for (String line = in.readLine(); line != null; line = in.readLine()) {
 			line = line.trim();
-			if(line.length() > 0) {
-				if(line.startsWith("#")) {
+			if (line.length() > 0) {
+				if (line.startsWith("#")) {
 					// comment line - let's try to pull out name or description
 
-					if(line.startsWith("#name:")) {
+					if (line.startsWith("#name:")) {
 						name = line.substring("#name:".length()).trim();
-					} else if(line.startsWith("#description:")) {
+					} else if (line.startsWith("#description:")) {
 						description = line.substring("#description:".length()).trim();
 					}
 				} else {
 					try {
 						// make sure we have an ontology
-						if(onto == null) {
+						if (onto == null) {
 							onto = of.createOntology(name, description);
 						}
 
 						// build a tripple
 
 						/*
-
-						int t1 = line.indexOf("\t");
-						int t2 = line.indexOf("\t", t1 + 1);
-
-						String subject  = line.substring(0, t1);
-						String predicate = line.substring(t1 + 1, t2);
-						String object   = line.substring(t2 + 1);
-
-						*/
+						 * 
+						 * int t1 = line.indexOf("\t"); int t2 = line.indexOf("\t", t1 + 1);
+						 * 
+						 * String subject = line.substring(0, t1); String predicate = line.substring(t1
+						 * + 1, t2); String object = line.substring(t2 + 1);
+						 * 
+						 */
 
 						StringTokenizer toke = new StringTokenizer(line);
 						String subject = toke.nextToken();
@@ -140,8 +134,9 @@ public class TabDelimParser {
 						Term relT = resolveTerm(predicate, onto);
 
 						Triple trip = resolveTriple(subT, objT, relT, onto);
-						trip = trip==null?null:trip; // prevent unused field error
+						trip = trip == null ? null : trip; // prevent unused field error
 					} catch (StringIndexOutOfBoundsException e) {
+						logger.error(e.getMessage(), e);
 						throw new IOException("Could not parse line: " + line);
 					}
 				}
@@ -154,11 +149,11 @@ public class TabDelimParser {
 	private Term resolveTerm(String termName, Ontology onto) {
 		boolean isTrippleTerm = termName.startsWith("(") && termName.endsWith(")");
 
-		if(onto.containsTerm(termName)) {
+		if (onto.containsTerm(termName)) {
 			return onto.getTerm(termName);
 		} else {
 			try {
-				if(isTrippleTerm) {
+				if (isTrippleTerm) {
 					int c1 = termName.indexOf(",");
 					int c2 = termName.indexOf(",", c1 + 1);
 
@@ -181,13 +176,13 @@ public class TabDelimParser {
 	}
 
 	private Triple resolveTriple(Term sub, Term obj, Term rel, Ontology onto) {
-		if(onto.containsTriple(sub, obj, rel)) {
+		if (onto.containsTriple(sub, obj, rel)) {
 			return onto.getTriples(sub, obj, rel).iterator().next();
 		} else {
 			try {
 				return onto.createTriple(sub, obj, rel, null, null);
 			} catch (AlreadyExistsException aee) {
-				throw new RuntimeException("Assertion Failure: Could not create triple",aee);
+				throw new RuntimeException("Assertion Failure: Could not create triple", aee);
 			}
 		}
 	}

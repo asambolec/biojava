@@ -36,7 +36,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A parser that parses a file from the UCSC genome browser that contains mapping of gene name to chromosome positions
+/**
+ * A parser that parses a file from the UCSC genome browser that contains
+ * mapping of gene name to chromosome positions
  *
  * @author Andreas Prlic
  *
@@ -45,22 +47,22 @@ public class GeneChromosomePositionParser {
 
 	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-	public static final String DEFAULT_MAPPING_URL="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refFlat.txt.gz";
+	public static final String DEFAULT_MAPPING_URL = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refFlat.txt.gz";
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		try {
 
-			List<GeneChromosomePosition> genePositions=	getChromosomeMappings();
+			List<GeneChromosomePosition> genePositions = getChromosomeMappings();
 			logger.info("got {} gene positions", genePositions.size());
 
-			for (GeneChromosomePosition pos : genePositions){
-				if ( pos.getGeneName().equals("FOLH1")) {
+			for (GeneChromosomePosition pos : genePositions) {
+				if ("FOLH1".equals(pos.getGeneName())) {
 					logger.info("Gene Position: {}", pos);
 					break;
 				}
 			}
 
-		} catch(Exception e){
+		} catch (Exception e) {
 			logger.error("Exception: ", e);
 		}
 	}
@@ -79,13 +81,14 @@ public class GeneChromosomePositionParser {
 	public static List<GeneChromosomePosition> getChromosomeMappings(InputStream inStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
 
-		ArrayList<GeneChromosomePosition> gcps = new ArrayList<GeneChromosomePosition>();
+		ArrayList<GeneChromosomePosition> gcps = new ArrayList<>();
 
 		String line = null;
 		while ((line = reader.readLine()) != null) {
 			GeneChromosomePosition gcp = getGeneChromosomePosition(line);
-			if ( gcp != null)
+			if (gcp != null) {
 				gcps.add(gcp);
+			}
 		}
 
 		// since this is a large list, remove empty content.
@@ -94,11 +97,12 @@ public class GeneChromosomePositionParser {
 	}
 
 	private static GeneChromosomePosition getGeneChromosomePosition(String line) {
-		if ( line == null)
+		if (line == null) {
 			return null;
+		}
 		String[] spl = line.split("\t");
 
-		if ( spl.length != 11) {
+		if (spl.length != 11) {
 			logger.warn("Line does not have 11 data items, but {}: {}", spl.length, line);
 			return null;
 		}
@@ -119,15 +123,15 @@ public class GeneChromosomePositionParser {
 		g.setExonStarts(getIntegerList(exonStarts));
 		g.setExonEnds(getIntegerList(exonEnds));
 
-		//System.out.println(line);
-		//System.out.println(Arrays.asList(spl) + " " + spl.length);
+		// System.out.println(line);
+		// System.out.println(Arrays.asList(spl) + " " + spl.length);
 		return g;
 	}
 
-	private static List<Integer> getIntegerList(String lst){
+	private static List<Integer> getIntegerList(String lst) {
 		String[] spl = lst.split(",");
-		ArrayList<Integer> l = new ArrayList<Integer>();
-		for (String s : spl){
+		ArrayList<Integer> l = new ArrayList<>();
+		for (String s : spl) {
 			l.add(Integer.parseInt(s));
 		}
 		l.trimToSize();

@@ -26,14 +26,12 @@ import java.util.List;
 /**
  * Representation of a Biological Assembly annotation as provided by the PDB.
  * Contains all the information required to build the Biological Assembly from
- * the asymmetric unit.
- * Note that the PDB allows for 1 or more Biological Assemblies for a given entry. They
- * are identified by the id field.
+ * the asymmetric unit. Note that the PDB allows for 1 or more Biological
+ * Assemblies for a given entry. They are identified by the id field.
  *
  * @author Jose Duarte
  */
 public class BioAssemblyInfo implements Serializable {
-
 
 	private static final long serialVersionUID = 1L;
 
@@ -50,6 +48,7 @@ public class BioAssemblyInfo implements Serializable {
 
 	/**
 	 * The identifier for this Biological Assembly, from 1 to n
+	 * 
 	 * @return
 	 */
 	public int getId() {
@@ -61,8 +60,10 @@ public class BioAssemblyInfo implements Serializable {
 	}
 
 	/**
-	 * Return the list of {@link BiologicalAssemblyTransformation}s needed to generate
-	 * the biological assembly. There is one transformation per internal chain id.
+	 * Return the list of {@link BiologicalAssemblyTransformation}s needed to
+	 * generate the biological assembly. There is one transformation per internal
+	 * chain id.
+	 * 
 	 * @return
 	 */
 	public List<BiologicalAssemblyTransformation> getTransforms() {
@@ -74,9 +75,10 @@ public class BioAssemblyInfo implements Serializable {
 	}
 
 	/**
-	 * Returns the macromolecular size of this biological assembly, i.e.
-	 * the number of polymeric chains (protein or nucleotide chains, not sugars) 
-	 * in the biological assembly.
+	 * Returns the macromolecular size of this biological assembly, i.e. the number
+	 * of polymeric chains (protein or nucleotide chains, not sugars) in the
+	 * biological assembly.
+	 * 
 	 * @return
 	 */
 	public int getMacromolecularSize() {
@@ -89,6 +91,7 @@ public class BioAssemblyInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[BioAssembly "+id+": "+transforms.size()+" transforms, mm size "+macromolecularSize+"]";
+		return new StringBuilder().append("[BioAssembly ").append(id).append(": ").append(transforms.size())
+				.append(" transforms, mm size ").append(macromolecularSize).append("]").toString();
 	}
 }

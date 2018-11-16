@@ -24,8 +24,8 @@ import org.biojava.nbio.ontology.utils.Annotation;
 import org.biojava.nbio.ontology.utils.WeakValueHashMap;
 
 import java.util.*;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,7 +34,8 @@ import java.util.*;
  */
 public class IntegerOntology
 
-implements Ontology {
+		implements Ontology {
+	private static final Logger logger = LoggerFactory.getLogger(IntegerOntology.class);
 	private final Map termCache;
 
 	IntegerOntology() {
@@ -52,7 +53,7 @@ implements Ontology {
 	}
 
 	@Override
-	public void setDescription(String description){
+	public void setDescription(String description) {
 	}
 
 	@Override
@@ -80,10 +81,10 @@ implements Ontology {
 
 					@Override
 					public Object next() {
-                        if(!hasNext()){
-                            throw new NoSuchElementException();
-                        }
-                        return resolveInt(i++);
+						if (!hasNext()) {
+							throw new NoSuchElementException();
+						}
+						return resolveInt(i++);
 					}
 
 					@Override
@@ -96,7 +97,7 @@ implements Ontology {
 	}
 
 	@Override
-	public Term getTerm(String s) throws NoSuchElementException {
+	public Term getTerm(String s) {
 		int val = Integer.parseInt(s);
 		return resolveInt(val);
 	}
@@ -117,43 +118,27 @@ implements Ontology {
 	}
 
 	@Override
-	public Term createTerm(String name) throws AlreadyExistsException,  IllegalArgumentException {
+	public Term createTerm(String name) throws AlreadyExistsException {
 		throw new IllegalArgumentException(getName() + " is immutable");
 	}
 
 	@Override
-	public Term createTerm(String name, String description)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException
-			{
+	public Term createTerm(String name, String description) throws AlreadyExistsException {
 		throw new IllegalArgumentException(getName() + " is immutable");
-			}
+	}
 
 	@Override
-	public Term createTerm(String name, String description, Object[] synonyms)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException
-			{
+	public Term createTerm(String name, String description, Object[] synonyms) throws AlreadyExistsException {
 		throw new IllegalArgumentException(getName() + " is immutable");
-			}
+	}
 
 	@Override
-	public Variable createVariable(String name, String description)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException
-			{
+	public Variable createVariable(String name, String description) throws AlreadyExistsException {
 		throw new IllegalArgumentException(getName() + " is immutable");
-			}
+	}
 
 	@Override
 	public Term importTerm(Term t, String name)
-
 
 	{
 		throw new IllegalArgumentException(getName() + " is immutable");
@@ -161,11 +146,9 @@ implements Ontology {
 
 	@Override
 	public Triple createTriple(Term subject, Term object, Term predicate, String name, String description)
-			throws
-			AlreadyExistsException
-			{
+			throws AlreadyExistsException {
 		throw new IllegalArgumentException(getName() + " is immutable");
-			}
+	}
 
 	@Override
 	public boolean containsTriple(Term subject, Term object, Term predicate) {
@@ -173,7 +156,7 @@ implements Ontology {
 	}
 
 	@Override
-	public void deleteTerm(Term t)  {
+	public void deleteTerm(Term t) {
 		throw new RuntimeException(getName() + " is immutable");
 	}
 
@@ -183,6 +166,7 @@ implements Ontology {
 		try {
 			Integer.parseInt(name);
 		} catch (NumberFormatException e) {
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 
@@ -190,10 +174,10 @@ implements Ontology {
 	}
 
 	public IntTerm resolveInt(int val) {
-		Integer i = new Integer(val);
+		Integer i = Integer.valueOf(val);
 		IntTerm term = (IntTerm) termCache.get(i);
 
-		if(term == null) {
+		if (term == null) {
 			term = new IntTerm(val);
 			termCache.put(i, term);
 		}
@@ -201,9 +185,15 @@ implements Ontology {
 		return term;
 	}
 
+	@Override
+	public void setName(String name) {
+		// ignore
+
+	}
+
 	public final class IntTerm
 
-	implements Term {
+			implements Term {
 		private final int val;
 		private Set synonyms;
 
@@ -215,7 +205,9 @@ implements Ontology {
 			this.val = val;
 
 			this.synonyms = new TreeSet();
-			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+			if (synonyms != null) {
+				this.synonyms.addAll(Arrays.asList(synonyms));
+			}
 		}
 
 		@Override
@@ -248,7 +240,7 @@ implements Ontology {
 		}
 
 		@Override
-		public void setDescription(String description){
+		public void setDescription(String description) {
 
 		}
 
@@ -262,12 +254,5 @@ implements Ontology {
 			return Annotation.EMPTY_ANNOTATION;
 		}
 	}
-
-	@Override
-	public void setName(String name) {
-		//ignore
-
-	}
-
 
 }

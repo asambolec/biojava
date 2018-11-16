@@ -32,23 +32,25 @@ import java.util.LinkedHashMap;
 
 /**
  * A ChromosomeSequence is a DNASequence but keeps track of geneSequences
+ * 
  * @author Scooter Willis
  */
 public class ChromosomeSequence extends DNASequence {
 
 	private int chromosomeNumber;
-	private LinkedHashMap<String, GeneSequence> geneSequenceHashMap = new LinkedHashMap<String, GeneSequence>();
+	private LinkedHashMap<String, GeneSequence> geneSequenceHashMap = new LinkedHashMap<>();
 
 	/**
-	 * Empty constructor used by tools that need a proper Bean that allows the actual
-	 * sequence data to be set after construction. Not recommended
+	 * Empty constructor used by tools that need a proper Bean that allows the
+	 * actual sequence data to be set after construction. Not recommended
 	 */
 	public ChromosomeSequence() {
-//        throw new UnsupportedOperationException("Null constructor not supported");
+		// throw new UnsupportedOperationException("Null constructor not supported");
 	}
 
 	/**
 	 * String is king and assume DNA
+	 * 
 	 * @param seqString
 	 * @throws CompoundNotFoundException
 	 */
@@ -58,9 +60,10 @@ public class ChromosomeSequence extends DNASequence {
 
 	/**
 	 * Fairly important constructor given the size of a ChromsomeSequence where the
-	 * ProxySequenceReader could load from disk via RandomAccessFile so that the sequence
-	 * doesn't need to be kept in memory. Could also be a NCBI proxy to load sequence
-	 * data as needed from remote web server.
+	 * ProxySequenceReader could load from disk via RandomAccessFile so that the
+	 * sequence doesn't need to be kept in memory. Could also be a NCBI proxy to
+	 * load sequence data as needed from remote web server.
+	 * 
 	 * @param proxyLoader
 	 */
 	public ChromosomeSequence(SequenceReader<NucleotideCompound> proxyLoader) {
@@ -68,21 +71,27 @@ public class ChromosomeSequence extends DNASequence {
 	}
 
 	/**
-	 * Allows the creation of a ChromosomeSequence using String for the sequence with a custom CompoundSet
+	 * Allows the creation of a ChromosomeSequence using String for the sequence
+	 * with a custom CompoundSet
+	 * 
 	 * @param seqString
 	 * @param compoundSet
 	 * @throws CompoundNotFoundException
 	 */
-	public ChromosomeSequence(String seqString, CompoundSet<NucleotideCompound> compoundSet) throws CompoundNotFoundException {
+	public ChromosomeSequence(String seqString, CompoundSet<NucleotideCompound> compoundSet)
+			throws CompoundNotFoundException {
 		super(seqString, compoundSet);
 	}
 
 	/**
-	 * Allows the creation of a ChromosomeSequence using a ProxyResequenceReader for the sequence with a custom CompoundSet
+	 * Allows the creation of a ChromosomeSequence using a ProxyResequenceReader for
+	 * the sequence with a custom CompoundSet
+	 * 
 	 * @param proxyLoader
 	 * @param compoundSet
 	 */
-	public ChromosomeSequence(SequenceReader<NucleotideCompound> proxyLoader, CompoundSet<NucleotideCompound> compoundSet) {
+	public ChromosomeSequence(SequenceReader<NucleotideCompound> proxyLoader,
+			CompoundSet<NucleotideCompound> compoundSet) {
 		super(proxyLoader, compoundSet);
 	}
 
@@ -101,8 +110,9 @@ public class ChromosomeSequence extends DNASequence {
 	}
 
 	/**
-	 * Get the list of genes that have been added to the ChromosomeSequence where accession.toString is the key.
-	 * The list retains the order the genes are added
+	 * Get the list of genes that have been added to the ChromosomeSequence where
+	 * accession.toString is the key. The list retains the order the genes are added
+	 * 
 	 * @return
 	 */
 
@@ -120,11 +130,12 @@ public class ChromosomeSequence extends DNASequence {
 	}
 
 	/**
-	 * Add a gene to the chromosome sequence using bioIndexing starts at 1 instead of 0. The
-	 * GeneSequence that is returned will have a reference to parent chromosome sequence
-	 * which actually contains the sequence data. Strand is important for positive and negative
-	 * direction where negative strand means we need reverse complement. If negative strand then
-	 * bioBegin will be greater than bioEnd
+	 * Add a gene to the chromosome sequence using bioIndexing starts at 1 instead
+	 * of 0. The GeneSequence that is returned will have a reference to parent
+	 * chromosome sequence which actually contains the sequence data. Strand is
+	 * important for positive and negative direction where negative strand means we
+	 * need reverse complement. If negative strand then bioBegin will be greater
+	 * than bioEnd
 	 *
 	 *
 	 * @param accession
@@ -142,6 +153,7 @@ public class ChromosomeSequence extends DNASequence {
 
 	/**
 	 * Get the gene based on accession. Will return null if not found
+	 * 
 	 * @param accession
 	 * @return
 	 */

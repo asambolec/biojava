@@ -56,8 +56,7 @@ public class GenbankWriterHelper {
 	 * @param proteinSequences
 	 * @throws Exception
 	 */
-	public static void writeProteinSequence(File file,
-			Collection<ProteinSequence> proteinSequences) throws Exception {
+	public static void writeProteinSequence(File file, Collection<ProteinSequence> proteinSequences) throws Exception {
 		FileOutputStream outputStream = new FileOutputStream(file);
 		BufferedOutputStream bo = new BufferedOutputStream(outputStream);
 		writeProteinSequence(bo, proteinSequences);
@@ -73,13 +72,11 @@ public class GenbankWriterHelper {
 	 * @throws Exception
 	 */
 
-	public static void writeProteinSequence(OutputStream outputStream,
-			Collection<ProteinSequence> proteinSequences) throws Exception {
+	public static void writeProteinSequence(OutputStream outputStream, Collection<ProteinSequence> proteinSequences)
+			throws Exception {
 
-		GenbankWriter<ProteinSequence, AminoAcidCompound> genbankWriter = new GenbankWriter<ProteinSequence, AminoAcidCompound>(
-				outputStream,
-				proteinSequences,
-				new GenericGenbankHeaderFormat<ProteinSequence, AminoAcidCompound>());
+		GenbankWriter<ProteinSequence, AminoAcidCompound> genbankWriter = new GenbankWriter<>(outputStream,
+				proteinSequences, new GenericGenbankHeaderFormat<ProteinSequence, AminoAcidCompound>());
 		genbankWriter.process();
 
 	}
@@ -92,8 +89,7 @@ public class GenbankWriterHelper {
 	 * @throws Exception
 	 */
 
-	public static void writeNucleotideSequence(File file,
-			Collection<DNASequence> dnaSequences) throws Exception {
+	public static void writeNucleotideSequence(File file, Collection<DNASequence> dnaSequences) throws Exception {
 		FileOutputStream outputStream = new FileOutputStream(file);
 		BufferedOutputStream bo = new BufferedOutputStream(outputStream);
 		writeNucleotideSequence(bo, dnaSequences);
@@ -109,8 +105,8 @@ public class GenbankWriterHelper {
 	 * @throws Exception
 	 */
 
-	public static void writeNucleotideSequence(OutputStream outputStream,
-			Collection<DNASequence> dnaSequences) throws Exception {
+	public static void writeNucleotideSequence(OutputStream outputStream, Collection<DNASequence> dnaSequences)
+			throws Exception {
 		writeNucleotideSequence(outputStream, dnaSequences, LINEAR_DNA);
 	}
 
@@ -123,14 +119,13 @@ public class GenbankWriterHelper {
 	 * @throws Exception
 	 */
 
-	public static void writeNucleotideSequence(OutputStream outputStream,
-			Collection<DNASequence> dnaSequences, String seqType)
-			throws Exception {
-		GenericGenbankHeaderFormat<DNASequence, NucleotideCompound> genericGenbankHeaderFormat = new GenericGenbankHeaderFormat<DNASequence, NucleotideCompound>(
+	public static void writeNucleotideSequence(OutputStream outputStream, Collection<DNASequence> dnaSequences,
+			String seqType) throws Exception {
+		GenericGenbankHeaderFormat<DNASequence, NucleotideCompound> genericGenbankHeaderFormat = new GenericGenbankHeaderFormat<>(
 				seqType);
 		// genericGenbankHeaderFormat.setLineSeparator(lineSep);
-		GenbankWriter<DNASequence, NucleotideCompound> genbankWriter = new GenbankWriter<DNASequence, NucleotideCompound>(
-				outputStream, dnaSequences, genericGenbankHeaderFormat);
+		GenbankWriter<DNASequence, NucleotideCompound> genbankWriter = new GenbankWriter<>(outputStream, dnaSequences,
+				genericGenbankHeaderFormat);
 		// genbankWriter.setLineSeparator(lineSep);
 		genbankWriter.process();
 	}
@@ -142,8 +137,7 @@ public class GenbankWriterHelper {
 	 * @param sequence
 	 * @throws Exception
 	 */
-	public static void writeSequence(File file, Sequence<?> sequence)
-			throws Exception {
+	public static void writeSequence(File file, Sequence<?> sequence) throws Exception {
 		FileOutputStream outputStream = new FileOutputStream(file);
 		BufferedOutputStream bo = new BufferedOutputStream(outputStream);
 		writeSequences(bo, singleSeqToCollection(sequence));
@@ -158,8 +152,7 @@ public class GenbankWriterHelper {
 	 * @param sequence
 	 * @throws Exception
 	 */
-	public static void writeSequence(OutputStream outputStream,
-			Sequence<?> sequence) throws Exception {
+	public static void writeSequence(OutputStream outputStream, Sequence<?> sequence) throws Exception {
 		writeSequences(outputStream, singleSeqToCollection(sequence));
 	}
 
@@ -169,9 +162,8 @@ public class GenbankWriterHelper {
 	 * @return
 	 */
 
-	private static Collection<Sequence<?>> singleSeqToCollection(
-			Sequence<?> sequence) {
-		Collection<Sequence<?>> sequences = new ArrayList<Sequence<?>>();
+	private static Collection<Sequence<?>> singleSeqToCollection(Sequence<?> sequence) {
+		Collection<Sequence<?>> sequences = new ArrayList<>();
 		sequences.add(sequence);
 		return sequences;
 	}
@@ -181,28 +173,16 @@ public class GenbankWriterHelper {
 	 * {@link OutputStream}. This is a very generic method which writes just the
 	 * AccessionID of the Sequence as the FASTA header.
 	 *
-	 * @param outputStream
-	 *            Stream to write to; can be System.out
-	 * @param sequences
-	 *            The sequences to write out
-	 * @throws Exception
-	 *             Thrown normally thanks to IO problems
+	 * @param outputStream Stream to write to; can be System.out
+	 * @param sequences    The sequences to write out
+	 * @throws Exception Thrown normally thanks to IO problems
 	 */
-	public static void writeSequences(OutputStream outputStream,
-			Collection<Sequence<?>> sequences) throws Exception {
+	public static void writeSequences(OutputStream outputStream, Collection<Sequence<?>> sequences) throws Exception {
 
-		GenbankHeaderFormatInterface<Sequence<?>, Compound> fhfi = new GenbankHeaderFormatInterface<Sequence<?>, Compound>() {
+		GenbankHeaderFormatInterface<Sequence<?>, Compound> fhfi = (Sequence<?> sequence) -> sequence.getAccession()
+				.toString();
 
-			@Override
-			public String getHeader(Sequence<?> sequence) {
-				return sequence.getAccession().toString();
-			}
-
-			;
-		};
-
-		GenbankWriter<Sequence<?>, Compound> genbankWriter = new GenbankWriter<Sequence<?>, Compound>(
-				outputStream, sequences, fhfi);
+		GenbankWriter<Sequence<?>, Compound> genbankWriter = new GenbankWriter<>(outputStream, sequences, fhfi);
 
 		genbankWriter.process();
 	}

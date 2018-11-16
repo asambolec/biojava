@@ -24,7 +24,6 @@ import org.biojava.nbio.structure.align.util.ResourceManager;
 
 public class FarmJobParameters {
 
-
 	public static final int DEFAULT_JOB_TIME = -1;
 	public static final int DEFAULT_NR_ALIGNMENTS = -1;
 	public static final int DEFAULT_NR_THREADS = 1;
@@ -35,7 +34,7 @@ public class FarmJobParameters {
 		DEFAULT_SERVER_URL = resourceManager.getString("server.url");
 	}
 	public static final String DEFAULT_PDB_PATH = "/tmp/";
-	public static final int DEFAULT_BATCH_SIZE         = 100;
+	public static final int DEFAULT_BATCH_SIZE = 100;
 
 	private static final String DEFAULT_BATCH_SIZE_PROP = "request.pair.size";
 
@@ -51,8 +50,7 @@ public class FarmJobParameters {
 	int stepSize;
 	String cacheFilePath;
 
-
-	public FarmJobParameters(){
+	public FarmJobParameters() {
 		nrAlignments = DEFAULT_NR_ALIGNMENTS;
 		time = DEFAULT_JOB_TIME;
 		threads = DEFAULT_NR_THREADS;
@@ -63,10 +61,10 @@ public class FarmJobParameters {
 		updateRemediatedFiles = false;
 		String nrPairsProp = resourceManager.getString(DEFAULT_BATCH_SIZE_PROP);
 
-		stepSize = 	DEFAULT_BATCH_SIZE;
+		stepSize = DEFAULT_BATCH_SIZE;
 
 		username = FarmJobRunnable.getRandomUsername();
-		if ( nrPairsProp != null){
+		if (nrPairsProp != null) {
 			stepSize = Integer.parseInt(nrPairsProp);
 		}
 
@@ -79,6 +77,7 @@ public class FarmJobParameters {
 	public void setPdbFilePath(String pdbFilePath) {
 		this.pdbFilePath = pdbFilePath;
 	}
+
 	public String getCacheFilePath() {
 		return cacheFilePath;
 	}
@@ -91,11 +90,9 @@ public class FarmJobParameters {
 		return nrAlignments;
 	}
 
-
 	public void setNrAlignments(int nrAlignments) {
 		this.nrAlignments = nrAlignments;
 	}
-
 
 	public int getTime() {
 		return time;
@@ -124,23 +121,28 @@ public class FarmJobParameters {
 	public String getUsername() {
 		return username;
 	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	/** Flag if a job that only runs one parallell job should be run in its own thread or in the main thread.
-	 * For User interface related apps should be set to true. Default: false;
+	/**
+	 * Flag if a job that only runs one parallell job should be run in its own
+	 * thread or in the main thread. For User interface related apps should be set
+	 * to true. Default: false;
+	 * 
 	 * @return flag
 	 */
 	public boolean isRunBackground() {
 		return runBackground;
 	}
+
 	public void setRunBackground(boolean runBackground) {
 		this.runBackground = runBackground;
 	}
 
-
-	/** how many pairs should be requested for alignment from server?
+	/**
+	 * how many pairs should be requested for alignment from server?
 	 *
 	 * @return stepsize
 	 */
@@ -152,8 +154,8 @@ public class FarmJobParameters {
 		this.stepSize = stepSize;
 	}
 
-
-	/** Flag if the job should be run in verbose mode. Default: false
+	/**
+	 * Flag if the job should be run in verbose mode. Default: false
 	 *
 	 * @return flag if the job should be run in verbose mode
 	 */
@@ -175,16 +177,12 @@ public class FarmJobParameters {
 
 	@Override
 	public String toString() {
-		return "FarmJobParameters [nrAlignments=" + nrAlignments + ", time="
-				+ time + ", threads=" + threads + ", server=" + server
-				+ ", pdbFilePath=" + pdbFilePath
-				+ ", username=" + username + ", runBackground="
-				+ runBackground + ", verbose=" + verbose
-				+ ", updateRemediatedFiles=" + updateRemediatedFiles
-				+ ", stepSize=" + stepSize + ", cacheFilePath=" + cacheFilePath
-				+ "]";
+		return new StringBuilder().append("FarmJobParameters [nrAlignments=").append(nrAlignments).append(", time=")
+				.append(time).append(", threads=").append(threads).append(", server=").append(server)
+				.append(", pdbFilePath=").append(pdbFilePath).append(", username=").append(username)
+				.append(", runBackground=").append(runBackground).append(", verbose=").append(verbose)
+				.append(", updateRemediatedFiles=").append(updateRemediatedFiles).append(", stepSize=").append(stepSize)
+				.append(", cacheFilePath=").append(cacheFilePath).append("]").toString();
 	}
-
-
 
 }

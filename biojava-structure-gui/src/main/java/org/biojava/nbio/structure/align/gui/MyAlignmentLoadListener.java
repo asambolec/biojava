@@ -41,16 +41,17 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Loads an alignment in an XML format and displays its content in a
- * new Jmol panel. Can handle both alignment formats: AFPChain and
- * MultipleAlignment.
+ * Loads an alignment in an XML format and displays its content in a new Jmol
+ * panel. Can handle both alignment formats: AFPChain and MultipleAlignment.
  * <p>
- * All the alignments stored in the File are displayed, not only the first
- * one. However, all the alignments in the same file have to be in the same
- * format (either AFPChain or MultipleAlignment).
- * Multiple Jmol panels can be created for that purpose.
+ * All the alignments stored in the File are displayed, not only the first one.
+ * However, all the alignments in the same file have to be in the same format
+ * (either AFPChain or MultipleAlignment). Multiple Jmol panels can be created
+ * for that purpose.
  *
  * @author Aleix Lafita
  * @version 2.0 - adapted for MultipleAlignments
@@ -58,72 +59,68 @@ import java.util.List;
  */
 public class MyAlignmentLoadListener implements ActionListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(MyAlignmentLoadListener.class);
+
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
 		final JFileChooser fc = new JFileChooser();
 
-		//in response to a button click
+		// in response to a button click
 		int returnVal = fc.showOpenDialog(null);
 
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		File file = fc.getSelectedFile();
+		try {
 
-			File file = fc.getSelectedFile();
-			try {
+			InputStreamProvider ip = new InputStreamProvider();
+			InputStream stream = ip.getInputStream(file);
+			BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
-				InputStreamProvider ip = new InputStreamProvider();
-				InputStream stream = ip.getInputStream(file);
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(stream));
-
-				StringBuffer input = new StringBuffer();
-				String str;
-				while ((str = in.readLine()) != null) {
-					input.append(str);
-				}
-				in.close();
-
-				String xml = input.toString();
-
-				//Determine the format of the file
-				if (xml.contains("MultipleAlignmentEnsemble")){
-
-					List<MultipleAlignmentEnsemble> ensembles =
-							MultipleAlignmentXMLParser.parseXMLfile(xml);
-
-					//Display all ensembles, and all its alignments
-					for (MultipleAlignmentEnsemble e:ensembles){
-						for (MultipleAlignment msa:e.getMultipleAlignments()){
-							MultipleAlignmentJmolDisplay.display(msa);
-						}
-					}
-
-				}
-				else {
-
-					AFPChain[] afps = AFPChainXMLParser.parseMultiXML(xml);
-
-					UserConfiguration conf = WebStartMain.getWebStartConfig();
-					AtomCache cache = new AtomCache(
-							conf.getPdbFilePath(),conf.getCacheFilePath());
-
-					for (AFPChain afpChain:afps){
-						Atom[] ca1 = cache.getAtoms(afpChain.getName1());
-						Atom[] ca2 = cache.getAtoms(afpChain.getName2());
-
-						AFPChainXMLParser.rebuildAFPChain(afpChain, ca1, ca2);
-						StructureAlignmentJmol jmol =
-								StructureAlignmentDisplay.display(
-										afpChain, ca1, ca2);
-
-						DisplayAFP.showAlignmentPanel(afpChain, ca1,ca2,jmol);
-					}
-				}
-			} catch (Exception e){
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null,"Could not load alignment "
-						+ "file. Exception: " + e.getMessage());
+			StringBuilder input = new StringBuilder();
+			String str;
+			while ((str = in.readLine()) != null) {
+				input.append(str);
 			}
+			in.close();
+
+			String xml = input.toString();
+
+			// Determine the format of the file
+			if (xml.contains("MultipleAlignmentEnsemble")) {
+
+				List<MultipleAlignmentEnsemble> ensembles = MultipleAlignmentXMLParser.parseXMLfile(xml);
+
+				// Display all ensembles, and all its alignments
+				for (MultipleAlignmentEnsemble e : ensembles) {
+					for (MultipleAlignment msa : e.getMultipleAlignments()) {
+						MultipleAlignmentJmolDisplay.display(msa);
+					}
+				}
+
+			} else {
+
+				AFPChain[] afps = AFPChainXMLParser.parseMultiXML(xml);
+
+				UserConfiguration conf = WebStartMain.getWebStartConfig();
+				AtomCache cache = new AtomCache(conf.getPdbFilePath(), conf.getCacheFilePath());
+
+				for (AFPChain afpChain : afps) {
+					Atom[] ca1 = cache.getAtoms(afpChain.getName1());
+					Atom[] ca2 = cache.getAtoms(afpChain.getName2());
+
+					AFPChainXMLParser.rebuildAFPChain(afpChain, ca1, ca2);
+					StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain, ca1, ca2);
+
+					DisplayAFP.showAlignmentPanel(afpChain, ca1, ca2, jmol);
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			JOptionPane.showMessageDialog(null, new StringBuilder().append("Could not load alignment ")
+					.append("file. Exception: ").append(e.getMessage()).toString());
 		}
 	}
 

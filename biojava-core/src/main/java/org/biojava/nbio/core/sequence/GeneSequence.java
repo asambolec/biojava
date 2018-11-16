@@ -41,29 +41,37 @@ public class GeneSequence extends DNASequence {
 
 	private final static Logger logger = LoggerFactory.getLogger(GeneSequence.class);
 
-	private final LinkedHashMap<String, TranscriptSequence> transcriptSequenceHashMap = new LinkedHashMap<String, TranscriptSequence>();
-	private final LinkedHashMap<String, IntronSequence> intronSequenceHashMap = new LinkedHashMap<String, IntronSequence>();
-	private final LinkedHashMap<String, ExonSequence> exonSequenceHashMap = new LinkedHashMap<String, ExonSequence>();
-	private final ArrayList<IntronSequence> intronSequenceList = new ArrayList<IntronSequence>();
-	private final ArrayList<ExonSequence> exonSequenceList = new ArrayList<ExonSequence>();
-	boolean intronAdded = false; // need to deal with the problem that typically introns are not added when validating the list and adding in introns as the regions not included in exons
+	private final LinkedHashMap<String, TranscriptSequence> transcriptSequenceHashMap = new LinkedHashMap<>();
+	private final LinkedHashMap<String, IntronSequence> intronSequenceHashMap = new LinkedHashMap<>();
+	private final LinkedHashMap<String, ExonSequence> exonSequenceHashMap = new LinkedHashMap<>();
+	private final ArrayList<IntronSequence> intronSequenceList = new ArrayList<>();
+	private final ArrayList<ExonSequence> exonSequenceList = new ArrayList<>();
+	boolean intronAdded = false; // need to deal with the problem that typically introns are not added when
+									// validating the list and adding in introns as the regions not included in
+									// exons
 	private Strand strand = Strand.UNDEFINED;
 	private ChromosomeSequence chromosomeSequence;
 
 	/**
-	 * A class that keeps track of the details of a GeneSequence which is difficult to properly model. Two important concepts that is difficult
-	 * to make everything flexible but still work. You can have GFF features that only describe Exons or Exons/Introns or CDS regions and one
-	 * or more Transcriptions. You can have exon sequences but that does not imply transcription to the actual protein.
+	 * A class that keeps track of the details of a GeneSequence which is difficult
+	 * to properly model. Two important concepts that is difficult to make
+	 * everything flexible but still work. You can have GFF features that only
+	 * describe Exons or Exons/Introns or CDS regions and one or more
+	 * Transcriptions. You can have exon sequences but that does not imply
+	 * transcription to the actual protein.
 	 *
-	 * The GeneSequence will keep track of Exons and Introns but to get a Protein sequence you need to start with a
-	 * TranscriptSequence and then add CDS sequences.
+	 * The GeneSequence will keep track of Exons and Introns but to get a Protein
+	 * sequence you need to start with a TranscriptSequence and then add CDS
+	 * sequences.
 	 *
-	 * This is also a key class in the biojava-3-genome module for reading and writing GFF3 files
+	 * This is also a key class in the biojava-3-genome module for reading and
+	 * writing GFF3 files
 	 *
 	 * @param parentDNASequence
 	 * @param begin
-	 * @param end inclusive of end
-	 * @param strand force a gene to have strand and transcription sequence will inherit
+	 * @param end               inclusive of end
+	 * @param strand            force a gene to have strand and transcription
+	 *                          sequence will inherit
 	 */
 	public GeneSequence(ChromosomeSequence parentSequence, int begin, int end, Strand strand) {
 		chromosomeSequence = parentSequence;
@@ -76,6 +84,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * The parent ChromosomeSequence which contains the actual DNA sequence data
+	 * 
 	 * @return Chromosome sequence
 	 */
 	public ChromosomeSequence getParentChromosomeSequence() {
@@ -88,50 +97,57 @@ public class GeneSequence extends DNASequence {
 	}
 
 	/**
-	 * Once everything has been added to the gene sequence where you might have added exon sequences only then you
-	 * can infer the intron sequences and add them. You may also have the case where you only added one or more
-	 * TranscriptSequences and from that you can infer the exon sequences and intron sequences.
-	 * Currently not implement
+	 * Once everything has been added to the gene sequence where you might have
+	 * added exon sequences only then you can infer the intron sequences and add
+	 * them. You may also have the case where you only added one or more
+	 * TranscriptSequences and from that you can infer the exon sequences and intron
+	 * sequences. Currently not implement
 	 */
 	public void addIntronsUsingExons() throws Exception {
-		if (intronAdded) { //going to assume introns are correct
+		if (intronAdded) { // going to assume introns are correct
 			return;
 		}
 		if (exonSequenceList.size() == 0) {
 			return;
 		}
 		ExonComparator exonComparator = new ExonComparator();
-		//sort based on start position and sense;
+		// sort based on start position and sense;
 		Collections.sort(exonSequenceList, exonComparator);
 		int shift = -1;
 		if (getStrand() == Strand.NEGATIVE) {
 			shift = 1;
 		}
-		//ExonSequence firstExonSequence = exonSequenceList.get(0);
+		// ExonSequence firstExonSequence = exonSequenceList.get(0);
 		int intronIndex = 1;
-//       if (firstExonSequence.getBioBegin().intValue() != getBioBegin().intValue()) {
-//           this.addIntron(new AccessionID(this.getAccession().getID() + "-" + "intron" + intronIndex), getBioBegin(), firstExonSequence.getBioBegin() + shift);
-//           intronIndex++;
-//       }
+		// if (firstExonSequence.getBioBegin().intValue() != getBioBegin().intValue()) {
+		// this.addIntron(new AccessionID(this.getAccession().getID() + "-" + "intron" +
+		// intronIndex), getBioBegin(), firstExonSequence.getBioBegin() + shift);
+		// intronIndex++;
+		// }
 		for (int i = 0; i < exonSequenceList.size() - 1; i++) {
 			ExonSequence exon1 = exonSequenceList.get(i);
 			ExonSequence exon2 = exonSequenceList.get(i + 1);
-			this.addIntron(new AccessionID(this.getAccession().getID() + "-" + "intron" + intronIndex), exon1.getBioEnd() - shift, exon2.getBioBegin() + shift);
+			this.addIntron(new AccessionID(new StringBuilder().append(this.getAccession().getID()).append("-")
+					.append("intron").append(intronIndex).toString()), exon1.getBioEnd() - shift,
+					exon2.getBioBegin() + shift);
 			intronIndex++;
 		}
 
-//       ExonSequence lastExonSequence = exonSequenceList.get(exonSequenceList.size() - 1);
-//       if (lastExonSequence.getBioEnd().intValue() != getBioEnd().intValue()) {
-//           this.addIntron(new AccessionID(this.getAccession().getID() + "-" + "intron" + intronIndex), lastExonSequence.getBioEnd() - shift, getBioEnd());
-//           intronIndex++;
-//       }
+		// ExonSequence lastExonSequence = exonSequenceList.get(exonSequenceList.size()
+		// - 1);
+		// if (lastExonSequence.getBioEnd().intValue() != getBioEnd().intValue()) {
+		// this.addIntron(new AccessionID(this.getAccession().getID() + "-" + "intron" +
+		// intronIndex), lastExonSequence.getBioEnd() - shift, getBioEnd());
+		// intronIndex++;
+		// }
 
-		//    log.severe("Add in support for building introns based on added exons");
+		// log.severe("Add in support for building introns based on added exons");
 
 	}
 
 	/**
 	 * A gene should have Strand
+	 * 
 	 * @return the strand
 	 */
 	public Strand getStrand() {
@@ -147,6 +163,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Get the transcript sequence by accession
+	 * 
 	 * @param accession
 	 * @return the transcript
 	 */
@@ -156,6 +173,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Get the collection of transcription sequences assigned to this gene
+	 * 
 	 * @return transcripts
 	 */
 	public LinkedHashMap<String, TranscriptSequence> getTranscripts() {
@@ -164,17 +182,18 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Remove the transcript sequence from the gene
+	 * 
 	 * @param accession
 	 * @return transcriptsequence
 	 */
 	public TranscriptSequence removeTranscript(String accession) {
-
 
 		return transcriptSequenceHashMap.remove(accession);
 	}
 
 	/**
 	 * Add a transcription sequence to a gene which describes a ProteinSequence
+	 * 
 	 * @param accession
 	 * @param begin
 	 * @param end
@@ -193,6 +212,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Remove the intron by accession
+	 * 
 	 * @param accession
 	 * @return intron sequence
 	 */
@@ -209,6 +229,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Add an Intron Currently used to mark an IntronSequence as a feature
+	 * 
 	 * @param accession
 	 * @param begin
 	 * @param end
@@ -219,7 +240,9 @@ public class GeneSequence extends DNASequence {
 			throw new Exception("Duplicate accesion id " + accession.getID());
 		}
 		intronAdded = true;
-		IntronSequence intronSequence = new IntronSequence(this, begin, end); // working off the assumption that intron frame is always 0 or doesn't matter and same sense as parent
+		IntronSequence intronSequence = new IntronSequence(this, begin, end); // working off the assumption that intron
+																				// frame is always 0 or doesn't matter
+																				// and same sense as parent
 		intronSequence.setAccession(accession);
 		intronSequenceList.add(intronSequence);
 		intronSequenceHashMap.put(accession.getID(), intronSequence);
@@ -228,6 +251,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Remove the exon sequence
+	 * 
 	 * @param accession
 	 * @return exon sequence
 	 */
@@ -240,9 +264,9 @@ public class GeneSequence extends DNASequence {
 				intronSequenceList.clear();
 				intronSequenceHashMap.clear();
 				intronAdded = false;
-				try{
+				try {
 					addIntronsUsingExons();
-				} catch(Exception e){
+				} catch (Exception e) {
 					logger.error("Remove Exon validate() error " + e.getMessage());
 				}
 				return exonSequence;
@@ -253,6 +277,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Add an ExonSequence mainly used to mark as a feature
+	 * 
 	 * @param accession
 	 * @param begin
 	 * @param end
@@ -263,7 +288,7 @@ public class GeneSequence extends DNASequence {
 			throw new Exception("Duplicate accesion id " + accession.getID());
 		}
 
-		ExonSequence exonSequence = new ExonSequence(this, begin, end); //sense should be the same as parent
+		ExonSequence exonSequence = new ExonSequence(this, begin, end); // sense should be the same as parent
 		exonSequence.setAccession(accession);
 		exonSequenceList.add(exonSequence);
 		exonSequenceHashMap.put(accession.getID(), exonSequence);
@@ -272,6 +297,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Get the exons as an ArrayList
+	 * 
 	 * @return exons
 	 */
 	public ArrayList<ExonSequence> getExonSequences() {
@@ -280,6 +306,7 @@ public class GeneSequence extends DNASequence {
 
 	/**
 	 * Get the introns as an ArrayList
+	 * 
 	 * @return introns
 	 */
 	public ArrayList<IntronSequence> getIntronSequences() {
@@ -287,14 +314,17 @@ public class GeneSequence extends DNASequence {
 	}
 
 	/**
-	 * Try to give method clarity where you want a DNASequence coding in the 5' to 3' direction
-	 * Returns the DNASequence representative of the 5' and 3' reading based on strand
+	 * Try to give method clarity where you want a DNASequence coding in the 5' to
+	 * 3' direction Returns the DNASequence representative of the 5' and 3' reading
+	 * based on strand
+	 * 
 	 * @return dna sequence
 	 */
 	public DNASequence getSequence5PrimeTo3Prime() {
 		String sequence = getSequenceAsString(this.getBioBegin(), this.getBioEnd(), this.getStrand());
 		if (getStrand() == Strand.NEGATIVE) {
-			//need to take complement of sequence because it is negative and we are returning the gene sequence from the opposite strand
+			// need to take complement of sequence because it is negative and we are
+			// returning the gene sequence from the opposite strand
 			StringBuilder b = new StringBuilder(getLength());
 			CompoundSet<NucleotideCompound> compoundSet = this.getCompoundSet();
 			for (int i = 0; i < sequence.length(); i++) {
@@ -308,8 +338,9 @@ public class GeneSequence extends DNASequence {
 		try {
 			dnaSequence = new DNASequence(sequence.toUpperCase());
 		} catch (CompoundNotFoundException e) {
-			// this should not happen, the sequence is DNA originally, if it does, there's a bug somewhere
-			logger.error("Could not create new DNA sequence in getSequence5PrimeTo3Prime(). Error: {}",e.getMessage());
+			// this should not happen, the sequence is DNA originally, if it does, there's a
+			// bug somewhere
+			logger.error("Could not create new DNA sequence in getSequence5PrimeTo3Prime(). Error: {}", e.getMessage());
 		}
 		dnaSequence.setAccession(new AccessionID(this.getAccession().getID()));
 		return dnaSequence;

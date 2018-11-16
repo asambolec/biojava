@@ -31,6 +31,7 @@ import org.biojava.nbio.core.sequence.template.CompoundSet;
 
 /**
  * Used to describe an Amino Acid.
+ * 
  * @author Richard Holland
  * @author Scooter Willis
  * @author Andy Yates
@@ -40,12 +41,11 @@ public class AminoAcidCompound extends AbstractCompound implements Serializable 
 	/**
 	 *
 	 */
-private static final long serialVersionUID = -1955116496725902319L;
-private final AminoAcidCompoundSet compoundSet;
+	private static final long serialVersionUID = -1955116496725902319L;
+	private final AminoAcidCompoundSet compoundSet;
 
-
-	public AminoAcidCompound(AminoAcidCompoundSet compoundSet, String shortName,
-			String longName, String description, Float molecularWeight) {
+	public AminoAcidCompound(AminoAcidCompoundSet compoundSet, String shortName, String longName, String description,
+			Float molecularWeight) {
 		super(shortName);
 		setShortName(shortName);
 		setLongName(longName);
@@ -56,7 +56,7 @@ private final AminoAcidCompoundSet compoundSet;
 
 	// TODO need to allow for modified name; that's not equality though is it?
 	@Override
-public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -72,12 +72,12 @@ public boolean equals(Object obj) {
 	}
 
 	@Override
-public int hashCode() {
+	public int hashCode() {
 		return toString().hashCode();
 	}
 
 	@Override
-public boolean equalsIgnoreCase(Compound compound) {
+	public boolean equalsIgnoreCase(Compound compound) {
 		if (compound == null) {
 			return false;
 		}

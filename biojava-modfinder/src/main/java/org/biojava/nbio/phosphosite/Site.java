@@ -34,9 +34,16 @@ import java.util.zip.GZIPInputStream;
 public class Site {
 
 	private final static Logger logger = LoggerFactory.getLogger(Site.class);
+	String protein;
+	String uniprot;
+	String geneSymb;
+	String chrLoc;
+	String modType;
+	String residue;
+	String group;
+	String organism;
 
-	public Site(){
-
+	public Site() {
 
 	}
 
@@ -50,45 +57,45 @@ public class Site {
 
 		String line = null;
 
-		List<Site > data = new ArrayList<Site>();
+		List<Site> data = new ArrayList<>();
 
 		List<String> headerFields = null;
 
 		int proteinIndex = -1;
 		int uniprotIndex = -1;
 		int residueIndex = -1;
-		int orgIndex     = -1;
-		int groupIndex   = -1;
-		int geneIndex    = -1;
+		int orgIndex = -1;
+		int groupIndex = -1;
+		int geneIndex = -1;
 
 		boolean inHeader = true;
 
-
-		while ((line = buf.readLine()) != null){
-			if ( line.startsWith("GENE") ||
-					line.startsWith("PROTEIN")) {
+		while ((line = buf.readLine()) != null) {
+			if (line.startsWith("GENE") || line.startsWith("PROTEIN")) {
 
 				headerFields = parseHeaderFields(line);
 
 				proteinIndex = headerFields.indexOf("PROTEIN");
 				uniprotIndex = headerFields.indexOf("ACC_ID");
 				residueIndex = headerFields.indexOf("MOD_RSD");
-				orgIndex     = headerFields.indexOf("ORGANISM");
-				groupIndex   = headerFields.indexOf("SITE_GRP_ID");
-				geneIndex 	 = headerFields.indexOf("GENE");
+				orgIndex = headerFields.indexOf("ORGANISM");
+				groupIndex = headerFields.indexOf("SITE_GRP_ID");
+				geneIndex = headerFields.indexOf("GENE");
 
 				inHeader = false;
 				continue;
 			}
-			if ( inHeader)
+			if (inHeader) {
 				continue;
+			}
 
-			if ( line.trim().length() == 0)
+			if (line.trim().isEmpty()) {
 				continue;
+			}
 
 			// fields are:
 			String[] spl = line.split("\t");
-			if ( spl.length  < 5){
+			if (spl.length < 5) {
 				logger.info("Found wrong line length: " + line);
 				continue;
 
@@ -101,11 +108,11 @@ public class Site {
 
 			String[] resSpl = residue.split("-");
 			String modType = null;
-			if ( resSpl.length == 2) {
+			if (resSpl.length == 2) {
 
-				 modType = resSpl[1];
+				modType = resSpl[1];
 			}
-			String group    = spl[groupIndex];
+			String group = spl[groupIndex];
 
 			String organism = spl[orgIndex];
 
@@ -131,23 +138,14 @@ public class Site {
 	private static List<String> parseHeaderFields(String line) {
 		String[] spl = line.split("\t");
 
-		List<String> h = new ArrayList<String>();
-		for (String s: spl){
+		List<String> h = new ArrayList<>();
+		for (String s : spl) {
 			h.add(s);
 
 		}
 
 		return h;
 	}
-
-	String protein;
-	String uniprot;
-	String geneSymb;
-	String chrLoc;
-	String modType;
-	String residue ;
-	String group;
-	String organism;
 
 	public String getProtein() {
 		return protein;
@@ -215,31 +213,34 @@ public class Site {
 
 	@Override
 	public String toString() {
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 
-		s.append("Site{" +
-				"protein='" + protein + '\'');
-		if ( uniprot != null)
-				s.append(", uniprot='" + uniprot + '\'' );
-		if ( geneSymb != null)
-			s.append(
-				", geneSymb='" + geneSymb + '\'' );
-		if (chrLoc != null)
-				s.append(", chrLoc='" + chrLoc + '\'' );
-		if (modType != null)
-			s.append(", modType='" + modType + '\'' );
+		s.append(new StringBuilder().append("Site{").append("protein='").append(protein).append('\'').toString());
+		if (uniprot != null) {
+			s.append(new StringBuilder().append(", uniprot='").append(uniprot).append('\'').toString());
+		}
+		if (geneSymb != null) {
+			s.append(new StringBuilder().append(", geneSymb='").append(geneSymb).append('\'').toString());
+		}
+		if (chrLoc != null) {
+			s.append(new StringBuilder().append(", chrLoc='").append(chrLoc).append('\'').toString());
+		}
+		if (modType != null) {
+			s.append(new StringBuilder().append(", modType='").append(modType).append('\'').toString());
+		}
 
-		if (residue != null)
-			s.append(        ", residue='" + residue + '\'' );
-		if ( group != null)
-				s.append(", group='" + group + '\'' );
-		if (organism != null)
-			s.append(", organism='" + organism + '\'' );
+		if (residue != null) {
+			s.append(new StringBuilder().append(", residue='").append(residue).append('\'').toString());
+		}
+		if (group != null) {
+			s.append(new StringBuilder().append(", group='").append(group).append('\'').toString());
+		}
+		if (organism != null) {
+			s.append(new StringBuilder().append(", organism='").append(organism).append('\'').toString());
+		}
 
-		  s.append(      '}');
+		s.append('}');
 
 		return s.toString();
 	}
 }
-
-

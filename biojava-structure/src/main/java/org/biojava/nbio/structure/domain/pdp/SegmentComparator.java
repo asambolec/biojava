@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 public class SegmentComparator implements Comparator<Segment>, Serializable {
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
 	@Override
 	public int compare(Segment v1, Segment v2) {
@@ -32,5 +32,3 @@ public class SegmentComparator implements Comparator<Segment>, Serializable {
 		return v1.compareTo(v2);
 	}
 }
-
-

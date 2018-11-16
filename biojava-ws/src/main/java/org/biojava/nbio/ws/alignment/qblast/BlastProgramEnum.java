@@ -32,11 +32,6 @@ package org.biojava.nbio.ws.alignment.qblast;
  */
 public enum BlastProgramEnum {
 
-	blastn,
-	blastp,
-	blastx,
-	megablast,
-	tblastn,
-	tblastx
+	blastn, blastp, blastx, megablast, tblastn, tblastx
 
 }

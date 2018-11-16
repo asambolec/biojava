@@ -26,26 +26,26 @@ package org.biojava.nbio.survival.cox.stats;
  */
 public class Cholesky2 {
 
-	   /* $Id: cholesky2.c 11357 2009-09-04 15:22:46Z therneau $
+	/*
+	 * $Id: cholesky2.c 11357 2009-09-04 15:22:46Z therneau $
 	 **
-	 ** subroutine to do Cholesky decompostion on a matrix: C = FDF'
-	 **   where F is lower triangular with 1's on the diagonal, and D is diagonal
+	 ** subroutine to do Cholesky decompostion on a matrix: C = FDF' where F is lower
+	 * triangular with 1's on the diagonal, and D is diagonal
 	 **
-	 ** arguments are:
-	 **     n         the size of the matrix to be factored
-	 **     **matrix  a ragged array containing an n by n submatrix to be factored
-	 **     toler     the threshold value for detecting "singularity"
+	 ** arguments are: n the size of the matrix to be factored **matrix a ragged
+	 * array containing an n by n submatrix to be factored toler the threshold value
+	 * for detecting "singularity"
 	 **
-	 **  The factorization is returned in the lower triangle, D occupies the
-	 **    diagonal and the upper triangle is left undisturbed.
-	 **    The lower triangle need not be filled in at the start.
+	 ** The factorization is returned in the lower triangle, D occupies the diagonal
+	 * and the upper triangle is left undisturbed. The lower triangle need not be
+	 * filled in at the start.
 	 **
-	 **  Return value:  the rank of the matrix (non-negative definite), or -rank
-	 **     it not SPD or NND
+	 ** Return value: the rank of the matrix (non-negative definite), or -rank it not
+	 * SPD or NND
 	 **
-	 **  If a column is deemed to be redundant, then that diagonal is set to zero.
+	 ** If a column is deemed to be redundant, then that diagonal is set to zero.
 	 **
-	 **   Terry Therneau
+	 ** Terry Therneau
 	 */
 	/**
 	 *
@@ -56,8 +56,11 @@ public class Cholesky2 {
 	 */
 	public static int process(double[][] matrix, int n, double toler) {
 		double temp;
-		int i, j, k;
-		double eps, pivot;
+		int i;
+		int j;
+		int k;
+		double eps;
+		double pivot;
 		int rank;
 		int nonneg;
 

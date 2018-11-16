@@ -111,8 +111,8 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 
 	private static final Logger logger = LoggerFactory.getLogger(SuperPositionQCP.class);
 
-	private double evec_prec = 1E-6;
-	private double eval_prec = 1E-11;
+	private double evecPrec = 1E-6;
+	private double evalPrec = 1E-11;
 
 	private Point3d[] x;
 	private Point3d[] y;
@@ -129,10 +129,38 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	private Matrix3d rotmat = new Matrix3d();
 	private Matrix4d transformation = new Matrix4d();
 	private double rmsd = 0;
-	private double Sxy, Sxz, Syx, Syz, Szx, Szy;
-	private double SxxpSyy, Szz, mxEigenV, SyzmSzy, SxzmSzx, SxymSyx;
-	private double SxxmSyy, SxypSyx, SxzpSzx;
-	private double Syy, Sxx, SyzpSzy;
+	private double sxy;
+
+	private double sxz;
+
+	private double syx;
+
+	private double syz;
+
+	private double szx;
+
+	private double szy;
+	private double sxxpSyy;
+
+	private double szz;
+
+	private double mxEigenV;
+
+	private double syzmSzy;
+
+	private double sxzmSzx;
+
+	private double sxymSyx;
+	private double sxxmSyy;
+
+	private double sxypSyx;
+
+	private double sxzpSzx;
+	private double syy;
+
+	private double sxx;
+
+	private double syzpSzy;
 	private boolean rmsdCalculated = false;
 	private boolean transformationCalculated = false;
 	private boolean centered = false;
@@ -140,9 +168,8 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	/**
 	 * Default constructor for the quaternion based superposition algorithm.
 	 * 
-	 * @param centered
-	 *            true if the point arrays are centered at the origin (faster),
-	 *            false otherwise
+	 * @param centered true if the point arrays are centered at the origin (faster),
+	 *                 false otherwise
 	 */
 	public SuperPositionQCP(boolean centered) {
 		super(centered);
@@ -151,28 +178,23 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	/**
 	 * Constructor with option to set the precision values.
 	 * 
-	 * @param centered
-	 *            true if the point arrays are centered at the origin (faster),
-	 *            false otherwise
-	 * @param evec_prec
-	 *            required eigenvector precision
-	 * @param eval_prec
-	 *            required eigenvalue precision
+	 * @param centered  true if the point arrays are centered at the origin
+	 *                  (faster), false otherwise
+	 * @param evec_prec required eigenvector precision
+	 * @param eval_prec required eigenvalue precision
 	 */
 	public SuperPositionQCP(boolean centered, double evec_prec, double eval_prec) {
 		super(centered);
-		this.evec_prec = evec_prec;
-		this.eval_prec = eval_prec;
+		this.evecPrec = evec_prec;
+		this.evalPrec = eval_prec;
 	}
 
 	/**
 	 * Sets the two input coordinate arrays. These input arrays must be of equal
 	 * length. Input coordinates are not modified.
 	 * 
-	 * @param x
-	 *            3d points of reference coordinate set
-	 * @param y
-	 *            3d points of coordinate set for superposition
+	 * @param x 3d points of reference coordinate set
+	 * @param y 3d points of coordinate set for superposition
 	 */
 	private void set(Point3d[] x, Point3d[] y) {
 		this.x = x;
@@ -182,15 +204,12 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	/**
-	 * Sets the two input coordinate arrays and weight array. All input arrays
-	 * must be of equal length. Input coordinates are not modified.
+	 * Sets the two input coordinate arrays and weight array. All input arrays must
+	 * be of equal length. Input coordinates are not modified.
 	 * 
-	 * @param x
-	 *            3d points of reference coordinate set
-	 * @param y
-	 *            3d points of coordinate set for superposition
-	 * @param weight
-	 *            a weight in the inclusive range [0,1] for each point
+	 * @param x      3d points of reference coordinate set
+	 * @param y      3d points of coordinate set for superposition
+	 * @param weight a weight in the inclusive range [0,1] for each point
 	 */
 	private void set(Point3d[] x, Point3d[] y, double[] weight) {
 		this.x = x;
@@ -201,10 +220,10 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	/**
-	 * Return the RMSD of the superposition of input coordinate set y onto x.
-	 * Note, this is the fasted way to calculate an RMSD without actually
-	 * superposing the two sets. The calculation is performed "lazy", meaning
-	 * calculations are only performed if necessary.
+	 * Return the RMSD of the superposition of input coordinate set y onto x. Note,
+	 * this is the fasted way to calculate an RMSD without actually superposing the
+	 * two sets. The calculation is performed "lazy", meaning calculations are only
+	 * performed if necessary.
 	 * 
 	 * @return root mean square deviation for superposition of y onto x
 	 */
@@ -221,8 +240,7 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	 * 
 	 * @param fixed
 	 * @param moved
-	 * @param weight
-	 *            array of weigths for each equivalent point position
+	 * @param weight array of weigths for each equivalent point position
 	 * @return
 	 */
 	public Matrix4d weightedSuperpose(Point3d[] fixed, Point3d[] moved, double[] weight) {
@@ -246,13 +264,11 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	/**
-	 * Calculates the RMSD value for superposition of y onto x. This requires
-	 * the coordinates to be precentered.
+	 * Calculates the RMSD value for superposition of y onto x. This requires the
+	 * coordinates to be precentered.
 	 * 
-	 * @param x
-	 *            3d points of reference coordinate set
-	 * @param y
-	 *            3d points of coordinate set for superposition
+	 * @param x 3d points of reference coordinate set
+	 * @param y 3d points of coordinate set for superposition
 	 */
 	private void calcRmsd(Point3d[] x, Point3d[] y) {
 		if (centered) {
@@ -307,10 +323,10 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	/**
-	 * Calculates the inner product between two coordinate sets x and y
-	 * (optionally weighted, if weights set through
-	 * {@link #set(Point3d[], Point3d[], double[])}). It also calculates an
-	 * upper bound of the most positive root of the key matrix.
+	 * Calculates the inner product between two coordinate sets x and y (optionally
+	 * weighted, if weights set through
+	 * {@link #set(Point3d[], Point3d[], double[])}). It also calculates an upper
+	 * bound of the most positive root of the key matrix.
 	 * http://theobald.brandeis.edu/qcp/qcprot.c
 	 * 
 	 * @param coords1
@@ -318,18 +334,24 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	 * @return
 	 */
 	private void innerProduct(Point3d[] coords1, Point3d[] coords2) {
-		double x1, x2, y1, y2, z1, z2;
-		double g1 = 0.0, g2 = 0.0;
+		double x1;
+		double x2;
+		double y1;
+		double y2;
+		double z1;
+		double z2;
+		double g1 = 0.0;
+		double g2 = 0.0;
 
-		Sxx = 0;
-		Sxy = 0;
-		Sxz = 0;
-		Syx = 0;
-		Syy = 0;
-		Syz = 0;
-		Szx = 0;
-		Szy = 0;
-		Szz = 0;
+		sxx = 0;
+		sxy = 0;
+		sxz = 0;
+		syx = 0;
+		syy = 0;
+		syz = 0;
+		szx = 0;
+		szy = 0;
+		szz = 0;
 
 		if (weight != null) {
 			wsum = 0;
@@ -349,34 +371,34 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 
 				g2 += weight[i] * (x2 * x2 + y2 * y2 + z2 * z2);
 
-				Sxx += (x1 * x2);
-				Sxy += (x1 * y2);
-				Sxz += (x1 * z2);
+				sxx += (x1 * x2);
+				sxy += (x1 * y2);
+				sxz += (x1 * z2);
 
-				Syx += (y1 * x2);
-				Syy += (y1 * y2);
-				Syz += (y1 * z2);
+				syx += (y1 * x2);
+				syy += (y1 * y2);
+				syz += (y1 * z2);
 
-				Szx += (z1 * x2);
-				Szy += (z1 * y2);
-				Szz += (z1 * z2);
+				szx += (z1 * x2);
+				szy += (z1 * y2);
+				szz += (z1 * z2);
 			}
 		} else {
 			for (int i = 0; i < coords1.length; i++) {
 				g1 += coords1[i].x * coords1[i].x + coords1[i].y * coords1[i].y + coords1[i].z * coords1[i].z;
 				g2 += coords2[i].x * coords2[i].x + coords2[i].y * coords2[i].y + coords2[i].z * coords2[i].z;
 
-				Sxx += coords1[i].x * coords2[i].x;
-				Sxy += coords1[i].x * coords2[i].y;
-				Sxz += coords1[i].x * coords2[i].z;
+				sxx += coords1[i].x * coords2[i].x;
+				sxy += coords1[i].x * coords2[i].y;
+				sxz += coords1[i].x * coords2[i].z;
 
-				Syx += coords1[i].y * coords2[i].x;
-				Syy += coords1[i].y * coords2[i].y;
-				Syz += coords1[i].y * coords2[i].z;
+				syx += coords1[i].y * coords2[i].x;
+				syy += coords1[i].y * coords2[i].y;
+				syz += coords1[i].y * coords2[i].z;
 
-				Szx += coords1[i].z * coords2[i].x;
-				Szy += coords1[i].z * coords2[i].y;
-				Szz += coords1[i].z * coords2[i].z;
+				szx += coords1[i].z * coords2[i].x;
+				szy += coords1[i].z * coords2[i].y;
+				szz += coords1[i].z * coords2[i].z;
 			}
 			wsum = coords1.length;
 		}
@@ -385,46 +407,46 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	private int calcRmsd(double len) {
-		double Sxx2 = Sxx * Sxx;
-		double Syy2 = Syy * Syy;
-		double Szz2 = Szz * Szz;
+		double Sxx2 = sxx * sxx;
+		double Syy2 = syy * syy;
+		double Szz2 = szz * szz;
 
-		double Sxy2 = Sxy * Sxy;
-		double Syz2 = Syz * Syz;
-		double Sxz2 = Sxz * Sxz;
+		double Sxy2 = sxy * sxy;
+		double Syz2 = syz * syz;
+		double Sxz2 = sxz * sxz;
 
-		double Syx2 = Syx * Syx;
-		double Szy2 = Szy * Szy;
-		double Szx2 = Szx * Szx;
+		double Syx2 = syx * syx;
+		double Szy2 = szy * szy;
+		double Szx2 = szx * szx;
 
-		double SyzSzymSyySzz2 = 2.0 * (Syz * Szy - Syy * Szz);
+		double SyzSzymSyySzz2 = 2.0 * (syz * szy - syy * szz);
 		double Sxx2Syy2Szz2Syz2Szy2 = Syy2 + Szz2 - Sxx2 + Syz2 + Szy2;
 
 		double c2 = -2.0 * (Sxx2 + Syy2 + Szz2 + Sxy2 + Syx2 + Sxz2 + Szx2 + Syz2 + Szy2);
-		double c1 = 8.0 * (Sxx * Syz * Szy + Syy * Szx * Sxz + Szz * Sxy * Syx - Sxx * Syy * Szz - Syz * Szx * Sxy
-				- Szy * Syx * Sxz);
+		double c1 = 8.0 * (sxx * syz * szy + syy * szx * sxz + szz * sxy * syx - sxx * syy * szz - syz * szx * sxy
+				- szy * syx * sxz);
 
-		SxzpSzx = Sxz + Szx;
-		SyzpSzy = Syz + Szy;
-		SxypSyx = Sxy + Syx;
-		SyzmSzy = Syz - Szy;
-		SxzmSzx = Sxz - Szx;
-		SxymSyx = Sxy - Syx;
-		SxxpSyy = Sxx + Syy;
-		SxxmSyy = Sxx - Syy;
+		sxzpSzx = sxz + szx;
+		syzpSzy = syz + szy;
+		sxypSyx = sxy + syx;
+		syzmSzy = syz - szy;
+		sxzmSzx = sxz - szx;
+		sxymSyx = sxy - syx;
+		sxxpSyy = sxx + syy;
+		sxxmSyy = sxx - syy;
 
 		double Sxy2Sxz2Syx2Szx2 = Sxy2 + Sxz2 - Syx2 - Szx2;
 
 		double c0 = Sxy2Sxz2Syx2Szx2 * Sxy2Sxz2Syx2Szx2
 				+ (Sxx2Syy2Szz2Syz2Szy2 + SyzSzymSyySzz2) * (Sxx2Syy2Szz2Syz2Szy2 - SyzSzymSyySzz2)
-				+ (-(SxzpSzx) * (SyzmSzy) + (SxymSyx) * (SxxmSyy - Szz))
-						* (-(SxzmSzx) * (SyzpSzy) + (SxymSyx) * (SxxmSyy + Szz))
-				+ (-(SxzpSzx) * (SyzpSzy) - (SxypSyx) * (SxxpSyy - Szz))
-						* (-(SxzmSzx) * (SyzmSzy) - (SxypSyx) * (SxxpSyy + Szz))
-				+ (+(SxypSyx) * (SyzpSzy) + (SxzpSzx) * (SxxmSyy + Szz))
-						* (-(SxymSyx) * (SyzmSzy) + (SxzpSzx) * (SxxpSyy + Szz))
-				+ (+(SxypSyx) * (SyzmSzy) + (SxzmSzx) * (SxxmSyy - Szz))
-						* (-(SxymSyx) * (SyzpSzy) + (SxzmSzx) * (SxxpSyy - Szz));
+				+ (-(sxzpSzx) * (syzmSzy) + (sxymSyx) * (sxxmSyy - szz))
+						* (-(sxzmSzx) * (syzpSzy) + (sxymSyx) * (sxxmSyy + szz))
+				+ (-(sxzpSzx) * (syzpSzy) - (sxypSyx) * (sxxpSyy - szz))
+						* (-(sxzmSzx) * (syzmSzy) - (sxypSyx) * (sxxpSyy + szz))
+				+ (+(sxypSyx) * (syzpSzy) + (sxzpSzx) * (sxxmSyy + szz))
+						* (-(sxymSyx) * (syzmSzy) + (sxzpSzx) * (sxxpSyy + szz))
+				+ (+(sxypSyx) * (syzmSzy) + (sxzmSzx) * (sxxmSyy - szz))
+						* (-(sxymSyx) * (syzpSzy) + (sxzmSzx) * (sxxpSyy - szz));
 
 		mxEigenV = e0;
 
@@ -437,8 +459,9 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 			double delta = ((a * mxEigenV + c0) / (2.0 * x2 * mxEigenV + b + a));
 			mxEigenV -= delta;
 
-			if (Math.abs(mxEigenV - oldg) < Math.abs(eval_prec * mxEigenV))
+			if (Math.abs(mxEigenV - oldg) < Math.abs(evalPrec * mxEigenV)) {
 				break;
+			}
 		}
 
 		if (i == 50) {
@@ -448,8 +471,8 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 		}
 
 		/*
-		 * the fabs() is to guard against extremely small, but *negative*
-		 * numbers due to floating point error
+		 * the fabs() is to guard against extremely small, but *negative* numbers due to
+		 * floating point error
 		 */
 		rmsd = Math.sqrt(Math.abs(2.0 * (e0 - mxEigenV) / len));
 
@@ -457,22 +480,22 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	private int calcRotationMatrix() {
-		double a11 = SxxpSyy + Szz - mxEigenV;
-		double a12 = SyzmSzy;
-		double a13 = -SxzmSzx;
-		double a14 = SxymSyx;
-		double a21 = SyzmSzy;
-		double a22 = SxxmSyy - Szz - mxEigenV;
-		double a23 = SxypSyx;
-		double a24 = SxzpSzx;
+		double a11 = sxxpSyy + szz - mxEigenV;
+		double a12 = syzmSzy;
+		double a13 = -sxzmSzx;
+		double a14 = sxymSyx;
+		double a21 = syzmSzy;
+		double a22 = sxxmSyy - szz - mxEigenV;
+		double a23 = sxypSyx;
+		double a24 = sxzpSzx;
 		double a31 = a13;
 		double a32 = a23;
-		double a33 = Syy - Sxx - Szz - mxEigenV;
-		double a34 = SyzpSzy;
+		double a33 = syy - sxx - szz - mxEigenV;
+		double a34 = syzpSzy;
 		double a41 = a14;
 		double a42 = a24;
 		double a43 = a34;
-		double a44 = Szz - SxxpSyy - mxEigenV;
+		double a44 = szz - sxxpSyy - mxEigenV;
 		double a3344_4334 = a33 * a44 - a43 * a34;
 		double a3244_4234 = a32 * a44 - a42 * a34;
 		double a3243_4233 = a32 * a43 - a42 * a33;
@@ -487,22 +510,25 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 		double qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
 
 		/*
-		 * The following code tries to calculate another column in the adjoint
-		 * matrix when the norm of the current column is too small. Usually this
-		 * commented block will never be activated. To be absolutely safe this
-		 * should be uncommented, but it is most likely unnecessary.
+		 * The following code tries to calculate another column in the adjoint matrix
+		 * when the norm of the current column is too small. Usually this commented
+		 * block will never be activated. To be absolutely safe this should be
+		 * uncommented, but it is most likely unnecessary.
 		 */
-		if (qsqr < evec_prec) {
+		if (qsqr < evecPrec) {
 			q1 = a12 * a3344_4334 - a13 * a3244_4234 + a14 * a3243_4233;
 			q2 = -a11 * a3344_4334 + a13 * a3144_4134 - a14 * a3143_4133;
 			q3 = a11 * a3244_4234 - a12 * a3144_4134 + a14 * a3142_4132;
 			q4 = -a11 * a3243_4233 + a12 * a3143_4133 - a13 * a3142_4132;
 			qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
 
-			if (qsqr < evec_prec) {
-				double a1324_1423 = a13 * a24 - a14 * a23, a1224_1422 = a12 * a24 - a14 * a22;
-				double a1223_1322 = a12 * a23 - a13 * a22, a1124_1421 = a11 * a24 - a14 * a21;
-				double a1123_1321 = a11 * a23 - a13 * a21, a1122_1221 = a11 * a22 - a12 * a21;
+			if (qsqr < evecPrec) {
+				double a1324_1423 = a13 * a24 - a14 * a23;
+				double a1224_1422 = a12 * a24 - a14 * a22;
+				double a1223_1322 = a12 * a23 - a13 * a22;
+				double a1124_1421 = a11 * a24 - a14 * a21;
+				double a1123_1321 = a11 * a23 - a13 * a21;
+				double a1122_1221 = a11 * a22 - a12 * a21;
 
 				q1 = a42 * a1324_1423 - a43 * a1224_1422 + a44 * a1223_1322;
 				q2 = -a41 * a1324_1423 + a43 * a1124_1421 - a44 * a1123_1321;
@@ -510,17 +536,16 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 				q4 = -a41 * a1223_1322 + a42 * a1123_1321 - a43 * a1122_1221;
 				qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
 
-				if (qsqr < evec_prec) {
+				if (qsqr < evecPrec) {
 					q1 = a32 * a1324_1423 - a33 * a1224_1422 + a34 * a1223_1322;
 					q2 = -a31 * a1324_1423 + a33 * a1124_1421 - a34 * a1123_1321;
 					q3 = a31 * a1224_1422 - a32 * a1124_1421 + a34 * a1122_1221;
 					q4 = -a31 * a1223_1322 + a32 * a1123_1321 - a33 * a1122_1221;
 					qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
 
-					if (qsqr < evec_prec) {
+					if (qsqr < evecPrec) {
 						/*
-						 * if qsqr is still too small, return the identity
-						 * matrix.
+						 * if qsqr is still too small, return the identity matrix.
 						 */
 						rotmat.setIdentity();
 
@@ -536,7 +561,8 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 		q3 /= normq;
 		q4 /= normq;
 
-		logger.debug("q: " + q1 + " " + q2 + " " + q3 + " " + q4);
+		logger.debug(new StringBuilder().append("q: ").append(q1).append(" ").append(q2).append(" ").append(q3)
+				.append(" ").append(q4).toString());
 
 		double a2 = q1 * q1;
 		double x2 = q2 * q2;
@@ -586,8 +612,7 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	/**
 	 * @param fixed
 	 * @param moved
-	 * @param weight
-	 *            array of weigths for each equivalent point position
+	 * @param weight array of weigths for each equivalent point position
 	 * @return weighted RMSD.
 	 */
 	public double getWeightedRmsd(Point3d[] fixed, Point3d[] moved, double[] weight) {
@@ -596,12 +621,12 @@ public final class SuperPositionQCP extends SuperPositionAbstract {
 	}
 
 	/**
-	 * The QCP method can be used as a two-step calculation: first compute the
-	 * RMSD (fast) and then compute the superposition.
+	 * The QCP method can be used as a two-step calculation: first compute the RMSD
+	 * (fast) and then compute the superposition.
 	 * 
-	 * This method assumes that the RMSD of two arrays of points has been
-	 * already calculated using {@link #getRmsd(Point3d[], Point3d[])} method
-	 * and calculates the transformation of the same two point arrays.
+	 * This method assumes that the RMSD of two arrays of points has been already
+	 * calculated using {@link #getRmsd(Point3d[], Point3d[])} method and calculates
+	 * the transformation of the same two point arrays.
 	 * 
 	 * @param fixed
 	 * @param moved

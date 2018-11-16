@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-
 /**
  *
  * @author Andy Yates
@@ -39,11 +38,11 @@ public abstract class AbstractCompoundSet<C extends Compound> implements Compoun
 
 	private final static Logger logger = LoggerFactory.getLogger(AbstractCompoundSet.class);
 
-	private Map<CharSequence, C> charSeqToCompound = new HashMap<CharSequence, C>();
+	private Map<CharSequence, C> charSeqToCompound = new HashMap<>();
 	private int maxCompoundCharSequenceLength = -1;
 	private Boolean compoundStringLengthEqual = null;
 
-	Map<C,Set<C>> equivalentsMap = new HashMap<C, Set<C>>();
+	Map<C, Set<C>> equivalentsMap = new HashMap<>();
 
 	protected void addCompound(C compound, C lowerCasedCompound, Iterable<C> equivalents) {
 		addCompound(compound);
@@ -52,7 +51,7 @@ public abstract class AbstractCompoundSet<C extends Compound> implements Compoun
 		addEquivalent(compound, lowerCasedCompound);
 		addEquivalent(lowerCasedCompound, compound);
 
-		for(C equivalent: equivalents) {
+		for (C equivalent : equivalents) {
 			addEquivalent(compound, equivalent);
 			addEquivalent(equivalent, compound);
 			addEquivalent(lowerCasedCompound, equivalent);
@@ -61,19 +60,19 @@ public abstract class AbstractCompoundSet<C extends Compound> implements Compoun
 	}
 
 	protected void addCompound(C compound, C lowerCasedCompound, C... equivalents) {
-		List<C> equiv = new ArrayList<C>(equivalents.length);
+		List<C> equiv = new ArrayList<>(equivalents.length);
 		equiv.addAll(Arrays.asList(equivalents));
 		addCompound(compound, lowerCasedCompound, equiv);
 	}
 
 	protected void addEquivalent(C compound, C equivalent) {
-	 Set<C> s = equivalentsMap.get(compound);
-	 if ( s == null){
-		 s = new HashSet<C>();
-		 equivalentsMap.put(compound, s);
-	 }
+		Set<C> s = equivalentsMap.get(compound);
+		if (s == null) {
+			s = new HashSet<>();
+			equivalentsMap.put(compound, s);
+		}
 
-		s.add( equivalent);
+		s.add(equivalent);
 	}
 
 	protected void addCompound(C compound) {
@@ -83,17 +82,17 @@ public abstract class AbstractCompoundSet<C extends Compound> implements Compoun
 	}
 
 	@Override
-public String getStringForCompound(C compound) {
+	public String getStringForCompound(C compound) {
 		return compound.toString();
 	}
 
 	@Override
-public C getCompoundForString(String string) {
-		if(string == null) {
+	public C getCompoundForString(String string) {
+		if (string == null) {
 			throw new IllegalArgumentException("Given a null CharSequence to process");
 		}
 
-		if (string.length()==0) {
+		if (string.isEmpty()) {
 			return null;
 		}
 
@@ -105,48 +104,48 @@ public C getCompoundForString(String string) {
 	}
 
 	@Override
-public int getMaxSingleCompoundStringLength() {
-		if(maxCompoundCharSequenceLength == -1) {
-			for(C compound: charSeqToCompound.values()) {
-				int size = getStringForCompound(compound).length();
-				if(size > maxCompoundCharSequenceLength) {
-					maxCompoundCharSequenceLength = size;
-				}
-			}
+	public int getMaxSingleCompoundStringLength() {
+		if (maxCompoundCharSequenceLength == -1) {
+			charSeqToCompound.values().stream().mapToInt(compound -> getStringForCompound(compound).length())
+					.forEach(size -> {
+						if (size > maxCompoundCharSequenceLength) {
+							maxCompoundCharSequenceLength = size;
+						}
+					});
 		}
 		return maxCompoundCharSequenceLength;
 	}
 
-		@Override
-		public boolean isCompoundStringLengthEqual() {
-				if(compoundStringLengthEqual == null) {
-						int lastSize = -1;
-						compoundStringLengthEqual = Boolean.TRUE;
-						for(CharSequence c: charSeqToCompound.keySet()) {
-								if(lastSize != c.length()) {
-										compoundStringLengthEqual = Boolean.FALSE;
-										break;
-								}
-						}
+	@Override
+	public boolean isCompoundStringLengthEqual() {
+		if (compoundStringLengthEqual == null) {
+			int lastSize = -1;
+			compoundStringLengthEqual = Boolean.TRUE;
+			for (CharSequence c : charSeqToCompound.keySet()) {
+				if (lastSize != c.length()) {
+					compoundStringLengthEqual = Boolean.FALSE;
+					break;
 				}
-				return compoundStringLengthEqual;
+			}
 		}
+		return compoundStringLengthEqual;
+	}
 
 	@Override
-public boolean hasCompound(C compound) {
+	public boolean hasCompound(C compound) {
 		C retrievedCompound = getCompoundForString(compound.toString());
 		return retrievedCompound != null;
 	}
 
 	@Override
-public boolean compoundsEquivalent(C compoundOne, C compoundTwo) {
+	public boolean compoundsEquivalent(C compoundOne, C compoundTwo) {
 		assertCompound(compoundOne);
 		assertCompound(compoundTwo);
 		return compoundOne.equals(compoundTwo) || equivalentsMap.get(compoundOne).contains(compoundTwo);
 	}
 
 	@Override
-public Set<C> getEquivalentCompounds(C compound) {
+	public Set<C> getEquivalentCompounds(C compound) {
 		return equivalentsMap.get(compound);
 	}
 
@@ -156,58 +155,58 @@ public Set<C> getEquivalentCompounds(C compound) {
 		return compoundOne.equalsIgnoreCase(compoundTwo);
 	}
 
-		@Override
-		public boolean isValidSequence(Sequence<C> sequence) {
-				for (C compound: sequence) {
-						if (!hasCompound(compound)) {
-								return false;
-						}
-				}
-				return true;
+	@Override
+	public boolean isValidSequence(Sequence<C> sequence) {
+		for (C compound : sequence) {
+			if (!hasCompound(compound)) {
+				return false;
+			}
 		}
-
-
+		return true;
+	}
 
 	@Override
-public List<C> getAllCompounds() {
-		return new ArrayList<C>(charSeqToCompound.values());
+	public List<C> getAllCompounds() {
+		return new ArrayList<>(charSeqToCompound.values());
 	}
 
 	private void assertCompound(C compound) {
 		if (!hasCompound(compound)) {
-			// TODO this used to throw an error, now only warning, is this the best solution?
-				// dmyersturnbull: I think throwing a CompoundNotFoundException is far better
+			// TODO this used to throw an error, now only warning, is this the best
+			// solution?
+			// dmyersturnbull: I think throwing a CompoundNotFoundException is far better
 			logger.warn("The CompoundSet {} knows nothing about the compound {}", getClass().getSimpleName(), compound);
-			//throw new CompoundNotFoundError("The CompoundSet "+
-			//    getClass().getSimpleName()+" knows nothing about the compound "+
-			//    compound);
+			// throw new CompoundNotFoundError("The CompoundSet "+
+			// getClass().getSimpleName()+" knows nothing about the compound "+
+			// compound);
 		}
 	}
 
-		@Override
-		public boolean isComplementable() {
-				return false;
-		}
+	@Override
+	public boolean isComplementable() {
+		return false;
+	}
 
-		@Override
-		public int hashCode() {
-				int s = Hashcoder.SEED;
-				s = Hashcoder.hash(s, charSeqToCompound);
-				s = Hashcoder.hash(s, equivalentsMap);
-				return s;
-		}
+	@Override
+	public int hashCode() {
+		int s = Hashcoder.SEED;
+		s = Hashcoder.hash(s, charSeqToCompound);
+		s = Hashcoder.hash(s, equivalentsMap);
+		return s;
+	}
 
-		@Override
-		@SuppressWarnings("unchecked")
-		public boolean equals(Object o) {
-				if (! (o instanceof AbstractCompoundSet)) return false;
-				if(Equals.classEqual(this, o)) {
-						AbstractCompoundSet<C> that = (AbstractCompoundSet<C>)o;
-						return  Equals.equal(charSeqToCompound, that.charSeqToCompound) &&
-										Equals.equal(equivalentsMap, that.equivalentsMap);
-				}
-				return false;
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean equals(Object o) {
+		if (!(o instanceof AbstractCompoundSet)) {
+			return false;
 		}
-
+		if (!Equals.classEqual(this, o)) {
+			return false;
+		}
+		AbstractCompoundSet<C> that = (AbstractCompoundSet<C>) o;
+		return Equals.equal(charSeqToCompound, that.charSeqToCompound)
+				&& Equals.equal(equivalentsMap, that.equivalentsMap);
+	}
 
 }

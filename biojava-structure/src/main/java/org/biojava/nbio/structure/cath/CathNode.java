@@ -25,11 +25,12 @@ package org.biojava.nbio.structure.cath;
 
 import java.io.Serializable;
 
-/** Represents a node in the CATH hierarchy.
+/**
+ * Represents a node in the CATH hierarchy.
  *
  * @author Daniel Asarnow
  */
-public class CathNode implements Serializable{
+public class CathNode implements Serializable {
 
 	public static final long serialVersionUID = 1L;
 
@@ -97,6 +98,6 @@ public class CathNode implements Serializable{
 
 	@Override
 	public String toString() {
-		return ""; //TODO implement
+		return ""; // TODO implement
 	}
 }

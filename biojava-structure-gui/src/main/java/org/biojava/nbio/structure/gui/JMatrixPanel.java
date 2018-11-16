@@ -34,44 +34,43 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-
-/** a JPanel that can display a difference of distance matrix and paths that have been
- * taken for the alignment
+/**
+ * a JPanel that can display a difference of distance matrix and paths that have
+ * been taken for the alignment
  *
- * <p>Note: This panel displays the transpose of its underlying matrix.
- * Thus its width will be the same as {@link Matrix#getRowDimension()} and its
- * height the same as {@link Matrix#getColumnDimension()}. This stems from the
- * unfortunate ordering of {@link Matrix#get(int, int)} parameters as (row, col),
- * which is opposite from the normal (x,y) order used when displaying graphics.
+ * <p>
+ * Note: This panel displays the transpose of its underlying matrix. Thus its
+ * width will be the same as {@link Matrix#getRowDimension()} and its height the
+ * same as {@link Matrix#getColumnDimension()}. This stems from the unfortunate
+ * ordering of {@link Matrix#get(int, int)} parameters as (row, col), which is
+ * opposite from the normal (x,y) order used when displaying graphics.
  *
  * @author Andreas Prlic
  *
  */
-public class JMatrixPanel extends JPanel{
+public class JMatrixPanel extends JPanel {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -1720879395453257846L;
+	final static BasicStroke stroke = new BasicStroke(2.0f);
 	BufferedImage _bufImage;
 	Matrix matrix;
-	ContinuousColorMapper cellColor; //Maps matrix elements to a color
+	ContinuousColorMapper cellColor; // Maps matrix elements to a color
 	float scale;
-
 	FragmentPair[] fragmentPairs;
 	AlternativeAlignment[] aligs;
 	int selectedAlignmentPos;
-
-	final static BasicStroke stroke = new BasicStroke(2.0f);
 	StrucAligParameters params;
 
-	public JMatrixPanel(){
+	public JMatrixPanel() {
 		scale = 1;
 		cellColor = new DefaultMatrixMapper(10, 0.9f);
-		//saturation = 0.9f;
-		//scalevalue = 10;
+		// saturation = 0.9f;
+		// scalevalue = 10;
 		selectedAlignmentPos = -1;
-		matrix = new Matrix(0,0);
+		matrix = new Matrix(0, 0);
 		params = new StrucAligParameters();
 	}
 
@@ -91,8 +90,6 @@ public class JMatrixPanel extends JPanel{
 		this.aligs = aligs;
 	}
 
-
-
 	public FragmentPair[] getFragmentPairs() {
 		return fragmentPairs;
 	}
@@ -105,20 +102,22 @@ public class JMatrixPanel extends JPanel{
 		return scale;
 	}
 
-	public void setPreferredSize(){
+	public void setPreferredSize() {
 
 		int prefW = Math.round(matrix.getRowDimension() * scale);
 		int prefH = Math.round(matrix.getColumnDimension() * scale);
 
-		this.setPreferredSize(new Dimension(prefW,prefH));
+		this.setPreferredSize(new Dimension(prefW, prefH));
 
 	}
 
 	public void setScale(float scale) {
 
-		if ( scale == this.scale)
+		if (scale == this.scale) {
 			return;
-		//System.out.println("setting scale " + scale + "current width " + getWidth() + " " + getHeight());
+			// System.out.println("setting scale " + scale + "current width " + getWidth() +
+			// " " + getHeight());
+		}
 
 		this.scale = scale;
 
@@ -132,7 +131,8 @@ public class JMatrixPanel extends JPanel{
 		return matrix;
 	}
 
-	/** sets the distance matrix to be displayed
+	/**
+	 * sets the distance matrix to be displayed
 	 *
 	 * @param matrix
 	 */
@@ -142,45 +142,46 @@ public class JMatrixPanel extends JPanel{
 	}
 
 	@Override
-	public void paintComponent(Graphics g){
+	public void paintComponent(Graphics g) {
 
-		//super.paintComponent(g);
+		// super.paintComponent(g);
 
-		Graphics2D g2 = (Graphics2D)g;
-		if ( _bufImage == null){
+		Graphics2D g2 = (Graphics2D) g;
+		if (_bufImage == null) {
 
 			int w = getWidth();
 			int h = getHeight();
-			_bufImage = (BufferedImage) createImage(w,h);
-			//Graphics gc = _bufImage.createGraphics();
-			//gc.setColor(Color.blue);
-			//gc.fillRect(0,0,w,h);
+			_bufImage = (BufferedImage) createImage(w, h);
+			// Graphics gc = _bufImage.createGraphics();
+			// gc.setColor(Color.blue);
+			// gc.fillRect(0,0,w,h);
 
 		}
 
-
-		g2.drawImage(_bufImage,null,0,0);
+		g2.drawImage(_bufImage, null, 0, 0);
 		drawDistances(g);
 
 		drawPairs(g);
 
-		if ( scale >= 4) {
+		if (scale >= 4) {
 			drawBoxes(g);
 		}
 	}
 
-	/** draw alternative alignments
+	/**
+	 * draw alternative alignments
 	 *
 	 * @param g
 	 */
-	public void drawPairs(Graphics g){
+	public void drawPairs(Graphics g) {
 
-		if ( aligs == null)
+		if (aligs == null) {
 			return;
+		}
 
 		int nr = aligs.length;
 
-		Graphics2D g2D = (Graphics2D)g;
+		Graphics2D g2D = (Graphics2D) g;
 		Stroke oldStroke = g2D.getStroke();
 		g2D.setStroke(stroke);
 
@@ -188,7 +189,7 @@ public class JMatrixPanel extends JPanel{
 		float hue;
 
 		int width = Math.round(scale);
-		int w2 = width / 2 ;
+		int w2 = width / 2;
 
 		for (int i = 0; i < aligs.length; i++) {
 			AlternativeAlignment a = aligs[i];
@@ -198,78 +199,74 @@ public class JMatrixPanel extends JPanel{
 			int yold = -1;
 			boolean start = true;
 
-			if ( (selectedAlignmentPos != -1 ) &&
-					( selectedAlignmentPos == i)){
+			if ((selectedAlignmentPos != -1) && (selectedAlignmentPos == i)) {
 				color = Color.white;
 			} else {
 
-				hue = i * (1/ (float)nr);
-				color = Color.getHSBColor(hue,1.0f,1.0f);
+				hue = i * (1 / (float) nr);
+				color = Color.getHSBColor(hue, 1.0f, 1.0f);
 			}
 			g.setColor(color);
 
 			for (int j = 0; j < idx1.length; j++) {
-				int x1 = Math.round(idx1[j]*scale) ;
-				int y1 = Math.round(idx2[j]*scale) ;
-				if ( ! start){
-					//g.drawLine(xold+1,yold,x1+1,y1);
+				int x1 = Math.round(idx1[j] * scale);
+				int y1 = Math.round(idx2[j] * scale);
+				if (!start) {
+					// g.drawLine(xold+1,yold,x1+1,y1);
 
-					//g2D.draw(new Line2D.Double(xold,yold,x1,y1));
-					g.fillRect(xold,yold,2,2);
+					// g2D.draw(new Line2D.Double(xold,yold,x1,y1));
+					g.fillRect(xold, yold, 2, 2);
 				} else {
-					g.fillRect(x1,y1, w2, w2);
-					start =false;
+					g.fillRect(x1, y1, w2, w2);
+					start = false;
 				}
 				xold = x1;
 				yold = y1;
 			}
 
-			if ( ! start)
-				g.fillRect(xold,yold,w2,w2);
-
+			if (!start) {
+				g.fillRect(xold, yold, w2, w2);
+			}
 
 		}
 
 		g2D.setStroke(oldStroke);
 	}
 
-
-	/** draw high scoring fragments that are used for the initial alignment seed
+	/**
+	 * draw high scoring fragments that are used for the initial alignment seed
 	 * selection
 	 *
 	 * @param g
 	 */
-	public void drawBoxes(Graphics g){
-		if ( fragmentPairs == null )
+	public void drawBoxes(Graphics g) {
+		if (fragmentPairs == null) {
 			return;
+		}
 
 		g.setColor(Color.yellow);
 
-
-		for (int i = 0; i < fragmentPairs.length; i++) {
-			FragmentPair fp =fragmentPairs[i];
+		for (FragmentPair fp : fragmentPairs) {
 			int xp = fp.getPos1();
 			int yp = fp.getPos2();
 
 			int width = Math.round(scale);
 
-			g.drawRect(Math.round(xp*scale),Math.round(yp*scale),width, width);
+			g.drawRect(Math.round(xp * scale), Math.round(yp * scale), width, width);
 
 		}
 	}
 
-
 	/**
 	 * For each element in matrix, draw it as a colored square or pixel.
 	 *
-	 * The color of a matrix element with value x is specified as
-	 *   - H: 1-x/scalevalue
-	 *   - S: saturation
-	 *   - B: 1-x/scalevalue
+	 * The color of a matrix element with value x is specified as - H:
+	 * 1-x/scalevalue - S: saturation - B: 1-x/scalevalue
+	 * 
 	 * @param g1
 	 */
-	public void drawDistances(Graphics g1){
-		Graphics2D g = (Graphics2D)g1;
+	public void drawDistances(Graphics g1) {
+		Graphics2D g = (Graphics2D) g1;
 
 		int c = matrix.getRowDimension();
 		int d = matrix.getColumnDimension();
@@ -278,17 +275,17 @@ public class JMatrixPanel extends JPanel{
 		int width = Math.round(scale);
 
 		for (int i = 0; i < c; i++) {
-			int ipaint = Math.round(i*scale);
+			int ipaint = Math.round(i * scale);
 
 			for (int j = 0; j < d; j++) {
-				double val = matrix.get(i,j);
+				double val = matrix.get(i, j);
 
-				int jpaint = Math.round(j*scale);
+				int jpaint = Math.round(j * scale);
 
 				Color color = cellColor.getColor(val);
 				g.setColor(color);
 
-				g.fillRect(ipaint,jpaint,width,width);
+				g.fillRect(ipaint, jpaint, width, width);
 			}
 
 		}
@@ -308,7 +305,5 @@ public class JMatrixPanel extends JPanel{
 	public void setCellColor(ContinuousColorMapper cellColor) {
 		this.cellColor = cellColor;
 	}
-
-
 
 }

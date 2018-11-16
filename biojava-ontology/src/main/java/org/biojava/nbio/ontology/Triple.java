@@ -27,10 +27,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 /**
- * A triple in an ontology.  This is two terms and a relationship between
- * them, similar to RDF and other similar logic systems.
+ * A triple in an ontology. This is two terms and a relationship between them,
+ * similar to RDF and other similar logic systems.
  *
  * <p>
  * For documentation purposes, a Triple may provide a name. However, a Triple
@@ -44,10 +43,10 @@ import java.util.TreeSet;
  * @see org.biojavax.ontology.ComparableTriple
  */
 
-public interface Triple
-extends Term {
+public interface Triple extends Term {
 	/**
 	 * Return the subject term of this triple
+	 * 
 	 * @return the subject term
 	 */
 
@@ -55,13 +54,16 @@ extends Term {
 
 	/**
 	 * Return the object term of this triple.
+	 * 
 	 * @return the object term
 	 */
 
 	public Term getObject();
 
 	/**
-	 * Return a Term which defines the type of relationship between the subject and object terms.
+	 * Return a Term which defines the type of relationship between the subject and
+	 * object terms.
+	 * 
 	 * @return the predicate
 	 */
 
@@ -70,15 +72,16 @@ extends Term {
 	/**
 	 * The hashcode for a Triple.
 	 *
-	 * <p>This <em>must</em> be implemented as:
+	 * <p>
+	 * This <em>must</em> be implemented as:
+	 * 
 	 * <pre>
-	 * return getSubject().hashCode() +
-	 * 31 * getObject().hashCode() +
-	 * 31 * 31 * getPredicate().hashCode();
+	 * return getSubject().hashCode() + 31 * getObject().hashCode() + 31 * 31 * getPredicate().hashCode();
 	 * </pre>
-	 * If you do not implement hashcode in this way then you have no guarantee
-	 * that your Triple objects will be found in an ontology and that they will
-	 * not be duplicated.
+	 * 
+	 * If you do not implement hashcode in this way then you have no guarantee that
+	 * your Triple objects will be found in an ontology and that they will not be
+	 * duplicated.
 	 * </p>
 	 */
 	@Override
@@ -90,18 +93,18 @@ extends Term {
 	 * <p>
 	 * Two triples are equivalent if they have the same subject, object and
 	 * predicate fields.
+	 * 
 	 * <pre>
-	 * if (! (o instanceof Triple)) {
-	 *     return false;
+	 * if (!(o instanceof Triple)) {
+	 * 	return false;
 	 * }
 	 * Triple to = (Triple) o;
-	 * return to.getSubject() == getSubject() &&
-	 *        to.getObject() == getObject() &&
-	 *        to.getPredicate() == getPredicate();
+	 * return to.getSubject() == getSubject() && to.getObject() == getObject() && to.getPredicate() == getPredicate();
 	 * </pre>
-	 * If you do not implement equals in this way then you have no guarantee
-	 * that your Triple objects will be found in an ontology and that they will
-	 * not be duplicated.
+	 * 
+	 * If you do not implement equals in this way then you have no guarantee that
+	 * your Triple objects will be found in an ontology and that they will not be
+	 * duplicated.
 	 * </p>
 	 */
 	@Override
@@ -111,12 +114,13 @@ extends Term {
 	 * Basic in-memory implementation of a Triple in an ontology
 	 *
 	 * This can be used to implement Ontology.createTriple
+	 * 
 	 * @see org.biojavax.ontology.SimpleComparableTriple
 	 */
 
 	public static final class Impl
 
-	implements Triple, java.io.Serializable {
+			implements Triple, java.io.Serializable {
 		/**
 		 *
 		 */
@@ -124,8 +128,8 @@ extends Term {
 		private final Term subject;
 		private final Term object;
 		private final Term predicate;
-		private /*final*/ String name;
-		private /*final*/ String description;
+		private /* final */ String name;
+		private /* final */ String description;
 		private Set<Object> synonyms;
 
 		public Impl(Term subject, Term object, Term predicate) {
@@ -136,21 +140,11 @@ extends Term {
 			this(subject, object, predicate, null, null, synonyms);
 		}
 
-		public Impl(Term subject,
-				Term object,
-				Term predicate,
-				String name,
-				String description) {
-			this(subject,object,predicate,name,description,null);
+		public Impl(Term subject, Term object, Term predicate, String name, String description) {
+			this(subject, object, predicate, name, description, null);
 		}
 
-		public Impl(Term subject,
-				Term object,
-				Term predicate,
-				String name,
-				String description,
-				Object[] synonyms)
-		{
+		public Impl(Term subject, Term object, Term predicate, String name, String description, Object[] synonyms) {
 			if (subject == null) {
 				throw new NullPointerException("Subject must not be null");
 			}
@@ -161,18 +155,14 @@ extends Term {
 				throw new NullPointerException("predicate must not be null");
 			}
 
-			if(
-					subject.getOntology() != object.getOntology() ||
-					subject.getOntology() != predicate.getOntology()
-			) {
-				throw new IllegalArgumentException(
-						"All terms must be from the same ontology: " +
-						subject.getOntology().getName() + ", " +
-						object.getOntology().getName() + ", " +
-						predicate.getOntology().getName());
+			if (subject.getOntology() != object.getOntology() || subject.getOntology() != predicate.getOntology()) {
+				throw new IllegalArgumentException(new StringBuilder()
+						.append("All terms must be from the same ontology: ").append(subject.getOntology().getName())
+						.append(", ").append(object.getOntology().getName()).append(", ")
+						.append(predicate.getOntology().getName()).toString());
 			}
 
-			if(description == null) {
+			if (description == null) {
 				description = "";
 			}
 
@@ -182,8 +172,10 @@ extends Term {
 			this.name = name;
 			this.description = description;
 
-			this.synonyms = new TreeSet<Object>();
-			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+			this.synonyms = new TreeSet<>();
+			if (synonyms != null) {
+				this.synonyms.addAll(Arrays.asList(synonyms));
+			}
 		}
 
 		@Override
@@ -203,8 +195,9 @@ extends Term {
 
 		@Override
 		public String getName() {
-			if(name == null) {
-				name = predicate + "(" + subject + ", " + object + ")";
+			if (name == null) {
+				name = new StringBuilder().append(predicate).append("(").append(subject).append(", ").append(object)
+						.append(")").toString();
 			}
 			return name;
 		}
@@ -213,8 +206,9 @@ extends Term {
 		public String getDescription() {
 			return description;
 		}
+
 		@Override
-		public void setDescription(String desc){
+		public void setDescription(String desc) {
 			this.description = desc;
 		}
 
@@ -249,27 +243,26 @@ extends Term {
 
 		@Override
 		public boolean equals(Object o) {
-			if (! (o instanceof Triple)) {
+			if (!(o instanceof Triple)) {
 				return false;
 			}
 			Triple to = (Triple) o;
-			return to.getSubject().equals(getSubject()) &&
-			to.getObject().equals(getObject()) &&
-			to.getPredicate().equals(getPredicate());
+			return to.getSubject().equals(getSubject()) && to.getObject().equals(getObject())
+					&& to.getPredicate().equals(getPredicate());
 		}
 
 		@Override
 		public int hashCode() {
-			return getSubject().hashCode() +
-			31 * getObject().hashCode() +
-			31 * 31 * getPredicate().hashCode();
+			return getSubject().hashCode() + 31 * getObject().hashCode() + 31 * 31 * getPredicate().hashCode();
 		}
 
 		@Override
 		public String toString() {
-			if (getName().length() > 0)
+			if (getName().length() > 0) {
 				return getName();
-			return subject + " " + predicate + " " + object;
+			}
+			return new StringBuilder().append(subject).append(" ").append(predicate).append(" ").append(object)
+					.toString();
 		}
 	}
 }

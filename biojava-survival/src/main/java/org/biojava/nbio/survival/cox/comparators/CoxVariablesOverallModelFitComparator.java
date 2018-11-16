@@ -31,13 +31,15 @@ import java.util.Comparator;
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class CoxVariablesOverallModelFitComparator implements Comparator<CoxVariables>, Serializable {
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
 	String variables = "";
 
 	/**
-	 * Variables are stored as a string representation of an ArrayList
-	 * [META_GENE] or [trtg, META_GENE] add variables used in cox regression to an array and then do toString.
+	 * Variables are stored as a string representation of an ArrayList [META_GENE]
+	 * or [trtg, META_GENE] add variables used in cox regression to an array and
+	 * then do toString.
+	 * 
 	 * @param variables
 	 */
 	public CoxVariablesOverallModelFitComparator(String variables) {
@@ -56,7 +58,7 @@ public class CoxVariablesOverallModelFitComparator implements Comparator<CoxVari
 		} else {
 			return 0;
 		}
-		//ascending order
+		// ascending order
 		// return coxVariables1.compareTo(coxVariables2);
 	}
 }

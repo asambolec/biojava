@@ -30,19 +30,21 @@ import org.biojava.nbio.structure.align.util.AtomCache;
 public class BioAssemblyIdentifier implements StructureIdentifier {
 
 	private static final long serialVersionUID = -356206725119993449L;
-	
-	private String pdbCode;
-	private int biolNr;
 
-	public static final Pattern BIO_NAME_PATTERN = Pattern.compile("^(?:BIO:)([0-9][a-z0-9]{3})(?::([0-9]+))?$", Pattern.CASE_INSENSITIVE);
+	public static final Pattern BIO_NAME_PATTERN = Pattern.compile("^(?:BIO:)([0-9][a-z0-9]{3})(?::([0-9]+))?$",
+			Pattern.CASE_INSENSITIVE);
+
+	private String pdbCode;
+
+	private int biolNr;
 
 	public BioAssemblyIdentifier(String name) {
 		Matcher match = BIO_NAME_PATTERN.matcher(name);
-		if(! match.matches() ) {
+		if (!match.matches()) {
 			throw new IllegalArgumentException("Invalid BIO identifier");
 		}
 		pdbCode = match.group(1);
-		if(match.group(2) != null) {
+		if (match.group(2) != null) {
 			biolNr = Integer.parseInt(match.group(2));
 		} else {
 			biolNr = 1;
@@ -56,20 +58,20 @@ public class BioAssemblyIdentifier implements StructureIdentifier {
 
 	@Override
 	public String getIdentifier() {
-		if( biolNr < 0) {
-			return "BIO:"+pdbCode;
+		if (biolNr < 0) {
+			return "BIO:" + pdbCode;
 		} else {
-			return String.format("BIO:%s:%d",pdbCode,biolNr);
+			return String.format("BIO:%s:%d", pdbCode, biolNr);
 		}
 	}
+
 	@Override
 	public String toString() {
 		return getIdentifier();
 	}
 
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-			IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		return cache.getBiologicalAssembly(pdbCode, biolNr, AtomCache.DEFAULT_BIOASSEMBLY_STYLE);
 	}
 

@@ -22,48 +22,50 @@
 package org.biojava.nbio.structure.gui.util;
 
 public class AlignedPosition {
+	/**
+	 * flag if this position is equivalent
+	 *
+	 */
+	public static final int EQUIVALENT = 1;
+	/**
+	 * they can be shown in the same column (for a compact display) , but they are
+	 * not structurally equivalent
+	 *
+	 */
+	public static final int NOT_ALIGNED = 0;
 	int pos1;
 	int pos2;
 	int equivalent;
 
-	/** flag if this position is equivalent
-	 *
-	 */
-	public static final int EQUIVALENT  = 1;
-
-	/** they can be shown in the same column (for a compact display)
-	 * , but they are not structurally equivalent
-	 *
-	 */
-	public static final int NOT_ALIGNED = 0;
-
-	public AlignedPosition(){
+	public AlignedPosition() {
 		pos1 = -1;
 		pos2 = -1;
 		equivalent = NOT_ALIGNED;
 	}
 
-	public int getPos(int position){
-		if (position == 1)
+	public int getPos(int position) {
+		if (position == 1) {
 			return pos1;
-		else
+		} else {
 			return pos2;
+		}
 	}
-	public void setPos(int position, int pos){
-		if (position == 1)
+
+	public void setPos(int position, int pos) {
+		if (position == 1) {
 			pos1 = pos;
-		else
+		} else {
 			pos2 = pos;
+		}
 	}
-
-
-
 
 	@Override
-	public  String toString(){
-		String t = " AlignedPosition pos1: " + pos1 + " pos2: "+ pos2 ;
-		if ( equivalent == EQUIVALENT)
-			t+= " EQR";
+	public String toString() {
+		String t = new StringBuilder().append(" AlignedPosition pos1: ").append(pos1).append(" pos2: ").append(pos2)
+				.toString();
+		if (equivalent == EQUIVALENT) {
+			t += " EQR";
+		}
 
 		return t;
 	}
@@ -91,6 +93,5 @@ public class AlignedPosition {
 	public void setEquivalent(int equivalent) {
 		this.equivalent = equivalent;
 	}
-
 
 }

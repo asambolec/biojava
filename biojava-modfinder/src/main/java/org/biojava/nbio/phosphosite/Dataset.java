@@ -32,13 +32,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Phosphosite is available under the PhosphoSitePlus® is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License and is freely available for non-commercial purposes from
+ * Phosphosite is available under the PhosphoSitePlus® is licensed under
+ * Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+ * and is freely available for non-commercial purposes from
  *
  * http://www.phosphosite.org/staticDownloads.do
  *
- * Please acknowledge PhosphoSitePlus®, www.phosphosite.org" at appropriate locations.
+ * Please acknowledge PhosphoSitePlus®, www.phosphosite.org" at appropriate
+ * locations.
  *
- * Please cite : “Hornbeck PV, Kornhauser JM, Tkachev S, Zhang B, Skrzypek E, Murray B, Latham V, Sullivan M (2012) PhosphoSitePlus: a comprehensive resource for investigating the structure and function of experimentally determined post-translational modifications in man and mouse. Nucleic Acids Res. 40(Database issue), D261–70.”.
+ * Please cite : “Hornbeck PV, Kornhauser JM, Tkachev S, Zhang B, Skrzypek E,
+ * Murray B, Latham V, Sullivan M (2012) PhosphoSitePlus: a comprehensive
+ * resource for investigating the structure and function of experimentally
+ * determined post-translational modifications in man and mouse. Nucleic Acids
+ * Res. 40(Database issue), D261–70.”.
  *
  *
  *
@@ -62,37 +69,33 @@ public class Dataset {
 
 	public static final String UBIQUITINATION = "https://www.phosphosite.org/downloads/Ubiquitination_site_dataset.gz";
 
-
-	public Dataset(){
-
+	public Dataset() {
 
 	}
 
-	private String[] getRemoteFiles(){
-		String[] files = new String[]{ACETYLATION,DISEASE_ASSOC,METHYLATION,PHOSPHORYLATION,REGULATORY,SUMOYLATION,UBIQUITINATION};
-
+	private String[] getRemoteFiles() {
+		String[] files = new String[] { ACETYLATION, DISEASE_ASSOC, METHYLATION, PHOSPHORYLATION, REGULATORY,
+				SUMOYLATION, UBIQUITINATION };
 
 		return files;
 	}
 
-	public File[] getLocalFiles(){
+	public File[] getLocalFiles() {
 
 		String[] rfiles = getRemoteFiles();
 
-
 		File dir = getLocalDir();
 
-		List<File> files = new ArrayList<File>();
-		for ( String f : rfiles) {
-
+		List<File> files = new ArrayList<>();
+		for (String f : rfiles) {
 
 			int slashIndex = f.lastIndexOf("/");
 
 			String fileName = f.substring(slashIndex);
 
-			File localFile = new File(dir+"/" + fileName);
+			File localFile = new File(new StringBuilder().append(dir).append("/").append(fileName).toString());
 
-			if (  localFile.exists()){
+			if (localFile.exists()) {
 				files.add(localFile);
 			}
 
@@ -101,58 +104,55 @@ public class Dataset {
 		return files.toArray(new File[files.size()]);
 	}
 
-
-	public File getLocalDir(){
+	public File getLocalDir() {
 		AtomCache cache = new AtomCache();
 
 		String path = cache.getCachePath();
 
-		File dir = new File(path+"/phosphosite");
+		File dir = new File(path + "/phosphosite");
 
 		return dir;
 	}
 
-	public void download(){
+	public void download() {
 
-		logger.warn("Downloading data from www.phosposite.org. Data is under CC-BY-NC-SA license. Please link to site and cite: ");
-		logger.warn("Hornbeck PV, Kornhauser JM, Tkachev S, Zhang B, Skrzypek E, Murray B, Latham V, Sullivan M (2012) PhosphoSitePlus: a comprehensive resource for investigating the structure and function of experimentally determined post-translational modifications in man and mouse. Nucleic Acids Res. 40(Database issue), D261–70.");
+		logger.warn(
+				"Downloading data from www.phosposite.org. Data is under CC-BY-NC-SA license. Please link to site and cite: ");
+		logger.warn(
+				"Hornbeck PV, Kornhauser JM, Tkachev S, Zhang B, Skrzypek E, Murray B, Latham V, Sullivan M (2012) PhosphoSitePlus: a comprehensive resource for investigating the structure and function of experimentally determined post-translational modifications in man and mouse. Nucleic Acids Res. 40(Database issue), D261–70.");
 
 		File dir = getLocalDir();
 
-		if ( ! dir.exists()) {
+		if (!dir.exists()) {
 
 			// need to download all...
 
 			dir.mkdir();
 
-
 		}
 
 		String[] files = getRemoteFiles();
 
-		for ( String f : files){
+		for (String f : files) {
 
 			try {
-
 
 				int slashIndex = f.lastIndexOf("/");
 
 				String fileName = f.substring(slashIndex);
 
-				File localFile = new File(dir+"/" + fileName);
+				File localFile = new File(new StringBuilder().append(dir).append("/").append(fileName).toString());
 
-				if ( ! localFile.exists()){
+				if (!localFile.exists()) {
 
 					URL u = new URL(f);
 					downloadFile(u, localFile);
 				}
 
+			} catch (Exception e) {
 
-			} catch (Exception e){
-
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}
-
 
 		}
 
@@ -162,7 +162,7 @@ public class Dataset {
 
 		logger.info("Downloading " + u);
 
-		File tmp = File.createTempFile("tmp","phosphosite");
+		File tmp = File.createTempFile("tmp", "phosphosite");
 
 		InputStream is = u.openStream();
 
@@ -170,29 +170,24 @@ public class Dataset {
 
 		FileOutputStream w = new FileOutputStream(tmp);
 
-		int i= 0;
+		int i = 0;
 		byte[] bytesIn = new byte[300000];
 		while ((i = in.read(bytesIn)) >= 0) {
-			w.write(bytesIn,0,i);
+			w.write(bytesIn, 0, i);
 		}
 		in.close();
 		w.close();
 
-
-		// now copy  tmp file to localFile
+		// now copy tmp file to localFile
 		copyFile(tmp, localFile);
 
 	}
 
-
-
-	public static void copyFile(File src, File dst) throws IOException
-	{
+	public static void copyFile(File src, File dst) throws IOException {
 
 		Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 	}
-
 
 	public static void main(String[] args) {
 
@@ -208,18 +203,14 @@ public class Dataset {
 
 				List<Site> sites = Site.parseSites(f);
 
-				logger.info("Got " + sites.size() + " sites");
-				for (Site s : sites) {
-					if (s.getUniprot().equals("P50225") || s.getUniprot().equals("P48025")) {
-						logger.info(s.toString());
-					}
-				}
+				logger.info(new StringBuilder().append("Got ").append(sites.size()).append(" sites").toString());
+				sites.stream().filter(s -> "P50225".equals(s.getUniprot()) || "P48025".equals(s.getUniprot()))
+						.forEach(s -> logger.info(s.toString()));
 
 			}
 
-
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 

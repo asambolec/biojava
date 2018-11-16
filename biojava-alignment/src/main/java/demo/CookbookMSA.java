@@ -34,21 +34,25 @@ import org.biojava.nbio.core.util.ConcurrencyTools;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CookbookMSA {
 
+	private static final Logger logger = LoggerFactory.getLogger(CookbookMSA.class);
+
 	public static void main(String[] args) throws Exception {
-		String[] ids = new String[] {"Q21691", "A8WS47", "O48771"};
+		String[] ids = new String[] { "Q21691", "A8WS47", "O48771" };
 		multipleSequenceAlignment(ids);
 	}
 
 	private static void multipleSequenceAlignment(String[] ids) throws Exception {
-		List<ProteinSequence> lst = new ArrayList<ProteinSequence>();
+		List<ProteinSequence> lst = new ArrayList<>();
 		for (String id : ids) {
 			lst.add(getSequenceForId(id));
 		}
 		Profile<ProteinSequence, AminoAcidCompound> profile = Alignments.getMultipleSequenceAlignment(lst);
-		System.out.printf("Clustalw:%s%s", System.getProperty("line.separator"), profile);
+		logger.info("Clustalw:%s%s", System.getProperty("line.separator"), profile);
 		System.out.println();
 
 		ConcurrencyTools.shutdown();
@@ -56,10 +60,10 @@ public class CookbookMSA {
 
 	private static ProteinSequence getSequenceForId(String uniProtId) throws Exception {
 		URL uniprotFasta = new URL(String.format("http://www.uniprot.org/uniprot/%s.fasta", uniProtId));
-		System.out.println("Getting Sequence from URL: "+ uniprotFasta);
+		logger.info("Getting Sequence from URL: " + uniprotFasta);
 
 		ProteinSequence seq = FastaReaderHelper.readFastaProteinSequence(uniprotFasta.openStream()).get(uniProtId);
-		System.out.printf("id : %s %s%s%s", uniProtId, seq, System.getProperty("line.separator"), seq.getOriginalHeader());
+		logger.info("id : %s %s%s%s", uniProtId, seq, System.getProperty("line.separator"), seq.getOriginalHeader());
 		System.out.println();
 
 		return seq;

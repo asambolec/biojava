@@ -25,13 +25,10 @@ package org.biojava.nbio.genome.io.fastq;
  *
  * @since 3.0.3
  */
-public final class SangerFastqReader
-	extends AbstractFastqReader
-{
+public final class SangerFastqReader extends AbstractFastqReader {
 
 	@Override
-	protected FastqVariant getVariant()
-	{
+	protected FastqVariant getVariant() {
 		return FastqVariant.FASTQ_SANGER;
 	}
 }

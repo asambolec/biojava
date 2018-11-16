@@ -21,7 +21,6 @@
 
 package org.biojava.nbio.ontology;
 
-
 /**
  * Thrown to indicate that a term or triple can't be added to an ontology
  * because it is already present.
@@ -31,12 +30,9 @@ package org.biojava.nbio.ontology;
 
 public class AlreadyExistsException extends OntologyException {
 
-
-
 	private static final long serialVersionUID = 1L;
 
 	public AlreadyExistsException() {
-		super();
 	}
 
 	public AlreadyExistsException(String description) {

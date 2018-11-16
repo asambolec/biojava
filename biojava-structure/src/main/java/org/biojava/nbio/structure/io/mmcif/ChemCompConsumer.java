@@ -35,62 +35,62 @@ public class ChemCompConsumer implements MMcifConsumer {
 	ChemicalComponentDictionary dictionary;
 
 	String latestChemCompId;
-	public ChemCompConsumer(){
+
+	public ChemCompConsumer() {
 		dictionary = new ChemicalComponentDictionary();
 	}
 
 	@Override
 	public void documentStart() {
 
-
 	}
 
-	public ChemicalComponentDictionary getDictionary(){
+	public ChemicalComponentDictionary getDictionary() {
 		return dictionary;
 	}
 
 	@Override
 	public void newChemComp(ChemComp c) {
 
-		if ( c.getId() == null)
+		if (c.getId() == null) {
 			logger.warn("chem comp ID == null " + c);
+		}
 
 		latestChemCompId = c.getId();
 		dictionary.addChemComp(c);
-		if ( c.getResidueType() == ResidueType.nonPolymer)
+		if (c.getResidueType() == ResidueType.nonPolymer) {
 			return;
+		}
 
-		if ( c.getResidueType() == ResidueType.saccharide)
+		if (c.getResidueType() == ResidueType.saccharide) {
 			return;
+		}
 
-		if ( c.getResidueType() == ResidueType.dSaccharide)
+		if (c.getResidueType() == ResidueType.dSaccharide) {
 			return;
+		}
 
-		//if ( c.isStandard())
-		//	System.out.println(c);
+		// if ( c.isStandard())
+		// System.out.println(c);
 	}
 
 	@Override
 	public void documentEnd() {
-
 
 	}
 
 	@Override
 	public void newAtomSite(AtomSite atom) {
 
-
 	}
 
 	@Override
 	public void newDatabasePDBremark(DatabasePDBremark remark) {
 
-
 	}
 
 	@Override
 	public void newDatabasePDBrev(DatabasePDBrev dbrev) {
-
 
 	}
 
@@ -102,18 +102,15 @@ public class ChemCompConsumer implements MMcifConsumer {
 	@Override
 	public void newEntity(Entity entity) {
 
-
 	}
 
 	@Override
 	public void newEntityPolySeq(EntityPolySeq epolseq) {
 
-
 	}
 
 	@Override
 	public void newExptl(Exptl exptl) {
-
 
 	}
 
@@ -131,98 +128,81 @@ public class ChemCompConsumer implements MMcifConsumer {
 	public void newStructNcsOper(StructNcsOper sNcsOper) {
 
 	}
-	
+
 	@Override
 	public void newAtomSites(AtomSites atomSites) {
-		
+
 	}
 
 	@Override
 	public void newPdbxEntityNonPoly(PdbxEntityNonPoly pen) {
-
 
 	}
 
 	@Override
 	public void newPdbxNonPolyScheme(PdbxNonPolyScheme ppss) {
 
-
 	}
 
 	@Override
 	public void newPdbxPolySeqScheme(PdbxPolySeqScheme ppss) {
-
 
 	}
 
 	@Override
 	public void newRefine(Refine r) {
 
-
 	}
 
 	@Override
 	public void newStructAsym(StructAsym sasym) {
-
 
 	}
 
 	@Override
 	public void newStructKeywords(StructKeywords kw) {
 
-
 	}
 
 	@Override
 	public void newStructRef(StructRef sref) {
-
 
 	}
 
 	@Override
 	public void newStructRefSeq(StructRefSeq sref) {
 
-
 	}
 
 	@Override
 	public void newStructRefSeqDif(StructRefSeqDif sref) {
-
 
 	}
 
 	@Override
 	public void setStruct(Struct struct) {
 
+	}
+
+	@Override
+	public void newGenericData(String category, List<String> loopFields, List<String> lineData) {
+		// System.out.println("unhandled category: " + category);
 
 	}
 
 	@Override
-	public void newGenericData(String category, List<String> loopFields,
-			List<String> lineData) {
-		//System.out.println("unhandled category: " + category);
-
-	}
-
-
-	@Override
-	public void newAuditAuthor(AuditAuthor aa)
-	{
-
+	public void newAuditAuthor(AuditAuthor aa) {
 
 	}
 
 	@Override
-	public FileParsingParameters getFileParsingParameters()
-	{
+	public FileParsingParameters getFileParsingParameters() {
 		// can be ingored in this case...
 		return null;
 	}
 
 	@Override
-	public void setFileParsingParameters(FileParsingParameters params)
-	{
-
+	public void setFileParsingParameters(FileParsingParameters params) {
 
 	}
 
@@ -236,18 +216,15 @@ public class ChemCompConsumer implements MMcifConsumer {
 	@Override
 	public void newPdbxStructOperList(PdbxStructOperList structOper) {
 
-
 	}
 
 	@Override
 	public void newPdbxStrucAssembly(PdbxStructAssembly strucAssembly) {
 
-
 	}
 
 	@Override
 	public void newPdbxStrucAssemblyGen(PdbxStructAssemblyGen strucAssembly) {
-
 
 	}
 
@@ -259,7 +236,6 @@ public class ChemCompConsumer implements MMcifConsumer {
 	@Override
 	public void newPdbxChemCompIndentifier(PdbxChemCompIdentifier id) {
 
-
 	}
 
 	@Override
@@ -270,29 +246,25 @@ public class ChemCompConsumer implements MMcifConsumer {
 	@Override
 	public void newPdbxChemCompDescriptor(PdbxChemCompDescriptor desc) {
 
-
 	}
 
 	@Override
 	public void newEntitySrcGen(EntitySrcGen entitySrcGen) {
 
-
 	}
+
 	@Override
 	public void newEntitySrcNat(EntitySrcNat entitySrcNat) {
-
 
 	}
 
 	@Override
 	public void newEntitySrcSyn(EntitySrcSyn entitySrcSyn) {
 
-
 	}
 
 	@Override
 	public void newStructConn(StructConn structConn) {
-
 
 	}
 
@@ -309,19 +281,17 @@ public class ChemCompConsumer implements MMcifConsumer {
 	@Override
 	public void newEntityPoly(EntityPoly entityPoly) {
 
-		
 	}
 
 	@Override
 	public void newPdbxAuditRevisionHistory(PdbxAuditRevisionHistory history) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void newPdbxDatabaseStatus(PdbxDatabaseStatus status) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
-

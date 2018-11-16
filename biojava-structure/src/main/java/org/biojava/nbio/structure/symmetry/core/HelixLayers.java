@@ -29,7 +29,7 @@ import java.util.List;
  * @author Peter
  */
 public class HelixLayers {
-	private List<Helix> helices = new ArrayList<Helix>();
+	private List<Helix> helices = new ArrayList<>();
 	private double symmetryDeviation = 0;
 
 	public int size() {
@@ -50,7 +50,7 @@ public class HelixLayers {
 	public Helix getByLowestAngle() {
 		double angle = Double.MAX_VALUE;
 		Helix lowest = null;
-		for (Helix helix: helices) {
+		for (Helix helix : helices) {
 			if (helix.getAngle() < angle) {
 				angle = helix.getAngle();
 				lowest = helix;
@@ -60,13 +60,13 @@ public class HelixLayers {
 	}
 
 	/*
-	 * Returns Helix with largest number of intermolecular contacts
-	 * between repeat units
+	 * Returns Helix with largest number of intermolecular contacts between repeat
+	 * units
 	 */
 	public Helix getByLargestContacts() {
 		double contacts = 0;
 		Helix largest = null;
-		for (Helix helix: helices) {
+		for (Helix helix : helices) {
 			if (helix.getContacts() > contacts) {
 				contacts = helix.getContacts();
 				largest = helix;
@@ -76,8 +76,8 @@ public class HelixLayers {
 	}
 
 	/*
-	 * Returns Helix that has the largest number of contacts, besides
-	 * the Helix with the lowest twist angle
+	 * Returns Helix that has the largest number of contacts, besides the Helix with
+	 * the lowest twist angle
 	 */
 	public Helix getByLargestContactsNotLowestAngle() {
 		double contacts = 0;
@@ -85,7 +85,7 @@ public class HelixLayers {
 		// TODO why are there helices with almost identical helix parameters??
 		double angle = lowest.getAngle() + 0.05;
 		Helix largest = null;
-		for (Helix helix: helices) {
+		for (Helix helix : helices) {
 			if (helix == lowest) {
 				continue;
 			}
@@ -101,8 +101,9 @@ public class HelixLayers {
 	}
 
 	/**
-	 * Returns QuatSymmetryScores averaged over all rotations
-	 * (except the first rotation, which is the unit operation E)
+	 * Returns QuatSymmetryScores averaged over all rotations (except the first
+	 * rotation, which is the unit operation E)
+	 * 
 	 * @return mean scores average over rotations
 	 */
 	public QuatSymmetryScores getScores() {
@@ -179,15 +180,15 @@ public class HelixLayers {
 
 	private double averageScores(double[] scores) {
 		double sum = 0;
-		for (double s: scores) {
+		for (double s : scores) {
 			sum += s;
 		}
-		return sum/scores.length;
+		return sum / scores.length;
 	}
 
 	private double minScores(double[] scores) {
 		double score = Double.MAX_VALUE;
-		for (double s: scores) {
+		for (double s : scores) {
 			score = Math.min(score, s);
 		}
 		return score;
@@ -195,7 +196,7 @@ public class HelixLayers {
 
 	private double maxScores(double[] scores) {
 		double score = Double.MIN_VALUE;
-		for (double s: scores) {
+		for (double s : scores) {
 			score = Math.max(score, s);
 		}
 		return score;
@@ -209,12 +210,8 @@ public class HelixLayers {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Helices: ").append(size()).append("\n");
-		for (Helix s: helices) {
-			sb.append(s.toString()).append("\n");
-		}
+		helices.forEach(s -> sb.append(s.toString()).append("\n"));
 		return sb.toString();
 	}
-
-
 
 }

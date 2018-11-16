@@ -28,10 +28,12 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 import java.util.*;
 
 /**
- * Set of proteinogenic amino acids.  Molecular weights are recorded in daltons (Da) as residues of a chain; monomers
- * outside of a chain would likely have an additional mass of 18.01524 Da contributed by an associated water molecule.
+ * Set of proteinogenic amino acids. Molecular weights are recorded in daltons
+ * (Da) as residues of a chain; monomers outside of a chain would likely have an
+ * additional mass of 18.01524 Da contributed by an associated water molecule.
  *
- * Currently we have different symbols to handle inserts so not as clean as it should be
+ * Currently we have different symbols to handle inserts so not as clean as it
+ * should be
  *
  * @author Richard Holland
  * @author Scooter Willis
@@ -39,9 +41,9 @@ import java.util.*;
  */
 public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompound> {
 
-	private final Map<String, AminoAcidCompound> aminoAcidCompoundCache = new HashMap<String, AminoAcidCompound>();
-	private final Map<AminoAcidCompound, Set<AminoAcidCompound>> equivalentsCache =
-			new HashMap<AminoAcidCompound, Set<AminoAcidCompound>>();
+	private final static CaseFreeAminoAcidCompoundSet aminoAcidCompoundSet = new CaseFreeAminoAcidCompoundSet();
+	private final Map<String, AminoAcidCompound> aminoAcidCompoundCache = new HashMap<>();
+	private final Map<AminoAcidCompound, Set<AminoAcidCompound>> equivalentsCache = new HashMap<>();
 
 	public CaseFreeAminoAcidCompoundSet() {
 		aminoAcidCompoundCache.put("A", new AminoAcidCompound(null, "A", "Ala", "Alanine", 71.0788f));
@@ -73,20 +75,21 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 		aminoAcidCompoundCache.put("_", new AminoAcidCompound(null, "_", "___", "Unspecified", null));
 		aminoAcidCompoundCache.put("*", new AminoAcidCompound(null, "*", "***", "Stop", null));
 
-		//Selenocysteine - this is encoded by UGA with the presence
-		//of a SECIS element (SElenoCysteine Insertion Sequence) in the mRNA
-		//and is a post-translation modification
+		// Selenocysteine - this is encoded by UGA with the presence
+		// of a SECIS element (SElenoCysteine Insertion Sequence) in the mRNA
+		// and is a post-translation modification
 		aminoAcidCompoundCache.put("U", new AminoAcidCompound(null, "U", "Sec", "Selenocysteine", 150.0388f));
 
-		//Pyrrolysine is encoded by UAG in mRNA (normally Amber stop codon) which is translated to
-		//this amino acid under the presence of pylT which creates an anti-codon CUA & pylS
-		//which then does the actual conversion to Pyl.
+		// Pyrrolysine is encoded by UAG in mRNA (normally Amber stop codon) which is
+		// translated to
+		// this amino acid under the presence of pylT which creates an anti-codon CUA &
+		// pylS
+		// which then does the actual conversion to Pyl.
 		aminoAcidCompoundCache.put("O", new AminoAcidCompound(null, "O", "Pyl", "Pyrrolysine", 255.3172f));
 
-		Map<String, AminoAcidCompound> lowerCaseSet = new HashMap<String, AminoAcidCompound>();
-		for(String s:this.aminoAcidCompoundCache.keySet()){
-			lowerCaseSet.put(s.toLowerCase(), this.aminoAcidCompoundCache.get(s));
-		}
+		Map<String, AminoAcidCompound> lowerCaseSet = new HashMap<>();
+		this.aminoAcidCompoundCache.keySet()
+				.forEach(s -> lowerCaseSet.put(s.toLowerCase(), this.aminoAcidCompoundCache.get(s)));
 		this.aminoAcidCompoundCache.putAll(lowerCaseSet);
 	}
 
@@ -97,11 +100,12 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 
 	@Override
 	public AminoAcidCompound getCompoundForString(String string) {
-		if (string.length() == 0) {
+		if (string.isEmpty()) {
 			return null;
 		}
 		if (string.length() > this.getMaxSingleCompoundStringLength()) {
-			throw new IllegalArgumentException("String supplied ("+string+") is too long. Max is "+getMaxSingleCompoundStringLength());
+			throw new IllegalArgumentException(new StringBuilder().append("String supplied (").append(string)
+					.append(") is too long. Max is ").append(getMaxSingleCompoundStringLength()).toString());
 		}
 		return this.aminoAcidCompoundCache.get(string);
 	}
@@ -111,13 +115,10 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 		return 1;
 	}
 
-
 	@Override
 	public boolean isCompoundStringLengthEqual() {
 		return true;
 	}
-
-	private final static CaseFreeAminoAcidCompoundSet aminoAcidCompoundSet = new CaseFreeAminoAcidCompoundSet();
 
 	public static CaseFreeAminoAcidCompoundSet getAminoAcidCompoundSet() {
 		return aminoAcidCompoundSet;
@@ -133,9 +134,7 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 	public Set<AminoAcidCompound> getEquivalentCompounds(AminoAcidCompound compound) {
 		if (equivalentsCache.isEmpty()) {
 			// most compounds are equivalent to themselves alone
-			for (AminoAcidCompound c : aminoAcidCompoundCache.values()) {
-				equivalentsCache.put(c, Collections.singleton(c));
-			}
+			aminoAcidCompoundCache.values().forEach(c -> equivalentsCache.put(c, Collections.singleton(c)));
 			// ambiguous Asparagine or Aspartic acid
 			addAmbiguousEquivalents("N", "D", "B");
 			// ambiguous Glutamine or Glutamic acid
@@ -143,8 +142,10 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 			// ambiguous Leucine or Isoleucine
 			addAmbiguousEquivalents("I", "L", "J");
 			// ambiguous gaps
-			AminoAcidCompound gap1, gap2, gap3;
-			Set<AminoAcidCompound> gaps = new HashSet<AminoAcidCompound>();
+			AminoAcidCompound gap1;
+			AminoAcidCompound gap2;
+			AminoAcidCompound gap3;
+			Set<AminoAcidCompound> gaps = new HashSet<>();
 			gaps.add(gap1 = aminoAcidCompoundCache.get("-"));
 			gaps.add(gap2 = aminoAcidCompoundCache.get("."));
 			gaps.add(gap3 = aminoAcidCompoundCache.get("_"));
@@ -152,28 +153,31 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 			equivalentsCache.put(gap2, gaps);
 			equivalentsCache.put(gap3, gaps);
 			// X is never equivalent, even to itself
-			equivalentsCache.put(aminoAcidCompoundCache.get("X"), new HashSet<AminoAcidCompound>());
+			equivalentsCache.put(aminoAcidCompoundCache.get("X"), new HashSet<>());
 		}
 		return equivalentsCache.get(compound);
 	}
 
-	// helper method to initialize the equivalent sets for 2 amino acid compounds and their ambiguity compound
+	// helper method to initialize the equivalent sets for 2 amino acid compounds
+	// and their ambiguity compound
 	private void addAmbiguousEquivalents(String one, String two, String either) {
 		Set<AminoAcidCompound> equivalents;
-		AminoAcidCompound cOne, cTwo, cEither;
+		AminoAcidCompound cOne;
+		AminoAcidCompound cTwo;
+		AminoAcidCompound cEither;
 
-		equivalents = new HashSet<AminoAcidCompound>();
+		equivalents = new HashSet<>();
 		equivalents.add(cOne = aminoAcidCompoundCache.get(one));
 		equivalents.add(cTwo = aminoAcidCompoundCache.get(two));
 		equivalents.add(cEither = aminoAcidCompoundCache.get(either));
 		equivalentsCache.put(cEither, equivalents);
 
-		equivalents = new HashSet<AminoAcidCompound>();
+		equivalents = new HashSet<>();
 		equivalents.add(cOne);
 		equivalents.add(cEither);
 		equivalentsCache.put(cOne, equivalents);
 
-		equivalents = new HashSet<AminoAcidCompound>();
+		equivalents = new HashSet<>();
 		equivalents.add(cTwo);
 		equivalents.add(cEither);
 		equivalentsCache.put(cTwo, equivalents);
@@ -186,9 +190,8 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 
 	@Override
 	public List<AminoAcidCompound> getAllCompounds() {
-		return new ArrayList<AminoAcidCompound>(aminoAcidCompoundCache.values());
+		return new ArrayList<>(aminoAcidCompoundCache.values());
 	}
-
 
 	@Override
 	public boolean isComplementable() {
@@ -197,7 +200,7 @@ public class CaseFreeAminoAcidCompoundSet implements CompoundSet<AminoAcidCompou
 
 	@Override
 	public boolean isValidSequence(Sequence<AminoAcidCompound> sequence) {
-		for (AminoAcidCompound c: sequence) {
+		for (AminoAcidCompound c : sequence) {
 			if (!hasCompound(c)) {
 				return false;
 			}

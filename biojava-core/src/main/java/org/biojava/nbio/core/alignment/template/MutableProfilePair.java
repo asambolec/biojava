@@ -34,15 +34,16 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of the alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
-public interface MutableProfilePair<S extends Sequence<C>, C extends Compound> extends MutableProfile<S, C>,
-		ProfilePair<S, C> {
+public interface MutableProfilePair<S extends Sequence<C>, C extends Compound>
+		extends MutableProfile<S, C>, ProfilePair<S, C> {
 
 	/**
 	 * Sets both {@link Profile}s of the pair.
 	 *
-	 * @param query becomes the first {@link Profile} of the pair
+	 * @param query  becomes the first {@link Profile} of the pair
 	 * @param target becomes the second {@link Profile} of the pair
 	 * @throws IllegalArgumentException if query and target are different lengths
 	 */
@@ -52,7 +53,8 @@ public interface MutableProfilePair<S extends Sequence<C>, C extends Compound> e
 	 * Sets the first {@link Profile} of the pair.
 	 *
 	 * @param query becomes the first {@link Profile} of the pair
-	 * @throws IllegalArgumentException if (new) query and (old) target are different lengths
+	 * @throws IllegalArgumentException if (new) query and (old) target are
+	 *                                  different lengths
 	 */
 	void setQuery(Profile<S, C> query);
 
@@ -60,7 +62,8 @@ public interface MutableProfilePair<S extends Sequence<C>, C extends Compound> e
 	 * Sets the second {@link Profile} of the pair.
 	 *
 	 * @param target becomes the second {@link Profile} of the pair
-	 * @throws IllegalArgumentException if (old) query and (new) target are different lengths
+	 * @throws IllegalArgumentException if (old) query and (new) target are
+	 *                                  different lengths
 	 */
 	void setTarget(Profile<S, C> target);
 

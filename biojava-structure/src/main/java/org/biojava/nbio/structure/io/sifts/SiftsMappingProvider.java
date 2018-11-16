@@ -40,22 +40,23 @@ public class SiftsMappingProvider {
 
 	private final static Logger logger = LoggerFactory.getLogger(SiftsMappingProvider.class);
 
-
 	private static final String EBI_SIFTS_FILE_LOCATION = "http://ftp.ebi.ac.uk/pub/databases/msd/sifts/xml/%s.xml.gz";
 
 	private static String fileLoc = EBI_SIFTS_FILE_LOCATION;
 
-	public static void setFileLocation(String myFileLocation){
+	public static void setFileLocation(String myFileLocation) {
 		fileLoc = myFileLocation;
 	}
 
 	/**
-	 * Return the SIFTS mappings by getting the info from individual SIFTS xml files at URL {@value EBI_SIFTS_FILE_LOCATION}
+	 * Return the SIFTS mappings by getting the info from individual SIFTS xml files
+	 * at URL {@value EBI_SIFTS_FILE_LOCATION}
+	 * 
 	 * @param pdbId the pdb identifier
 	 * @return
 	 * @throws IOException if problems downloading or parsing the file
 	 */
-	public static List<SiftsEntity> getSiftsMapping(String pdbId) throws IOException{
+	public static List<SiftsEntity> getSiftsMapping(String pdbId) throws IOException {
 		// grab files from here:
 
 		AtomCache cache = new AtomCache();
@@ -64,30 +65,28 @@ public class SiftsMappingProvider {
 
 		pdbId = pdbId.toLowerCase();
 
-		String dirHash = pdbId.substring(1,3);
-		File siftsDir = new File(path , "SIFTS");
+		String dirHash = pdbId.substring(1, 3);
+		File siftsDir = new File(path, "SIFTS");
 
-
-		if ( ! siftsDir.exists()) {
+		if (!siftsDir.exists()) {
 			logger.info("Creating directory {}", siftsDir.toString());
 			siftsDir.mkdir();
 		}
 
 		File hashDir = new File(siftsDir, dirHash);
 
-		if ( ! hashDir.exists()){
+		if (!hashDir.exists()) {
 			logger.info("Creating directory {}", hashDir.toString());
 			hashDir.mkdir();
 		}
-		File dest = new File( hashDir, pdbId + ".sifts.xml.gz");
+		File dest = new File(hashDir, pdbId + ".sifts.xml.gz");
 
 		logger.debug("testing SIFTS file " + dest.getAbsolutePath());
 
-
-		if ( ! dest.exists()){
-			String u = String.format(fileLoc,pdbId);
+		if (!dest.exists()) {
+			String u = String.format(fileLoc, pdbId);
 			URL url = new URL(u);
-			logger.debug("Downloading SIFTS file {} to {}",url,dest);
+			logger.debug("Downloading SIFTS file {} to {}", url, dest);
 			FileDownloadUtils.downloadFile(url, dest);
 		}
 
@@ -97,11 +96,9 @@ public class SiftsMappingProvider {
 
 		parser.parseXmlFile(is);
 
-		//System.out.println(parser.getEntities());
+		// System.out.println(parser.getEntities());
 		return parser.getEntities();
 
-
 	}
-
 
 }

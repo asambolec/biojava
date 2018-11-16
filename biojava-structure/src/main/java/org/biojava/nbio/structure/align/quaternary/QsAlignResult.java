@@ -56,8 +56,8 @@ public class QsAlignResult {
 	private QsRelation relation;
 
 	/**
-	 * The Constructor of the result takes the same inputs as the
-	 * {@link QsAlign} algorithm.
+	 * The Constructor of the result takes the same inputs as the {@link QsAlign}
+	 * algorithm.
 	 * 
 	 * @param subunits1
 	 * @param subunits2
@@ -97,8 +97,9 @@ public class QsAlignResult {
 	 */
 	public Map<Integer, Integer> getSubunitMap() {
 
-		if (subunitMap == null)
+		if (subunitMap == null) {
 			return Collections.emptyMap();
+		}
 
 		return Collections.unmodifiableMap(subunitMap);
 	}
@@ -112,12 +113,12 @@ public class QsAlignResult {
 
 		// Check consistency of the map
 		if (Collections.max(subunitMap.keySet()) > subunits1.size()
-				| Collections.max(subunitMap.values()) > subunits2.size())
-			throw new IndexOutOfBoundsException(
-					"Subunit Map index higher than Subunit List size.");
+				| Collections.max(subunitMap.values()) > subunits2.size()) {
+			throw new IndexOutOfBoundsException("Subunit Map index higher than Subunit List size.");
+		}
 
 		// Update the relation enum
-		if (subunitMap.size() == 0) {
+		if (subunitMap.isEmpty()) {
 			relation = QsRelation.DIFFERENT;
 		} else if (subunitMap.keySet().size() == subunits1.size()) {
 			if (subunitMap.values().size() == subunits2.size()) {
@@ -143,17 +144,17 @@ public class QsAlignResult {
 	 * @return length of the alignment
 	 */
 	public int length() {
-		if (subunitMap == null)
+		if (subunitMap == null) {
 			return 0;
+		}
 
 		return subunitMap.size();
 	}
 
 	/**
-	 * The transformation 4D matrix that needs to be applied to the second group
-	 * of Subunits to superimpose them onto the first group of Subunits, given
-	 * the equivalent residues in the SubunitCluster and the Subunit
-	 * equivalencies.
+	 * The transformation 4D matrix that needs to be applied to the second group of
+	 * Subunits to superimpose them onto the first group of Subunits, given the
+	 * equivalent residues in the SubunitCluster and the Subunit equivalencies.
 	 * <p>
 	 * This is equivalent to
 	 * multipleAlignment.getBlockSet(0).getTransformations().get(1).
@@ -162,8 +163,9 @@ public class QsAlignResult {
 	 */
 	public Matrix4d getTransform() {
 
-		if (alignment == null)
+		if (alignment == null) {
 			return null;
+		}
 
 		return alignment.getBlockSet(0).getTransformations().get(1);
 	}
@@ -177,17 +179,19 @@ public class QsAlignResult {
 	 */
 	public double getRmsd() {
 
-		if (alignment == null)
+		if (alignment == null) {
 			return -1.0;
-		if (alignment.getScore(MultipleAlignmentScorer.RMSD) == null)
+		}
+		if (alignment.getScore(MultipleAlignmentScorer.RMSD) == null) {
 			return MultipleAlignmentScorer.getRMSD(alignment);
+		}
 
 		return alignment.getScore(MultipleAlignmentScorer.RMSD);
 	}
 
 	/**
-	 * The quaternary structure relation {@link QsRelation} between the two
-	 * groups of Subunits.
+	 * The quaternary structure relation {@link QsRelation} between the two groups
+	 * of Subunits.
 	 * 
 	 * @return relation
 	 */
@@ -196,8 +200,8 @@ public class QsAlignResult {
 	}
 
 	/**
-	 * The quaternary structure relation {@link QsRelation} between the two
-	 * groups of Subunits.
+	 * The quaternary structure relation {@link QsRelation} between the two groups
+	 * of Subunits.
 	 * 
 	 * @param relation
 	 */
@@ -219,8 +223,7 @@ public class QsAlignResult {
 	 * The alignment that specifies the residue equivalencies of the equivalent
 	 * Subunits.
 	 * 
-	 * @param alignment
-	 *            a MultipleAlignment object
+	 * @param alignment a MultipleAlignment object
 	 */
 	public void setAlignment(MultipleAlignment alignment) {
 		this.alignment = alignment;
@@ -234,10 +237,9 @@ public class QsAlignResult {
 	 */
 	public List<Subunit> getAlignedSubunits1() {
 
-		List<Subunit> aligned = new ArrayList<Subunit>(subunitMap.size());
+		List<Subunit> aligned = new ArrayList<>(subunitMap.size());
 
-		for (Integer key : subunitMap.keySet())
-			aligned.add(subunits1.get(key));
+		subunitMap.keySet().forEach(key -> aligned.add(subunits1.get(key)));
 
 		return aligned;
 	}
@@ -250,10 +252,9 @@ public class QsAlignResult {
 	 */
 	public List<Subunit> getAlignedSubunits2() {
 
-		List<Subunit> aligned = new ArrayList<Subunit>(subunitMap.size());
+		List<Subunit> aligned = new ArrayList<>(subunitMap.size());
 
-		for (Integer key : subunitMap.keySet())
-			aligned.add(subunits2.get(subunitMap.get(key)));
+		subunitMap.keySet().forEach(key -> aligned.add(subunits2.get(subunitMap.get(key))));
 
 		return aligned;
 	}
@@ -267,8 +268,7 @@ public class QsAlignResult {
 		// Obtain the indices of the clustered subunits
 		for (SubunitCluster cluster : clusters) {
 			if (cluster.getSubunits().contains(subunits1.get(index))) {
-				return cluster.getAlignedAtomsSubunit(cluster.getSubunits()
-						.indexOf(subunits1.get(index)));
+				return cluster.getAlignedAtomsSubunit(cluster.getSubunits().indexOf(subunits1.get(index)));
 			}
 		}
 		return null;
@@ -279,8 +279,7 @@ public class QsAlignResult {
 		// Obtain the indices of the clustered subunits
 		for (SubunitCluster cluster : clusters) {
 			if (cluster.getSubunits().contains(subunits2.get(index))) {
-				return cluster.getAlignedAtomsSubunit(cluster.getSubunits()
-						.indexOf(subunits2.get(index)));
+				return cluster.getAlignedAtomsSubunit(cluster.getSubunits().indexOf(subunits2.get(index)));
 			}
 		}
 		return null;
@@ -288,18 +287,12 @@ public class QsAlignResult {
 
 	@Override
 	public String toString() {
-		return "QsAlignResult [relation="
-				+ relation
-				+ ", rmsd="
-				+ getRmsd()
-				+ ", length="
-				+ length()
-				+ ", Aligned 1: "
-				+ getAlignedSubunits1().stream().map(s -> s.getName())
-						.collect(Collectors.toList())
-				+ ", Aligned 2: "
-				+ getAlignedSubunits2().stream().map(s -> s.getName())
-						.collect(Collectors.toList()) + "]";
+		return new StringBuilder().append("QsAlignResult [relation=").append(relation).append(", rmsd=")
+				.append(getRmsd()).append(", length=").append(length()).append(", Aligned 1: ")
+				.append(getAlignedSubunits1().stream().map(Subunit::getName).collect(Collectors.toList()))
+				.append(", Aligned 2: ")
+				.append(getAlignedSubunits2().stream().map(Subunit::getName).collect(Collectors.toList())).append("]")
+				.toString();
 	}
 
 }

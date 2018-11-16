@@ -27,7 +27,9 @@ package org.biojava.nbio.structure.gui.util.color;
  *
  * For instance, to map [10^0, 10^10] to a rainbow gradient, use
  *
- * new LogColorMapper(GradientMapper.getGradientMapper(GradientMapper.RAINBOW_GRADIENT, 0, 10))
+ * new
+ * LogColorMapper(GradientMapper.getGradientMapper(GradientMapper.RAINBOW_GRADIENT,
+ * 0, 10))
  *
  * @author Spencer Bliven
  *
@@ -38,6 +40,7 @@ public class LogColorMapper extends ContinuousColorMapperTransform {
 
 	/**
 	 * Creates a new LogColorMapper with base 10.
+	 * 
 	 * @param logspaceMapper
 	 */
 	public LogColorMapper(ContinuousColorMapper logspaceMapper) {
@@ -45,11 +48,11 @@ public class LogColorMapper extends ContinuousColorMapperTransform {
 	}
 
 	/**
-	 * If logspaceMapper maps values x1 to x2, this creates a
-	 * mapper for values base^x1 to base^x2
+	 * If logspaceMapper maps values x1 to x2, this creates a mapper for values
+	 * base^x1 to base^x2
 	 *
 	 * @param logspaceMapper logspace mapper
-	 * @param base The base of the logorithm
+	 * @param base           The base of the logorithm
 	 */
 	public LogColorMapper(ContinuousColorMapper logspaceMapper, int base) {
 		super(logspaceMapper);
@@ -58,13 +61,14 @@ public class LogColorMapper extends ContinuousColorMapperTransform {
 
 	/**
 	 * Apply log transform.
+	 * 
 	 * @param value
 	 * @return log_b(value)
 	 * @see org.biojava.nbio.structure.gui.util.color.ContinuousColorMapperTransform#transform(double)
 	 */
 	@Override
 	public double transform(double value) {
-		double logValue = Math.log(value>0?value:0)/Math.log(base);
+		double logValue = Math.log(value > 0 ? value : 0) / Math.log(base);
 		return logValue;
 	}
 

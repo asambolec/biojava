@@ -39,11 +39,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class PositionInQueueXMLConverter
-{
+public class PositionInQueueXMLConverter {
 
-	public String toXML(int position) throws IOException{
+	private static final Logger logger = LoggerFactory.getLogger(PositionInQueueXMLConverter.class);
+
+	public String toXML(int position) throws IOException {
 		StringWriter swriter = new StringWriter();
 
 		PrintWriter writer = new PrintWriter(swriter);
@@ -56,12 +59,11 @@ public class PositionInQueueXMLConverter
 		return swriter.toString();
 	}
 
-	public int fromXML(String xml){
+	public int fromXML(String xml) {
 		int position = Integer.MIN_VALUE;
 
-		try
-		{
-			//Convert string to XML document
+		try {
+			// Convert string to XML document
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = factory.newDocumentBuilder();
 			InputSource inStream = new InputSource();
@@ -71,62 +73,55 @@ public class PositionInQueueXMLConverter
 			// normalize text representation
 			doc.getDocumentElement().normalize();
 
-
-			//Element rootElement = doc.getDocumentElement();
+			// Element rootElement = doc.getDocumentElement();
 
 			NodeList listOfAlignments = doc.getElementsByTagName("queue");
-			//int numArrays = listOfAlignments.getLength();
-			//System.out.println("got " + numArrays + " alignment results.");
+			// int numArrays = listOfAlignments.getLength();
+			// System.out.println("got " + numArrays + " alignment results.");
 			// go over the blocks
 
+			for (int afpPos = 0; afpPos < listOfAlignments.getLength(); afpPos++) {
 
-			for(int afpPos=0; afpPos<listOfAlignments.getLength() ; afpPos++)
-			{
+				Node rootElement = listOfAlignments.item(afpPos);
 
-				Node rootElement       = listOfAlignments.item(afpPos);
-
-				String pos = getAttribute(rootElement,"position");
+				String pos = getAttribute(rootElement, "position");
 
 				try {
 					position = Integer.parseInt(pos);
-				} catch (NumberFormatException f){
-					f.printStackTrace();
+				} catch (NumberFormatException f) {
+					logger.error(f.getMessage(), f);
 				}
 
 			}
-		}
-		catch (SAXParseException err)
-		{
-			System.out.println ("** Parsing error" + ", line "
-					+ err.getLineNumber () + ", uri " + err.getSystemId ());
-			System.out.println(" " + err.getMessage ());
-		}
-		catch (SAXException e)
-		{
-			Exception x = e.getException ();
-			((x == null) ? e : x).printStackTrace ();
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace ();
+		} catch (SAXParseException err) {
+			logger.info(new StringBuilder().append("** Parsing error").append(", line ").append(err.getLineNumber())
+					.append(", uri ").append(err.getSystemId()).toString(), err);
+			logger.info(" " + err.getMessage(), err);
+		} catch (SAXException e) {
+			Exception x = e.getException();
+			((x == null) ? e : x).printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 
 		return position;
 	}
 
-
-	private static String getAttribute(Node node, String attr){
-		if( ! node.hasAttributes())
+	private static String getAttribute(Node node, String attr) {
+		if (!node.hasAttributes()) {
 			return null;
+		}
 
 		NamedNodeMap atts = node.getAttributes();
 
-		if ( atts == null)
+		if (atts == null) {
 			return null;
+		}
 
 		Node att = atts.getNamedItem(attr);
-		if ( att == null)
+		if (att == null) {
 			return null;
+		}
 
 		String value = att.getTextContent();
 

@@ -36,12 +36,15 @@ public class CoxScore {
 	 * @param useStrata
 	 * @return
 	 */
-	public static double[][] process(CoxMethod method, ArrayList<SurvivalInfo> survivalInfoList, CoxInfo coxInfo, boolean useStrata) {
-		int i, j, k;
+	public static double[][] process(CoxMethod method, ArrayList<SurvivalInfo> survivalInfoList, CoxInfo coxInfo,
+			boolean useStrata) {
+		int i;
+		int j;
+		int k;
 		double temp;
 		int n = survivalInfoList.size();
 
-		ArrayList<String> variables = new ArrayList<String>(coxInfo.getCoefficientsList().keySet());
+		ArrayList<String> variables = new ArrayList<>(coxInfo.getCoefficientsList().keySet());
 		int nvar = variables.size();
 
 		double deaths;
@@ -53,16 +56,19 @@ public class CoxScore {
 		double[] score = new double[n];
 		double[] a = new double[nvar];
 		double[] a2 = new double[nvar];
-		double denom = 0, e_denom;
+		double denom = 0;
+		double e_denom;
 		double risk;
 		double[][] covar = new double[nvar][n];
 		double[][] resid = new double[nvar][n];
-		double hazard, meanwt;
-		double downwt, temp2;
+		double hazard;
+		double meanwt;
+		double downwt;
+		double temp2;
 		double mean;
 
-		//  n = *nx;
-		//  nvar  = *nvarx;
+		// n = *nx;
+		// nvar = *nvarx;
 		for (int p = 0; p < n; p++) {
 			SurvivalInfo si = survivalInfoList.get(p);
 			time[p] = si.getTime();
@@ -75,7 +81,7 @@ public class CoxScore {
 			weights[p] = si.getWeight();
 			score[p] = si.getScore();
 
-			for(int v = 0; v < variables.size(); v++){
+			for (int v = 0; v < variables.size(); v++) {
 				String variable = variables.get(v);
 				Double value = si.getVariable(variable);
 				covar[v][p] = value;
@@ -83,15 +89,13 @@ public class CoxScore {
 
 		}
 
-
-
-		//  a = scratch;
-		//  a2 = a+nvar;
-	/*
-		 **  Set up the ragged array
+		// a = scratch;
+		// a2 = a+nvar;
+		/*
+		 ** Set up the ragged array
 		 */
-		//   covar=  dmatrix(covar2, n, nvar);
-		//   resid=  dmatrix(resid2, n, nvar);
+		// covar= dmatrix(covar2, n, nvar);
+		// resid= dmatrix(resid2, n, nvar);
 
 		e_denom = 0;
 		deaths = 0;
@@ -99,7 +103,7 @@ public class CoxScore {
 		for (i = 0; i < nvar; i++) {
 			a2[i] = 0;
 		}
-		strata[n - 1] = 1;  /*failsafe */
+		strata[n - 1] = 1; /* failsafe */
 		for (i = n - 1; i >= 0; i--) {
 			if (strata[i] == 1) {
 				denom = 0;
@@ -128,7 +132,7 @@ public class CoxScore {
 				if (deaths < 2 || method == CoxMethod.Breslow) {
 					hazard = meanwt / denom;
 					for (j = 0; j < nvar; j++) {
-						temp = (a[j] / denom);     /* xbar */
+						temp = (a[j] / denom); /* xbar */
 						for (k = i; k < n; k++) {
 							temp2 = covar[j][k] - temp;
 							if (time[k] == time[i] && status[k] == 1) {
@@ -140,7 +144,7 @@ public class CoxScore {
 							}
 						}
 					}
-				} else {  /* the harder case */
+				} else { /* the harder case */
 					meanwt /= deaths;
 					for (dd = 0; dd < deaths; dd++) {
 						downwt = dd / deaths;
@@ -152,8 +156,7 @@ public class CoxScore {
 								temp2 = covar[j][k] - mean;
 								if (time[k] == time[i] && status[k] == 1) {
 									resid[j][k] += temp2 / deaths;
-									resid[j][k] -= temp2 * score[k] * hazard
-											* (1 - downwt);
+									resid[j][k] -= temp2 * score[k] * hazard * (1 - downwt);
 								} else {
 									resid[j][k] -= temp2 * score[k] * hazard;
 								}
@@ -181,11 +184,11 @@ public class CoxScore {
 
 		}
 
-		//appears to be backward internally
+		// appears to be backward internally
 		double[][] flipresid = new double[n][nvar];
 
-		for(int s = 0; s < resid.length; s++){
-			for(int t = 0; t  < resid[0].length; t++){
+		for (int s = 0; s < resid.length; s++) {
+			for (int t = 0; t < resid[0].length; t++) {
 				flipresid[t][s] = resid[s][t];
 			}
 		}

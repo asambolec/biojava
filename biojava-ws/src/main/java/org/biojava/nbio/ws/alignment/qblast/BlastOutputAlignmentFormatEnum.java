@@ -32,11 +32,6 @@ package org.biojava.nbio.ws.alignment.qblast;
  */
 public enum BlastOutputAlignmentFormatEnum {
 
-	Pairwise,
-	QueryAnchored,
-	QueryAnchoredNoIdentities,
-	FlatQueryAnchored,
-	FlatQueryAnchoredNoIdentities,
-	Tabular
+	Pairwise, QueryAnchored, QueryAnchoredNoIdentities, FlatQueryAnchored, FlatQueryAnchoredNoIdentities, Tabular
 
 }

@@ -29,12 +29,14 @@ import org.biojava.nbio.core.sequence.template.CompoundSet;
 import java.util.Map;
 
 /**
- * Defines a data structure which holds the score (penalty or bonus) given during alignment for the exchange of one
- * {@link Compound} in a sequence for another.
+ * Defines a data structure which holds the score (penalty or bonus) given
+ * during alignment for the exchange of one {@link Compound} in a sequence for
+ * another.
  *
  * @author Mark Chapman
  * @author Paolo Pavan
- * @param <C> each element of the matrix corresponds to a pair of {@link Compound}s of type C
+ * @param <C> each element of the matrix corresponds to a pair of
+ *        {@link Compound}s of type C
  */
 public interface SubstitutionMatrix<C extends Compound> {
 
@@ -60,7 +62,8 @@ public interface SubstitutionMatrix<C extends Compound> {
 	short[][] getMatrix();
 
 	/**
-	 * Returns this matrix as a formatted String with {@link Compound} labels along the axes.
+	 * Returns this matrix as a formatted String with {@link Compound} labels along
+	 * the axes.
 	 *
 	 * @return this matrix as a formatted String
 	 */
@@ -88,19 +91,23 @@ public interface SubstitutionMatrix<C extends Compound> {
 	String getName();
 
 	/**
-	 * Returns value in matrix for conversion from first {@link Compound} to the second.  If an argument does not
-	 * belong to the {@link CompoundSet}, this could either throw an {@link IllegalArgumentException} or it could
-	 * return {@link #getMinValue()}.
+	 * Returns value in matrix for conversion from first {@link Compound} to the
+	 * second. If an argument does not belong to the {@link CompoundSet}, this could
+	 * either throw an {@link IllegalArgumentException} or it could return
+	 * {@link #getMinValue()}.
 	 *
 	 * @param from original {@link Compound}
-	 * @param to replacement {@link Compound}
-	 * @return value in matrix for conversion from first {@link Compound} to the second
-	 * @throws IllegalArgumentException possibly, if an argument does not belong to the {@link CompoundSet}
+	 * @param to   replacement {@link Compound}
+	 * @return value in matrix for conversion from first {@link Compound} to the
+	 *         second
+	 * @throws IllegalArgumentException possibly, if an argument does not belong to
+	 *                                  the {@link CompoundSet}
 	 */
 	short getValue(C from, C to);
 
 	/**
-	 * Rescales the matrix so that to {@link #getMaxValue()} - {@link #getMinValue()} = scale.
+	 * Rescales the matrix so that to {@link #getMaxValue()} -
+	 * {@link #getMinValue()} = scale.
 	 *
 	 * @param scale new normalization scale of this matrix
 	 * @throws IllegalArgumentException if scale < 1

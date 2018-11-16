@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.core.search.io.blast;
 
-
 import org.biojava.nbio.core.search.io.Hit;
 import org.biojava.nbio.core.search.io.Hsp;
 import org.biojava.nbio.core.search.io.Result;
@@ -43,11 +42,11 @@ import org.xml.sax.SAXException;
 
 /**
  * Re-designed by Paolo Pavan on the footprint of:
- * org.biojava.nbio.genome.query.BlastXMLQuery by Scooter Willis <willishf at gmail dot com>
+ * org.biojava.nbio.genome.query.BlastXMLQuery by Scooter Willis <willishf at
+ * gmail dot com>
  *
- * You may want to find my contacts on Github and LinkedIn for code info
- * or discuss major changes.
- * https://github.com/paolopavan
+ * You may want to find my contacts on Github and LinkedIn for code info or
+ * discuss major changes. https://github.com/paolopavan
  *
  *
  * @author Paolo Pavan
@@ -56,34 +55,39 @@ public class BlastXMLParser implements ResultFactory {
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Hsp.class);
 	Document blastDoc = null;
 	private File targetFile;
-	private List<Sequence> queryReferences, databaseReferences;
-	private Map<String,Sequence> queryReferencesMap, databaseReferencesMap;
+	private List<Sequence> queryReferences;
+	private List<Sequence> databaseReferences;
+	private Map<String, Sequence> queryReferencesMap;
+	private Map<String, Sequence> databaseReferencesMap;
 
 	public BlastXMLParser() {
 
 	}
+
 	@Override
-	public void setFile(File f){
+	public void setFile(File f) {
 		targetFile = f;
 	}
 
-	private void readFile(String blastFile) throws IOException, ParseException{
+	private void readFile(String blastFile) throws IOException, ParseException {
 		logger.info("Start reading " + blastFile);
 		try {
 			blastDoc = XMLHelper.loadXML(blastFile);
 		} catch (SAXException ex) {
 			logger.error("A parsing error has occurred while reading XML blast file");
-			throw new ParseException(ex.getMessage(),0);
+			throw new ParseException(ex.getMessage(), 0);
 		} catch (ParserConfigurationException ex) {
 			logger.error("Internal XML parser non properly configured");
-			throw new ParseException(ex.getMessage(),0);
+			throw new ParseException(ex.getMessage(), 0);
 		}
 		logger.info("Read finished");
 	}
 
 	@Override
 	public List<Result> createObjects(double maxEScore) throws IOException, ParseException {
-		if (targetFile == null) throw new IllegalStateException("File to be parsed not specified.");
+		if (targetFile == null) {
+			throw new IllegalStateException("File to be parsed not specified.");
+		}
 
 		// getAbsolutePath throws SecurityException
 		readFile(targetFile.getAbsolutePath());
@@ -96,83 +100,105 @@ public class BlastXMLParser implements ResultFactory {
 
 		try {
 			// select top level elements
-			String program = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(),"BlastOutput_program").getTextContent();
-			String version = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(),"BlastOutput_version").getTextContent();
-			String reference = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(),"BlastOutput_reference").getTextContent();
-			String dbFile = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(),"BlastOutput_db").getTextContent();
+			String program = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(), "BlastOutput_program")
+					.getTextContent();
+			String version = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(), "BlastOutput_version")
+					.getTextContent();
+			String reference = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(), "BlastOutput_reference")
+					.getTextContent();
+			String dbFile = XMLHelper.selectSingleElement(blastDoc.getDocumentElement(), "BlastOutput_db")
+					.getTextContent();
 
-			logger.info("Query for hits in "+ targetFile);
-			ArrayList<Element> IterationsList = XMLHelper.selectElements(blastDoc.getDocumentElement(), "BlastOutput_iterations/Iteration[Iteration_hits]");
+			logger.info("Query for hits in " + targetFile);
+			ArrayList<Element> IterationsList = XMLHelper.selectElements(blastDoc.getDocumentElement(),
+					"BlastOutput_iterations/Iteration[Iteration_hits]");
 			logger.info(IterationsList.size() + " results");
 
-			resultsCollection = new ArrayList<Result>();
+			resultsCollection = new ArrayList<>();
 			for (Element element : IterationsList) {
 				BlastResultBuilder resultBuilder = new BlastResultBuilder();
 				// will add BlastOutput* key sections in the result object
-				resultBuilder
-					.setProgram(program)
-					.setVersion(version)
-					.setReference(reference)
-					.setDbFile(dbFile);
+				resultBuilder.setProgram(program).setVersion(version).setReference(reference).setDbFile(dbFile);
 
 				// Iteration* section keys:
 				resultBuilder
-					.setIterationNumber(new Integer(XMLHelper.selectSingleElement(element,"Iteration_iter-num").getTextContent()))
-					.setQueryID(XMLHelper.selectSingleElement(element,"Iteration_query-ID").getTextContent())
-					.setQueryDef(XMLHelper.selectSingleElement(element, "Iteration_query-def").getTextContent())
-					.setQueryLength(new Integer(XMLHelper.selectSingleElement(element,"Iteration_query-len").getTextContent()));
+						.setIterationNumber(Integer
+								.valueOf(XMLHelper.selectSingleElement(element, "Iteration_iter-num").getTextContent()))
+						.setQueryID(XMLHelper.selectSingleElement(element, "Iteration_query-ID").getTextContent())
+						.setQueryDef(XMLHelper.selectSingleElement(element, "Iteration_query-def").getTextContent())
+						.setQueryLength(Integer.valueOf(
+								XMLHelper.selectSingleElement(element, "Iteration_query-len").getTextContent()));
 
-				if (queryReferences != null) resultBuilder.setQuerySequence(queryReferencesMap.get(
-						XMLHelper.selectSingleElement(element,"Iteration_query-ID").getTextContent()
-				));
-
-
+				if (queryReferences != null) {
+					resultBuilder.setQuerySequence(queryReferencesMap
+							.get(XMLHelper.selectSingleElement(element, "Iteration_query-ID").getTextContent()));
+				}
 
 				Element iterationHitsElement = XMLHelper.selectSingleElement(element, "Iteration_hits");
 				ArrayList<Element> hitList = XMLHelper.selectElements(iterationHitsElement, "Hit");
 
-				hitsCollection = new ArrayList<Hit>();
+				hitsCollection = new ArrayList<>();
 				for (Element hitElement : hitList) {
 					BlastHitBuilder blastHitBuilder = new BlastHitBuilder();
 					blastHitBuilder
-						.setHitNum(new Integer(XMLHelper.selectSingleElement(hitElement, "Hit_num").getTextContent()))
-						.setHitId(XMLHelper.selectSingleElement(hitElement, "Hit_id").getTextContent())
-						.setHitDef(XMLHelper.selectSingleElement(hitElement, "Hit_def").getTextContent())
-						.setHitAccession(XMLHelper.selectSingleElement(hitElement, "Hit_accession").getTextContent())
-						.setHitLen(new Integer(XMLHelper.selectSingleElement(hitElement, "Hit_len").getTextContent()));
+							.setHitNum(Integer
+									.valueOf(XMLHelper.selectSingleElement(hitElement, "Hit_num").getTextContent()))
+							.setHitId(XMLHelper.selectSingleElement(hitElement, "Hit_id").getTextContent())
+							.setHitDef(XMLHelper.selectSingleElement(hitElement, "Hit_def").getTextContent())
+							.setHitAccession(
+									XMLHelper.selectSingleElement(hitElement, "Hit_accession").getTextContent())
+							.setHitLen(Integer
+									.valueOf(XMLHelper.selectSingleElement(hitElement, "Hit_len").getTextContent()));
 
-					if (databaseReferences != null) blastHitBuilder.setHitSequence(databaseReferencesMap.get(
-						XMLHelper.selectSingleElement(hitElement, "Hit_id").getTextContent()
-					));
+					if (databaseReferences != null) {
+						blastHitBuilder.setHitSequence(databaseReferencesMap
+								.get(XMLHelper.selectSingleElement(hitElement, "Hit_id").getTextContent()));
+					}
 
 					Element hithspsElement = XMLHelper.selectSingleElement(hitElement, "Hit_hsps");
 					ArrayList<Element> hspList = XMLHelper.selectElements(hithspsElement, "Hsp");
 
-					hspsCollection = new ArrayList<Hsp>();
+					hspsCollection = new ArrayList<>();
 					for (Element hspElement : hspList) {
-						Double evalue = new Double(XMLHelper.selectSingleElement(hspElement, "Hsp_evalue").getTextContent());
+						Double evalue = Double
+								.valueOf(XMLHelper.selectSingleElement(hspElement, "Hsp_evalue").getTextContent());
 
-						// add the new hsp only if it pass the specified threshold. It can save lot of memory and some parsing time
+						// add the new hsp only if it pass the specified threshold. It can save lot of
+						// memory and some parsing time
 						if (evalue <= maxEScore) {
 							BlastHspBuilder blastHspBuilder = new BlastHspBuilder();
 							blastHspBuilder
-								.setHspNum(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_num").getTextContent()))
-								.setHspBitScore(new Double(XMLHelper.selectSingleElement(hspElement, "Hsp_bit-score").getTextContent()))
-								.setHspScore(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_score").getTextContent()))
-								.setHspEvalue(evalue)
-								.setHspQueryFrom(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_query-from").getTextContent()))
-								.setHspQueryTo(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_query-to").getTextContent()))
-								.setHspHitFrom(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_hit-from").getTextContent()))
-								.setHspHitTo(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_hit-to").getTextContent()))
-								.setHspQueryFrame(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_query-frame").getTextContent()))
-								.setHspHitFrame(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_hit-frame").getTextContent()))
-								.setHspIdentity(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_identity").getTextContent()))
-								.setHspPositive(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_positive").getTextContent()))
-								.setHspGaps(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_gaps").getTextContent()))
-								.setHspAlignLen(new Integer(XMLHelper.selectSingleElement(hspElement, "Hsp_align-len").getTextContent()))
-								.setHspQseq(XMLHelper.selectSingleElement(hspElement, "Hsp_qseq").getTextContent())
-								.setHspHseq(XMLHelper.selectSingleElement(hspElement, "Hsp_hseq").getTextContent())
-								.setHspIdentityString(XMLHelper.selectSingleElement(hspElement, "Hsp_midline").getTextContent());
+									.setHspNum(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_num").getTextContent()))
+									.setHspBitScore(Double.valueOf(XMLHelper
+											.selectSingleElement(hspElement, "Hsp_bit-score").getTextContent()))
+									.setHspScore(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_score").getTextContent()))
+									.setHspEvalue(evalue)
+									.setHspQueryFrom(Integer.valueOf(XMLHelper
+											.selectSingleElement(hspElement, "Hsp_query-from").getTextContent()))
+									.setHspQueryTo(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_query-to").getTextContent()))
+									.setHspHitFrom(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_hit-from").getTextContent()))
+									.setHspHitTo(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_hit-to").getTextContent()))
+									.setHspQueryFrame(Integer.valueOf(XMLHelper
+											.selectSingleElement(hspElement, "Hsp_query-frame").getTextContent()))
+									.setHspHitFrame(Integer.valueOf(XMLHelper
+											.selectSingleElement(hspElement, "Hsp_hit-frame").getTextContent()))
+									.setHspIdentity(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_identity").getTextContent()))
+									.setHspPositive(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_positive").getTextContent()))
+									.setHspGaps(Integer.valueOf(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_gaps").getTextContent()))
+									.setHspAlignLen(Integer.valueOf(XMLHelper
+											.selectSingleElement(hspElement, "Hsp_align-len").getTextContent()))
+									.setHspQseq(XMLHelper.selectSingleElement(hspElement, "Hsp_qseq").getTextContent())
+									.setHspHseq(XMLHelper.selectSingleElement(hspElement, "Hsp_hseq").getTextContent())
+									.setHspIdentityString(
+											XMLHelper.selectSingleElement(hspElement, "Hsp_midline").getTextContent());
 
 							hspsCollection.add(blastHspBuilder.createBlastHsp());
 						}
@@ -186,16 +212,16 @@ public class BlastXMLParser implements ResultFactory {
 				resultsCollection.add(resultBuilder.createBlastResult());
 			}
 		} catch (XPathException e) {
-			throw new ParseException(e.getMessage(),0);
+			throw new ParseException(e.getMessage(), 0);
 		}
-		logger.info("Parsing of "+targetFile+" finished.");
+		logger.info(new StringBuilder().append("Parsing of ").append(targetFile).append(" finished.").toString());
 
 		return resultsCollection;
 	}
 
 	@Override
-	public List<String> getFileExtensions(){
-		ArrayList<String> extensions = new ArrayList<String>(1);
+	public List<String> getFileExtensions() {
+		ArrayList<String> extensions = new ArrayList<>(1);
 		extensions.add("blastxml");
 		return extensions;
 	}
@@ -215,20 +241,21 @@ public class BlastXMLParser implements ResultFactory {
 	 */
 	private void mapIds() {
 		if (queryReferences != null) {
-			queryReferencesMap = new HashMap<String,Sequence>(queryReferences.size());
-			for (int counter=0; counter < queryReferences.size() ; counter ++){
-				String id = "Query_"+(counter+1);
+			queryReferencesMap = new HashMap<>(queryReferences.size());
+			for (int counter = 0; counter < queryReferences.size(); counter++) {
+				String id = "Query_" + (counter + 1);
 				queryReferencesMap.put(id, queryReferences.get(counter));
 			}
 		}
 
-		if (databaseReferences != null) {
-			databaseReferencesMap = new HashMap<String,Sequence>(databaseReferences.size());
-			for (int counter=0; counter < databaseReferences.size() ; counter ++){
-				// this is strange: while Query_id are 1 based, Hit (database) id are 0 based
-				String id = "gnl|BL_ORD_ID|"+(counter);
-				databaseReferencesMap.put(id, databaseReferences.get(counter));
-			}
+		if (databaseReferences == null) {
+			return;
+		}
+		databaseReferencesMap = new HashMap<>(databaseReferences.size());
+		for (int counter = 0; counter < databaseReferences.size(); counter++) {
+			// this is strange: while Query_id are 1 based, Hit (database) id are 0 based
+			String id = "gnl|BL_ORD_ID|" + (counter);
+			databaseReferencesMap.put(id, databaseReferences.get(counter));
 		}
 	}
 
@@ -238,16 +265,21 @@ public class BlastXMLParser implements ResultFactory {
 	}
 }
 
-
 class BlastHsp extends org.biojava.nbio.core.search.io.Hsp {
-	public BlastHsp(int hspNum, double hspBitScore, int hspScore, double hspEvalue, int hspQueryFrom, int hspQueryTo, int hspHitFrom, int hspHitTo, int hspQueryFrame, int hspHitFrame, int hspIdentity, int hspPositive, int hspGaps, int hspAlignLen, String hspQseq, String hspHseq, String hspIdentityString, Double percentageIdentity, Integer mismatchCount) {
-		super(hspNum, hspBitScore, hspScore, hspEvalue, hspQueryFrom, hspQueryTo, hspHitFrom, hspHitTo, hspQueryFrame, hspHitFrame, hspIdentity, hspPositive, hspGaps, hspAlignLen, hspQseq, hspHseq, hspIdentityString, percentageIdentity, mismatchCount);
+	public BlastHsp(int hspNum, double hspBitScore, int hspScore, double hspEvalue, int hspQueryFrom, int hspQueryTo,
+			int hspHitFrom, int hspHitTo, int hspQueryFrame, int hspHitFrame, int hspIdentity, int hspPositive,
+			int hspGaps, int hspAlignLen, String hspQseq, String hspHseq, String hspIdentityString,
+			Double percentageIdentity, Integer mismatchCount) {
+		super(hspNum, hspBitScore, hspScore, hspEvalue, hspQueryFrom, hspQueryTo, hspHitFrom, hspHitTo, hspQueryFrame,
+				hspHitFrame, hspIdentity, hspPositive, hspGaps, hspAlignLen, hspQseq, hspHseq, hspIdentityString,
+				percentageIdentity, mismatchCount);
 	}
 
 }
 
 class BlastHit extends org.biojava.nbio.core.search.io.Hit {
-	public BlastHit(int hitNum, String hitId, String hitDef, String hitAccession, int hitLen, List<Hsp> hitHsps, Sequence hitSequence) {
+	public BlastHit(int hitNum, String hitId, String hitDef, String hitAccession, int hitLen, List<Hsp> hitHsps,
+			Sequence hitSequence) {
 		super(hitNum, hitId, hitDef, hitAccession, hitLen, hitHsps, hitSequence);
 	}
 

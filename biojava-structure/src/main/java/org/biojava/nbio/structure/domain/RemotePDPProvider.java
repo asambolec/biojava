@@ -45,45 +45,28 @@ import org.biojava.nbio.structure.scop.server.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/** A class that provided PDP assignments that are loaded from a remote web server
+/**
+ * A class that provided PDP assignments that are loaded from a remote web
+ * server
  *
  * @author Andreas Prlic
  *
  */
-public class RemotePDPProvider extends SerializableCache<String,SortedSet<String>>  implements PDPProvider{
+public class RemotePDPProvider extends SerializableCache<String, SortedSet<String>> implements PDPProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(RemotePDPProvider.class);
 
 	public static final String DEFAULT_SERVER = "http://source.rcsb.org/jfatcatserver/domains/";
 
+	private static String cacheFileName = "remotepdpdomaindefs.ser";
+
 	String server = DEFAULT_SERVER;
 
-	private static String CACHE_FILE_NAME = "remotepdpdomaindefs.ser";
-
-
-	public static void main(String[] args) throws IOException, StructureException{
-		RemotePDPProvider me = new RemotePDPProvider(true);
-
-		//System.out.println(scop.getByCategory(ScopCategory.Superfamily));
-		SortedSet<String> pdpdomains = me.getPDPDomainNamesForPDB("4HHB");
-		System.out.println(pdpdomains);
-
-		AtomCache cache = new AtomCache();
-		Structure s = me.getDomain(pdpdomains.first(), cache);
-		System.out.println(s);
-
-		me.flushCache();
-
-	}
-
-
-	public RemotePDPProvider(){
+	public RemotePDPProvider() {
 		// equivalent to this(false) but without IOException
-		super(CACHE_FILE_NAME);
+		super(cacheFileName);
 		disableCache();
 	}
-
 
 	/**
 	 *
@@ -92,11 +75,11 @@ public class RemotePDPProvider extends SerializableCache<String,SortedSet<String
 	 */
 	public RemotePDPProvider(boolean useCache) throws IOException {
 
-		super(CACHE_FILE_NAME);
+		super(cacheFileName);
 
-		if ( ! useCache) {
+		if (!useCache) {
 			disableCache();
-			//else if ( serializedCache.keySet().size() < 10000){
+			// else if ( serializedCache.keySet().size() < 10000){
 		} else {
 			// make sure we always have the latest assignments...
 			loadRepresentativeDomains();
@@ -104,9 +87,24 @@ public class RemotePDPProvider extends SerializableCache<String,SortedSet<String
 
 	}
 
+	public static void main(String[] args) throws IOException, StructureException {
+		RemotePDPProvider me = new RemotePDPProvider(true);
 
+		// System.out.println(scop.getByCategory(ScopCategory.Superfamily));
+		SortedSet<String> pdpdomains = me.getPDPDomainNamesForPDB("4HHB");
+		logger.info(String.valueOf(pdpdomains));
 
-	/** get the ranges of representative domains from the centralized server
+		AtomCache cache = new AtomCache();
+		Structure s = me.getDomain(pdpdomains.first(), cache);
+		logger.info(String.valueOf(s));
+
+		me.flushCache();
+
+	}
+
+	/**
+	 * get the ranges of representative domains from the centralized server
+	 * 
 	 * @throws IOException if the server cannot be reached
 	 */
 	private void loadRepresentativeDomains() throws IOException {
@@ -114,34 +112,33 @@ public class RemotePDPProvider extends SerializableCache<String,SortedSet<String
 		AssignmentXMLSerializer results = null;
 		try {
 			URL u = new URL(server + "getRepresentativePDPDomains");
-			logger.info("Fetching {}",u);
+			logger.info("Fetching {}", u);
 			InputStream response = URLConnectionTools.getInputStream(u);
 			String xml = JFatCatClient.convertStreamToString(response);
-			results  = AssignmentXMLSerializer.fromXML(xml);
+			results = AssignmentXMLSerializer.fromXML(xml);
 
-			Map<String,String> data = results.getAssignments();
-			logger.info("got {} domain ranges for PDP domains from server.",data.size());
-			for (String key: data.keySet()){
+			Map<String, String> data = results.getAssignments();
+			logger.info("got {} domain ranges for PDP domains from server.", data.size());
+			data.keySet().forEach(key -> {
 				String range = data.get(key);
 
 				// work around list in results;
 
 				String[] spl = range.split(",");
-				SortedSet<String> value = new TreeSet<String>();
+				SortedSet<String> value = new TreeSet<>();
 
-				for (String s : spl){
+				for (String s : spl) {
 					value.add(s);
 
 				}
 				serializedCache.put(key, value);
-			}
+			});
 
-		} catch (MalformedURLException e){
-			logger.error("Malformed PDP server: "+server,e);
-			throw new IllegalArgumentException("Invalid Server: "+server, e);
+		} catch (MalformedURLException e) {
+			logger.error("Malformed PDP server: " + server, e);
+			throw new IllegalArgumentException("Invalid Server: " + server, e);
 		}
 	}
-
 
 	public String getServer() {
 		return server;
@@ -153,10 +150,12 @@ public class RemotePDPProvider extends SerializableCache<String,SortedSet<String
 
 	/**
 	 * Get the structure for a particular PDP domain
+	 * 
 	 * @param pdpDomainName PDP identifier, e.g. "PDP:4HHBAa"
-	 * @param cache AtomCache, responsible for fetching and storing the coordinates
+	 * @param cache         AtomCache, responsible for fetching and storing the
+	 *                      coordinates
 	 * @return Structure representing the PDP domain
-	 * @throws IOException if the server cannot be reached
+	 * @throws IOException        if the server cannot be reached
 	 * @throws StructureException For errors parsing the structure
 	 */
 	@Override
@@ -172,89 +171,88 @@ public class RemotePDPProvider extends SerializableCache<String,SortedSet<String
 	 * @throws IOException if the server cannot be reached
 	 */
 	@Override
-	public PDPDomain getPDPDomain(String pdpDomainName) throws IOException{
+	public PDPDomain getPDPDomain(String pdpDomainName) throws IOException {
 		SortedSet<String> domainRanges = null;
-		if ( serializedCache != null){
-			if ( serializedCache.containsKey(pdpDomainName)){
-				domainRanges= serializedCache.get(pdpDomainName);
+		if (serializedCache != null) {
+			if (serializedCache.containsKey(pdpDomainName)) {
+				domainRanges = serializedCache.get(pdpDomainName);
 
 			}
 		}
-
 
 		boolean shouldRequestDomainRanges = checkDomainRanges(domainRanges);
 
 		try {
-			if (shouldRequestDomainRanges){
-				URL u = new URL(server + "getPDPDomain?pdpId="+pdpDomainName);
-				logger.info("Fetching {}",u);
+			if (shouldRequestDomainRanges) {
+				URL u = new URL(new StringBuilder().append(server).append("getPDPDomain?pdpId=").append(pdpDomainName)
+						.toString());
+				logger.info("Fetching {}", u);
 				InputStream response = URLConnectionTools.getInputStream(u);
 				String xml = JFatCatClient.convertStreamToString(response);
 				domainRanges = XMLUtil.getDomainRangesFromXML(xml);
-				if ( domainRanges != null)
-					cache(pdpDomainName,domainRanges);
+				if (domainRanges != null) {
+					cache(pdpDomainName, domainRanges);
+				}
 			}
-		} catch (MalformedURLException e){
-			logger.error("Problem generating PDP request URL for "+pdpDomainName,e);
-			throw new IllegalArgumentException("Invalid PDP name: "+pdpDomainName, e);
+		} catch (MalformedURLException e) {
+			logger.error("Problem generating PDP request URL for " + pdpDomainName, e);
+			throw new IllegalArgumentException("Invalid PDP name: " + pdpDomainName, e);
 		}
 
 		String pdbId = null;
-		List<ResidueRange> ranges = new ArrayList<ResidueRange>();
-		for(String domainRange : domainRanges) {
+		List<ResidueRange> ranges = new ArrayList<>();
+		for (String domainRange : domainRanges) {
 			SubstructureIdentifier strucId = new SubstructureIdentifier(domainRange);
-			if(pdbId == null) {
+			if (pdbId == null) {
 				pdbId = strucId.getPdbId();
-			} else if(!pdbId.equals(strucId.getPdbId())) {
+			} else if (!pdbId.equals(strucId.getPdbId())) {
 				// should never happen with correct server implementation
 				throw new RuntimeException("Don't know how to take the union of domains from multiple PDB IDs.");
 			}
 
 			ranges.addAll(strucId.getResidueRanges());
 		}
-		return new PDPDomain(pdpDomainName,ranges);
+		return new PDPDomain(pdpDomainName, ranges);
 	}
 
-	/** returns true if client should fetch domain definitions from server
+	/**
+	 * returns true if client should fetch domain definitions from server
 	 *
 	 * @param domainRanges
 	 * @return
 	 */
 	private boolean checkDomainRanges(SortedSet<String> domainRanges) {
 
-		if ( (domainRanges == null) || (domainRanges.size() == 0)){
+		if ((domainRanges == null) || (domainRanges.size() == 0)) {
 			return true;
 		}
 
-		for ( String d : domainRanges){
-			//System.out.println("domainRange: >" + d +"< " + d.length());
-			if ( (d != null) && (d.length() >0)){
-				return false;
-			}
-		}
-
-		return true;
+		// System.out.println("domainRange: >" + d +"< " + d.length());
+		return domainRanges.stream().filter(d -> (d != null) && (d.length() > 0)).findFirst().map(d -> false)
+				.orElse(true);
 	}
 
 	/**
 	 * Get a list of all PDP domains for a given PDB entry
+	 * 
 	 * @param pdbId PDB ID
 	 * @return Set of domain names, e.g. "PDP:4HHBAa"
 	 * @throws IOException if the server cannot be reached
 	 */
 	@Override
-	public SortedSet<String> getPDPDomainNamesForPDB(String pdbId) throws IOException{
+	public SortedSet<String> getPDPDomainNamesForPDB(String pdbId) throws IOException {
 		SortedSet<String> results = null;
 		try {
-			URL u = new URL(server + "getPDPDomainNamesForPDB?pdbId="+pdbId);
-			logger.info("Fetching {}",u);
+			URL u = new URL(new StringBuilder().append(server).append("getPDPDomainNamesForPDB?pdbId=").append(pdbId)
+					.toString());
+			logger.info("Fetching {}", u);
 			InputStream response = URLConnectionTools.getInputStream(u);
 			String xml = JFatCatClient.convertStreamToString(response);
-			results  = XMLUtil.getDomainRangesFromXML(xml);
+			results = XMLUtil.getDomainRangesFromXML(xml);
 
-		} catch (MalformedURLException e){
-			logger.error("Problem generating PDP request URL for "+pdbId,e);
-			throw new IllegalArgumentException("Invalid PDB name: "+pdbId, e);
+		} catch (MalformedURLException e) {
+			logger.error("Problem generating PDP request URL for " + pdbId, e);
+			throw new IllegalArgumentException("Invalid PDB name: " + pdbId, e);
 		}
 		return results;
 	}

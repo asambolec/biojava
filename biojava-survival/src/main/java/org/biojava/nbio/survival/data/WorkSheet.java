@@ -22,6 +22,8 @@ package org.biojava.nbio.survival.data;
 
 import java.io.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Need to handle very large spreadsheets of expression data so keep memory
@@ -31,11 +33,19 @@ import java.util.*;
  */
 public class WorkSheet {
 
-	private LinkedHashMap<String, HeaderInfo> columnLookup = new LinkedHashMap<String, HeaderInfo>();
-	private LinkedHashMap<String, HeaderInfo> rowLookup = new LinkedHashMap<String, HeaderInfo>();
+	private static final Logger logger = LoggerFactory.getLogger(WorkSheet.class);
+	private LinkedHashMap<String, HeaderInfo> columnLookup = new LinkedHashMap<>();
+	private LinkedHashMap<String, HeaderInfo> rowLookup = new LinkedHashMap<>();
 	private CompactCharSequence[][] data = new CompactCharSequence[1][1];
-	HashMap<String, String> dataGrid = new HashMap<String, String>();
+	HashMap<String, String> dataGrid = new HashMap<>();
 	private String indexColumnName = "";
+	private LinkedHashMap<String, String> metaDataColumnsHashMap = new LinkedHashMap<>();
+	private LinkedHashMap<String, String> metaDataRowsHashMap = new LinkedHashMap<>();
+	// When we do gene signatures we ask for the same data value often. This method
+	// took up 50% of the time.
+	HashMap<String, Double> doubleValues = new HashMap<>();
+	boolean cacheDoubleValues = false;
+	private String rowHeader = "REF";
 
 	/**
 	 *
@@ -50,7 +60,7 @@ public class WorkSheet {
 	 * @throws Exception
 	 */
 	public WorkSheet(Collection<String> rows, Collection<String> columns) throws Exception {
-		//    rowsList = new ArrayList<String>(rows);
+		// rowsList = new ArrayList<String>(rows);
 		int i = 1;
 		for (String row : rows) {
 			if (rowLookup.containsKey(row)) {
@@ -68,10 +78,8 @@ public class WorkSheet {
 			i++;
 		}
 
-
-
-		//  columnsList.trimToSize();
-		//  rowsList.trimToSize();
+		// columnsList.trimToSize();
+		// rowsList.trimToSize();
 		data = new CompactCharSequence[rowLookup.size() + 1][columnLookup.size() + 1];
 	}
 
@@ -80,7 +88,8 @@ public class WorkSheet {
 	 * @param values
 	 */
 	public WorkSheet(String[][] values) {
-		//    System.out.println("In worksheet init " + Runtime.getRuntime().totalMemory());
+		// System.out.println("In worksheet init " +
+		// Runtime.getRuntime().totalMemory());
 		String[] columns = new String[values[0].length];
 		for (int i = 0; i < columns.length; i++) {
 			columns[i] = new String(values[0][i].getBytes());
@@ -88,7 +97,6 @@ public class WorkSheet {
 		for (int i = 1; i < columns.length; i++) {
 			columnLookup.put(columns[i], new HeaderInfo(i));
 		}
-
 
 		for (int i = 1; i < values.length; i++) {
 			String row = new String(values[i][0].getBytes());
@@ -102,13 +110,38 @@ public class WorkSheet {
 				data[row][col] = new CompactCharSequence(value);
 				values[row][col] = null;
 			}
-			System.out.println("Row " + row + " " + Runtime.getRuntime().totalMemory());
+			logger.info(new StringBuilder().append("Row ").append(row).append(" ")
+					.append(Runtime.getRuntime().totalMemory()).toString());
 
 		}
 		values = null;
 		System.gc();
-		//data = values;
+		// data = values;
 
+	}
+
+	/**
+	 *
+	 * @param values
+	 */
+	public WorkSheet(CompactCharSequence[][] values) {
+		// System.out.println("In worksheet init " +
+		// Runtime.getRuntime().totalMemory());
+		String[] columns = new String[values[0].length];
+		for (int i = 0; i < columns.length; i++) {
+			columns[i] = values[0][i].toString();
+		}
+		this.setIndexColumnName(columns[0]);
+		for (int i = 1; i < columns.length; i++) {
+			columnLookup.put(columns[i], new HeaderInfo(i));
+		}
+
+		for (int i = 1; i < values.length; i++) {
+			String row = values[i][0].toString();
+			rowLookup.put(row, new HeaderInfo(i));
+		}
+
+		data = values;
 	}
 
 	/**
@@ -125,13 +158,13 @@ public class WorkSheet {
 
 	@Override
 	public String toString() {
-		return super.toString(); //To change body of generated methods, choose Tools | Templates.
+		return super.toString(); // To change body of generated methods, choose Tools | Templates.
 	}
 
 	/**
-	 * Split a worksheet randomly. Used for creating a discovery/validation data
-	 * set The first file name will matched the percentage and the second file
-	 * the remainder
+	 * Split a worksheet randomly. Used for creating a discovery/validation data set
+	 * The first file name will matched the percentage and the second file the
+	 * remainder
 	 *
 	 * @param percentage
 	 * @param fileName1
@@ -160,18 +193,18 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Create a copy of a worksheet. If shuffling of columns or row for testing
-	 * a way to duplicate original worksheet
+	 * Create a copy of a worksheet. If shuffling of columns or row for testing a
+	 * way to duplicate original worksheet
 	 *
 	 * @param copyWorkSheet
 	 * @param rows
 	 * @return
 	 * @throws Exception
 	 */
-	static public WorkSheet getCopyWorkSheetSelectedRows(WorkSheet copyWorkSheet, ArrayList<String> rows) throws Exception {
+	static public WorkSheet getCopyWorkSheetSelectedRows(WorkSheet copyWorkSheet, ArrayList<String> rows)
+			throws Exception {
 
 		ArrayList<String> columns = copyWorkSheet.getColumns();
-
 
 		WorkSheet workSheet = new WorkSheet(rows, columns);
 		for (String row : rows) {
@@ -186,8 +219,8 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Create a copy of a worksheet. If shuffling of columns or row for testing
-	 * a way to duplicate original worksheet
+	 * Create a copy of a worksheet. If shuffling of columns or row for testing a
+	 * way to duplicate original worksheet
 	 *
 	 * @param copyWorkSheet
 	 * @return
@@ -197,7 +230,6 @@ public class WorkSheet {
 		ArrayList<String> rows = copyWorkSheet.getRows();
 		ArrayList<String> columns = copyWorkSheet.getColumns();
 
-
 		WorkSheet workSheet = new WorkSheet(rows, columns);
 		for (String row : rows) {
 			for (String col : columns) {
@@ -212,41 +244,16 @@ public class WorkSheet {
 
 	/**
 	 *
-	 * @param values
-	 */
-	public WorkSheet(CompactCharSequence[][] values) {
-		//     System.out.println("In worksheet init " + Runtime.getRuntime().totalMemory());
-		String[] columns = new String[values[0].length];
-		for (int i = 0; i < columns.length; i++) {
-			columns[i] = values[0][i].toString();
-		}
-		this.setIndexColumnName(columns[0]);
-		for (int i = 1; i < columns.length; i++) {
-			columnLookup.put(columns[i], new HeaderInfo(i));
-		}
-
-
-		for (int i = 1; i < values.length; i++) {
-			String row = values[i][0].toString();
-			rowLookup.put(row, new HeaderInfo(i));
-		}
-
-		data = values;
-	}
-	private LinkedHashMap<String, String> metaDataColumnsHashMap = new LinkedHashMap<String, String>();
-
-	/**
-	 *
 	 * @return
 	 */
 	public ArrayList<String> getMetaDataColumns() {
-		ArrayList<String> metaColumns = new ArrayList<String>();
-		for (String key : metaDataColumnsHashMap.keySet()) {
+		ArrayList<String> metaColumns = new ArrayList<>();
+		metaDataColumnsHashMap.keySet().forEach(key -> {
 			HeaderInfo hi = columnLookup.get(key);
 			if (!hi.isHide()) {
 				metaColumns.add(key);
 			}
-		}
+		});
 		return metaColumns;
 	}
 
@@ -255,13 +262,13 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getMetaDataRows() {
-		ArrayList<String> metaRows = new ArrayList<String>();
-		for (String key : metaDataRowsHashMap.keySet()) {
+		ArrayList<String> metaRows = new ArrayList<>();
+		metaDataRowsHashMap.keySet().forEach(key -> {
 			HeaderInfo hi = rowLookup.get(key);
 			if (!hi.isHide()) {
 				metaRows.add(key);
 			}
-		}
+		});
 		return metaRows;
 	}
 
@@ -270,19 +277,15 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getDataColumns() {
-		ArrayList<String> dataColumns = new ArrayList<String>();
+		ArrayList<String> dataColumns = new ArrayList<>();
 		ArrayList<String> columns = this.getColumns();
-		for (String column : columns) {
-			if (!metaDataColumnsHashMap.containsKey(column)) {
-				dataColumns.add(column);
-			}
-		}
+		columns.stream().filter(column -> !metaDataColumnsHashMap.containsKey(column)).forEach(dataColumns::add);
 		return dataColumns;
 	}
 
 	/**
-	 * Randomly shuffle the columns and rows. Should be constrained to the same
-	 * data type if not probably doesn't make any sense.
+	 * Randomly shuffle the columns and rows. Should be constrained to the same data
+	 * type if not probably doesn't make any sense.
 	 *
 	 * @param columns
 	 * @param rows
@@ -291,8 +294,8 @@ public class WorkSheet {
 	public void shuffleColumnsAndThenRows(ArrayList<String> columns, ArrayList<String> rows) throws Exception {
 		doubleValues.clear();
 
-		for (String column : columns) { //shuffle all values in the column
-			ArrayList<Integer> rowIndex = new ArrayList<Integer>();
+		for (String column : columns) { // shuffle all values in the column
+			ArrayList<Integer> rowIndex = new ArrayList<>();
 			for (int i = 0; i < rows.size(); i++) {
 				rowIndex.add(i);
 			}
@@ -302,7 +305,6 @@ public class WorkSheet {
 				int randomIndex = rowIndex.get(i);
 				String destinationRow = rows.get(randomIndex);
 
-
 				String temp = this.getCell(destinationRow, column);
 				String value = this.getCell(row, column);
 				this.addCell(destinationRow, column, value);
@@ -311,7 +313,7 @@ public class WorkSheet {
 		}
 
 		for (String row : rows) {
-			ArrayList<Integer> columnIndex = new ArrayList<Integer>();
+			ArrayList<Integer> columnIndex = new ArrayList<>();
 			for (int i = 0; i < columns.size(); i++) {
 				columnIndex.add(i);
 			}
@@ -322,7 +324,6 @@ public class WorkSheet {
 				int randomIndex = columnIndex.get(i);
 				String destinationCol = columns.get(randomIndex);
 
-
 				String temp = this.getCell(row, destinationCol);
 				String value = this.getCell(row, column);
 				this.addCell(row, destinationCol, value);
@@ -330,12 +331,11 @@ public class WorkSheet {
 			}
 		}
 
-
 	}
 
 	/**
-	 * Need to shuffle column values to allow for randomized testing. The
-	 * columns in the list will be shuffled together
+	 * Need to shuffle column values to allow for randomized testing. The columns in
+	 * the list will be shuffled together
 	 *
 	 * @param columns
 	 * @throws Exception
@@ -343,8 +343,8 @@ public class WorkSheet {
 	public void shuffleColumnValues(ArrayList<String> columns) throws Exception {
 		doubleValues.clear();
 		ArrayList<String> rows = this.getDataRows();
-		for (String column : columns) { //shuffle all values in the column
-			ArrayList<Integer> rowIndex = new ArrayList<Integer>();
+		for (String column : columns) { // shuffle all values in the column
+			ArrayList<Integer> rowIndex = new ArrayList<>();
 			for (int i = 0; i < rows.size(); i++) {
 				rowIndex.add(i);
 			}
@@ -353,7 +353,6 @@ public class WorkSheet {
 				String row = rows.get(i);
 				int randomIndex = rowIndex.get(i);
 				String destinationRow = rows.get(randomIndex);
-
 
 				String temp = this.getCell(destinationRow, column);
 				String value = this.getCell(row, column);
@@ -365,8 +364,8 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Need to shuffle rows values to allow for randomized testing. The rows in
-	 * the list will be shuffled together
+	 * Need to shuffle rows values to allow for randomized testing. The rows in the
+	 * list will be shuffled together
 	 *
 	 * @param rows
 	 * @throws Exception
@@ -375,7 +374,7 @@ public class WorkSheet {
 		doubleValues.clear();
 		ArrayList<String> columns = this.getColumns();
 		for (String row : rows) {
-			ArrayList<Integer> columnIndex = new ArrayList<Integer>();
+			ArrayList<Integer> columnIndex = new ArrayList<>();
 			for (int i = 0; i < columns.size(); i++) {
 				columnIndex.add(i);
 			}
@@ -401,9 +400,7 @@ public class WorkSheet {
 	 */
 	public void hideMetaDataColumns(boolean value) {
 		ArrayList<String> metadataColumns = this.getMetaDataColumns();
-		for (String column : metadataColumns) {
-			this.hideColumn(column, value);
-		}
+		metadataColumns.forEach(column -> this.hideColumn(column, value));
 	}
 
 	/**
@@ -412,9 +409,7 @@ public class WorkSheet {
 	 */
 	public void hideMetaDataRows(boolean value) {
 		ArrayList<String> metadataRows = this.getMetaDataRows();
-		for (String row : metadataRows) {
-			this.hideRow(row, value);
-		}
+		metadataRows.forEach(row -> this.hideRow(row, value));
 	}
 
 	/**
@@ -464,7 +459,6 @@ public class WorkSheet {
 			}
 		}
 
-
 	}
 
 	/**
@@ -483,9 +477,7 @@ public class WorkSheet {
 	 * @param metaDataColumns
 	 */
 	public void markMetaDataColumns(ArrayList<String> metaDataColumns) {
-		for (String column : metaDataColumns) {
-			metaDataColumnsHashMap.put(column, column);
-		}
+		metaDataColumns.forEach(column -> metaDataColumnsHashMap.put(column, column));
 	}
 
 	/**
@@ -521,7 +513,6 @@ public class WorkSheet {
 			return true;
 		}
 	}
-	private LinkedHashMap<String, String> metaDataRowsHashMap = new LinkedHashMap<String, String>();
 
 	/**
 	 *
@@ -537,9 +528,7 @@ public class WorkSheet {
 	 */
 	public void setMetaDataRows(ArrayList<String> metaDataRows) {
 		metaDataRowsHashMap.clear();
-		for (String row : metaDataRows) {
-			metaDataRowsHashMap.put(row, row);
-		}
+		metaDataRows.forEach(row -> metaDataRowsHashMap.put(row, row));
 	}
 
 	/**
@@ -625,8 +614,8 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Apply filter to a column to change values from say numberic to nominal
-	 * based on some range
+	 * Apply filter to a column to change values from say numberic to nominal based
+	 * on some range
 	 *
 	 * @param column
 	 * @param changeValue
@@ -646,7 +635,7 @@ public class WorkSheet {
 	 * @param defaultValue
 	 */
 	public void addColumn(String column, String defaultValue) {
-		ArrayList<String> columns = new ArrayList<String>();
+		ArrayList<String> columns = new ArrayList<>();
 		columns.add(column);
 		addColumns(columns, defaultValue);
 	}
@@ -674,17 +663,16 @@ public class WorkSheet {
 				}
 			}
 		}
-		//   columnLookup.get("ZNF30");
+		// columnLookup.get("ZNF30");
 
-		//     int startIndex = columnLookup.size() + 1;
-		//     for (String column : columns) {
-		//        if(column.equals("ttr")){
-		//            int dummy = 1;
-		//        }
-		//        columnLookup.put(column, new HeaderInfo(startIndex));
-		//        startIndex++;
-		//    }
-
+		// int startIndex = columnLookup.size() + 1;
+		// for (String column : columns) {
+		// if(column.equals("ttr")){
+		// int dummy = 1;
+		// }
+		// columnLookup.put(column, new HeaderInfo(startIndex));
+		// startIndex++;
+		// }
 
 	}
 
@@ -694,7 +682,7 @@ public class WorkSheet {
 	 * @param defaultValue
 	 */
 	public void addRow(String row, String defaultValue) {
-		ArrayList<String> rows = new ArrayList<String>();
+		ArrayList<String> rows = new ArrayList<>();
 		rows.add(row);
 		addRows(rows, defaultValue);
 	}
@@ -728,14 +716,13 @@ public class WorkSheet {
 	 * array to the new array.
 	 *
 	 * @param oldArray the old array, to be reallocated.
-	 * @param newSize the new array size.
+	 * @param newSize  the new array size.
 	 * @return A new array with the same contents.
 	 */
 	private static Object resizeArray(Object oldArray, int newSize) {
 		int oldSize = java.lang.reflect.Array.getLength(oldArray);
 		Class<?> elementType = oldArray.getClass().getComponentType();
-		Object newArray = java.lang.reflect.Array.newInstance(
-				elementType, newSize);
+		Object newArray = java.lang.reflect.Array.newInstance(elementType, newSize);
 		int preserveLength = Math.min(oldSize, newSize);
 		if (preserveLength > 0) {
 			System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
@@ -755,12 +742,13 @@ public class WorkSheet {
 		HeaderInfo rowIndex = rowLookup.get(row);
 		HeaderInfo colIndex = columnLookup.get(col);
 		if (rowIndex == null) {
-			throw new Exception("Row " + row + " not found in worksheet");
+			throw new Exception(
+					new StringBuilder().append("Row ").append(row).append(" not found in worksheet").toString());
 		}
 		if (colIndex == null) {
-			throw new Exception("Column " + col + " not found in worksheet");
+			throw new Exception(
+					new StringBuilder().append("Column ").append(col).append(" not found in worksheet").toString());
 		}
-
 
 		data[rowIndex.getIndex()][colIndex.getIndex()] = new CompactCharSequence(value);
 	}
@@ -773,13 +761,7 @@ public class WorkSheet {
 	public boolean isValidRow(String row) {
 		HeaderInfo rowIndex = rowLookup.get(row);
 		if (rowIndex == null) {
-			for (String rowtable : rowLookup.keySet()) {
-				if (row.equalsIgnoreCase(rowtable)) {
-
-					return true;
-				}
-			}
-			return false;
+			return rowLookup.keySet().stream().anyMatch(row::equalsIgnoreCase);
 		} else {
 			return true;
 		}
@@ -793,23 +775,12 @@ public class WorkSheet {
 	public boolean isValidColumn(String col) {
 		HeaderInfo colIndex = columnLookup.get(col);
 		if (colIndex == null) {
-			for (String coltable : columnLookup.keySet()) {
-				if (col.equalsIgnoreCase(coltable)) {
-
-					return true;
-				}
-			}
-
-			return false;
-
+			return columnLookup.keySet().stream().anyMatch(col::equalsIgnoreCase);
 
 		} else {
 			return true;
 		}
 	}
-	//When we do gene signatures we ask for the same data value often. This method took up 50% of the time.
-	HashMap<String, Double> doubleValues = new HashMap<String, Double>();
-	boolean cacheDoubleValues = false;
 
 	/**
 	 *
@@ -828,7 +799,7 @@ public class WorkSheet {
 	 */
 	public Double getCellDouble(String row, String col) throws Exception {
 		if (cacheDoubleValues) {
-			String key = row + ":" + col;
+			String key = new StringBuilder().append(row).append(":").append(col).toString();
 
 			Double v = doubleValues.get(key);
 			if (v != null) {
@@ -839,6 +810,7 @@ public class WorkSheet {
 			try {
 				v = Double.parseDouble(value);
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 			doubleValues.put(key, v);
 			return v;
@@ -848,6 +820,7 @@ public class WorkSheet {
 			try {
 				v = Double.parseDouble(value);
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 			return v;
 		}
@@ -870,7 +843,7 @@ public class WorkSheet {
 		HeaderInfo colIndex = columnLookup.get(col);
 
 		if (rowIndex == null) {
-			//allow for case insentive search
+			// allow for case insentive search
 			for (String rowtable : rowLookup.keySet()) {
 				if (row.equalsIgnoreCase(rowtable)) {
 					rowIndex = rowLookup.get(rowtable);
@@ -878,11 +851,12 @@ public class WorkSheet {
 				}
 			}
 			if (rowIndex == null) {
-				throw new Exception("Row " + row + " not found in worksheet");
+				throw new Exception(
+						new StringBuilder().append("Row ").append(row).append(" not found in worksheet").toString());
 			}
 		}
 		if (colIndex == null) {
-			//allow for case insentive search
+			// allow for case insentive search
 			for (String coltable : columnLookup.keySet()) {
 				if (col.equalsIgnoreCase(coltable)) {
 					colIndex = columnLookup.get(coltable);
@@ -890,7 +864,8 @@ public class WorkSheet {
 				}
 			}
 			if (colIndex == null) {
-				throw new Exception("Column " + col + " not found in worksheet");
+				throw new Exception(
+						new StringBuilder().append("Column ").append(col).append(" not found in worksheet").toString());
 			}
 		}
 
@@ -909,13 +884,13 @@ public class WorkSheet {
 	 * @param changeValue
 	 */
 	public void changeRowHeader(ChangeValue changeValue) {
-		ArrayList<String> rows = new ArrayList<String>(rowLookup.keySet());
-		for (String row : rows) {
+		ArrayList<String> rows = new ArrayList<>(rowLookup.keySet());
+		rows.forEach(row -> {
 			String newRow = changeValue.change(row);
 			HeaderInfo value = rowLookup.get(row);
 			rowLookup.remove(row);
 			rowLookup.put(newRow, value);
-		}
+		});
 	}
 
 	/**
@@ -923,13 +898,13 @@ public class WorkSheet {
 	 * @param changeValue
 	 */
 	public void changeColumnHeader(ChangeValue changeValue) {
-		ArrayList<String> columns = new ArrayList<String>(columnLookup.keySet());
-		for (String col : columns) {
+		ArrayList<String> columns = new ArrayList<>(columnLookup.keySet());
+		columns.forEach(col -> {
 			String newCol = changeValue.change(col);
 			HeaderInfo value = columnLookup.get(col);
 			columnLookup.remove(col);
 			columnLookup.put(newCol, value);
-		}
+		});
 	}
 
 	/**
@@ -945,10 +920,11 @@ public class WorkSheet {
 		}
 		rowLookup.remove(row);
 		rowLookup.put(newRow, value);
-		if (this.isMetaDataRow(row)) {
-			metaDataRowsHashMap.remove(row);
-			metaDataRowsHashMap.put(newRow, newRow);
+		if (!this.isMetaDataRow(row)) {
+			return;
 		}
+		metaDataRowsHashMap.remove(row);
+		metaDataRowsHashMap.put(newRow, newRow);
 	}
 
 	/**
@@ -978,10 +954,11 @@ public class WorkSheet {
 		}
 		columnLookup.remove(col);
 		columnLookup.put(newCol, value);
-		if (this.isMetaDataColumn(col)) {
-			metaDataColumnsHashMap.remove(col);
-			metaDataColumnsHashMap.put(newCol, newCol);
+		if (!this.isMetaDataColumn(col)) {
+			return;
 		}
+		metaDataColumnsHashMap.remove(col);
+		metaDataColumnsHashMap.put(newCol, newCol);
 
 	}
 
@@ -994,7 +971,7 @@ public class WorkSheet {
 	public Integer getColumnIndex(String column) throws Exception {
 		HeaderInfo headerInfo = columnLookup.get(column);
 		if (headerInfo == null) {
-			throw new Exception("Column " + column + " not found");
+			throw new Exception(new StringBuilder().append("Column ").append(column).append(" not found").toString());
 		}
 		return headerInfo.getIndex();
 	}
@@ -1008,7 +985,7 @@ public class WorkSheet {
 	public Integer getRowIndex(String row) throws Exception {
 		HeaderInfo headerInfo = rowLookup.get(row);
 		if (headerInfo == null) {
-			throw new Exception("Row " + row + " not found");
+			throw new Exception(new StringBuilder().append("Row ").append(row).append(" not found").toString());
 		}
 		return headerInfo.getIndex();
 	}
@@ -1030,8 +1007,8 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getRandomDataColumns(int number, ArrayList<String> columns) {
-		ArrayList<String> randomColumns = new ArrayList<String>();
-		HashMap<String, String> picked = new HashMap<String, String>();
+		ArrayList<String> randomColumns = new ArrayList<>();
+		HashMap<String, String> picked = new HashMap<>();
 		while (picked.size() < number) {
 			double v = Math.random();
 			int index = (int) (v * columns.size());
@@ -1051,10 +1028,8 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getAllColumns() {
-		ArrayList<String> columns = new ArrayList<String>();
-		for (String col : columnLookup.keySet()) {
-			columns.add(col);
-		}
+		ArrayList<String> columns = new ArrayList<>();
+		columnLookup.keySet().forEach(columns::add);
 		return columns;
 	}
 
@@ -1064,13 +1039,13 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getColumns() {
-		ArrayList<String> columns = new ArrayList<String>();
-		for (String col : columnLookup.keySet()) {
+		ArrayList<String> columns = new ArrayList<>();
+		columnLookup.keySet().forEach(col -> {
 			HeaderInfo hi = columnLookup.get(col);
 			if (!hi.isHide()) {
 				columns.add(col);
 			}
-		}
+		});
 		return columns;
 	}
 
@@ -1082,8 +1057,8 @@ public class WorkSheet {
 	 * @throws Exception
 	 */
 	public ArrayList<String> getDiscreteColumnValues(String column) throws Exception {
-		HashMap<String, String> hashMapValues = new HashMap<String, String>();
-		ArrayList<String> values = new ArrayList<String>();
+		HashMap<String, String> hashMapValues = new HashMap<>();
+		ArrayList<String> values = new ArrayList<>();
 		ArrayList<String> rows = getDataRows();
 		for (String row : rows) {
 			String value = getCell(row, column);
@@ -1103,8 +1078,8 @@ public class WorkSheet {
 	 * @throws Exception
 	 */
 	public ArrayList<String> getDiscreteRowValues(String row) throws Exception {
-		HashMap<String, String> hashMapValues = new HashMap<String, String>();
-		ArrayList<String> values = new ArrayList<String>();
+		HashMap<String, String> hashMapValues = new HashMap<>();
+		ArrayList<String> values = new ArrayList<>();
 		for (String column : getColumns()) {
 			String value = getCell(row, column);
 			if (!hashMapValues.containsKey(value)) {
@@ -1121,10 +1096,8 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getAllRows() {
-		ArrayList<String> rows = new ArrayList<String>();
-		for (String row : rowLookup.keySet()) {
-			rows.add(row);
-		}
+		ArrayList<String> rows = new ArrayList<>();
+		rowLookup.keySet().forEach(rows::add);
 		return rows;
 
 	}
@@ -1135,13 +1108,13 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getRows() {
-		ArrayList<String> rows = new ArrayList<String>();
-		for (String row : rowLookup.keySet()) {
+		ArrayList<String> rows = new ArrayList<>();
+		rowLookup.keySet().forEach(row -> {
 			HeaderInfo hi = rowLookup.get(row);
 			if (!hi.isHide()) {
 				rows.add(row);
 			}
-		}
+		});
 		return rows;
 	}
 
@@ -1151,7 +1124,7 @@ public class WorkSheet {
 	 * @return
 	 */
 	public ArrayList<String> getDataRows() {
-		ArrayList<String> rows = new ArrayList<String>();
+		ArrayList<String> rows = new ArrayList<>();
 		for (String row : rowLookup.keySet()) {
 			if (this.isMetaDataRow(row)) {
 				continue;
@@ -1165,8 +1138,8 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Get the log scale of this worksheet where a zero value will be set to .1
-	 * as Log(0) is undefined
+	 * Get the log scale of this worksheet where a zero value will be set to .1 as
+	 * Log(0) is undefined
 	 *
 	 * @param base
 	 * @return
@@ -1204,8 +1177,9 @@ public class WorkSheet {
 						} else {
 							d = Math.log(d) / Math.log(base);
 						}
-						workSheet.addCell(row, col, d + "");
+						workSheet.addCell(row, col, Double.toString(d));
 					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
 						workSheet.addCell(row, col, value);
 					}
 
@@ -1261,8 +1235,7 @@ public class WorkSheet {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-
-		ArrayList<CompactCharSequence[]> rows = new ArrayList<CompactCharSequence[]>();
+		ArrayList<CompactCharSequence[]> rows = new ArrayList<>();
 
 		String line = br.readLine();
 		int numcolumns = -1;
@@ -1299,7 +1272,6 @@ public class WorkSheet {
 				}
 			}
 
-
 		}
 
 		return data;
@@ -1309,7 +1281,7 @@ public class WorkSheet {
 	static String[][] getAllValues(String fileName, char delimiter) throws Exception {
 		FileReader reader = new FileReader(fileName);
 		BufferedReader br = new BufferedReader(reader);
-		ArrayList<String[]> rows = new ArrayList<String[]>();
+		ArrayList<String[]> rows = new ArrayList<>();
 
 		String line = br.readLine();
 		int numcolumns = -1;
@@ -1336,7 +1308,6 @@ public class WorkSheet {
 				data[i][j] = row[j];
 			}
 
-
 		}
 
 		return data;
@@ -1344,9 +1315,9 @@ public class WorkSheet {
 	}
 
 	/**
-	 * Combine two work sheets where you join based on rows. Rows that are found
-	 * in one but not the other are removed. If the second sheet is meta data
-	 * then a meta data column will be added between the two joined columns
+	 * Combine two work sheets where you join based on rows. Rows that are found in
+	 * one but not the other are removed. If the second sheet is meta data then a
+	 * meta data column will be added between the two joined columns
 	 *
 	 * @param w1FileName
 	 * @param w2FileName
@@ -1355,7 +1326,8 @@ public class WorkSheet {
 	 * @return
 	 * @throws Exception
 	 */
-	static public WorkSheet unionWorkSheetsRowJoin(String w1FileName, String w2FileName, char delimitter, boolean secondSheetMetaData) throws Exception {
+	static public WorkSheet unionWorkSheetsRowJoin(String w1FileName, String w2FileName, char delimitter,
+			boolean secondSheetMetaData) throws Exception {
 		WorkSheet w1 = WorkSheet.readCSV(w1FileName, delimitter);
 		WorkSheet w2 = WorkSheet.readCSV(w2FileName, delimitter);
 		return unionWorkSheetsRowJoin(w1, w2, secondSheetMetaData);
@@ -1363,9 +1335,9 @@ public class WorkSheet {
 	}
 
 	/**
-	 * * Combine two work sheets where you join based on rows. Rows that are
-	 * found in one but not the other are removed. If the second sheet is meta
-	 * data then a meta data column will be added between the two joined columns
+	 * * Combine two work sheets where you join based on rows. Rows that are found
+	 * in one but not the other are removed. If the second sheet is meta data then a
+	 * meta data column will be added between the two joined columns
 	 *
 	 * @param w1
 	 * @param w2
@@ -1373,7 +1345,8 @@ public class WorkSheet {
 	 * @return
 	 * @throws Exception
 	 */
-	static public WorkSheet unionWorkSheetsRowJoin(WorkSheet w1, WorkSheet w2, boolean secondSheetMetaData) throws Exception {
+	static public WorkSheet unionWorkSheetsRowJoin(WorkSheet w1, WorkSheet w2, boolean secondSheetMetaData)
+			throws Exception {
 		ArrayList<String> w1Columns = w1.getColumns();
 		ArrayList<String> w2Columns = w2.getColumns();
 		ArrayList<String> w1DataColumns = w1.getDataColumns();
@@ -1381,45 +1354,32 @@ public class WorkSheet {
 		ArrayList<String> w1MetaDataColumns = w1.getMetaDataColumns();
 		ArrayList<String> w2MetaDataColumns = w2.getMetaDataColumns();
 
-
 		if (secondSheetMetaData) {
 			if (!w1.getColumns().contains("META_DATA")) {
 				w1DataColumns.add("META_DATA");
 			}
 		}
 
-		ArrayList<String> joinedColumns = new ArrayList<String>();
+		ArrayList<String> joinedColumns = new ArrayList<>();
 		joinedColumns.addAll(w1DataColumns);
 		joinedColumns.addAll(w2DataColumns);
 		if (!joinedColumns.contains("META_DATA") && (w1MetaDataColumns.size() > 0 || w2MetaDataColumns.size() > 0)) {
 			joinedColumns.add("META_DATA");
 		}
-		for (String column : w1MetaDataColumns) {
-			if (!joinedColumns.contains(column)) {
-				joinedColumns.add(column);
-			}
-		}
-		for (String column : w2MetaDataColumns) {
-			if (!joinedColumns.contains(column)) {
-				joinedColumns.add(column);
-			}
-		}
+		w1MetaDataColumns.stream().filter(column -> !joinedColumns.contains(column)).forEach(joinedColumns::add);
+		w2MetaDataColumns.stream().filter(column -> !joinedColumns.contains(column)).forEach(joinedColumns::add);
 		ArrayList<String> w1Rows = w1.getRows();
 		ArrayList<String> w2Rows = w2.getRows();
-		ArrayList<String> rows = new ArrayList<String>();
+		ArrayList<String> rows = new ArrayList<>();
 
-		HashSet<String> w1Key = new HashSet<String>(w1Rows);
-		for (String key : w2Rows) {
-			if (w1Key.contains(key)) {
-				rows.add(key);
-			}
-		}
+		HashSet<String> w1Key = new HashSet<>(w1Rows);
+		w2Rows.stream().filter(w1Key::contains).forEach(rows::add);
 
 		WorkSheet worksheet = new WorkSheet(rows, joinedColumns);
 
 		for (String row : rows) {
 			for (String column : w1Columns) {
-				if (column.equals("META_DATA")) {
+				if ("META_DATA".equals(column)) {
 					continue;
 				}
 				String value = w1.getCell(row, column);
@@ -1429,7 +1389,7 @@ public class WorkSheet {
 
 		for (String row : rows) {
 			for (String column : w2Columns) {
-				if (column.equals("META_DATA")) {
+				if ("META_DATA".equals(column)) {
 					continue;
 				}
 				String value = w2.getCell(row, column);
@@ -1451,12 +1411,10 @@ public class WorkSheet {
 	 */
 	static public WorkSheet readCSV(String fileName, char delimiter) throws Exception {
 
-
 		return readCSV(new File(fileName), delimiter);
 	}
 
 	static public WorkSheet readCSV(File f, char delimiter) throws Exception {
-
 
 		return readCSV(new FileInputStream(f), delimiter);
 	}
@@ -1470,7 +1428,6 @@ public class WorkSheet {
 	 * @throws Exception
 	 */
 	static public WorkSheet readCSV(InputStream is, char delimiter) throws Exception {
-
 
 		CompactCharSequence[][] data = getAllValuesCompactCharSequence(is, delimiter);
 
@@ -1516,7 +1473,6 @@ public class WorkSheet {
 		bs.close();
 		file.close();
 	}
-	private String rowHeader = "REF";
 
 	/**
 	 *
@@ -1528,9 +1484,9 @@ public class WorkSheet {
 
 	/**
 	 * Add columns from a second worksheet to be joined by common row. If the
-	 * appended worksheet doesn't contain a row in the master worksheet then
-	 * default value of "" is used. Rows in the appended worksheet not found in
-	 * the master worksheet are not added.
+	 * appended worksheet doesn't contain a row in the master worksheet then default
+	 * value of "" is used. Rows in the appended worksheet not found in the master
+	 * worksheet are not added.
 	 *
 	 * @param worksheet
 	 * @throws Exception
@@ -1551,15 +1507,13 @@ public class WorkSheet {
 			}
 		}
 
-
-
 	}
 
 	/**
 	 * Add rows from a second worksheet to be joined by common column. If the
 	 * appended worksheet doesn't contain a column in the master worksheet then
-	 * default value of "" is used. Columns in the appended worksheet not found
-	 * in the master worksheet are not added.
+	 * default value of "" is used. Columns in the appended worksheet not found in
+	 * the master worksheet are not added.
 	 *
 	 * @param worksheet
 	 * @throws Exception
@@ -1593,7 +1547,7 @@ public class WorkSheet {
 	 */
 	public void save(OutputStream outputStream, char delimitter, boolean quoteit) throws Exception {
 		outputStream.write(rowHeader.getBytes());
-		//String quote = "\"";
+		// String quote = "\"";
 
 		for (String col : getColumns()) {
 			outputStream.write(delimitter);
@@ -1619,19 +1573,19 @@ public class WorkSheet {
 				String value = getCell(row, col);
 				outputStream.write(delimitter);
 				if (!this.isMetaDataColumn(col) && !this.isMetaDataRow(row)) {
-					if (value == null || value.length() == 0 || value.equalsIgnoreCase("null")) {
+					if (value == null || value.isEmpty() || "null".equalsIgnoreCase(value)) {
 						value = "NaN";
 					}
 				} else {
-					if (value == null || value.length() == 0 || value.equalsIgnoreCase("null")) {
+					if (value == null || value.isEmpty() || "null".equalsIgnoreCase(value)) {
 						value = "";
 					}
 				}
 
 				outputStream.write(value.getBytes());
-				//  }catch(Exception e){
-				//      System.out.println(row + " " + col);
-				//  }
+				// }catch(Exception e){
+				// System.out.println(row + " " + col);
+				// }
 			}
 			outputStream.write("\r\n".getBytes());
 		}

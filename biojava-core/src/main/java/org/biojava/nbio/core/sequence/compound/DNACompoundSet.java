@@ -28,14 +28,6 @@ import org.biojava.nbio.core.sequence.template.AbstractNucleotideCompoundSet;
  */
 public class DNACompoundSet extends AbstractNucleotideCompoundSet<NucleotideCompound> {
 
-	private static class InitaliseOnDemand {
-		public static final DNACompoundSet INSTANCE = new DNACompoundSet();
-	}
-
-	public static DNACompoundSet getDNACompoundSet() {
-		return InitaliseOnDemand.INSTANCE;
-	}
-
 	public DNACompoundSet() {
 		addNucleotideCompound("A", "T");
 		addNucleotideCompound("T", "A");
@@ -45,17 +37,24 @@ public class DNACompoundSet extends AbstractNucleotideCompoundSet<NucleotideComp
 		addNucleotideCompound("-", "-");
 	}
 
+	public static DNACompoundSet getDNACompoundSet() {
+		return InitaliseOnDemand.INSTANCE;
+	}
+
 	@Override
-public NucleotideCompound newNucleotideCompound(String base, String complement, String... equivalents) {
-		if(equivalents.length == 0) {
+	public NucleotideCompound newNucleotideCompound(String base, String complement, String... equivalents) {
+		if (equivalents.length == 0) {
 			return new NucleotideCompound(base, this, complement);
-		}
-		else {
+		} else {
 			NucleotideCompound[] compounds = new NucleotideCompound[equivalents.length];
-			for(int i=0; i<compounds.length; i++) {
+			for (int i = 0; i < compounds.length; i++) {
 				compounds[i] = getCompoundForString(equivalents[i]);
 			}
 			return new NucleotideCompound(base, this, complement, compounds);
 		}
+	}
+
+	private static class InitaliseOnDemand {
+		public static final DNACompoundSet INSTANCE = new DNACompoundSet();
 	}
 }

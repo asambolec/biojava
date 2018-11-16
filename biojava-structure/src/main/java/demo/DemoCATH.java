@@ -20,14 +20,16 @@
  */
 package demo;
 
-
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.cath.CathDatabase;
 import org.biojava.nbio.structure.cath.CathDomain;
 import org.biojava.nbio.structure.cath.CathInstallation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** An example for how to access CATH data.
+/**
+ * An example for how to access CATH data.
  *
  * run with -Xmx512M
  *
@@ -35,9 +37,11 @@ import org.biojava.nbio.structure.cath.CathInstallation;
  *
  */
 public class DemoCATH {
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoCATH.class);
 
-		AtomCache cache  = new AtomCache();
+	public static void main(String[] args) {
+
+		AtomCache cache = new AtomCache();
 
 		CathDatabase database = new CathInstallation(cache.getPath());
 
@@ -45,20 +49,16 @@ public class DemoCATH {
 
 		CathDomain cathDomain = database.getDescriptionByCathId(domainID);
 
-		System.out.println(cathDomain);
-
+		logger.info(String.valueOf(cathDomain));
 
 		Structure cathDomainStructure;
 		try {
 			cathDomainStructure = cache.getStructure(domainID);
-			System.out.println(cathDomainStructure);
+			logger.info(String.valueOf(cathDomainStructure));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
-
-
-
 
 	}
 }

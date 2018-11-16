@@ -27,8 +27,7 @@ import java.io.IOException;
  *
  * @since 3.0.3
  */
-public interface ParseListener
-{
+public interface ParseListener {
 	/**
 	 * Notify this parse listener of a description line.
 	 *
@@ -41,9 +40,9 @@ public interface ParseListener
 	 * Notify this parse listener of a sequence line.
 	 *
 	 * <p>
-	 * Note that the sequence in FASTQ format may contain end-of-line characters,
-	 * so both this method and <code>appendSequence(String)</code> may be called per FASTQ
-	 * formatted sequence.
+	 * Note that the sequence in FASTQ format may contain end-of-line characters, so
+	 * both this method and <code>appendSequence(String)</code> may be called per
+	 * FASTQ formatted sequence.
 	 * </p>
 	 *
 	 * @param sequence sequence line
@@ -55,8 +54,8 @@ public interface ParseListener
 	 * Notify this parse listener of an additional sequence line.
 	 *
 	 * <p>
-	 * Note that the sequence in FASTQ format may contain end-of-line characters,
-	 * so this method may be called more than once per FASTQ formatted sequence.
+	 * Note that the sequence in FASTQ format may contain end-of-line characters, so
+	 * this method may be called more than once per FASTQ formatted sequence.
 	 * </p>
 	 *
 	 * @param sequence additional sequence line
@@ -76,9 +75,9 @@ public interface ParseListener
 	 * Notify this listener of a quality line.
 	 *
 	 * <p>
-	 * Note that the quality scores in FASTQ format may contain end-of-line characters,
-	 * so both this method and <code>appendQuality(String)</code> may be called per FASTQ
-	 * formatted sequence.
+	 * Note that the quality scores in FASTQ format may contain end-of-line
+	 * characters, so both this method and <code>appendQuality(String)</code> may be
+	 * called per FASTQ formatted sequence.
 	 * </p>
 	 *
 	 * @param quality quality line
@@ -90,8 +89,9 @@ public interface ParseListener
 	 * Notify this listener of a quality line.
 	 *
 	 * <p>
-	 * Note that the quality scores in FASTQ format may contain end-of-line characters,
-	 * so this method may be called more than once per FASTQ formatted sequence.
+	 * Note that the quality scores in FASTQ format may contain end-of-line
+	 * characters, so this method may be called more than once per FASTQ formatted
+	 * sequence.
 	 * </p>
 	 *
 	 * @param quality additional quality line

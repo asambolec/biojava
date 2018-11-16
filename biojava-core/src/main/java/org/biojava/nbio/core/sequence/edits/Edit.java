@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Interface for carrying out edit operations on a Sequence. The 3 major
- * methods of Editing are supported
+ * Interface for carrying out edit operations on a Sequence. The 3 major methods
+ * of Editing are supported
  *
  * <ul>
  * <li>Insertion</li>
@@ -41,9 +41,9 @@ import java.util.List;
  * <li>Substitution</li>
  * </ul>
  *
- * The interface is provided so end users can use our implementations, which
- * are implementations which attempts to create views of Sequences in an
- * editted form not a full-realised editted Sequence, or their own.
+ * The interface is provided so end users can use our implementations, which are
+ * implementations which attempts to create views of Sequences in an editted
+ * form not a full-realised editted Sequence, or their own.
  *
  * @author ayates
  * @param <C> The type of compound to edit
@@ -53,39 +53,14 @@ public interface Edit<C extends Compound> {
 	Sequence<C> edit(Sequence<C> sequence);
 
 	/**
-	 * Abstract class which defines all edit operations as a call to discover
-	 * what 5' and 3' ends of an editing Sequence should be joined together
-	 * with a target Sequence. These ends can be of 0 length but conceptionally
-	 * they can still exist.
+	 * Abstract class which defines all edit operations as a call to discover what
+	 * 5' and 3' ends of an editing Sequence should be joined together with a target
+	 * Sequence. These ends can be of 0 length but conceptionally they can still
+	 * exist.
 	 */
 	public static abstract class AbstractEdit<C extends Compound> implements Edit<C> {
 
 		private final static Logger logger = LoggerFactory.getLogger(AbstractEdit.class);
-
-		/**
-		 * Should return the 5-prime end of the given Sequence according to
-		 * the edit. An empty Sequence is valid.
-		 */
-		protected abstract Sequence<C> getFivePrime(Sequence<C> editingSequence);
-
-		/**
-		 * Should return the 3-prime end of the given Sequence according to
-		 * the edit. An empty Sequence is valid.
-		 */
-		protected abstract Sequence<C> getThreePrime(Sequence<C> editingSequence);
-
-
-		@Override
-		public Sequence<C> edit(Sequence<C> editingSequence) {
-			Sequence<C> targetSequence = getTargetSequence(editingSequence);
-			List<Sequence<C>> sequences = new ArrayList<Sequence<C>>();
-
-			sequences.add(getFivePrime(editingSequence));
-			sequences.add(targetSequence);
-			sequences.add(getThreePrime(editingSequence));
-
-			return new JoiningSequenceReader<C>(sequences);
-		}
 		private int start = -1;
 		private int end = -1;
 		private String stringSequence;
@@ -100,6 +75,30 @@ public interface Edit<C extends Compound> {
 			this.end = end;
 		}
 
+		/**
+		 * Should return the 5-prime end of the given Sequence according to the edit. An
+		 * empty Sequence is valid.
+		 */
+		protected abstract Sequence<C> getFivePrime(Sequence<C> editingSequence);
+
+		/**
+		 * Should return the 3-prime end of the given Sequence according to the edit. An
+		 * empty Sequence is valid.
+		 */
+		protected abstract Sequence<C> getThreePrime(Sequence<C> editingSequence);
+
+		@Override
+		public Sequence<C> edit(Sequence<C> editingSequence) {
+			Sequence<C> targetSequence = getTargetSequence(editingSequence);
+			List<Sequence<C>> sequences = new ArrayList<>();
+
+			sequences.add(getFivePrime(editingSequence));
+			sequences.add(targetSequence);
+			sequences.add(getThreePrime(editingSequence));
+
+			return new JoiningSequenceReader<>(sequences);
+		}
+
 		protected void setStringSequence(String stringSequence) {
 			this.stringSequence = stringSequence;
 		}
@@ -111,16 +110,15 @@ public interface Edit<C extends Compound> {
 		/**
 		 * Returns the Sequence which is our edit.
 		 *
-		 * @param editingSequence Asked for in-case we need to do String to
-		 * Sequence conversion so we need a CompoundSet which is given
-		 * by the Sequence we are editing
+		 * @param editingSequence Asked for in-case we need to do String to Sequence
+		 *                        conversion so we need a CompoundSet which is given by
+		 *                        the Sequence we are editing
 		 * @return The Sequence<C> object we wish to insert
 		 */
 		public Sequence<C> getTargetSequence(Sequence<C> editingSequence) {
 			if (sequence == null && stringSequence != null) {
 				try {
-					sequence = new BasicSequence<C>(
-								stringSequence, editingSequence.getCompoundSet());
+					sequence = new BasicSequence<>(stringSequence, editingSequence.getCompoundSet());
 				} catch (CompoundNotFoundException e) {
 					// TODO is there a better way to handle this exception?
 					logger.error("Problem setting sequence, some unrecognised compounds: {}", e.getMessage());
@@ -130,13 +128,12 @@ public interface Edit<C extends Compound> {
 		}
 
 		/**
-		 * Returns an empty sequence with the given compound set of the editing
-		 * sequence
+		 * Returns an empty sequence with the given compound set of the editing sequence
 		 */
 		protected Sequence<C> getEmptySequence(Sequence<C> editingSequence) {
 			Sequence<C> s = null;
 			try {
-				s = new BasicSequence<C>("", editingSequence.getCompoundSet());
+				s = new BasicSequence<>("", editingSequence.getCompoundSet());
 			} catch (CompoundNotFoundException e) {
 				// should not happen
 				logger.error("Could not construct empty sequence. {}. This is most likely a bug.", e.getMessage());
@@ -195,10 +192,10 @@ public interface Edit<C extends Compound> {
 	}
 
 	/**
-	 * Edit implementation which allows us to insert a base at any position
-	 * in a Sequence. Specifying 1 base is used to insert at the start and
-	 * end of a Sequence. If you wish to carry out an in-sequence insertion
-	 * then you specify the flanking base positions e.g.
+	 * Edit implementation which allows us to insert a base at any position in a
+	 * Sequence. Specifying 1 base is used to insert at the start and end of a
+	 * Sequence. If you wish to carry out an in-sequence insertion then you specify
+	 * the flanking base positions e.g.
 	 *
 	 * <pre>
 	 *   ACTG insert TT @ position 1   : TTACGT
@@ -206,8 +203,8 @@ public interface Edit<C extends Compound> {
 	 *   ACTG insert A  @ position 4   : ACGTA
 	 * </pre>
 	 *
-	 * The code will raise exceptions if you attempt a single base edit
-	 * with an insertion.
+	 * The code will raise exceptions if you attempt a single base edit with an
+	 * insertion.
 	 */
 	public static class Insert<C extends Compound> extends AbstractEdit<C> {
 
@@ -245,9 +242,9 @@ public interface Edit<C extends Compound> {
 				} else if (getEnd() == editingSequence.getLength()) {
 					return editingSequence;
 				} else {
-					throw new IllegalStateException("Given one position to "
-							+ "insert at but this is not the start or end "
-							+ "of the Sequence; cannot support this");
+					throw new IllegalStateException(new StringBuilder().append("Given one position to ")
+							.append("insert at but this is not the start or end ")
+							.append("of the Sequence; cannot support this").toString());
 				}
 			}
 			return editingSequence.getSubSequence(1, getStart());
@@ -261,9 +258,9 @@ public interface Edit<C extends Compound> {
 				} else if (getEnd() == editingSequence.getLength()) {
 					return getEmptySequence(editingSequence);
 				} else {
-					throw new IllegalStateException("Given one position to "
-							+ "insert at but this is not the start or end "
-							+ "of the Sequence; cannot support this");
+					throw new IllegalStateException(new StringBuilder().append("Given one position to ")
+							.append("insert at but this is not the start or end ")
+							.append("of the Sequence; cannot support this").toString());
 				}
 			}
 			return editingSequence.getSubSequence(getEnd(), editingSequence.getLength());
@@ -271,8 +268,8 @@ public interface Edit<C extends Compound> {
 	}
 
 	/**
-	 * Allows for the substitution of bases into an existing Sequence. This
-	 * allows us to do edits like:
+	 * Allows for the substitution of bases into an existing Sequence. This allows
+	 * us to do edits like:
 	 *
 	 * <pre>
 	 *    Sub TT @ position 2
@@ -281,9 +278,9 @@ public interface Edit<C extends Compound> {
 	 *
 	 * We do not support
 	 *
-	 * Edits do not require the length of the insertion but do rely on the
-	 * presence of a CompoundSet to parse a String (if given) which means
-	 * the eventual length of a Sequence is a lazy operation.
+	 * Edits do not require the length of the insertion but do rely on the presence
+	 * of a CompoundSet to parse a String (if given) which means the eventual length
+	 * of a Sequence is a lazy operation.
 	 */
 	public static class Substitute<C extends Compound> extends AbstractEdit<C> {
 
@@ -298,18 +295,18 @@ public interface Edit<C extends Compound> {
 		}
 
 		/**
-		 * Must use this rather than the no-args getEnd as this can return
-		 * -1 and the length of a sub is dependent on the length of the
-		 * Sequence; we cannot assume 1:1 mapping between characters in a
-		 * String and the number of compounds we will have to insert.
+		 * Must use this rather than the no-args getEnd as this can return -1 and the
+		 * length of a sub is dependent on the length of the Sequence; we cannot assume
+		 * 1:1 mapping between characters in a String and the number of compounds we
+		 * will have to insert.
 		 */
 		public int getEnd(Sequence<C> sequence) {
-			if (getEnd() == -1) {
-				int start = getStart();
-				int length = getTargetSequence(sequence).getLength();
-				return (start + length) - 1;
+			if (!(getEnd() == -1)) {
+				return getEnd();
 			}
-			return getEnd();
+			int start = getStart();
+			int length = getTargetSequence(sequence).getLength();
+			return (start + length) - 1;
 		}
 
 		@Override
@@ -325,10 +322,9 @@ public interface Edit<C extends Compound> {
 		protected Sequence<C> getThreePrime(Sequence<C> editingSequence) {
 			int end = getEnd(editingSequence);
 			if (end > editingSequence.getLength()) {
-				throw new IndexOutOfBoundsException(end +
-						" is greater than the max index of " +
-						"the editing sequence (" +
-						editingSequence.getLength());
+				throw new IndexOutOfBoundsException(
+						new StringBuilder().append(end).append(" is greater than the max index of ")
+								.append("the editing sequence (").append(editingSequence.getLength()).toString());
 			} else if (end == editingSequence.getLength()) {
 				return getEmptySequence(editingSequence);
 			}

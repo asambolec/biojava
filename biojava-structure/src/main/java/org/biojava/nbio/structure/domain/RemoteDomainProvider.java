@@ -40,7 +40,6 @@ import org.biojava.nbio.structure.scop.server.XMLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A DomainProvider that uses a mixture of SCOP and PDP domains.
  *
@@ -50,36 +49,37 @@ import org.slf4j.LoggerFactory;
  * As of 2015, this class is equivalent to the method used by RCSB to define
  * representatives for structural similarity comparisons.
  */
-public class RemoteDomainProvider extends SerializableCache<String,SortedSet<String>> implements DomainProvider{
+public class RemoteDomainProvider extends SerializableCache<String, SortedSet<String>> implements DomainProvider {
 	private static final Logger logger = LoggerFactory.getLogger(RemoteDomainProvider.class);
+
+	private static String cacheFileName = "remotedomaincache.ser";
 
 	public String url = RemotePDPProvider.DEFAULT_SERVER;
 
 	ScopDatabase scop;
+
 	PDPProvider pdp;
 
-	private static String CACHE_FILE_NAME = "remotedomaincache.ser";
-
-
-	public RemoteDomainProvider(){
+	public RemoteDomainProvider() {
 		// equivalent to this(false) but without IOException
-		super(CACHE_FILE_NAME);
+		super(cacheFileName);
 		disableCache();
 		scop = ScopFactory.getSCOP();
 		pdp = new RemotePDPProvider();
 	}
 
-	/** initialize this provider with caching enabled
+	/**
+	 * initialize this provider with caching enabled
 	 *
 	 * @param cache
 	 * @throws IOException
 	 */
-	public RemoteDomainProvider(boolean cache) throws IOException{
-		super(CACHE_FILE_NAME);
+	public RemoteDomainProvider(boolean cache) throws IOException {
+		super(cacheFileName);
 
-		if( ! cache) {
+		if (!cache) {
 			disableCache();
-			//} else if ( serializedCache.keySet().size() < 20000){
+			// } else if ( serializedCache.keySet().size() < 20000){
 		} else {
 			// always load the representative assignments from server...
 			// this makes sure we always have the latest assignments
@@ -90,7 +90,9 @@ public class RemoteDomainProvider extends SerializableCache<String,SortedSet<Str
 		pdp = new RemotePDPProvider(cache);
 	}
 
-	/** Requests the domain assignments for the current PDB IDs from the PDB.
+	/**
+	 * Requests the domain assignments for the current PDB IDs from the PDB.
+	 * 
 	 * @throws IOException if the server cannot be reached
 	 *
 	 */
@@ -98,115 +100,109 @@ public class RemoteDomainProvider extends SerializableCache<String,SortedSet<Str
 		AssignmentXMLSerializer results = null;
 		try {
 			URL u = new URL(url + "getRepresentativeDomains");
-			logger.info("Fetching {}",u);
+			logger.info("Fetching {}", u);
 			InputStream response = URLConnectionTools.getInputStream(u);
 			String xml = JFatCatClient.convertStreamToString(response);
-			results  = AssignmentXMLSerializer.fromXML(xml);
+			results = AssignmentXMLSerializer.fromXML(xml);
 
-			Map<String,String> data = results.getAssignments();
-			logger.info("got {} ranges from server.",data.size());
-			for (String key: data.keySet()){
+			Map<String, String> data = results.getAssignments();
+			logger.info("got {} ranges from server.", data.size());
+			data.keySet().forEach(key -> {
 				String range = data.get(key);
 
 				// work around list in results;
 
 				String[] spl = range.split(",");
-				SortedSet<String> value = new TreeSet<String>();
+				SortedSet<String> value = new TreeSet<>();
 
-				for (String s : spl){
+				for (String s : spl) {
 					value.add(s);
 
 				}
 				serializedCache.put(key, value);
-			}
+			});
 
-		} catch (MalformedURLException e){
-			logger.error("Malformed Domain server: "+url,e);
-			throw new IllegalArgumentException("Invalid Server: "+url, e);
+		} catch (MalformedURLException e) {
+			logger.error("Malformed Domain server: " + url, e);
+			throw new IllegalArgumentException("Invalid Server: " + url, e);
 		}
 	}
 
 	@Override
 	public SortedSet<String> getDomainNames(String name) throws IOException, StructureException {
 
-
-		if ( name.length() < 4)
+		if (name.length() < 4) {
 			throw new IllegalArgumentException("Can't interpret IDs that are shorter than 4 residues!");
+		}
 
-		if ( serializedCache != null){
-			if ( serializedCache.containsKey(name)){
+		if (serializedCache != null) {
+			if (serializedCache.containsKey(name)) {
 				return serializedCache.get(name);
 			}
 		}
 
 		StructureName n = new StructureName(name);
 
-		List<ScopDomain>scopDomains = scop.getDomainsForPDB(n.getPdbId());
+		List<ScopDomain> scopDomains = scop.getDomainsForPDB(n.getPdbId());
 
 		String chainID = n.getChainId();
 
-		if ( scopDomains == null || scopDomains.size() == 0){
-			SortedSet<String> data= getPDPDomains(n);
-			cache(name,data);
+		if (scopDomains == null || scopDomains.size() == 0) {
+			SortedSet<String> data = getPDPDomains(n);
+			cache(name, data);
 			return data;
 		} else {
-			SortedSet<String> r = new TreeSet<String>();
-			for ( ScopDomain d: scopDomains){
-				StructureName s = new StructureName(d.getScopId());
-
-				if( chainID == null){
+			SortedSet<String> r = new TreeSet<>();
+			scopDomains.stream().map(d -> new StructureName(d.getScopId())).forEach(s -> {
+				if (chainID == null) {
 					r.add(s.getIdentifier());
 
-				} else if( s.getChainId().equalsIgnoreCase(n.getChainId())) {
+				} else if (s.getChainId().equalsIgnoreCase(n.getChainId())) {
 					// SCOP IDS are case insensitive...
 					r.add(s.getIdentifier());
 				}
-			}
-			cache(name,r);
+			});
+			cache(name, r);
 			return r;
 		}
 
-
-
 	}
-
-
-
 
 	private SortedSet<String> getPDPDomains(StructureName n) throws IOException, StructureException {
 		SortedSet<String> pdpDomains = pdp.getPDPDomainNamesForPDB(n.getPdbId());
 
-		SortedSet<String> r = new TreeSet<String>();
+		SortedSet<String> r = new TreeSet<>();
 		String chainID = n.getChainId();
-		for ( String s : pdpDomains){
+		pdpDomains.forEach(s -> {
 			StructureName d = new StructureName(s);
-			if ( chainID == null)
+			if (chainID == null) {
 				r.add(s);
-			else if ( d.getChainId().equals(n.getChainId())){
+			} else if (d.getChainId().equals(n.getChainId())) {
 				r.add(s);
 			}
-		}
-		logger.info(n + " got PDP domains: "+ r);
+		});
+		logger.info(new StringBuilder().append(n).append(" got PDP domains: ").append(r).toString());
 		return r;
 	}
 
-	public static void main(String[] args) throws IOException, StructureException{
-		String name ="3KIH.A";
+	public static void main(String[] args) throws IOException, StructureException {
+		String name = "3KIH.A";
 		RemoteDomainProvider me = new RemoteDomainProvider(true);
-		System.out.println(me.getDomainNames(name));
+		logger.info(String.valueOf(me.getDomainNames(name)));
 		StructureName n = new StructureName(name);
-		System.out.println(n);
-		//System.out.println(new  AtomCache().getStructure(name));
+		logger.info(String.valueOf(n));
+		// System.out.println(new AtomCache().getStructure(name));
 		me.flushCache();
 	}
 
 	@Override
 	public void flushCache() {
 		super.flushCache();
-		if ( pdp instanceof RemotePDPProvider){
-			RemotePDPProvider remotePDP = (RemotePDPProvider)pdp;
-			remotePDP.flushCache();
+		if (!(pdp instanceof RemotePDPProvider)) {
+			return;
 		}
+		RemotePDPProvider remotePDP = (RemotePDPProvider) pdp;
+		remotePDP.flushCache();
 	}
 
 	@Override
@@ -216,19 +212,16 @@ public class RemoteDomainProvider extends SerializableCache<String,SortedSet<Str
 		SortedSet<String> domainRanges = null;
 		try {
 			URL u = new URL(url);
-			logger.info("Fetching {}",url);
+			logger.info("Fetching {}", url);
 			InputStream response = URLConnectionTools.getInputStream(u);
 			String xml = JFatCatClient.convertStreamToString(response);
-			//System.out.println(xml);
+			// System.out.println(xml);
 			domainRanges = XMLUtil.getDomainRangesFromXML(xml);
-		} catch (MalformedURLException e){
-			logger.error("Malformed Domain server: "+url,e);
-			throw new IllegalArgumentException("Invalid Server: "+url, e);
+		} catch (MalformedURLException e) {
+			logger.error("Malformed Domain server: " + url, e);
+			throw new IllegalArgumentException("Invalid Server: " + url, e);
 		}
 		return domainRanges;
 	}
-
-
-
 
 }

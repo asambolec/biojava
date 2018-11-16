@@ -43,10 +43,11 @@ import java.util.List;
  * Implements a data structure for a {@link Sequence} within an alignment.
  *
  * @author Mark Chapman
- * @param <C> each element of the {@link Sequence} is a {@link Compound} of type C
+ * @param <C> each element of the {@link Sequence} is a {@link Compound} of type
+ *        C
  */
-public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> implements Serializable, AlignedSequence<S, C> {
-
+public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound>
+		implements Serializable, AlignedSequence<S, C> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -55,7 +56,11 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	// always stored
 	private AlignedSequence<S, C> prev;
 	private S original;
-	private int length, numBefore, numAfter;
+	private int length;
+
+	private int numBefore;
+
+	private int numAfter;
 	private Location location;
 
 	// cached (lazily initialized)
@@ -66,10 +71,12 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	private int[] sequenceFromAlignment;
 
 	/**
-	 * Creates an {@link AlignedSequence} for the given {@link Sequence} in a global alignment.
+	 * Creates an {@link AlignedSequence} for the given {@link Sequence} in a global
+	 * alignment.
 	 *
 	 * @param original the original {@link Sequence} before alignment
-	 * @param steps lists whether the sequence aligns a {@link Compound} or gap at each index of the alignment
+	 * @param steps    lists whether the sequence aligns a {@link Compound} or gap
+	 *                 at each index of the alignment
 	 * @throws IllegalArgumentException if given sequence does not fit in alignment
 	 */
 	public SimpleAlignedSequence(S original, List<Step> steps) {
@@ -77,12 +84,14 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	}
 
 	/**
-	 * Creates an {@link AlignedSequence} for the given {@link Sequence} in a local alignment.
+	 * Creates an {@link AlignedSequence} for the given {@link Sequence} in a local
+	 * alignment.
 	 *
-	 * @param original the original {@link Sequence} before alignment
-	 * @param steps lists whether the sequence aligns a {@link Compound} or gap at each index of the alignment
+	 * @param original  the original {@link Sequence} before alignment
+	 * @param steps     lists whether the sequence aligns a {@link Compound} or gap
+	 *                  at each index of the alignment
 	 * @param numBefore number of {@link Compound}s before a local alignment
-	 * @param numAfter number of {@link Compound}s after a local alignment
+	 * @param numAfter  number of {@link Compound}s after a local alignment
 	 * @throws IllegalArgumentException if given sequence does not fit in alignment
 	 */
 	public SimpleAlignedSequence(S original, List<Step> steps, int numBefore, int numAfter) {
@@ -94,10 +103,12 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	}
 
 	/**
-	 * Creates a new {@link AlignedSequence} for the given {@link AlignedSequence} in a global alignment.
+	 * Creates a new {@link AlignedSequence} for the given {@link AlignedSequence}
+	 * in a global alignment.
 	 *
-	 * @param prev the previous {@link AlignedSequence} before this alignment
-	 * @param steps lists whether the sequence aligns a {@link Compound} or gap at each index of the alignment
+	 * @param prev  the previous {@link AlignedSequence} before this alignment
+	 * @param steps lists whether the sequence aligns a {@link Compound} or gap at
+	 *              each index of the alignment
 	 * @throws IllegalArgumentException if given sequence does not fit in alignment
 	 */
 	public SimpleAlignedSequence(AlignedSequence<S, C> prev, List<Step> steps) {
@@ -105,12 +116,14 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	}
 
 	/**
-	 * Creates a new {@link AlignedSequence} for the given {@link AlignedSequence} in a local alignment.
+	 * Creates a new {@link AlignedSequence} for the given {@link AlignedSequence}
+	 * in a local alignment.
 	 *
-	 * @param prev the previous {@link AlignedSequence} before this alignment
-	 * @param steps lists whether the sequence aligns a {@link Compound} or gap at each index of the alignment
+	 * @param prev      the previous {@link AlignedSequence} before this alignment
+	 * @param steps     lists whether the sequence aligns a {@link Compound} or gap
+	 *                  at each index of the alignment
 	 * @param numBefore number of {@link Compound}s before a local alignment
-	 * @param numAfter number of {@link Compound}s after a local alignment
+	 * @param numAfter  number of {@link Compound}s after a local alignment
 	 * @throws IllegalArgumentException if given sequence does not fit in alignment
 	 */
 	public SimpleAlignedSequence(AlignedSequence<S, C> prev, List<Step> steps, int numBefore, int numAfter) {
@@ -137,7 +150,8 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	private void setAlignmentFromSequence() {
 		alignmentFromSequence = new int[original.getLength()];
-		int s = 1, a = 1;
+		int s = 1;
+		int a = 1;
 		for (int i = 0; i < numBefore; i++, s++) {
 			alignmentFromSequence[s - 1] = a;
 		}
@@ -155,15 +169,17 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	@Override
 	public int[] getAlignmentFromSequence() {
-		if (alignmentFromSequence == null)
+		if (alignmentFromSequence == null) {
 			setAlignmentFromSequence();
+		}
 		return alignmentFromSequence;
 	}
 
 	@Override
 	public int getAlignmentIndexAt(int sequenceIndex) {
-		if (alignmentFromSequence == null)
+		if (alignmentFromSequence == null) {
 			setAlignmentFromSequence();
+		}
 		return alignmentFromSequence[sequenceIndex - 1];
 	}
 
@@ -212,7 +228,8 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	private void setSequenceFromAlignment() {
 		sequenceFromAlignment = new int[length];
-		int a = 1, s = numBefore + 1;
+		int a = 1;
+		int s = numBefore + 1;
 		for (int i = 0; i < getStart().getPosition(); i++, a++) {
 			sequenceFromAlignment[a - 1] = s;
 		}
@@ -226,15 +243,17 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	@Override
 	public int[] getSequenceFromAlignment() {
-		if (sequenceFromAlignment == null)
+		if (sequenceFromAlignment == null) {
 			setSequenceFromAlignment();
+		}
 		return sequenceFromAlignment;
 	}
 
 	@Override
 	public int getSequenceIndexAt(int alignmentIndex) {
-		if (sequenceFromAlignment == null)
+		if (sequenceFromAlignment == null) {
 			setSequenceFromAlignment();
+		}
 		return sequenceFromAlignment[alignmentIndex - 1];
 	}
 
@@ -255,8 +274,8 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 				return false;
 			}
 			for (Location sublocation : location) {
-				if (sublocation.getStart().getPosition() <= alignmentIndex &&
-						alignmentIndex <= sublocation.getEnd().getPosition()) {
+				if (sublocation.getStart().getPosition() <= alignmentIndex
+						&& alignmentIndex <= sublocation.getEnd().getPosition()) {
 					return false;
 				}
 			}
@@ -285,7 +304,7 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	@Override
 	public List<C> getAsList() {
-		List<C> compounds = new ArrayList<C>();
+		List<C> compounds = new ArrayList<>();
 		for (int i = 1; i <= length; i++) {
 			compounds.add(getCompoundAt(i));
 		}
@@ -293,34 +312,36 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	}
 
 	@Override
-	public boolean equals(Object o){
+	public boolean equals(Object o) {
 
-		if(! Equals.classEqual(this, o)) {
+		if (!Equals.classEqual(this, o)) {
 			return false;
 		}
 
-		Sequence<C> other = (Sequence<C>)o;
-		if ( original.getAsList().size() != other.getAsList().size())
+		Sequence<C> other = (Sequence<C>) o;
+		if (original.getAsList().size() != other.getAsList().size()) {
 			return false;
+		}
 
-		for ( int i = 0 ; i< original.getAsList().size() ; i++){
-			if ( ! original.getAsList().get(i).equalsIgnoreCase(other.getAsList().get(i)))
+		for (int i = 0; i < original.getAsList().size(); i++) {
+			if (!original.getAsList().get(i).equalsIgnoreCase(other.getAsList().get(i))) {
 				return false;
+			}
 		}
 		return true;
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		String s = getSequenceAsString();
 		return s.hashCode();
 	}
 
 	@Override
 	public C getCompoundAt(int alignmentIndex) {
-		return alignmentIndex >= 1 && alignmentIndex <= length && isGap(alignmentIndex) ?
-				getCompoundSet().getCompoundForString(gap) :
-				original.getCompoundAt(getSequenceIndexAt(alignmentIndex));
+		return alignmentIndex >= 1 && alignmentIndex <= length && isGap(alignmentIndex)
+				? getCompoundSet().getCompoundForString(gap)
+				: original.getCompoundAt(getSequenceIndexAt(alignmentIndex));
 	}
 
 	@Override
@@ -373,7 +394,8 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 	// method from Object
 
 	/**
-	 * Provides standard Java language access to results of {@link #getSequenceAsString()}.
+	 * Provides standard Java language access to results of
+	 * {@link #getSequenceAsString()}.
 	 */
 	@Override
 	public String toString() {
@@ -382,15 +404,19 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 
 	// helper method to initialize the location
 	private void setLocation(List<Step> steps) {
-		List<Location> sublocations = new ArrayList<Location>();
-		int start = 0, step = 0, oStep = numBefore+numAfter, oMax = this.original.getLength(), pStep = 0, pMax =
-				(prev == null) ? 0 : prev.getLength();
+		List<Location> sublocations = new ArrayList<>();
+		int start = 0;
+		int step = 0;
+		int oStep = numBefore + numAfter;
+		int oMax = this.original.getLength();
+		int pStep = 0;
+		int pMax = (prev == null) ? 0 : prev.getLength();
 		boolean inGap = true;
 
 		// build sublocations: pieces of sequence separated by gaps
 		for (; step < length; step++) {
-			boolean isGapStep = (steps.get(step) == Step.GAP),
-					isGapPrev = (pStep < pMax && prev.isGap(pStep + 1));
+			boolean isGapStep = (steps.get(step) == Step.GAP);
+			boolean isGapPrev = (pStep < pMax && prev.isGap(pStep + 1));
 			if (!isGapStep && !isGapPrev) {
 				oStep++;
 				if (inGap) {
@@ -415,34 +441,35 @@ public class SimpleAlignedSequence<S extends Sequence<C>, C extends Compound> im
 		} else if (sublocations.size() == 1) {
 			location = sublocations.get(0);
 		} else {
-			location = new SimpleLocation(sublocations.get(0).getStart(), sublocations.get(sublocations.size() - 1).getEnd(),
-					Strand.UNDEFINED,
-					false, sublocations);
+			location = new SimpleLocation(sublocations.get(0).getStart(),
+					sublocations.get(sublocations.size() - 1).getEnd(), Strand.UNDEFINED, false, sublocations);
 		}
 		// TODO handle circular alignments
 
-		// check that alignment has correct number of compounds in it to fit original sequence
+		// check that alignment has correct number of compounds in it to fit original
+		// sequence
 		if (step != length || oStep != oMax || pStep != pMax) {
 			throw new IllegalArgumentException("Given sequence does not fit in alignment.");
 		}
 	}
 
 	@Override
-	//TODO Needs to implements
+	// TODO Needs to implements
 	public SequenceView<C> getInverse() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public int getNumGapPositions() {
-		if (numGapPositions == -1)
+		if (numGapPositions == -1) {
 			getNumGaps();
+		}
 		return numGapPositions;
 	}
 
 	@Override
 	public double getCoverage() {
-		
+
 		double coverage = getLength() - getNumGapPositions();
 		return coverage / getOriginalSequence().getLength();
 	}

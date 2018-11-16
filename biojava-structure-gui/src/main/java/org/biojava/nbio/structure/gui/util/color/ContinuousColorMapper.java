@@ -24,8 +24,8 @@ package org.biojava.nbio.structure.gui.util.color;
 import java.awt.*;
 
 /**
- * Provides a mapping between real numbers and Colors.
- * For instance, this could generate a gradient.
+ * Provides a mapping between real numbers and Colors. For instance, this could
+ * generate a gradient.
  *
  * @author Spencer Bliven
  *

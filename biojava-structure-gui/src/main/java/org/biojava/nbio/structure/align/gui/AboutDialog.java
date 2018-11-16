@@ -31,17 +31,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AboutDialog
-{
+public class AboutDialog {
 	Box vBox;
-	public AboutDialog(){
+
+	public AboutDialog() {
 
 	}
 
-	public void showDialog(){
+	public void showDialog() {
 		JDialog dialog = new JDialog();
 
-		dialog.setSize(new Dimension(500,650));
+		dialog.setSize(new Dimension(500, 650));
 
 		ResourceManager mgr = ResourceManager.getResourceManager("ce");
 
@@ -50,68 +50,58 @@ public class AboutDialog
 		msg += mgr.getString("ce.about");
 
 		msg += "<b>Currently suported algorithms and version:</b><br>";
-		// add the Algorithms and  version nrs.
+		// add the Algorithms and version nrs.
 
 		StructureAlignment[] algorithms = StructureAlignmentFactory.getAllAlgorithms();
-		for (StructureAlignment algorithm: algorithms){
-			msg+="<i>"+algorithm.getAlgorithmName()+"</i> V." +algorithm.getVersion()+"<br>";
+		for (StructureAlignment algorithm : algorithms) {
+			msg += new StringBuilder().append("<i>").append(algorithm.getAlgorithmName()).append("</i> V.")
+					.append(algorithm.getVersion()).append("<br>").toString();
 		}
-		//msg+="<hr>";
+		// msg+="<hr>";
 
 		JEditorPane txt = new JEditorPane("text/html", msg);
 		txt.setEditable(false);
 
 		JScrollPane scroll = new JScrollPane(txt);
-		scroll.setSize(new Dimension(300,500));
-		vBox= Box.createVerticalBox();
+		scroll.setSize(new Dimension(300, 500));
+		vBox = Box.createVerticalBox();
 		vBox.add(scroll);
 
-		txt.addHyperlinkListener(new HyperlinkListener(){
+		txt.addHyperlinkListener((HyperlinkEvent e) -> {
 
-			@Override
-			public void hyperlinkUpdate(HyperlinkEvent e) {
-
-				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					String href = e.getDescription();
-					BrowserOpener.showDocument(href);
-				}
-				if ( e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-					// change the mouse curor
-					vBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				}
-				if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-					vBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				}
+			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+				String href = e.getDescription();
+				BrowserOpener.showDocument(href);
+			}
+			if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+				// change the mouse curor
+				vBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			}
+			if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+				vBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 
-
-
-
 		JButton close = new JButton("Close");
 
-		close.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				Object source = event.getSource();
+		close.addActionListener((ActionEvent event) -> {
+			Object source = event.getSource();
 
-				JButton but = (JButton)source;
-				Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
+			JButton but = (JButton) source;
+			Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent();
 
-				JDialog dia = (JDialog) parent;
-				dia.dispose();
-			}
+			JDialog dia = (JDialog) parent;
+			dia.dispose();
 		});
 
 		Box hBoxb = Box.createHorizontalBox();
 		hBoxb.add(Box.createGlue());
-		hBoxb.add(close,BorderLayout.EAST);
+		hBoxb.add(close, BorderLayout.EAST);
 
 		vBox.add(hBoxb);
 
 		dialog.getContentPane().add(vBox);
 		dialog.setVisible(true);
-
 
 	}
 }

@@ -28,19 +28,24 @@ import org.biojava.nbio.structure.domain.pdp.*;
 
 import java.util.List;
 
-
-/** Protein Domain Parser is a an algorithm that attempts at assigning domains for 3D protein structures.
- * Since domains in proteins are difficult to define, results detected by automated algorithms have to be taken with a grain of salt.
+/**
+ * Protein Domain Parser is a an algorithm that attempts at assigning domains
+ * for 3D protein structures. Since domains in proteins are difficult to define,
+ * results detected by automated algorithms have to be taken with a grain of
+ * salt.
  *
- *   see<pre>
+ * see
+ * 
+ * <pre>
 J Mol Biol. 2004 Jun 4;339(3):647-78.
 
 Toward consistent assignment of structural domains in proteins.
 
 Veretnik S, Bourne PE, Alexandrov NN, Shindyalov IN.
-</pre>
-
- * This implementation is based on a Java port of the PDP algorithm, as described in:
+ * </pre>
+ * 
+ * This implementation is based on a Java port of the PDP algorithm, as
+ * described in:
  *
  *
  * @author Andreas Prlic
@@ -48,68 +53,64 @@ Veretnik S, Bourne PE, Alexandrov NN, Shindyalov IN.
  */
 public class LocalProteinDomainParser {
 
-
-	/** make sure this class can only get accessed via the static method calls
+	/**
+	 * make sure this class can only get accessed via the static method calls
 	 *
 	 */
-	private LocalProteinDomainParser(){
+	private LocalProteinDomainParser() {
 
 	}
 
-	/** Suggest domains for a protein structure
+	/**
+	 * Suggest domains for a protein structure
 	 *
 	 * @param s the protein structure
 	 * @return a list of possible domains
 	 * @throws StructureException
 	 */
-	public static List<Domain> suggestDomains(Structure s) throws StructureException{
+	public static List<Domain> suggestDomains(Structure s) throws StructureException {
 
 		Atom[] ca = StructureTools.getRepresentativeAtomArray(s);
 
 		return suggestDomains(ca);
 	}
 
-
-	/** Suggest domains for a set of Calpha atoms
+	/**
+	 * Suggest domains for a set of Calpha atoms
 	 *
 	 * @param ca an array of Calpha atoms
 	 * @return a list of possible domains
 	 * @throws StructureException
 	 */
-	public static List<Domain> suggestDomains(Atom[] ca) throws StructureException{
+	public static List<Domain> suggestDomains(Atom[] ca) throws StructureException {
 
 		GetDistanceMatrix distMaxCalculator = new GetDistanceMatrix();
 
 		PDPDistanceMatrix pdpMatrix = distMaxCalculator.getDistanceMatrix(ca);
 
-
-
 		Domain dom = new Domain();
 		Chain c = ca[0].getGroup().getChain();
-		dom.setId("D"+c.getStructure().getPDBCode()+c.getId()+"1");
+		dom.setId(new StringBuilder().append("D").append(c.getStructure().getPDBCode()).append(c.getId()).append("1")
+				.toString());
 		dom.setSize(ca.length);
 		dom.setNseg(1);
 		dom.getSegmentAtPos(0).setFrom(0);
-		dom.getSegmentAtPos(0).setTo(ca.length-1);
+		dom.getSegmentAtPos(0).setTo(ca.length - 1);
 
 		CutSites cutSites = new CutSites();
 
 		// Do the initial splitting
-		CutDomain cutDomain = new CutDomain(ca,pdpMatrix);
+		CutDomain cutDomain = new CutDomain(ca, pdpMatrix);
 		cutDomain.cutDomain(dom, cutSites, pdpMatrix);
-		List<Domain> domains =  cutDomain.getDomains();
-
+		List<Domain> domains = cutDomain.getDomains();
 
 		//
 		domains = ClusterDomains.cluster(domains, pdpMatrix);
 
 		ShortSegmentRemover.cleanup(domains);
 
-
 		return domains;
 
 	}
-
-
 
 }

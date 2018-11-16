@@ -23,6 +23,7 @@ package org.biojava.nbio.structure;
 
 /**
  * Work in progress - NOT final!
+ * 
  * @author Jules Jacobsen <jacobsen@ebi.ac.uk>
  */
 public enum BondType {

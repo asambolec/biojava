@@ -32,8 +32,11 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class JPrintPanel extends JPanel implements Printable,ActionListener{
+public class JPrintPanel extends JPanel implements Printable, ActionListener {
+	private static final Logger logger = LoggerFactory.getLogger(JPrintPanel.class);
 	/**
 	 *
 	 */
@@ -47,18 +50,14 @@ public class JPrintPanel extends JPanel implements Printable,ActionListener{
 		}
 		Graphics2D g2D = (Graphics2D) g;
 		g.translate(20, 20);
-		Font  f = new Font("Monospaced",Font.PLAIN,10);
-		g.setFont (f);
+		Font f = new Font("Monospaced", Font.PLAIN, 10);
+		g.setFont(f);
 
-		double scale = pf.getImageableWidth()/this.getSize().getWidth();
+		double scale = pf.getImageableWidth() / this.getSize().getWidth();
 
-	    g2D.scale(scale,scale);
+		g2D.scale(scale, scale);
 
-		paint (g);
-
-
-
-
+		paint(g);
 
 		return Printable.PAGE_EXISTS;
 	}
@@ -70,12 +69,12 @@ public class JPrintPanel extends JPanel implements Printable,ActionListener{
 		printJob.setPrintable(this);
 
 		try {
-			if(printJob.printDialog()){
+			if (printJob.printDialog()) {
 				printJob.print();
 			}
 		} catch (Exception printException) {
-			System.err.println("Error during printing: " +printException.getMessage());
-			printException.printStackTrace();
+			logger.error("Error during printing: " + printException.getMessage(), printException);
+			logger.error(printException.getMessage(), printException);
 		}
 	}
 

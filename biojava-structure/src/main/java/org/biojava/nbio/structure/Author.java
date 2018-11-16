@@ -25,14 +25,14 @@ import java.io.Serializable;
 
 /**
  * Describes author attributes for author information in a PDB file.
+ * 
  * @author Jules Jacobsen
  */
-public class Author implements Serializable{
+public class Author implements Serializable {
 
 	private static final long serialVersionUID = 4840370515056666418L;
 	private String surname = "";
 	private String initials = "";
-
 
 	public String getInitials() {
 		return initials;
@@ -77,7 +77,5 @@ public class Author implements Serializable{
 	public String toString() {
 		return initials + surname;
 	}
-
-
 
 }

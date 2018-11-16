@@ -29,6 +29,31 @@ import org.biojava.nbio.structure.align.ce.CECPParameters.DuplicationHint;
 
 public class CeCPUserArgumentProcessor extends CeUserArgumentProcessor {
 
+	@Override
+	protected StartupParameters getStartupParametersInstance() {
+		return new CeCPStartupParams();
+	}
+
+	@Override
+	public StructureAlignment getAlgorithm() {
+		return new CeCPMain();
+	}
+
+	@Override
+	public Object getParameters() {
+		CECPParameters aligParams = (CECPParameters) super.getParameters();
+		CeCPStartupParams startParams = (CeCPStartupParams) params;
+
+		if (aligParams == null) {
+			aligParams = new CECPParameters();
+		}
+
+		// Copy relevant parameters from the startup parameters
+		aligParams.setDuplicationHint(startParams.getDuplicationHint());
+		aligParams.setMinCPLength(startParams.getMinCPLength());
+		return aligParams;
+	}
+
 	protected class CeCPStartupParams extends CeStartupParams {
 		protected DuplicationHint duplicationHint;
 		protected Integer minCPLength;
@@ -58,34 +83,9 @@ public class CeCPUserArgumentProcessor extends CeUserArgumentProcessor {
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
-			builder.append("CeCPStartupParams [duplicationHint=")
-					.append(duplicationHint).append(", minCPLength=")
+			builder.append("CeCPStartupParams [duplicationHint=").append(duplicationHint).append(", minCPLength=")
 					.append(minCPLength).append("]");
 			return builder.toString();
 		}
 	}
-
-	@Override
-	protected StartupParameters getStartupParametersInstance() {
-		return  new CeCPStartupParams();
-	}
-	@Override
-	public StructureAlignment getAlgorithm() {
-		return new CeCPMain();
-	}
-
-	@Override
-	public Object getParameters() {
-		CECPParameters aligParams = (CECPParameters) super.getParameters();
-		CeCPStartupParams startParams = (CeCPStartupParams) params;
-
-		if ( aligParams == null)
-			aligParams = new CECPParameters();
-
-		// Copy relevant parameters from the startup parameters
-		aligParams.setDuplicationHint(startParams.getDuplicationHint());
-		aligParams.setMinCPLength(startParams.getMinCPLength());
-		return aligParams;
-	}
 }
-

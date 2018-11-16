@@ -37,30 +37,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-@XmlRootElement(name = "TreeSetStringWrapper", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "TreeSetStringWrapper", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class ListStringWrapper implements Serializable{
-
+public class ListStringWrapper implements Serializable {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 4193799052494327416L;
-	List<String> data;
-
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(ListStringWrapper.class);
-		} catch (Exception e){
+			jaxbContext = JAXBContext.newInstance(ListStringWrapper.class);
+		} catch (Exception e) {
 			throw new RuntimeException("Could not initialize JAXB context for " + ListStringWrapper.class, e);
 		}
 	}
 
-	public ListStringWrapper(){
-		data = new ArrayList<String>();
+	List<String> data;
+
+	public ListStringWrapper() {
+		data = new ArrayList<>();
 	}
 
 	public List<String> getData() {
@@ -70,7 +67,8 @@ public class ListStringWrapper implements Serializable{
 	public void setData(List<String> data) {
 		this.data = data;
 	}
-	public  String toXML(){
+
+	public String toXML() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -82,18 +80,19 @@ public class ListStringWrapper implements Serializable{
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			throw new RuntimeException("Could not convert " + getClass() + " to XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(
+					new StringBuilder().append("Could not convert ").append(getClass()).append(" to XML").toString(),
+					e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static ListStringWrapper fromXML(String xml){
+	public static ListStringWrapper fromXML(String xml) {
 
 		ListStringWrapper job = null;
 
@@ -105,12 +104,12 @@ public class ListStringWrapper implements Serializable{
 
 			job = (ListStringWrapper) un.unmarshal(bais);
 
-		} catch (Exception e){
-			throw new RuntimeException("Could not parse " + ListStringWrapper.class + " from XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(new StringBuilder().append("Could not parse ").append(ListStringWrapper.class)
+					.append(" from XML").toString(), e);
 		}
 
 		return job;
 	}
-
 
 }

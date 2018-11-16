@@ -37,7 +37,8 @@ import java.util.Map;
  *
  * @author ayates
  */
-public class RnaSequenceView extends SequenceProxyView<NucleotideCompound> implements ProxySequenceReader<NucleotideCompound> {
+public class RnaSequenceView extends SequenceProxyView<NucleotideCompound>
+		implements ProxySequenceReader<NucleotideCompound> {
 
 	private CompoundSet<NucleotideCompound> rnaCompounds;
 	private Map<NucleotideCompound, NucleotideCompound> dnaToRna = null;
@@ -47,8 +48,7 @@ public class RnaSequenceView extends SequenceProxyView<NucleotideCompound> imple
 		this(sourceDna, RNACompoundSet.getRNACompoundSet());
 	}
 
-	public RnaSequenceView(Sequence<NucleotideCompound> sourceDna,
-			CompoundSet<NucleotideCompound> rnaCompounds) {
+	public RnaSequenceView(Sequence<NucleotideCompound> sourceDna, CompoundSet<NucleotideCompound> rnaCompounds) {
 		super(sourceDna);
 		this.rnaCompounds = rnaCompounds;
 	}
@@ -75,45 +75,38 @@ public class RnaSequenceView extends SequenceProxyView<NucleotideCompound> imple
 	}
 
 	public Map<NucleotideCompound, NucleotideCompound> getRnaToDna() {
-		if(rnaToDna == null) {
+		if (rnaToDna == null) {
 			buildTranslators();
 		}
 		return rnaToDna;
 	}
 
 	public Map<NucleotideCompound, NucleotideCompound> getDnaToRna() {
-		if(dnaToRna == null) {
+		if (dnaToRna == null) {
 			buildTranslators();
 		}
 		return dnaToRna;
 	}
 
 	protected void buildTranslators() {
-		Map<NucleotideCompound, NucleotideCompound> localDnaToRna =
-				new HashMap<NucleotideCompound, NucleotideCompound>();
-		Map<NucleotideCompound, NucleotideCompound> localRnaToDna =
-				new HashMap<NucleotideCompound, NucleotideCompound>();
+		Map<NucleotideCompound, NucleotideCompound> localDnaToRna = new HashMap<>();
+		Map<NucleotideCompound, NucleotideCompound> localRnaToDna = new HashMap<>();
 
-		NucleotideCompound thymine =
-				getViewedSequence().getCompoundSet().getCompoundForString("T");
-		NucleotideCompound lowerThymine =
-				getViewedSequence().getCompoundSet().getCompoundForString("t");
+		NucleotideCompound thymine = getViewedSequence().getCompoundSet().getCompoundForString("T");
+		NucleotideCompound lowerThymine = getViewedSequence().getCompoundSet().getCompoundForString("t");
 
-		for (NucleotideCompound dnaBase : getViewedSequence().getCompoundSet().getAllCompounds()) {
+		getViewedSequence().getCompoundSet().getAllCompounds().forEach(dnaBase -> {
 			NucleotideCompound equivalent;
 			if (dnaBase.equals(thymine)) {
 				equivalent = rnaCompounds.getCompoundForString("U");
-			}
-			else if (dnaBase.equals(lowerThymine)) {
+			} else if (dnaBase.equals(lowerThymine)) {
 				equivalent = rnaCompounds.getCompoundForString("u");
-			}
-			else {
-				equivalent = rnaCompounds.getCompoundForString(
-					dnaBase.toString());
+			} else {
+				equivalent = rnaCompounds.getCompoundForString(dnaBase.toString());
 			}
 			localDnaToRna.put(dnaBase, equivalent);
 			localRnaToDna.put(equivalent, dnaBase);
-		}
+		});
 		this.dnaToRna = localDnaToRna;
 		this.rnaToDna = localRnaToDna;
 	}

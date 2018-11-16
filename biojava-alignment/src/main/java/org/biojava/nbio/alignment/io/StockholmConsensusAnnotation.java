@@ -41,7 +41,7 @@ class StockholmConsensusAnnotation {
 	private String activeSite;
 	private String asPFamPredicted;
 	private String asSwissProt;
-	private String intron; //TODO (?)
+	private String intron; // TODO (?)
 	private String referenceAnnotation;
 	private String modelMask;
 

@@ -51,29 +51,23 @@ public class Subunit {
 	private ProteinSequence sequence = null;
 
 	/**
-	 * A Subunit is solely defined by the coordinates of the representative
-	 * Atoms of its residues. It can be identified with a StructureIdentifier
-	 * and/or a name and stores a reference to the Structure from which the
-	 * Atoms were obtained.
+	 * A Subunit is solely defined by the coordinates of the representative Atoms of
+	 * its residues. It can be identified with a StructureIdentifier and/or a name
+	 * and stores a reference to the Structure from which the Atoms were obtained.
 	 * 
-	 * @param reprAtoms
-	 *            representative Atoms. It cannot be null or empty
-	 * @param name
-	 *            String field that identifies the Subunit. It can be null
-	 * @param identifier
-	 *            StructureIdentifier. It can be null
-	 * @param structure
-	 *            parent Structure object. It can be null
+	 * @param reprAtoms  representative Atoms. It cannot be null or empty
+	 * @param name       String field that identifies the Subunit. It can be null
+	 * @param identifier StructureIdentifier. It can be null
+	 * @param structure  parent Structure object. It can be null
 	 */
-	public Subunit(Atom[] reprAtoms, String name,
-			StructureIdentifier identifier, Structure structure) {
+	public Subunit(Atom[] reprAtoms, String name, StructureIdentifier identifier, Structure structure) {
 
-		if (reprAtoms == null)
-			throw new IllegalArgumentException(
-					"Representative Atom Array of the Subunit is null");
-		if (reprAtoms.length==0)
-			throw new IllegalArgumentException(
-					"Representative Atom Array of the Subunit has 0 length");
+		if (reprAtoms == null) {
+			throw new IllegalArgumentException("Representative Atom Array of the Subunit is null");
+		}
+		if (reprAtoms.length == 0) {
+			throw new IllegalArgumentException("Representative Atom Array of the Subunit has 0 length");
+		}
 
 		this.reprAtoms = reprAtoms;
 		this.name = name;
@@ -107,15 +101,16 @@ public class Subunit {
 	 */
 	public String getProteinSequenceString() {
 
-		if (sequence != null)
+		if (sequence != null) {
 			return sequence.toString();
+		}
 
 		StringBuilder builder = new StringBuilder();
-		for (Atom a : reprAtoms)
+		for (Atom a : reprAtoms) {
 			// This method preferred over getChemComp.getOneLetterCode because
 			// it returns always X for Unknown residues
-			builder.append(StructureTools.get1LetterCode(a.getGroup()
-					.getPDBName()));
+			builder.append(StructureTools.get1LetterCode(a.getGroup().getPDBName()));
+		}
 
 		return builder.toString();
 	}
@@ -126,11 +121,11 @@ public class Subunit {
 	 * @return sequence ProteinSequence
 	 * @throws CompoundNotFoundException
 	 */
-	public ProteinSequence getProteinSequence()
-			throws CompoundNotFoundException {
+	public ProteinSequence getProteinSequence() throws CompoundNotFoundException {
 
-		if (sequence == null)
+		if (sequence == null) {
 			sequence = new ProteinSequence(getProteinSequenceString());
+		}
 
 		return sequence;
 	}
@@ -147,8 +142,7 @@ public class Subunit {
 	/**
 	 * The Name of a Subunit is a free-text field, user defined.
 	 * 
-	 * @param name
-	 *            of the Subunit
+	 * @param name of the Subunit
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -174,8 +168,8 @@ public class Subunit {
 
 	@Override
 	public String toString() {
-		return "Subunit [Name: " + name + ", Identifier: " + identifier
-				+ ", Size:" + size() + ", Sequence:" + sequence + "]";
+		return new StringBuilder().append("Subunit [Name: ").append(name).append(", Identifier: ").append(identifier)
+				.append(", Size:").append(size()).append(", Sequence:").append(sequence).append("]").toString();
 	}
 
 }

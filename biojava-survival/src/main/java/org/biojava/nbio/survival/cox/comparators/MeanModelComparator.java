@@ -31,7 +31,7 @@ import java.util.Comparator;
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class MeanModelComparator implements Comparator<CoxVariables>, Serializable {
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
 	String variable = "";
 
@@ -40,7 +40,7 @@ public class MeanModelComparator implements Comparator<CoxVariables>, Serializab
 	 * @param variable
 	 */
 	public MeanModelComparator(String variable) {
-	  this.variable = variable;
+		this.variable = variable;
 	}
 
 	@Override
@@ -48,8 +48,9 @@ public class MeanModelComparator implements Comparator<CoxVariables>, Serializab
 		CoxInfo ci1LTMean = coxVariables1.getCoxInfo("<MEAN");
 		CoxInfo ci1GTMean = coxVariables1.getCoxInfo(">MEAN");
 
-		if(ci1LTMean == null || ci1GTMean == null)
+		if (ci1LTMean == null || ci1GTMean == null) {
 			return 0;
+		}
 
 		double c1LTpvalue = ci1LTMean.getCoefficient(variable).getPvalue();
 		double c1GTpvalue = ci1GTMean.getCoefficient(variable).getPvalue();
@@ -62,7 +63,7 @@ public class MeanModelComparator implements Comparator<CoxVariables>, Serializab
 		double c2LTpvalue = ci2LTMean.getCoefficient(variable).getPvalue();
 		double c2GTpvalue = ci2GTMean.getCoefficient(variable).getPvalue();
 
-	   double c2ratio = Math.min(c2LTpvalue, c2GTpvalue) / Math.max(c2LTpvalue, c2GTpvalue);
+		double c2ratio = Math.min(c2LTpvalue, c2GTpvalue) / Math.max(c2LTpvalue, c2GTpvalue);
 
 		if (c1ratio > c2ratio) {
 			return 1;
@@ -71,7 +72,7 @@ public class MeanModelComparator implements Comparator<CoxVariables>, Serializab
 		} else {
 			return 0;
 		}
-		//ascending order
+		// ascending order
 		// return coxVariables1.compareTo(coxVariables2);
 	}
 }

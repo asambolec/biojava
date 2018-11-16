@@ -27,8 +27,7 @@ package org.biojava.nbio.protmod;
 import java.util.Set;
 
 /**
- * This interface defines information about a specific protein
- * modification.
+ * This interface defines information about a specific protein modification.
  *
  * @author Jianjiong Gao
  * @since 3.0

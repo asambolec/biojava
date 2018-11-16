@@ -33,14 +33,13 @@ import javax.vecmath.*;
 
 import java.util.*;
 
-public class RotationAxisAligner extends AxisAligner{
-	
-	private static final Logger logger = LoggerFactory
-			.getLogger(RotationAxisAligner.class);
-	
-	private static final Vector3d X_AXIS = new Vector3d(1,0,0);
-	private static final Vector3d Y_AXIS = new Vector3d(0,1,0);
-	private static final Vector3d Z_AXIS = new Vector3d(0,0,1);
+public class RotationAxisAligner extends AxisAligner {
+
+	private static final Logger logger = LoggerFactory.getLogger(RotationAxisAligner.class);
+
+	private static final Vector3d X_AXIS = new Vector3d(1, 0, 0);
+	private static final Vector3d Y_AXIS = new Vector3d(0, 1, 0);
+	private static final Vector3d Z_AXIS = new Vector3d(0, 0, 1);
 
 	private QuatSymmetrySubunits subunits = null;
 	private RotationGroup rotationGroup = null;
@@ -50,7 +49,7 @@ public class RotationAxisAligner extends AxisAligner{
 	private Vector3d referenceVector = new Vector3d();
 	private Vector3d principalRotationVector = new Vector3d();
 	private Vector3d[] principalAxesOfInertia = null;
-	 List<List<Integer>> alignedOrbits = null;
+	List<List<Integer>> alignedOrbits = null;
 
 	private Vector3d minBoundary = new Vector3d();
 	private Vector3d maxBoundary = new Vector3d();
@@ -73,8 +72,11 @@ public class RotationAxisAligner extends AxisAligner{
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.biojava.nbio.structure.quaternary.core.AxisAligner#getTransformation()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.biojava.nbio.structure.quaternary.core.AxisAligner#getTransformation()
 	 */
 	@Override
 	public String getSymmetry() {
@@ -131,6 +133,7 @@ public class RotationAxisAligner extends AxisAligner{
 
 	/**
 	 * Returns the radius for drawing the minor rotation axis in the xy-plane
+	 * 
 	 * @return double radius in xy-plane
 	 */
 	@Override
@@ -140,9 +143,10 @@ public class RotationAxisAligner extends AxisAligner{
 	}
 
 	/**
-	 * Returns a transformation matrix transform polyhedra for Cn structures.
-	 * The center in this matrix is the geometric center, rather then the centroid.
-	 * In Cn structures those are usually not the same.
+	 * Returns a transformation matrix transform polyhedra for Cn structures. The
+	 * center in this matrix is the geometric center, rather then the centroid. In
+	 * Cn structures those are usually not the same.
+	 * 
 	 * @return
 	 */
 	@Override
@@ -156,9 +160,9 @@ public class RotationAxisAligner extends AxisAligner{
 	}
 
 	/**
-	 * Returns the geometric center of polyhedron. In the case of the Cn
-	 * point group, the centroid and geometric center are usually not
-	 * identical.
+	 * Returns the geometric center of polyhedron. In the case of the Cn point
+	 * group, the centroid and geometric center are usually not identical.
+	 * 
 	 * @return
 	 */
 	@Override
@@ -170,9 +174,9 @@ public class RotationAxisAligner extends AxisAligner{
 		reverseTransformationMatrix.get(translation);
 
 		// calculate adjustment around z-axis and transform adjustment to
-		//  original coordinate frame with the reverse transformation
+		// original coordinate frame with the reverse transformation
 		if (rotationGroup.getPointGroup().startsWith("C")) {
-			Vector3d corr = new Vector3d(0,0, minBoundary.z+getDimension().z);
+			Vector3d corr = new Vector3d(0, 0, minBoundary.z + getDimension().z);
 			reverseTransformationMatrix.transform(corr);
 			geometricCenter.set(corr);
 		}
@@ -204,47 +208,47 @@ public class RotationAxisAligner extends AxisAligner{
 	 * @return
 	 */
 
-	private void run () {
-		if (modified) {
-			calcPrincipalRotationVector();
-			calcPrincipalAxes();
-			// initial alignment with draft reference axis
-			calcReferenceVector();
-			calcTransformation();
-
-			// refine ref. axis for cyclic and dihedral systems
-			if ((rotationGroup.getPointGroup().startsWith("C") &&
-					!rotationGroup.getPointGroup().startsWith("C2")) ||
-				(rotationGroup.getPointGroup().startsWith("D") &&
-							!rotationGroup.getPointGroup().startsWith("D2"))
-					) {
-				refineReferenceVector();
-				calcTransformation();
-			}
-			calcReverseTransformation();
-			calcBoundaries();
-			if (! rotationGroup.getPointGroup().equals("Helical")) {
-				calcAlignedOrbits();
-			}
-			modified = false;
+	private void run() {
+		if (!modified) {
+			return;
 		}
+		calcPrincipalRotationVector();
+		calcPrincipalAxes();
+		// initial alignment with draft reference axis
+		calcReferenceVector();
+		calcTransformation();
+		// refine ref. axis for cyclic and dihedral systems
+		if ((rotationGroup.getPointGroup().startsWith("C") && !rotationGroup.getPointGroup().startsWith("C2"))
+				|| (rotationGroup.getPointGroup().startsWith("D") && !rotationGroup.getPointGroup().startsWith("D2"))) {
+			refineReferenceVector();
+			calcTransformation();
+		}
+		calcReverseTransformation();
+		calcBoundaries();
+		if (!"Helical".equals(rotationGroup.getPointGroup())) {
+			calcAlignedOrbits();
+		}
+		modified = false;
 	}
+
 	/**
-	 * Returns a list of orbits (an orbit is a cyclic permutation of subunit indices that are related
-	 * by a rotation around the principal rotation axis) ordered from the +z direction to the -z direction (z-depth).
-	 * Within an orbit, subunit indices are ordered with a clockwise rotation around the z-axis.
+	 * Returns a list of orbits (an orbit is a cyclic permutation of subunit indices
+	 * that are related by a rotation around the principal rotation axis) ordered
+	 * from the +z direction to the -z direction (z-depth). Within an orbit, subunit
+	 * indices are ordered with a clockwise rotation around the z-axis.
+	 * 
 	 * @return list of orbits ordered by z-depth
 	 */
 	private void calcAlignedOrbits() {
-		Map<Double, List<Integer>> depthMap = new TreeMap<Double, List<Integer>>();
+		Map<Double, List<Integer>> depthMap = new TreeMap<>();
 		double[] depth = getSubunitZDepth();
 		alignedOrbits = calcOrbits();
 
 		// calculate the mean depth of orbit along z-axis
-		for (List<Integer> orbit: alignedOrbits) {
+		alignedOrbits.forEach(orbit -> {
 			// calculate the mean depth along z-axis for each orbit
 			double meanDepth = 0;
-			for (int subunit: orbit) {
+			for (int subunit : orbit) {
 				meanDepth += depth[subunit];
 			}
 			meanDepth /= orbit.size();
@@ -254,24 +258,25 @@ public class RotationAxisAligner extends AxisAligner{
 				meanDepth += 0.01;
 			}
 			depthMap.put(meanDepth, orbit);
-		}
+		});
 
 		// now fill orbits back into list ordered by depth
 		alignedOrbits.clear();
-		for (List<Integer> orbit: depthMap.values()) {
+		depthMap.values().forEach(orbit -> {
 			// order subunit in a clockwise rotation around the z-axis
 			/// starting at the 12 O-clock position (+y position)
 			alignWithReferenceAxis(orbit);
 			alignedOrbits.add(orbit);
-		}
+		});
 	}
 
 	/**
 	 * Returns an ordered list of subunit ids (orbit) in such a way that the subunit
-	 * indices start at the 12 o-clock (+y axis) and proceed in a clockwise direction
-	 * to the 11 o-clock position to close the "orbit".
+	 * indices start at the 12 o-clock (+y axis) and proceed in a clockwise
+	 * direction to the 11 o-clock position to close the "orbit".
 	 *
-	 * @param orbit list of subunit indices that are transformed into each other by a rotation
+	 * @param orbit list of subunit indices that are transformed into each other by
+	 *              a rotation
 	 * @return list of subunit indices ordered in a clockwise direction
 	 */
 
@@ -287,17 +292,17 @@ public class RotationAxisAligner extends AxisAligner{
 		double dotMin2 = Double.MIN_VALUE;
 		int index1 = 0;
 		int index2 = 0;
-		Vector3d Y1 = new Vector3d(0,1,0);
-		Vector3d Y2 = new Vector3d(0,1,0);
+		Vector3d Y1 = new Vector3d(0, 1, 0);
+		Vector3d Y2 = new Vector3d(0, 1, 0);
 		Matrix3d m = new Matrix3d();
-		double angle = -2*Math.PI/fold;
-		m.rotZ(0.1*angle); // add small offset, since two subunits may be equidistant to the y-axis
+		double angle = -2 * Math.PI / fold;
+		m.rotZ(0.1 * angle); // add small offset, since two subunits may be equidistant to the y-axis
 		m.transform(Y1);
-		m.rotZ(1.1*angle);
+		m.rotZ(1.1 * angle);
 		m.transform(Y2);
 		// transform subunit centers into z-aligned position and calculate
 		// width in xy direction.
-		for (int i: orbit) {
+		for (int i : orbit) {
 			Point3d p = subunits.getCenters().get(i);
 			probe.set(p);
 			transformationMatrix.transform(probe);
@@ -314,33 +319,31 @@ public class RotationAxisAligner extends AxisAligner{
 				index2 = i;
 			}
 		}
-//		System.out.println("Index1/2: " + index1 + " - " + index2);
-//		System.out.println("Orbit0: " + orbit);
+		// System.out.println("Index1/2: " + index1 + " - " + index2);
+		// System.out.println("Orbit0: " + orbit);
 		// order subunit indices in a clockwise orientation around the z-axis
 		// bring subunit into position 0
 		for (int i = 0; i < n; i++) {
 			if (orbit.get(0) == index1) {
 				break;
 			}
-			Collections.rotate(orbit,1);
+			Collections.rotate(orbit, 1);
 		}
-//		System.out.println("Orbit1: " + orbit);
-		// bring second subunit  onto position 1
+		// System.out.println("Orbit1: " + orbit);
+		// bring second subunit onto position 1
 		if (orbit.get(1) == index2) {
 			return orbit;
 		}
-		Collections.reverse(orbit.subList(1,  orbit.size()));
+		Collections.reverse(orbit.subList(1, orbit.size()));
 		if (orbit.get(1) != index2) {
 			logger.warn("alignWithReferenceAxis failed");
 		}
-//		System.out.println("Orbit2: " + orbit);
+		// System.out.println("Orbit2: " + orbit);
 		return orbit;
 	}
 
-
-
 	private void calcTransformation() {
-		if (rotationGroup.getPointGroup().equals("C1")) {
+		if ("C1".equals(rotationGroup.getPointGroup())) {
 			calcTransformationByInertiaAxes();
 		} else {
 			calcTransformationBySymmetryAxes();
@@ -358,7 +361,7 @@ public class RotationAxisAligner extends AxisAligner{
 		axisVectors[0] = new Vector3d(principalRotationVector);
 		axisVectors[1] = new Vector3d(referenceVector);
 
-		//  y,z axis centered at the centroid of the subunits
+		// y,z axis centered at the centroid of the subunits
 		Vector3d[] referenceVectors = new Vector3d[2];
 		referenceVectors[0] = new Vector3d(Z_AXIS);
 		referenceVectors[1] = new Vector3d(Y_AXIS);
@@ -401,9 +404,9 @@ public class RotationAxisAligner extends AxisAligner{
 	}
 
 	/**
-	 * Returns a transformation matrix that rotates refPoints to match
-	 * coordPoints
-	 * @param refPoints the points to be aligned
+	 * Returns a transformation matrix that rotates refPoints to match coordPoints
+	 * 
+	 * @param refPoints        the points to be aligned
 	 * @param referenceVectors
 	 * @return
 	 */
@@ -417,12 +420,12 @@ public class RotationAxisAligner extends AxisAligner{
 		Vector3d v2 = new Vector3d(referenceVectors[0]);
 		double dot = v1.dot(v2);
 		if (Math.abs(dot) < 0.999) {
-			axis.cross(v1,v2);
+			axis.cross(v1, v2);
 			axis.normalize();
 			a.set(axis, v1.angle(v2));
 			m1.set(a);
 			// make sure matrix element m33 is 1.0. It's 0 on Linux.
-			m1.setElement(3,  3, 1.0);
+			m1.setElement(3, 3, 1.0);
 		} else if (dot > 0) {
 			// parallel axis, nothing to do -> identity matrix
 			m1.setIdentity();
@@ -441,12 +444,12 @@ public class RotationAxisAligner extends AxisAligner{
 		Matrix4d m2 = new Matrix4d();
 		dot = v1.dot(v2);
 		if (Math.abs(dot) < 0.999) {
-			axis.cross(v1,v2);
+			axis.cross(v1, v2);
 			axis.normalize();
 			a.set(axis, v1.angle(v2));
 			m2.set(a);
 			// make sure matrix element m33 is 1.0. It's 0 on Linux.
-			m2.setElement(3,  3, 1.0);
+			m2.setElement(3, 3, 1.0);
 		} else if (dot > 0) {
 			// parallel axis, nothing to do -> identity matrix
 			m2.setIdentity();
@@ -470,8 +473,7 @@ public class RotationAxisAligner extends AxisAligner{
 		ref[0] = new Point3d(referenceVectors[0]);
 		ref[1] = new Point3d(referenceVectors[1]);
 		if (CalcPoint.rmsd(axes, ref) > 0.1) {
-			logger.warn("AxisTransformation: axes alignment is off. RMSD: " 
-					+ CalcPoint.rmsd(axes, ref));
+			logger.warn("AxisTransformation: axes alignment is off. RMSD: " + CalcPoint.rmsd(axes, ref));
 		}
 
 		return m2;
@@ -480,11 +482,11 @@ public class RotationAxisAligner extends AxisAligner{
 	private void calcPrincipalAxes() {
 		MomentsOfInertia moi = new MomentsOfInertia();
 
-		for (Point3d[] list: subunits.getTraces()) {
-			for (Point3d p: list) {
+		subunits.getTraces().forEach(list -> {
+			for (Point3d p : list) {
 				moi.addPoint(p, 1.0);
 			}
-		}
+		});
 		principalAxesOfInertia = moi.getPrincipalAxes();
 	}
 
@@ -502,8 +504,8 @@ public class RotationAxisAligner extends AxisAligner{
 
 		Point3d probe = new Point3d();
 
-		for (Point3d[] list: subunits.getTraces()) {
-			for (Point3d p: list) {
+		subunits.getTraces().forEach(list -> {
+			for (Point3d p : list) {
 				probe.set(p);
 				transformationMatrix.transform(probe);
 
@@ -513,40 +515,41 @@ public class RotationAxisAligner extends AxisAligner{
 				maxBoundary.y = Math.max(maxBoundary.y, probe.y);
 				minBoundary.z = Math.min(minBoundary.z, probe.z);
 				maxBoundary.z = Math.max(maxBoundary.z, probe.z);
-				xyRadiusMax = Math.max(xyRadiusMax, Math.sqrt(probe.x*probe.x + probe.y * probe.y));
+				xyRadiusMax = Math.max(xyRadiusMax, Math.sqrt(probe.x * probe.x + probe.y * probe.y));
 			}
-		}
+		});
 	}
 
 	/*
-	 * Modifies the rotation part of the transformation axis for
-	 * a Cn symmetric complex, so that the narrower end faces the
-	 * viewer, and the wider end faces away from the viewer. Example: 3LSV
+	 * Modifies the rotation part of the transformation axis for a Cn symmetric
+	 * complex, so that the narrower end faces the viewer, and the wider end faces
+	 * away from the viewer. Example: 3LSV
 	 */
 	private void calcZDirection() {
 		calcBoundaries();
 
 		// if the longer part of the structure faces towards the back (-z direction),
 		// rotate around y-axis so the longer part faces the viewer (+z direction)
-		if (Math.abs(minBoundary.z) > Math.abs(maxBoundary.z)) {
-			Matrix4d rot = flipY();
-			rot.mul(transformationMatrix);
-			transformationMatrix.set(rot);
+		if (Math.abs(minBoundary.z) <= Math.abs(maxBoundary.z)) {
+			return;
 		}
+		Matrix4d rot = flipY();
+		rot.mul(transformationMatrix);
+		transformationMatrix.set(rot);
 	}
 
 	/**
 	 *
 	 */
 	private List<List<Integer>> getOrbitsByXYWidth() {
-		Map<Double, List<Integer>> widthMap = new TreeMap<Double, List<Integer>>();
+		Map<Double, List<Integer>> widthMap = new TreeMap<>();
 		double[] width = getSubunitXYWidth();
 		List<List<Integer>> orbits = calcOrbits();
 
 		// calculate the mean width of orbits in XY-plane
-		for (List<Integer> orbit: orbits) {
+		orbits.forEach(orbit -> {
 			double meanWidth = 0;
-			for (int subunit: orbit) {
+			for (int subunit : orbit) {
 				meanWidth += width[subunit];
 			}
 			meanWidth /= orbit.size();
@@ -555,13 +558,11 @@ public class RotationAxisAligner extends AxisAligner{
 				meanWidth += 0.01;
 			}
 			widthMap.put(meanWidth, orbit);
-		}
+		});
 
 		// now fill orbits back into list ordered by width
 		orbits.clear();
-		for (List<Integer> orbit: widthMap.values()) {
-			orbits.add(orbit);
-		}
+		widthMap.values().forEach(orbits::add);
 		return orbits;
 	}
 
@@ -574,10 +575,10 @@ public class RotationAxisAligner extends AxisAligner{
 		// width in xy direction.
 		for (int i = 0; i < n; i++) {
 			width[i] = Double.MIN_VALUE;
-			for (Point3d p: subunits.getTraces().get(i)) {
+			for (Point3d p : subunits.getTraces().get(i)) {
 				probe.set(p);
 				transformationMatrix.transform(probe);
-				width[i] = Math.max(width[i], Math.sqrt(probe.x*probe.x + probe.y*probe.y));
+				width[i] = Math.max(width[i], Math.sqrt(probe.x * probe.x + probe.y * probe.y));
 			}
 		}
 		return width;
@@ -591,7 +592,7 @@ public class RotationAxisAligner extends AxisAligner{
 		// transform subunit centers into z-aligned position and calculate
 		// z-coordinates (depth) along the z-axis.
 		for (int i = 0; i < n; i++) {
-			Point3d p= subunits.getCenters().get(i);
+			Point3d p = subunits.getCenters().get(i);
 			probe.set(p);
 			transformationMatrix.transform(probe);
 			depth[i] = probe.z;
@@ -600,22 +601,24 @@ public class RotationAxisAligner extends AxisAligner{
 	}
 
 	/**
-	 * Returns a list of list of subunit ids that form an "orbit", i.e. they
-	 * are transformed into each other during a rotation around the principal symmetry axis (z-axis)
+	 * Returns a list of list of subunit ids that form an "orbit", i.e. they are
+	 * transformed into each other during a rotation around the principal symmetry
+	 * axis (z-axis)
+	 * 
 	 * @return
 	 */
 	private List<List<Integer>> calcOrbits() {
 		int n = subunits.getSubunitCount();
 		int fold = rotationGroup.getRotation(0).getFold();
 
-		List<List<Integer>> orbits = new ArrayList<List<Integer>>();
+		List<List<Integer>> orbits = new ArrayList<>();
 		boolean[] used = new boolean[n];
 		Arrays.fill(used, false);
 
 		for (int i = 0; i < n; i++) {
-			if (! used[i]) {
+			if (!used[i]) {
 				// determine the equivalent subunits
-				List<Integer> orbit = new ArrayList<Integer>(fold);
+				List<Integer> orbit = new ArrayList<>(fold);
 				for (int j = 0; j < fold; j++) {
 					List<Integer> permutation = rotationGroup.getRotation(j).getPermutation();
 					orbit.add(permutation.get(i));
@@ -633,14 +636,14 @@ public class RotationAxisAligner extends AxisAligner{
 		}
 		List<Integer> p0 = rotationGroup.getRotation(0).getPermutation();
 		List<Integer> p1 = rotationGroup.getRotation(1).getPermutation();
-//		System.out.println("deconvolute");
-//		System.out.println("Permutation0: " + p0);
-//		System.out.println("Permutation1: " + p1);
+		// System.out.println("deconvolute");
+		// System.out.println("Permutation0: " + p0);
+		// System.out.println("Permutation1: " + p1);
 
-		List<Integer> inRotationOrder = new ArrayList<Integer>(orbit.size());
+		List<Integer> inRotationOrder = new ArrayList<>(orbit.size());
 		inRotationOrder.add(orbit.get(0));
 		for (int i = 1; i < orbit.size(); i++) {
-			int current = inRotationOrder.get(i-1);
+			int current = inRotationOrder.get(i - 1);
 			int index = p0.indexOf(current);
 			int next = p1.get(index);
 			if (!orbit.contains(next)) {
@@ -649,24 +652,27 @@ public class RotationAxisAligner extends AxisAligner{
 			}
 			inRotationOrder.add(next);
 		}
-//		System.out.println("In order: " + inRotationOrder);
+		// System.out.println("In order: " + inRotationOrder);
 		return inRotationOrder;
 	}
 
 	/**
-	 * Returns a vector along the principal rotation axis for the
-	 * alignment of structures along the z-axis
+	 * Returns a vector along the principal rotation axis for the alignment of
+	 * structures along the z-axis
+	 * 
 	 * @return principal rotation vector
 	 */
 	private void calcPrincipalRotationVector() {
-		Rotation rotation = rotationGroup.getRotation(0); // the rotation around the principal axis is the first rotation
+		Rotation rotation = rotationGroup.getRotation(0); // the rotation around the principal axis is the first
+															// rotation
 		AxisAngle4d axisAngle = rotation.getAxisAngle();
 		principalRotationVector = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
 	}
 
 	/**
-	 * Returns a vector perpendicular to the principal rotation vector
-	 * for the alignment of structures in the xy-plane
+	 * Returns a vector perpendicular to the principal rotation vector for the
+	 * alignment of structures in the xy-plane
+	 * 
 	 * @return reference vector
 	 */
 	private void calcReferenceVector() {
@@ -675,13 +681,13 @@ public class RotationAxisAligner extends AxisAligner{
 			referenceVector = getReferenceAxisCylic();
 		} else if (rotationGroup.getPointGroup().startsWith("D")) {
 			referenceVector = getReferenceAxisDihedral();
-		} else if (rotationGroup.getPointGroup().equals("T")) {
+		} else if ("T".equals(rotationGroup.getPointGroup())) {
 			referenceVector = getReferenceAxisTetrahedral();
-		} else if (rotationGroup.getPointGroup().equals("O")) {
+		} else if ("O".equals(rotationGroup.getPointGroup())) {
 			referenceVector = getReferenceAxisOctahedral();
-		} else if (rotationGroup.getPointGroup().equals("I")) {
+		} else if ("I".equals(rotationGroup.getPointGroup())) {
 			referenceVector = getReferenceAxisIcosahedral();
-		} else if (rotationGroup.getPointGroup().equals("Helical")) {
+		} else if ("Helical".equals(rotationGroup.getPointGroup())) {
 			// TODO what should the reference vector be??
 			referenceVector = getReferenceAxisCylic();
 		}
@@ -695,8 +701,9 @@ public class RotationAxisAligner extends AxisAligner{
 	}
 
 	/**
-	 * Returns a normalized vector that represents a minor rotation axis, except
-	 * for Cn, this represents an axis orthogonal to the principal axis.
+	 * Returns a normalized vector that represents a minor rotation axis, except for
+	 * Cn, this represents an axis orthogonal to the principal axis.
+	 * 
 	 * @return minor rotation axis
 	 */
 	private void refineReferenceVector() {
@@ -713,29 +720,31 @@ public class RotationAxisAligner extends AxisAligner{
 	private Vector3d orthogonalize(Vector3d vector1, Vector3d vector2) {
 		double dot = vector1.dot(vector2);
 		Vector3d ref = new Vector3d(vector2);
-//		System.out.println("p.r: " + dot);
-//		System.out.println("Orig refVector: " + referenceVector);
+		// System.out.println("p.r: " + dot);
+		// System.out.println("Orig refVector: " + referenceVector);
 		if (dot < 0) {
 			vector2.negate();
 		}
 		vector2.cross(vector1, vector2);
-//		System.out.println("Intermed. refVector: " + vector2);
+		// System.out.println("Intermed. refVector: " + vector2);
 		vector2.normalize();
-//		referenceVector.cross(referenceVector, principalRotationVector);
+		// referenceVector.cross(referenceVector, principalRotationVector);
 		vector2.cross(vector1, vector2);
 		vector2.normalize();
 		if (ref.dot(vector2) < 0) {
 			vector2.negate();
 		}
-//		System.out.println("Mod. refVector: " + vector2);
+		// System.out.println("Mod. refVector: " + vector2);
 		return vector2;
 	}
+
 	/**
 	 * Returns the default reference vector for the alignment of Cn structures
+	 * 
 	 * @return
 	 */
 	private Vector3d getReferenceAxisCylic() {
-		if (rotationGroup.getPointGroup().equals("C2")) {
+		if ("C2".equals(rotationGroup.getPointGroup())) {
 			Vector3d vr = new Vector3d(subunits.getOriginalCenters().get(0));
 			vr.sub(subunits.getCentroid());
 			vr.normalize();
@@ -746,7 +755,7 @@ public class RotationAxisAligner extends AxisAligner{
 		// rotation vector
 		Vector3d vmin = null;
 		double dotMin = 1.0;
-		for (Vector3d v: principalAxesOfInertia) {
+		for (Vector3d v : principalAxesOfInertia) {
 			if (Math.abs(principalRotationVector.dot(v)) < dotMin) {
 				dotMin = Math.abs(principalRotationVector.dot(v));
 				vmin = new Vector3d(v);
@@ -759,20 +768,20 @@ public class RotationAxisAligner extends AxisAligner{
 		return vmin;
 	}
 
-
 	/**
 	 * Returns a reference vector for the alignment of Cn structures.
+	 * 
 	 * @return reference vector
 	 */
 	private Vector3d getReferenceAxisCylicWithSubunitAlignment() {
-		if (rotationGroup.getPointGroup().equals("C2")) {
+		if ("C2".equals(rotationGroup.getPointGroup())) {
 			return referenceVector;
 		}
 
 		// find subunit that extends the most in the xy-plane
 		List<List<Integer>> orbits = getOrbitsByXYWidth();
 		// get the last orbit which is the widest
-		List<Integer> widestOrbit = orbits.get(orbits.size()-1);
+		List<Integer> widestOrbit = orbits.get(orbits.size() - 1);
 		List<Point3d> centers = subunits.getCenters();
 		int subunit = widestOrbit.get(0);
 
@@ -795,24 +804,23 @@ public class RotationAxisAligner extends AxisAligner{
 		Vector3d ref = getSubunitReferenceVector();
 
 		for (int i = 0; i < rotationGroup.getOrder(); i++) {
-			if (rotationGroup.getRotation(i).getDirection() == 1 &&
-					(rotationGroup.getRotation(i).getFold() < maxFold) ||
-					rotationGroup.getPointGroup().equals("D2")) {
+			if (rotationGroup.getRotation(i).getDirection() == 1 && (rotationGroup.getRotation(i).getFold() < maxFold)
+					|| "D2".equals(rotationGroup.getPointGroup())) {
 
 				AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
 				Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
 				v.normalize();
 
-//				System.out.println("Ref axis angle(+): " + Math.toDegrees(v.angle(ref)));
-				double angle =  v.angle(ref);
+				// System.out.println("Ref axis angle(+): " + Math.toDegrees(v.angle(ref)));
+				double angle = v.angle(ref);
 				if (angle < minAngle) {
 					minAngle = angle;
 					refVec = v;
 				}
 				Vector3d vn = new Vector3d(v);
 				vn.negate();
-//				System.out.println("Ref axis angle(-): " + Math.toDegrees(vn.angle(ref)));
-				angle =  vn.angle(ref);
+				// System.out.println("Ref axis angle(-): " + Math.toDegrees(vn.angle(ref)));
+				angle = vn.angle(ref);
 				if (angle < minAngle) {
 					minAngle = angle;
 					refVec = vn;
@@ -846,75 +854,75 @@ public class RotationAxisAligner extends AxisAligner{
 
 	private Vector3d getReferenceAxisTetrahedral() {
 		for (int i = 0; i < rotationGroup.getOrder(); i++) {
-				AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
-				Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
-				double d = v.dot(principalRotationVector);
-				if (rotationGroup.getRotation(i).getFold() == 3) {
-					// the dot product 0 is between to adjacent 3-fold axes
-					if (d > 0.3 && d < 0.9) {
-						return v;
-					}
+			AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
+			Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
+			double d = v.dot(principalRotationVector);
+			if (rotationGroup.getRotation(i).getFold() == 3) {
+				// the dot product 0 is between to adjacent 3-fold axes
+				if (d > 0.3 && d < 0.9) {
+					return v;
 				}
+			}
 		}
 		return null;
 	}
 
 	private Vector3d getReferenceAxisOctahedral() {
 		for (int i = 0; i < rotationGroup.getOrder(); i++) {
-				AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
-				Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
-				double d = v.dot(principalRotationVector);
-				if (rotationGroup.getRotation(i).getFold() == 4) {
-					// the dot product 0 is between to adjacent 4-fold axes
-					if (d > -0.1 && d < 0.1 ) {
-						return v;
-					}
+			AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
+			Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
+			double d = v.dot(principalRotationVector);
+			if (rotationGroup.getRotation(i).getFold() == 4) {
+				// the dot product 0 is between to adjacent 4-fold axes
+				if (d > -0.1 && d < 0.1) {
+					return v;
 				}
+			}
 		}
 		return null;
 	}
 
 	private Vector3d getReferenceAxisIcosahedral() {
 		for (int i = 0; i < rotationGroup.getOrder(); i++) {
-				AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
-				Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
-				double d = v.dot(principalRotationVector);
-				if (rotationGroup.getRotation(i).getFold() == 5) {
-					// the dot product of 0.447.. is between to adjacent 5-fold axes
-//					if (d > 0.447 && d < 0.448) {
-					if (d > 0.4 && d < 0.5) {
-						return v;
-					}
+			AxisAngle4d axisAngle = rotationGroup.getRotation(i).getAxisAngle();
+			Vector3d v = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
+			double d = v.dot(principalRotationVector);
+			if (rotationGroup.getRotation(i).getFold() == 5) {
+				// the dot product of 0.447.. is between to adjacent 5-fold axes
+				// if (d > 0.447 && d < 0.448) {
+				if (d > 0.4 && d < 0.5) {
+					return v;
 				}
+			}
 		}
 		return null;
 	}
 
 	private Vector3d getSubunitReferenceVector() {
-			int n = subunits.getSubunitCount();
-			Point3d probe = new Point3d();
+		int n = subunits.getSubunitCount();
+		Point3d probe = new Point3d();
 
-			// transform subunit centers into z-aligned position and calculate
-			// width in xy direction.
-			double maxWidthSq = 0;
-			Point3d ref = null;
-			for (int i = 0; i < n; i++) {
-				for (Point3d p: subunits.getTraces().get(i)) {
-					probe.set(p);
-					transformationMatrix.transform(probe);
-					double widthSq = probe.x*probe.x + probe.y*probe.y;
-					if (widthSq > maxWidthSq) {
-						maxWidthSq = widthSq;
-						ref = p;
-					}
+		// transform subunit centers into z-aligned position and calculate
+		// width in xy direction.
+		double maxWidthSq = 0;
+		Point3d ref = null;
+		for (int i = 0; i < n; i++) {
+			for (Point3d p : subunits.getTraces().get(i)) {
+				probe.set(p);
+				transformationMatrix.transform(probe);
+				double widthSq = probe.x * probe.x + probe.y * probe.y;
+				if (widthSq > maxWidthSq) {
+					maxWidthSq = widthSq;
+					ref = p;
 				}
 			}
-	//		System.out.println("width: " + maxWidthSq);
-			Vector3d refVector = new Vector3d();
-			refVector.sub(ref, subunits.getCentroid());
-			refVector.normalize();
-			return refVector;
 		}
+		// System.out.println("width: " + maxWidthSq);
+		Vector3d refVector = new Vector3d();
+		refVector.sub(ref, subunits.getCentroid());
+		refVector.normalize();
+		return refVector;
+	}
 
 	private static Matrix4d flipX() {
 		Matrix4d rot = new Matrix4d();

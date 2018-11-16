@@ -39,22 +39,25 @@ import org.biojava.nbio.core.sequence.views.ReversedSequenceView;
 
 /**
  * RNASequence where RNACompoundSet are the allowed values
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 
 public class RNASequence extends AbstractSequence<NucleotideCompound> {
 
-		/**
-		 * Create a RNA sequence from a String
-		 * @param seqString
-		 * @throws CompoundNotFoundException
-		 */
+	/**
+	 * Create a RNA sequence from a String
+	 * 
+	 * @param seqString
+	 * @throws CompoundNotFoundException
+	 */
 	public RNASequence(String seqString) throws CompoundNotFoundException {
 		super(seqString, RNACompoundSet.getRNACompoundSet());
 	}
 
 	/**
 	 * Create a RNA aequence from a proxy reader
+	 * 
 	 * @param proxyLoader
 	 */
 	public RNASequence(ProxySequenceReader<NucleotideCompound> proxyLoader) {
@@ -63,6 +66,7 @@ public class RNASequence extends AbstractSequence<NucleotideCompound> {
 
 	/**
 	 * Create a RNA sequence from a string with a user defined RNA compound set
+	 * 
 	 * @param seqString
 	 * @param compoundSet
 	 * @throws CompoundNotFoundException
@@ -73,6 +77,7 @@ public class RNASequence extends AbstractSequence<NucleotideCompound> {
 
 	/**
 	 * Create a RNA sequence from a proxy reader and user defined RNA compound set
+	 * 
 	 * @param proxyLoader
 	 * @param compoundSet
 	 */
@@ -83,33 +88,37 @@ public class RNASequence extends AbstractSequence<NucleotideCompound> {
 
 	/**
 	 * Get reverse complement view of the sequence
+	 * 
 	 * @return
 	 */
 	public SequenceView<NucleotideCompound> getReverseComplement() {
-		return new ComplementSequenceView<NucleotideCompound>(getInverse());
+		return new ComplementSequenceView<>(getInverse());
 	}
 
 	/**
-	 * Get the inverse view of the sequence. It is the reverse sequence from
-	 * end to begin where use reverse could imply complement. Called getInverse()
-	 * in the hopes of making less confusing.
+	 * Get the inverse view of the sequence. It is the reverse sequence from end to
+	 * begin where use reverse could imply complement. Called getInverse() in the
+	 * hopes of making less confusing.
+	 * 
 	 * @return
 	 */
 	@Override
-public SequenceView<NucleotideCompound> getInverse() {
-		return new ReversedSequenceView<NucleotideCompound>(this);
+	public SequenceView<NucleotideCompound> getInverse() {
+		return new ReversedSequenceView<>(this);
 	}
 
 	/**
 	 * Get the complement view of the RNA sequence
+	 * 
 	 * @return
 	 */
 	public SequenceView<NucleotideCompound> getComplement() {
-		return new ComplementSequenceView<NucleotideCompound>(this);
+		return new ComplementSequenceView<>(this);
 	}
 
 	/**
 	 * Get the ProteinSequence from the RNA sequence
+	 * 
 	 * @return
 	 */
 	public ProteinSequence getProteinSequence() {
@@ -117,14 +126,14 @@ public SequenceView<NucleotideCompound> getInverse() {
 	}
 
 	/**
-	 * Get the ProteinSequene from the RNA sequence with user defined
-	 * transcription engine
+	 * Get the ProteinSequene from the RNA sequence with user defined transcription
+	 * engine
 	 *
 	 * @param engine
 	 * @return
 	 */
 	public ProteinSequence getProteinSequence(TranscriptionEngine engine) {
-		return (ProteinSequence)engine.getRnaAminoAcidTranslator().createSequence(this);
+		return (ProteinSequence) engine.getRnaAminoAcidTranslator().createSequence(this);
 	}
 
 	public double getGC() {

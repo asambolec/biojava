@@ -27,7 +27,6 @@ import org.biojava.nbio.structure.symmetry.axis.RotationAxisAligner;
 import org.biojava.nbio.structure.symmetry.geometry.Prism;
 import org.biojava.nbio.structure.symmetry.geometry.RectangularPrism;
 
-
 /**
  * @author Peter
  *
@@ -36,11 +35,12 @@ public class JmolSymmetryScriptGeneratorCn extends JmolSymmetryScriptGeneratorPo
 
 	public JmolSymmetryScriptGeneratorCn(RotationAxisAligner axisTransformation, String name) {
 		super(axisTransformation, name);
-		if (axisTransformation.getRotationGroup().getPointGroup().equals("C2")) {
-			setPolyhedron(new RectangularPrism(axisTransformation.getDimension().z*2, axisTransformation.getDimension().x*2, axisTransformation.getDimension().y*2));
+		if ("C2".equals(axisTransformation.getRotationGroup().getPointGroup())) {
+			setPolyhedron(new RectangularPrism(axisTransformation.getDimension().z * 2,
+					axisTransformation.getDimension().x * 2, axisTransformation.getDimension().y * 2));
 		} else {
 			Prism p = new Prism(axisTransformation.getRotationGroup().getRotation(0).getFold());
-			p.setHeight(axisTransformation.getDimension().z*2);
+			p.setHeight(axisTransformation.getDimension().z * 2);
 			p.setInscribedRadius(axisTransformation.getRadius());
 			setPolyhedron(p);
 		}
@@ -54,7 +54,7 @@ public class JmolSymmetryScriptGeneratorCn extends JmolSymmetryScriptGeneratorPo
 		RotationAxisAligner at = getAxisTransformation();
 		double polyhedronExtension = Math.max(getPolyhedron().getCirumscribedRadius(), at.getDimension().z);
 
-		int zoom = Math.round((float)(maxExtension/polyhedronExtension * 110));
+		int zoom = Math.round((float) (maxExtension / polyhedronExtension * 110));
 		if (zoom > 100) {
 			zoom = 100;
 		}
@@ -63,21 +63,22 @@ public class JmolSymmetryScriptGeneratorCn extends JmolSymmetryScriptGeneratorPo
 
 	@Override
 	public int getOrientationCount() {
-		//  the last two views (top, bottom) are not that interesting.
-		if (getAxisTransformation().getRotationGroup().getPointGroup().equals("C2")) {
-		    return getPolyhedron().getViewCount()-2;
+		// the last two views (top, bottom) are not that interesting.
+		if ("C2".equals(getAxisTransformation().getRotationGroup().getPointGroup())) {
+			return getPolyhedron().getViewCount() - 2;
 		}
 		return getPolyhedron().getViewCount();
 	}
 
 	/**
 	 * Returns the name of a specific orientation
+	 * 
 	 * @param index orientation index
 	 * @return name of orientation
 	 */
 	@Override
 	public String getOrientationName(int index) {
-		if (getAxisTransformation().getRotationGroup().getPointGroup().equals("C2")) {
+		if ("C2".equals(getAxisTransformation().getRotationGroup().getPointGroup())) {
 			if (index == 0) {
 				return "Front C2 axis";
 			} else if (index == 2) {

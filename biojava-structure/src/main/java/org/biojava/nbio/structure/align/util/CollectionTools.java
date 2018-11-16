@@ -32,8 +32,8 @@ public class CollectionTools {
 	public static int[] toIntArray(Collection<Number> l) {
 		int[] a = new int[l.size()];
 		int i = 0;
-		for (Iterator<Number> j = l.iterator(); j.hasNext(); ) {
-			a[i++] = ( j.next()).intValue();
+		for (Number aL : l) {
+			a[i++] = (aL).intValue();
 		}
 		return a;
 	}
@@ -41,8 +41,8 @@ public class CollectionTools {
 	public static double[] toDoubleArray(Collection<Number> l) {
 		double[] a = new double[l.size()];
 		int i = 0;
-		for (Iterator<Number> j = l.iterator(); j.hasNext(); ) {
-			a[i++] = j.next().doubleValue();
+		for (Number aL : l) {
+			a[i++] = aL.doubleValue();
 		}
 		return a;
 	}

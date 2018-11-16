@@ -41,7 +41,7 @@ public class ParseGO {
 
 	private static final Logger logger = LoggerFactory.getLogger(ParseGO.class);
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		String u = "http://sourceforge.net/p/song/svn/HEAD/tree/trunk/subsets/biosapiens.obo?format=raw";
 
@@ -51,17 +51,13 @@ public class ParseGO {
 			OboParser parser = new OboParser();
 			InputStream inStream = url.openStream();
 
-			BufferedReader oboFile = new BufferedReader ( new InputStreamReader ( inStream ) );
+			BufferedReader oboFile = new BufferedReader(new InputStreamReader(inStream));
 
 			Ontology ontology = parser.parseOBO(oboFile, "BioSapiens", "the BioSapiens ontology");
 
 			Set<Term> keys = ontology.getTerms();
-			Iterator<Term> iter = keys.iterator();
-			while (iter.hasNext()){
-				Term t = iter.next();
-				logger.info("{} [{}]", t.getName(), t.getDescription());
-			}
-		} catch (Exception e){
+			keys.forEach(t -> logger.info("{} [{}]", t.getName(), t.getDescription()));
+		} catch (Exception e) {
 			logger.error("Exception: ", e);
 		}
 	}

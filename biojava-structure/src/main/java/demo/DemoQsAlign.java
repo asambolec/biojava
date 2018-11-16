@@ -29,6 +29,8 @@ import org.biojava.nbio.structure.align.quaternary.QsAlign;
 import org.biojava.nbio.structure.align.quaternary.QsAlignParameters;
 import org.biojava.nbio.structure.align.quaternary.QsAlignResult;
 import org.biojava.nbio.structure.cluster.SubunitClustererParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demo on how to use programatically {@link QsAlign} for the alignment of
@@ -47,8 +49,9 @@ import org.biojava.nbio.structure.cluster.SubunitClustererParameters;
  */
 public class DemoQsAlign {
 
-	public static void main(String[] args) throws IOException,
-			StructureException {
+	private static final Logger logger = LoggerFactory.getLogger(DemoQsAlign.class);
+
+	public static void main(String[] args) throws IOException, StructureException {
 
 		// Align two trimeric DNA clamps
 		Structure s1 = StructureIO.getStructure("1bcc");
@@ -58,10 +61,9 @@ public class DemoQsAlign {
 		SubunitClustererParameters clusterParams = new SubunitClustererParameters();
 		QsAlignParameters alignParams = new QsAlignParameters();
 
-		QsAlignResult result = QsAlign
-				.align(s1, s2, clusterParams, alignParams);
+		QsAlignResult result = QsAlign.align(s1, s2, clusterParams, alignParams);
 
-		System.out.println(result);
+		logger.info(String.valueOf(result));
 
 	}
 }

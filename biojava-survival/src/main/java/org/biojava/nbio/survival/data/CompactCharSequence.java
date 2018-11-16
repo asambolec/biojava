@@ -22,26 +22,23 @@ package org.biojava.nbio.survival.data;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *http://www.javamex.com/tutorials/memory/ascii_charsequence.shtml
+ * http://www.javamex.com/tutorials/memory/ascii_charsequence.shtml
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class CompactCharSequence implements CharSequence, Serializable {
 
+	private static final Logger logger = LoggerFactory.getLogger(CompactCharSequence.class);
 	static final long serialVersionUID = 1L;
 	private static final String ENCODING = "ISO-8859-1";
 	private final int offset;
 	private final int end;
 	private final byte[] data;
 	private final boolean nullstring;
-
-	private CompactCharSequence(byte[] data, int offset, int end) {
-		this.data = data;
-		this.offset = offset;
-		this.end = end;
-		nullstring = false;
-	}
 
 	/**
 	 *
@@ -61,16 +58,25 @@ public class CompactCharSequence implements CharSequence, Serializable {
 				nullstring = true;
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Unexpected: " + ENCODING + " not supported!");
+			logger.error(e.getMessage(), e);
+			throw new RuntimeException(
+					new StringBuilder().append("Unexpected: ").append(ENCODING).append(" not supported!").toString());
 		}
+	}
+
+	private CompactCharSequence(byte[] data, int offset, int end) {
+		this.data = data;
+		this.offset = offset;
+		this.end = end;
+		nullstring = false;
 	}
 
 	@Override
 	public char charAt(int index) {
 		int ix = index + offset;
 		if (ix >= end) {
-			throw new StringIndexOutOfBoundsException("Invalid index "
-					+ index + " length " + length());
+			throw new StringIndexOutOfBoundsException(new StringBuilder().append("Invalid index ").append(index)
+					.append(" length ").append(length()).toString());
 		}
 		return (char) (data[ix] & 0xff);
 	}
@@ -83,8 +89,8 @@ public class CompactCharSequence implements CharSequence, Serializable {
 	@Override
 	public CharSequence subSequence(int start, int end) {
 		if (start < 0 || end >= (this.end - offset)) {
-			throw new IllegalArgumentException("Illegal range "
-					+ start + "-" + end + " for sequence of length " + length());
+			throw new IllegalArgumentException(new StringBuilder().append("Illegal range ").append(start).append("-")
+					.append(end).append(" for sequence of length ").append(length()).toString());
 		}
 		return new CompactCharSequence(data, start + offset, end + offset);
 	}
@@ -95,13 +101,16 @@ public class CompactCharSequence implements CharSequence, Serializable {
 			if (nullstring) {
 				return null;
 			} else {
-				if(length() == 0)
+				if (length() == 0) {
 					return "";
-				else
+				} else {
 					return new String(data, offset, end - offset, ENCODING);
+				}
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Unexpected: " + ENCODING + " not supported");
+			logger.error(e.getMessage(), e);
+			throw new RuntimeException(
+					new StringBuilder().append("Unexpected: ").append(ENCODING).append(" not supported").toString());
 		}
 	}
 }

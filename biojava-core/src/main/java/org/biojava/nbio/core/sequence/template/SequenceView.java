@@ -25,7 +25,6 @@
  */
 package org.biojava.nbio.core.sequence.template;
 
-
 public interface SequenceView<C extends Compound> extends Sequence<C> {
 
 	public Sequence<C> getViewedSequence();

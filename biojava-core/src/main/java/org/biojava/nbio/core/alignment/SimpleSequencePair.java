@@ -38,50 +38,41 @@ import java.util.List;
  *
  * @author Mark Chapman
  * @author Paolo Pavan
- * @param <S>
- *            each element of the alignment {@link Profile} is of type S
- * @param <C>
- *            each element of an {@link AlignedSequence} is a {@link Compound}
- *            of type C
+ * @param <S> each element of the alignment {@link Profile} is of type S
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
-public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
-		extends SimpleProfile<S, C> implements SequencePair<S, C> {
+public class SimpleSequencePair<S extends Sequence<C>, C extends Compound> extends SimpleProfile<S, C>
+		implements SequencePair<S, C> {
 
 	private static final long serialVersionUID = 1L;
 
-	private int identicals = -1, similars = -1;
+	private int identicals = -1;
+
+	private int similars = -1;
 
 	/**
 	 * Creates a pair profile for the given already aligned sequences.
 	 *
-	 * @param query
-	 *            the first sequence of the pair
-	 * @param target
-	 *            the second sequence of the pair
-	 * @throws IllegalArgumentException
-	 *             if sequences differ in size
+	 * @param query  the first sequence of the pair
+	 * @param target the second sequence of the pair
+	 * @throws IllegalArgumentException if sequences differ in size
 	 */
-	public SimpleSequencePair(AlignedSequence<S, C> query,
-			AlignedSequence<S, C> target) {
+	public SimpleSequencePair(AlignedSequence<S, C> query, AlignedSequence<S, C> target) {
 		super(query, target);
 	}
 
 	/**
 	 * Creates a pair profile for the given sequences with a global alignment.
 	 *
-	 * @param query
-	 *            the first sequence of the pair
-	 * @param target
-	 *            the second sequence of the pair
-	 * @param sx
-	 *            lists whether the query sequence aligns a {@link Compound} or
-	 *            gap at each index of the alignment
-	 * @param sy
-	 *            lists whether the target sequence aligns a {@link Compound} or
-	 *            gap at each index of the alignment
-	 * @throws IllegalArgumentException
-	 *             if alignments differ in size or given sequences do not fit in
-	 *             alignments
+	 * @param query  the first sequence of the pair
+	 * @param target the second sequence of the pair
+	 * @param sx     lists whether the query sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param sy     lists whether the target sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @throws IllegalArgumentException if alignments differ in size or given
+	 *                                  sequences do not fit in alignments
 	 */
 	public SimpleSequencePair(S query, S target, List<Step> sx, List<Step> sy) {
 		this(query, target, sx, 0, 0, sy, 0, 0);
@@ -90,34 +81,24 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 	/**
 	 * Creates a pair profile for the given sequences with a local alignment.
 	 *
-	 * @param query
-	 *            the first sequence of the pair
-	 * @param target
-	 *            the second sequence of the pair
-	 * @param sx
-	 *            lists whether the query sequence aligns a {@link Compound} or
-	 *            gap at each index of the alignment
-	 * @param xb
-	 *            number of {@link Compound}s skipped in the query sequence
-	 *            before the aligned region
-	 * @param xa
-	 *            number of {@link Compound}s skipped in the query sequence
-	 *            after the aligned region
-	 * @param sy
-	 *            lists whether the target sequence aligns a {@link Compound} or
-	 *            gap at each index of the alignment
-	 * @param yb
-	 *            number of {@link Compound}s skipped in the target sequence
-	 *            before the aligned region
-	 * @param ya
-	 *            number of {@link Compound}s skipped in the target sequence
-	 *            after the aligned region
-	 * @throws IllegalArgumentException
-	 *             if alignments differ in size or given sequences do not fit in
-	 *             alignments
+	 * @param query  the first sequence of the pair
+	 * @param target the second sequence of the pair
+	 * @param sx     lists whether the query sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param xb     number of {@link Compound}s skipped in the query sequence
+	 *               before the aligned region
+	 * @param xa     number of {@link Compound}s skipped in the query sequence after
+	 *               the aligned region
+	 * @param sy     lists whether the target sequence aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param yb     number of {@link Compound}s skipped in the target sequence
+	 *               before the aligned region
+	 * @param ya     number of {@link Compound}s skipped in the target sequence
+	 *               after the aligned region
+	 * @throws IllegalArgumentException if alignments differ in size or given
+	 *                                  sequences do not fit in alignments
 	 */
-	public SimpleSequencePair(S query, S target, List<Step> sx, int xb, int xa,
-			List<Step> sy, int yb, int ya) {
+	public SimpleSequencePair(S query, S target, List<Step> sx, int xb, int xa, List<Step> sy, int yb, int ya) {
 		super(query, target, sx, xb, xa, sy, yb, ya);
 	}
 
@@ -138,8 +119,7 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 
 	@Override
 	public int getIndexInQueryForTargetAt(int targetIndex) {
-		return getAlignedSequence(1).getSequenceIndexAt(
-				getAlignedSequence(2).getAlignmentIndexAt(targetIndex));
+		return getAlignedSequence(1).getSequenceIndexAt(getAlignedSequence(2).getAlignmentIndexAt(targetIndex));
 	}
 
 	@Override
@@ -149,8 +129,7 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 
 	@Override
 	public int getIndexInTargetForQueryAt(int queryIndex) {
-		return getAlignedSequence(2).getSequenceIndexAt(
-				getAlignedSequence(1).getAlignmentIndexAt(queryIndex));
+		return getAlignedSequence(2).getSequenceIndexAt(getAlignedSequence(1).getAlignmentIndexAt(queryIndex));
 	}
 
 	@Override
@@ -158,8 +137,7 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 		if (identicals == -1) {
 			identicals = 0;
 			for (int i = 1; i <= getLength(); i++) {
-				if (getCompoundInQueryAt(i).equalsIgnoreCase(
-						getCompoundInTargetAt(i))) {
+				if (getCompoundInQueryAt(i).equalsIgnoreCase(getCompoundInTargetAt(i))) {
 					identicals++;
 				}
 			}
@@ -178,12 +156,11 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 				C c1 = getCompoundInQueryAt(i);
 				C c2 = getCompoundInTargetAt(i);
 
-				if (c1 instanceof AminoAcidCompound
-						&& c2 instanceof AminoAcidCompound) {
-					short value = matrix.getValue((AminoAcidCompound) c1,
-							(AminoAcidCompound) c2);
-					if (value > 0)
+				if (c1 instanceof AminoAcidCompound && c2 instanceof AminoAcidCompound) {
+					short value = matrix.getValue((AminoAcidCompound) c1, (AminoAcidCompound) c2);
+					if (value > 0) {
 						similars++;
+					}
 				} else {
 
 					if (getCompoundSet().compoundsEquivalent(c1, c2)) {
@@ -208,12 +185,15 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 	}
 
 	/**
-	 * Returns the percentage of identity between the two sequences in the alignment as a fraction between 0 and 1.
+	 * Returns the percentage of identity between the two sequences in the alignment
+	 * as a fraction between 0 and 1.
 	 *
-	 * @param countGaps
-	 * 		If true, gap positions are counted as mismatches, i.e., the percentage is normalized by the alignment length.
-	 * 		If false, gap positions are not counted, i.e. the percentage is normalized by the number of aligned residue pairs.
-	 *      See May (2004). "Percent sequence identity: the need to be explicit."
+	 * @param countGaps If true, gap positions are counted as mismatches, i.e., the
+	 *                  percentage is normalized by the alignment length. If false,
+	 *                  gap positions are not counted, i.e. the percentage is
+	 *                  normalized by the number of aligned residue pairs. See May
+	 *                  (2004). "Percent sequence identity: the need to be
+	 *                  explicit."
 	 * @return the percentage of sequence identity as a fraction in [0,1]
 	 */
 	@Override
@@ -221,8 +201,7 @@ public class SimpleSequencePair<S extends Sequence<C>, C extends Compound>
 		double seqid = getNumIdenticals();
 		double length = getLength();
 		if (!countGaps) {
-			length = length - getAlignedSequence(1).getNumGapPositions()
-					- getAlignedSequence(2).getNumGapPositions();
+			length = length - getAlignedSequence(1).getNumGapPositions() - getAlignedSequence(2).getNumGapPositions();
 		}
 		return seqid / length;
 	}

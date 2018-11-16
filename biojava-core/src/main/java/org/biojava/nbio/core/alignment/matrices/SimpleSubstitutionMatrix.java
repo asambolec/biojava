@@ -31,17 +31,23 @@ import org.biojava.nbio.core.sequence.template.CompoundSet;
 
 import java.io.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Implements a data structure which holds the score (penalty or bonus) given during alignment for the exchange of one
- * {@link Compound} in a sequence for another.
+ * Implements a data structure which holds the score (penalty or bonus) given
+ * during alignment for the exchange of one {@link Compound} in a sequence for
+ * another.
  *
  * @author Mark Chapman
  * @author Daniel Cameron
  * @author Paolo Pavan
- * @param <C> each element of the matrix corresponds to a pair of {@link Compound}s of type C
+ * @param <C> each element of the matrix corresponds to a pair of
+ *        {@link Compound}s of type C
  */
 public class SimpleSubstitutionMatrix<C extends Compound> implements SubstitutionMatrix<C>, Serializable {
+
+	private static final Logger logger = LoggerFactory.getLogger(SimpleSubstitutionMatrix.class);
 
 	/**
 	 *
@@ -51,21 +57,22 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	private static final String comment = "#";
 
 	private CompoundSet<C> compoundSet;
-	private String description, name;
-	private short[][] matrix;
-	private short max, min;
-	private List<C> rows, cols;
+	private String description;
 
-	public static SubstitutionMatrix<AminoAcidCompound> getBlosum62() {
-		return new SimpleSubstitutionMatrix<AminoAcidCompound>(AminoAcidCompoundSet.getAminoAcidCompoundSet(), new InputStreamReader(
-				SimpleSubstitutionMatrix.class.getResourceAsStream("/matrices/blosum62.txt")), "blosum62");
-	}
+	private String name;
+	private short[][] matrix;
+	private short max;
+
+	private short min;
+	private List<C> rows;
+
+	private List<C> cols;
 
 	/**
 	 * Creates a substitution matrix by reading in a file.
 	 *
 	 * @param compoundSet the {@link CompoundSet} on which the matrix is defined
-	 * @param fileInput file parsed for a substitution matrix
+	 * @param fileInput   file parsed for a substitution matrix
 	 * @throws FileNotFoundException if fileInput parameter cannot be read
 	 */
 	public SimpleSubstitutionMatrix(CompoundSet<C> compoundSet, File fileInput) throws FileNotFoundException {
@@ -76,8 +83,8 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	 * Creates a substitution matrix by parsing some input.
 	 *
 	 * @param compoundSet the {@link CompoundSet} on which the matrix is defined
-	 * @param input input parsed for a substitution matrix
-	 * @param name the name (short description) of this matrix
+	 * @param input       input parsed for a substitution matrix
+	 * @param name        the name (short description) of this matrix
 	 */
 	public SimpleSubstitutionMatrix(CompoundSet<C> compoundSet, Reader input, String name) {
 		this(compoundSet, new Scanner(input), name);
@@ -88,7 +95,7 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	 *
 	 * @param compoundSet the {@link CompoundSet} on which the matrix is defined
 	 * @param matrixInput String parsed for a substitution matrix
-	 * @param name the name (short description) of this matrix
+	 * @param name        the name (short description) of this matrix
 	 */
 	public SimpleSubstitutionMatrix(CompoundSet<C> compoundSet, String matrixInput, String name) {
 		this(compoundSet, new Scanner(matrixInput), name);
@@ -98,13 +105,13 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	 * Creates an identity substitution matrix from match and replace values.
 	 *
 	 * @param compoundSet the {@link CompoundSet} on which the matrix is defined
-	 * @param match matrix value used for equivalent {@link Compound}s
-	 * @param replace matrix value used for differing {@link Compound}s
+	 * @param match       matrix value used for equivalent {@link Compound}s
+	 * @param replace     matrix value used for differing {@link Compound}s
 	 */
 	public SimpleSubstitutionMatrix(CompoundSet<C> compoundSet, short match, short replace) {
 		this.compoundSet = compoundSet;
 		description = "Identity matrix. All replaces and all matches are treated equally.";
-		name = "IDENTITY_" + match + "_" + replace;
+		name = new StringBuilder().append("IDENTITY_").append(match).append("_").append(replace).toString();
 		max = (match > replace) ? match : replace;
 		min = (match < replace) ? match : replace;
 		rows = cols = compoundSet.getAllCompounds();
@@ -114,6 +121,7 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 				try {
 					matrix[r][c] = (compoundSet.compoundsEquivalent(rows.get(r), cols.get(c))) ? match : replace;
 				} catch (UnsupportedOperationException e) {
+					logger.error(e.getMessage(), e);
 					matrix[r][c] = (r == c) ? match : replace;
 				}
 			}
@@ -126,11 +134,11 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 		this.name = name;
 		max = Short.MIN_VALUE;
 		min = Short.MAX_VALUE;
-		rows = new ArrayList<C>();
-		cols = new ArrayList<C>();
+		rows = new ArrayList<>();
+		cols = new ArrayList<>();
 		StringBuilder descriptionIn = new StringBuilder();
-		List<short[]> matrixIn = new ArrayList<short[]>();
-		while(input.hasNextLine()) {
+		List<short[]> matrixIn = new ArrayList<>();
+		while (input.hasNextLine()) {
 			String line = input.nextLine();
 			if (line.startsWith(comment)) {
 				descriptionIn.append(String.format("%s%n", line));
@@ -160,6 +168,12 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 		}
 	}
 
+	public static SubstitutionMatrix<AminoAcidCompound> getBlosum62() {
+		return new SimpleSubstitutionMatrix<>(AminoAcidCompoundSet.getAminoAcidCompoundSet(),
+				new InputStreamReader(SimpleSubstitutionMatrix.class.getResourceAsStream("/matrices/blosum62.txt")),
+				"blosum62");
+	}
+
 	@Override
 	public CompoundSet<C> getCompoundSet() {
 		return compoundSet;
@@ -182,24 +196,22 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	@Override
 	public String getMatrixAsString() {
 		StringBuilder s = new StringBuilder();
-		int lengthCompound = compoundSet.getMaxSingleCompoundStringLength(), lengthRest =
-				Math.max(Math.max(Short.toString(min).length(), Short.toString(max).length()), lengthCompound) + 1;
-		String padCompound = "%" + Integer.toString(lengthCompound) + "s",
-				padRest = "%" + Integer.toString(lengthRest);
+		int lengthCompound = compoundSet.getMaxSingleCompoundStringLength();
+		int lengthRest = Math.max(Math.max(Short.toString(min).length(), Short.toString(max).length()), lengthCompound)
+				+ 1;
+		String padCompound = new StringBuilder().append("%").append(Integer.toString(lengthCompound)).append("s")
+				.toString();
+		String padRest = "%" + Integer.toString(lengthRest);
 		for (int i = 0; i < lengthCompound; i++) {
 			s.append(" ");
 		}
-		for (C col : cols) {
-			s.append(String.format(padRest + "s", compoundSet.getStringForCompound(col)));
-		}
+		cols.forEach(col -> s.append(String.format(padRest + "s", compoundSet.getStringForCompound(col))));
 		s.append(String.format("%n"));
-		for (C row : rows) {
+		rows.forEach(row -> {
 			s.append(String.format(padCompound, compoundSet.getStringForCompound(row)));
-			for (C col : cols) {
-				s.append(String.format(padRest + "d", getValue(row, col)));
-			}
+			cols.forEach(col -> s.append(String.format(padRest + "d", getValue(row, col))));
 			s.append(String.format("%n"));
-		}
+		});
 		return s.toString();
 	}
 
@@ -217,14 +229,17 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	public String getName() {
 		return name;
 	}
+
 	/**
-	 * Returns the index of the first occurrence of the specified element in the list.
-	 * If the list does not contain the given compound, the index of the first occurrence
-	 * of the element according to case-insensitive equality.
-	 * If no such elements exist, -1 is returned.
-	 * @param list list of compounds to search
+	 * Returns the index of the first occurrence of the specified element in the
+	 * list. If the list does not contain the given compound, the index of the first
+	 * occurrence of the element according to case-insensitive equality. If no such
+	 * elements exist, -1 is returned.
+	 * 
+	 * @param list     list of compounds to search
 	 * @param compound compound to search for
-	 * @return Returns the index of the first match to the specified element in this list, or -1 if there is no such index.
+	 * @return Returns the index of the first match to the specified element in this
+	 *         list, or -1 if there is no such index.
 	 */
 	private static <C extends Compound> int getIndexOfCompound(List<C> list, C compound) {
 		int index = list.indexOf(compound);
@@ -238,9 +253,11 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 		}
 		return index;
 	}
+
 	@Override
 	public short getValue(C from, C to) {
-		int row = getIndexOfCompound(rows, from), col = getIndexOfCompound(cols, to);
+		int row = getIndexOfCompound(rows, from);
+		int col = getIndexOfCompound(cols, to);
 		if (row == -1 || col == -1) {
 			row = getIndexOfCompound(cols, from);
 			col = getIndexOfCompound(rows, to);
@@ -288,7 +305,7 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	@Override
 	public Map<C, Short> getRow(C row) {
 		int rowIndex = rows.indexOf(row);
-		Map<C, Short> map = new HashMap<C, Short>();
+		Map<C, Short> map = new HashMap<>();
 		for (int colIndex = 0; colIndex < matrix[rowIndex].length; colIndex++) {
 			map.put(cols.get(colIndex), matrix[rowIndex][colIndex]);
 		}
@@ -298,7 +315,7 @@ public class SimpleSubstitutionMatrix<C extends Compound> implements Substitutio
 	@Override
 	public Map<C, Short> getColumn(C column) {
 		int colIndex = cols.indexOf(column);
-		Map<C, Short> map = new HashMap<C, Short>();
+		Map<C, Short> map = new HashMap<>();
 		for (int i = 0; i < matrix.length; i++) {
 			map.put(rows.get(i), matrix[i][colIndex]);
 		}

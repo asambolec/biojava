@@ -37,31 +37,36 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-/** A class to define where a structure for the alignment is coming from
+/**
+ * A class to define where a structure for the alignment is coming from
  *
  * @author Andreas Prlic
  * @since 1.7
  * @version %I% %G%
  */
-public class PDBDirPanel
-extends JPanel
-implements StructurePairSelector{
+public class PDBDirPanel extends JPanel implements StructurePairSelector {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -5682120627824627408L;
 
-	boolean debug = true;
-	JTextField pdbDir;
-	JTextField f1;
-	JTextField f2;
-	JTextField c1;
-	JTextField c2;
-
 	private static final Logger logger = LoggerFactory.getLogger(StructurePairSelector.class);
 
-	/** load the PDB files from a local directory
+	boolean debug = true;
+
+	JTextField pdbDir;
+
+	JTextField f1;
+
+	JTextField f2;
+
+	JTextField c1;
+
+	JTextField c2;
+
+	/**
+	 * load the PDB files from a local directory
 	 *
 	 */
 	public PDBDirPanel() {
@@ -71,54 +76,50 @@ implements StructurePairSelector{
 		pdbDir = new JTextField(20);
 
 		String conf = System.getProperty(UserConfiguration.PDB_DIR);
-		if ( conf != null){
+		if (conf != null) {
 			pdbDir.setText(conf);
 		}
 		JPanel dir = getPDBDirPanel(pdbDir);
 		vBox.add(dir);
 
-
 		int pdbfSize = 4;
 
 		f1 = new JTextField(pdbfSize);
 		c1 = new JTextField(1);
-		JPanel p1 = getPDBFilePanel(1,f1,c1);
+		JPanel p1 = getPDBFilePanel(1, f1, c1);
 		vBox.add(p1);
 
 		f2 = new JTextField(pdbfSize);
 		c2 = new JTextField(1);
-		JPanel p2 = getPDBFilePanel(2, f2,c2);
+		JPanel p2 = getPDBFilePanel(2, f2, c2);
 		vBox.add(p2);
-
 
 		this.add(vBox);
 
 	}
 
-
-	private Structure fromPDB(JTextField f, JTextField c) throws StructureException{
+	private Structure fromPDB(JTextField f, JTextField c) throws StructureException {
 		String pdb = f.getText();
 
-
-		if ( pdb.length() < 4) {
+		if (pdb.length() < 4) {
 			f.setText("!!!");
 			return null;
 		}
 
 		String chain = c.getText();
-		if ( debug )
-			System.out.println("file :" + pdb + " " +  chain);
-		/// prepare structures
+		if (debug) {
+			logger.info(new StringBuilder().append("file :").append(pdb).append(" ").append(chain).toString());
+			/// prepare structures
+		}
 
 		// load them from the file system
-
-
 
 		String dir = pdbDir.getText();
 		PDBFileReader reader = new PDBFileReader(dir);
 
-		if ( debug )
-			System.out.println("dir: " + dir);
+		if (debug) {
+			logger.info("dir: " + dir);
+		}
 
 		Structure tmp1 = new StructureImpl();
 
@@ -127,42 +128,40 @@ implements StructurePairSelector{
 
 			// no chain has been specified
 			// return whole structure
-			if (( chain == null) || (chain.length()==0)){
+			if ((chain == null) || (chain.isEmpty())) {
 				return structure1;
 			}
-			if ( debug)
-				System.out.println("using chain " + chain +  " for structure " + structure1.getPDBCode());
+			if (debug) {
+				logger.info(new StringBuilder().append("using chain ").append(chain).append(" for structure ")
+						.append(structure1.getPDBCode()).toString());
+			}
 			Chain c1 = structure1.findChain(chain);
 			tmp1.setPDBCode(structure1.getPDBCode());
 			tmp1.setPDBHeader(structure1.getPDBHeader());
 			tmp1.setPDBCode(structure1.getPDBCode());
 			tmp1.addChain(c1);
-			System.out.println("ok");
+			logger.info("ok");
 
-		} catch (IOException e){
+		} catch (IOException e) {
 			logger.warn(e.getMessage());
 			throw new StructureException(e);
 		}
 		return tmp1;
 	}
 
-
-
 	@Override
-	public Structure getStructure1() throws StructureException{
-		return fromPDB(f1,c1);
+	public Structure getStructure1() throws StructureException {
+		return fromPDB(f1, c1);
 	}
 
 	@Override
-	public Structure getStructure2() throws StructureException{
-		return fromPDB(f2,c2);
+	public Structure getStructure2() throws StructureException {
+		return fromPDB(f2, c2);
 	}
 
-
-	private JPanel getPDBDirPanel(JTextField f){
+	private JPanel getPDBDirPanel(JTextField f) {
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createLineBorder(Color.black));
-
 
 		JLabel l01 = new JLabel("Select PDB directory");
 		panel.add(l01);
@@ -176,12 +175,10 @@ implements StructurePairSelector{
 		return panel;
 	}
 
-	private JPanel getPDBFilePanel(int pos ,JTextField f, JTextField c){
+	private JPanel getPDBFilePanel(int pos, JTextField f, JTextField c) {
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createLineBorder(Color.black));
-
-
 
 		JLabel l01 = new JLabel("PDB code ");
 
@@ -190,10 +187,7 @@ implements StructurePairSelector{
 
 		JLabel l11 = new JLabel(pos + ":");
 
-
-
-		f.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
-
+		f.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 
 		hBox11.add(l11);
 		hBox11.add(Box.createVerticalGlue());
@@ -203,9 +197,9 @@ implements StructurePairSelector{
 		panel.add(hBox11);
 
 		Box hBox21 = Box.createHorizontalBox();
-		JLabel l21 = new JLabel("Chain" + pos + ":");
+		JLabel l21 = new JLabel(new StringBuilder().append("Chain").append(pos).append(":").toString());
 
-		c.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		c.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 		hBox21.add(l21);
 		hBox21.add(Box.createGlue());
 		hBox21.add(c, BorderLayout.CENTER);
@@ -218,21 +212,23 @@ implements StructurePairSelector{
 
 }
 
-class ChooseDirAction extends AbstractAction{
+class ChooseDirAction extends AbstractAction {
 
+	public static final long serialVersionUID = 0l;
 	JTextField textField;
-	public ChooseDirAction (JTextField textField){
+
+	public ChooseDirAction(JTextField textField) {
 		super("Choose");
 		this.textField = textField;
 	}
-	public static final long serialVersionUID = 0l;
+
 	// This method is called when the button is pressed
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		// Perform action...
 		JFileChooser chooser = new JFileChooser();
 		String txt = textField.getText();
-		if ( txt != null){
+		if (txt != null) {
 			chooser.setCurrentDirectory(new java.io.File(txt));
 		}
 		chooser.setDialogTitle("Choose directory that contains your PDB files");
@@ -243,17 +239,14 @@ class ChooseDirAction extends AbstractAction{
 		chooser.setAcceptAllFileFilterUsed(false);
 		//
 
-
-
-//		In response to a button click:
+		// In response to a button click:
 		int returnVal = chooser.showOpenDialog(null);
-		if ( returnVal == JFileChooser.APPROVE_OPTION) {
-			File file = chooser.getSelectedFile();
-			textField.setText(file.getAbsolutePath());
-			textField.repaint();
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
 		}
+		File file = chooser.getSelectedFile();
+		textField.setText(file.getAbsolutePath());
+		textField.repaint();
 
 	}
 }
-
-

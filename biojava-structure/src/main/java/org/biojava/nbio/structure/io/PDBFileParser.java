@@ -79,29 +79,32 @@ import org.biojava.nbio.structure.xtal.SpaceGroup;
 import org.biojava.nbio.structure.xtal.SymoplibParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
- * This class implements the actual PDB file parsing. Do not access it directly, but
- * via the PDBFileReader class.
+ * This class implements the actual PDB file parsing. Do not access it directly,
+ * but via the PDBFileReader class.
  *
  * <h2>Parsing</h2>
  *
- * During the PDBfile parsing several Flags can be set. See the {@link #setFileParsingParameters(FileParsingParameters)} methods.
+ * During the PDBfile parsing several Flags can be set. See the
+ * {@link #setFileParsingParameters(FileParsingParameters)} methods.
  *
  *
  * <p>
- * To provide excessive memory usage for large PDB files, there is the ATOM_CA_THRESHOLD.
- * If more Atoms than this threshold are being parsed in a PDB file, the parser will automatically
- * switch to a C-alpha only representation.
+ * To provide excessive memory usage for large PDB files, there is the
+ * ATOM_CA_THRESHOLD. If more Atoms than this threshold are being parsed in a
+ * PDB file, the parser will automatically switch to a C-alpha only
+ * representation.
  *
  * <p>
  * The result of the parsing of the PDB file is a new {@link Structure} object.
  *
  * <p>
- * For more documentation on how to work with the Structure API please
- * see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
- * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
+ * For more documentation on how to work with the Structure API please see
+ * <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target=
+ * "_top"> http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
  *
  *
  *
@@ -111,6 +114,7 @@ import org.slf4j.LoggerFactory;
  * Q: How can I get a Structure object from a PDB file?
  * <p>
  * A:
+ * 
  * <pre>
  * public {@link Structure} loadStructure(String pathToPDBFile){
  * 	// The PDBFileParser is wrapped by the PDBFileReader
@@ -133,116 +137,128 @@ import org.slf4j.LoggerFactory;
  * @author Jose Duarte
  * @since 1.4
  */
-public class PDBFileParser  {
-
-
+public class PDBFileParser {
 
 	private static final Logger logger = LoggerFactory.getLogger(PDBFileParser.class);
 
 	// for printing
 	private static final String NEWLINE = System.getProperty("line.separator");
 
+	private static final List<String> compndFieldValues = Collections
+			.unmodifiableList(new ArrayList<String>(Arrays.asList("MOL_ID:", "MOLECULE:", "CHAIN:", "SYNONYM:", "EC:",
+					"FRAGMENT:", "ENGINEERED:", "MUTATION:", "BIOLOGICAL_UNIT:", "OTHER_DETAILS:")));
+
+	private static final List<String> ignoreCompndFieldValues = Collections.unmodifiableList(
+			new ArrayList<String>(Arrays.asList("HETEROGEN:", "ENGINEEREED:", "FRAGMENT,", "MUTANT:", "SYNTHETIC:")));
+
+	// ENGINEEREED in pdb219d
+
+	private static final List<String> sourceFieldValues = Collections
+			.unmodifiableList(new ArrayList<String>(Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
+					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", "ORGANISM_TAXID:", "STRAIN:", "VARIANT:", "CELL_LINE:",
+					"ATCC:", "ORGAN:", "TISSUE:", "CELL:", "ORGANELLE:", "SECRETION:", "GENE:", "CELLULAR_LOCATION:",
+					"EXPRESSION_SYSTEM:", "EXPRESSION_SYSTEM_TAXID:", "EXPRESSION_SYSTEM_STRAIN:",
+					"EXPRESSION_SYSTEM_VARIANT:", "EXPRESSION_SYSTEM_CELL_LINE:", "EXPRESSION_SYSTEM_ATCC_NUMBER:",
+					"EXPRESSION_SYSTEM_ORGAN:", "EXPRESSION_SYSTEM_TISSUE:", "EXPRESSION_SYSTEM_CELL:",
+					"EXPRESSION_SYSTEM_ORGANELLE:", "EXPRESSION_SYSTEM_CELLULAR_LOCATION:",
+					"EXPRESSION_SYSTEM_VECTOR_TYPE:", "EXPRESSION_SYSTEM_VECTOR:", "EXPRESSION_SYSTEM_PLASMID:",
+					"EXPRESSION_SYSTEM_GENE:", "OTHER_DETAILS:")));
 
 	// required for parsing:
-	private String pdbId; //the actual id of the entry
-	private Structure     structure;
-	private List<List<Chain>> allModels; // a temp data structure to keep all models
-	private List<Chain>   currentModel; // contains the ATOM records for each model
-	private Chain         currentChain;
-	private Group         currentGroup;
+	private String pdbId; // the actual id of the entry
 
- 	private List<Chain>   seqResChains; // contains all the chains for the SEQRES records
-	//we're going to work on the assumption that the files are current -
-	//if the pdb_HEADER_Handler detects a legacy format, this will be changed to true.
-	//if true then lines will be truncated at 72 characters in certain cases
-	//(pdb_COMPOUND_handler for example)
+	private Structure structure;
+
+	private List<List<Chain>> allModels; // a temp data structure to keep all models
+
+	private List<Chain> currentModel; // contains the ATOM records for each model
+
+	private Chain currentChain;
+
+	private Group currentGroup;
+
+	private List<Chain> seqResChains; // contains all the chains for the SEQRES records
+
+	// we're going to work on the assumption that the files are current -
+	// if the pdb_HEADER_Handler detects a legacy format, this will be changed to
+	// true.
+	// if true then lines will be truncated at 72 characters in certain cases
+	// (pdb_COMPOUND_handler for example)
 	private boolean isLegacyFormat = false;
 
 	private boolean blankChainIdsPresent = false;
-	
+
 	// for re-creating the biological assembly
 	private PDBBioAssemblyParser bioAssemblyParser = null;
 
 	private PDBHeader pdbHeader;
-	private PDBCrystallographicInfo crystallographicInfo;
-	private JournalArticle journalArticle;
-	private List<Map<String, Integer>> connects ;
-	private List<Map<String,String>> helixList;
-	private List<Map<String,String>> strandList;
-	private List<Map<String,String>> turnList;
 
-	private int lengthCheck ;
+	private PDBCrystallographicInfo crystallographicInfo;
+
+	private JournalArticle journalArticle;
+
+	private List<Map<String, Integer>> connects;
+
+	private List<Map<String, String>> helixList;
+
+	private List<Map<String, String>> strandList;
+
+	private List<Map<String, String>> turnList;
+
+	private int lengthCheck;
 
 	private boolean isLastCompndLine = false;
+
 	private boolean isLastSourceLine = false;
-	private EntityInfo current_compound;
-	private List<EntityInfo> entities = new ArrayList<EntityInfo>();
-	private HashMap<Integer,List<String>> compoundMolIds2chainIds = new HashMap<Integer, List<String>>();
-	private List<String> compndLines = new ArrayList<String>();
-	private List<String> sourceLines = new ArrayList<String>();
-	private List<String> journalLines = new ArrayList<String>();
+
+	private EntityInfo currentCompound;
+
+	private List<EntityInfo> entities = new ArrayList<>();
+
+	private HashMap<Integer, List<String>> compoundMolIds2chainIds = new HashMap<>();
+
+	private List<String> compndLines = new ArrayList<>();
+
+	private List<String> sourceLines = new ArrayList<>();
+
+	private List<String> journalLines = new ArrayList<>();
+
 	private List<DBRef> dbrefs;
-	private Map<String, Site> siteMap = new LinkedHashMap<String, Site>();
-	private Map<String, List<ResidueNumber>> siteToResidueMap = new LinkedHashMap<String, List<ResidueNumber>>();
+
+	private Map<String, Site> siteMap = new LinkedHashMap<>();
+
+	private Map<String, List<ResidueNumber>> siteToResidueMap = new LinkedHashMap<>();
 
 	private List<SSBondImpl> ssbonds = new ArrayList<>();
-	
-    // for storing LINK until we have all the atoms parsed
-    private List<LinkRecord> linkRecords;
+
+	// for storing LINK until we have all the atoms parsed
+	private List<LinkRecord> linkRecords;
 
 	private Matrix4d currentNcsOp;
+
 	private List<Matrix4d> ncsOperators;
 
 	// for parsing COMPOUND and SOURCE Header lines
 	private int prevMolId;
+
 	private String previousContinuationField;
+
 	private String continuationField;
+
 	private String continuationString;
 
 	private DateFormat dateFormat;
 
 	// for rfree parsing
 	private float rfreeStandardLine = -1;
+
 	private float rfreeNoCutoffLine = -1;
-
-	private static  final List<String> compndFieldValues = new ArrayList<String>(
-			Arrays.asList(
-					"MOL_ID:", "MOLECULE:", "CHAIN:", "SYNONYM:",
-					"EC:", "FRAGMENT:", "ENGINEERED:", "MUTATION:",
-					"BIOLOGICAL_UNIT:", "OTHER_DETAILS:"
-					));
-
-
-	private static final List<String> ignoreCompndFieldValues = new ArrayList<String>(
-			Arrays.asList(
-					"HETEROGEN:","ENGINEEREED:","FRAGMENT,",
-					"MUTANT:","SYNTHETIC:"
-					));
-	// ENGINEEREED in pdb219d
-
-	private static final List<String> sourceFieldValues = new ArrayList<String>(
-			Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
-					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:",
-					"ORGANISM_TAXID:","STRAIN:",
-					"VARIANT:", "CELL_LINE:", "ATCC:", "ORGAN:", "TISSUE:",
-					"CELL:", "ORGANELLE:", "SECRETION:", "GENE:",
-					"CELLULAR_LOCATION:", "EXPRESSION_SYSTEM:",
-					"EXPRESSION_SYSTEM_TAXID:",
-					"EXPRESSION_SYSTEM_STRAIN:", "EXPRESSION_SYSTEM_VARIANT:",
-					"EXPRESSION_SYSTEM_CELL_LINE:",
-					"EXPRESSION_SYSTEM_ATCC_NUMBER:",
-					"EXPRESSION_SYSTEM_ORGAN:", "EXPRESSION_SYSTEM_TISSUE:",
-					"EXPRESSION_SYSTEM_CELL:", "EXPRESSION_SYSTEM_ORGANELLE:",
-					"EXPRESSION_SYSTEM_CELLULAR_LOCATION:",
-					"EXPRESSION_SYSTEM_VECTOR_TYPE:",
-					"EXPRESSION_SYSTEM_VECTOR:", "EXPRESSION_SYSTEM_PLASMID:",
-					"EXPRESSION_SYSTEM_GENE:", "OTHER_DETAILS:"));
 
 	private int atomCount;
 
 	// parsing options:
 
-	private int atomCAThreshold ;
+	private int atomCAThreshold;
 
 	private int loadMaxAtoms;
 
@@ -251,87 +267,87 @@ public class PDBFileParser  {
 	/** flag to tell parser to only read Calpha coordinates **/
 	private boolean parseCAonly;
 
-
 	private FileParsingParameters params;
-	
+
 	private boolean startOfMolecule;
+
 	private boolean startOfModel;
+
+	// Site variable related to parsing the REMARK 800 records.
+	Site site;
 
 	public PDBFileParser() {
 		params = new FileParsingParameters();
 
 		allModels = new ArrayList<>();
-		structure     = null;
-		currentModel  = null;
-		currentChain  = null;
-		currentGroup  = null;
-		// we initialise to true since at the beginning of the file we are always starting a new molecule 
+		structure = null;
+		currentModel = null;
+		currentChain = null;
+		currentGroup = null;
+		// we initialise to true since at the beginning of the file we are always
+		// starting a new molecule
 		startOfMolecule = true;
 		startOfModel = true;
 
-		
-		pdbHeader 	  = new PDBHeader();
+		pdbHeader = new PDBHeader();
 		crystallographicInfo = new PDBCrystallographicInfo();
-		connects      = new ArrayList<Map<String,Integer>>() ;
+		connects = new ArrayList<>();
 
-
-		helixList     = new ArrayList<Map<String,String>>();
-		strandList    = new ArrayList<Map<String,String>>();
-		turnList      = new ArrayList<Map<String,String>>();
-		current_compound = null;
-		dbrefs        = new ArrayList<DBRef>();
+		helixList = new ArrayList<>();
+		strandList = new ArrayList<>();
+		turnList = new ArrayList<>();
+		currentCompound = null;
+		dbrefs = new ArrayList<>();
 		siteMap = null;
 		dateFormat = new SimpleDateFormat("dd-MMM-yy", Locale.US);
 		atomCount = 0;
 		atomOverflow = false;
 		parseCAonly = false;
-		
+
 		// this SHOULD not be done
 		// DONOT:setFileParsingParameters(params);
 		// set the correct max values for parsing...
 		loadMaxAtoms = params.getMaxAtoms();
 		atomCAThreshold = params.getAtomCaThreshold();
-		
-        linkRecords = new ArrayList<LinkRecord>();
+
+		linkRecords = new ArrayList<>();
 
 		blankChainIdsPresent = false;
-		
+
 	}
 
 	/** initiate new resNum, either Hetatom, Nucleotide, or AminoAcid */
-	private Group getNewGroup(String recordName,Character aminoCode1, String aminoCode3) {
+	private Group getNewGroup(String recordName, Character aminoCode1, String aminoCode3) {
 
-		Group g =  ChemCompGroupFactory.getGroupFromChemCompDictionary(aminoCode3);
-		if ( g != null && !g.getChemComp().isEmpty())
+		Group g = ChemCompGroupFactory.getGroupFromChemCompDictionary(aminoCode3);
+		if (g != null && !g.getChemComp().isEmpty()) {
 			return g;
-
+		}
 
 		Group group;
-		if (aminoCode1 == null || StructureTools.UNKNOWN_GROUP_LABEL == aminoCode1 ){
+		if (aminoCode1 == null || StructureTools.UNKNOWN_GROUP_LABEL == aminoCode1) {
 			group = new HetatomImpl();
 
-		} else if(StructureTools.isNucleotide(aminoCode3))  {
+		} else if (StructureTools.isNucleotide(aminoCode3)) {
 			// it is a nucleotide
 			NucleotideImpl nu = new NucleotideImpl();
 			group = nu;
 
 		} else {
-			AminoAcidImpl aa = new AminoAcidImpl() ;
+			AminoAcidImpl aa = new AminoAcidImpl();
 			aa.setAminoType(aminoCode1);
-			group = aa ;
+			group = aa;
 		}
 
-		//		System.out.println("new resNum type: "+ resNum.getType() );
-		return  group ;
+		// System.out.println("new resNum type: "+ resNum.getType() );
+		return group;
 	}
-
-
 
 	// Handler methods to deal with PDB file records properly.
 	/**
-	 Handler for
-	 HEADER Record Format
-	 <pre>
+	 * Handler for HEADER Record Format
+	 * 
+	 * <pre>
 	 COLUMNS        DATA TYPE       FIELD           DEFINITION
 	 ----------------------------------------------------------------------------------
 	 1 -  6        Record name     "HEADER"
@@ -340,48 +356,49 @@ public class PDBFileParser  {
 	 the coordinates were received by
 	 the PDB
 	 63 - 66        IDcode          idCode          This identifier is unique within PDB
-	</pre>
+	 * </pre>
 	 */
 	private void pdb_HEADER_Handler(String line) {
 
-		String classification  = null;
+		String classification = null;
 		String deposition_date = null;
-		String pdbCode         = null;
+		String pdbCode = null;
 
 		int len = line.trim().length();
-		if(len > 10) {
-			classification  = line.substring (10, min(len,50)).trim() ;
+		if (len > 10) {
+			classification = line.substring(10, min(len, 50)).trim();
 			pdbHeader.setClassification(classification);
 		}
-		if(len > 50) {
-			deposition_date = line.substring (50, min(len,59)).trim() ;
+		if (len > 50) {
+			deposition_date = line.substring(50, min(len, 59)).trim();
 			try {
 				Date dep = dateFormat.parse(deposition_date);
 				pdbHeader.setDepDate(dep);
 
-			} catch (ParseException e){
-				logger.info("Could not parse deposition date string '"+deposition_date+"'. Will continue without deposition date");
+			} catch (ParseException e) {
+				logger.error(e.getMessage(), e);
+				logger.info(new StringBuilder().append("Could not parse deposition date string '")
+						.append(deposition_date).append("'. Will continue without deposition date").toString());
 			}
 		}
-		if(len > 62) {
-			pdbCode         = line.substring (62, min(len,66)).trim() ;
+		if (len > 62) {
+			pdbCode = line.substring(62, min(len, 66)).trim();
 			pdbId = pdbCode;
 
 			logger.debug("Parsing entry " + pdbId);
-
 
 			structure.setPDBCode(pdbCode);
 			pdbHeader.setIdCode(pdbCode);
 		}
 
-		//*really* old files (you'll need to hunt to find these as they
-		//should have been remediated) have headers like below. Plus the
-		//pdbId at positions 72-76 is present in every line
+		// *really* old files (you'll need to hunt to find these as they
+		// should have been remediated) have headers like below. Plus the
+		// pdbId at positions 72-76 is present in every line
 
-		//HEADER    PROTEINASE INHIBITOR (TRYPSIN)          05-OCT-84   5PTI      5PTI   3
-		//HEADER    TRANSFERASE (ACYLTRANSFERASE)           02-SEP-92   1LAC      1LAC   2
+		// HEADER PROTEINASE INHIBITOR (TRYPSIN) 05-OCT-84 5PTI 5PTI 3
+		// HEADER TRANSFERASE (ACYLTRANSFERASE) 02-SEP-92 1LAC 1LAC 2
 		if (len > 66) {
-			if (pdbId.equals(line.substring (72, 76))){
+			if (pdbId.equals(line.substring(72, 76))) {
 				isLegacyFormat = true;
 				logger.warn(pdbId + " is a LEGACY entry - this will most likely not parse correctly.");
 			}
@@ -389,9 +406,9 @@ public class PDBFileParser  {
 
 	}
 
-
-	/** 
+	/**
 	 * Parses the following record:
+	 * 
 	 * <pre>
 	 *  COLUMNS      DATA  TYPE      FIELD         DEFINITION
 	 * ------------------------------------------------------------------------------------
@@ -401,6 +418,7 @@ public class PDBFileParser  {
 	 *                                            by commas.
 	 *
 	 * </pre>
+	 * 
 	 * @param line
 	 */
 	private void pdb_AUTHOR_Handler(String line) {
@@ -408,18 +426,16 @@ public class PDBFileParser  {
 		String authors = line.substring(10).trim();
 
 		String auth = pdbHeader.getAuthors();
-		if (auth == null){
+		if (auth == null) {
 			pdbHeader.setAuthors(authors);
 		} else {
-			auth +=  authors;
+			auth += authors;
 			pdbHeader.setAuthors(auth);
 		}
 
 	}
 
-
-
-	/** 
+	/**
 	 * Parses the following record:
 	 *
 	 * <pre>
@@ -453,37 +469,40 @@ public class PDBFileParser  {
 	 * 72 - 76       Integer          length       Length of this helix.
 	 * </pre>
 	 */
-	private void pdb_HELIX_Handler(String line){
+	private void pdb_HELIX_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		if (line.length()<38) {
+		if (line.length() < 38) {
 			logger.info("HELIX line has length under 38. Ignoring it.");
 			return;
 		}
 
-		String initResName = line.substring(15,18).trim();
-		String initChainId = line.substring(19,20);
-		String initSeqNum  = line.substring(21,25).trim();
-		String initICode   = line.substring(25,26);
-		String endResName  = line.substring(27,30).trim();
-		String endChainId  = line.substring(31,32);
-		String endSeqNum   = line.substring(33,37).trim();
-		String endICode    = line.substring(37,38);
+		String initResName = line.substring(15, 18).trim();
+		String initChainId = line.substring(19, 20);
+		String initSeqNum = line.substring(21, 25).trim();
+		String initICode = line.substring(25, 26);
+		String endResName = line.substring(27, 30).trim();
+		String endChainId = line.substring(31, 32);
+		String endSeqNum = line.substring(33, 37).trim();
+		String endICode = line.substring(37, 38);
 
-		//System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
-		//        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
+		// System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " +
+		// initICode + " " +
+		// endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
 
-		Map<String,String> m = new HashMap<String,String>();
+		Map<String, String> m = new HashMap<>();
 
-		m.put("initResName",initResName);
+		m.put("initResName", initResName);
 		m.put("initChainId", initChainId);
 		m.put("initSeqNum", initSeqNum);
 		m.put("initICode", initICode);
 		m.put("endResName", endResName);
 		m.put("endChainId", endChainId);
-		m.put("endSeqNum",endSeqNum);
-		m.put("endICode",endICode);
+		m.put("endSeqNum", endSeqNum);
+		m.put("endICode", endICode);
 
 		helixList.add(m);
 
@@ -491,6 +510,7 @@ public class PDBFileParser  {
 
 	/**
 	 * Handler for
+	 * 
 	 * <pre>
 	 *       COLUMNS     DATA TYPE        FIELD           DEFINITION
 	 * --------------------------------------------------------------
@@ -540,44 +560,47 @@ public class PDBFileParser  {
 	 *                                               previous strand.
 	 * </pre>
 	 */
-	private void pdb_SHEET_Handler( String line){
+	private void pdb_SHEET_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		if (line.length()<38) {
+		if (line.length() < 38) {
 			logger.info("SHEET line has length under 38. Ignoring it.");
 			return;
 		}
 
-		String initResName = line.substring(17,20).trim();
-		String initChainId = line.substring(21,22);
-		String initSeqNum  = line.substring(22,26).trim();
-		String initICode   = line.substring(26,27);
-		String endResName  = line.substring(28,31).trim();
-		String endChainId  = line.substring(32,33);
-		String endSeqNum   = line.substring(33,37).trim();
-		String endICode    = line.substring(37,38);
+		String initResName = line.substring(17, 20).trim();
+		String initChainId = line.substring(21, 22);
+		String initSeqNum = line.substring(22, 26).trim();
+		String initICode = line.substring(26, 27);
+		String endResName = line.substring(28, 31).trim();
+		String endChainId = line.substring(32, 33);
+		String endSeqNum = line.substring(33, 37).trim();
+		String endICode = line.substring(37, 38);
 
-		//System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
-		//        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
+		// System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " +
+		// initICode + " " +
+		// endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
 
-		Map<String,String> m = new HashMap<String,String>();
+		Map<String, String> m = new HashMap<>();
 
-		m.put("initResName",initResName);
+		m.put("initResName", initResName);
 		m.put("initChainId", initChainId);
 		m.put("initSeqNum", initSeqNum);
 		m.put("initICode", initICode);
 		m.put("endResName", endResName);
 		m.put("endChainId", endChainId);
-		m.put("endSeqNum",endSeqNum);
-		m.put("endICode",endICode);
+		m.put("endSeqNum", endSeqNum);
+		m.put("endICode", endICode);
 
 		strandList.add(m);
 	}
 
-
 	/**
 	 * Handler for TURN lines
+	 * 
 	 * <pre>
 	 * COLUMNS      DATA TYPE        FIELD         DEFINITION
 	 * --------------------------------------------------------------------
@@ -603,46 +626,50 @@ public class PDBFileParser  {
 	 *                                             of turn.
 	 * 41 - 70      String           comment       Associated comment.
 	 * </pre>
+	 * 
 	 * @param line
 	 */
-	private void pdb_TURN_Handler( String line){
+	private void pdb_TURN_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		if (line.length()<36) {
+		if (line.length() < 36) {
 			logger.info("TURN line has length under 36. Ignoring it.");
 			return;
 		}
 
-		String initResName = line.substring(15,18).trim();
-		String initChainId = line.substring(19,20);
-		String initSeqNum  = line.substring(20,24).trim();
-		String initICode   = line.substring(24,25);
-		String endResName  = line.substring(26,29).trim();
-		String endChainId  = line.substring(30,31);
-		String endSeqNum   = line.substring(31,35).trim();
-		String endICode    = line.substring(35,36);
+		String initResName = line.substring(15, 18).trim();
+		String initChainId = line.substring(19, 20);
+		String initSeqNum = line.substring(20, 24).trim();
+		String initICode = line.substring(24, 25);
+		String endResName = line.substring(26, 29).trim();
+		String endChainId = line.substring(30, 31);
+		String endSeqNum = line.substring(31, 35).trim();
+		String endICode = line.substring(35, 36);
 
-		//System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " + initICode + " " +
-		//        endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
+		// System.out.println(initResName + " " + initChainId + " " + initSeqNum + " " +
+		// initICode + " " +
+		// endResName + " " + endChainId + " " + endSeqNum + " " + endICode);
 
-		Map<String,String> m = new HashMap<String,String>();
+		Map<String, String> m = new HashMap<>();
 
-		m.put("initResName",initResName);
+		m.put("initResName", initResName);
 		m.put("initChainId", initChainId);
 		m.put("initSeqNum", initSeqNum);
 		m.put("initICode", initICode);
 		m.put("endResName", endResName);
 		m.put("endChainId", endChainId);
-		m.put("endSeqNum",endSeqNum);
-		m.put("endICode",endICode);
+		m.put("endSeqNum", endSeqNum);
+		m.put("endICode", endICode);
 
 		turnList.add(m);
 	}
 
 	/**
-	 * Handler for
-	 * REVDAT Record format:
+	 * Handler for REVDAT Record format:
+	 * 
 	 * <pre>
 	 *
 	 * COLUMNS       DATA TYPE      FIELD         DEFINITION
@@ -675,40 +702,45 @@ public class PDBFileParser  {
 		// keep the first as latest modified date and the last as release date
 		Date modDate = pdbHeader.getModDate();
 
-		if ( modDate == null || modDate.equals(new Date(0)) ) {
-			
+		if (modDate == null || modDate.equals(new Date(0))) {
+
 			// modified date is still uninitialized
-			String modificationDate = line.substring (13, 22).trim() ;
+			String modificationDate = line.substring(13, 22).trim();
 
 			try {
 				Date dep = dateFormat.parse(modificationDate);
 				pdbHeader.setModDate(dep);
 				pdbHeader.setRelDate(dep);
-			} catch (ParseException e){
-				logger.info("Could not parse revision date string '"+modificationDate+"'. ");
+			} catch (ParseException e) {
+				logger.error(e.getMessage(), e);
+				logger.info(new StringBuilder().append("Could not parse revision date string '")
+						.append(modificationDate).append("'. ").toString());
 			}
 
 		} else {
-			
+
 			// set as the release date
-			String releaseDate = line.substring (13, 22).trim() ;
+			String releaseDate = line.substring(13, 22).trim();
 
 			try {
 				Date dep = dateFormat.parse(releaseDate);
 				pdbHeader.setRelDate(dep);
-			} catch (ParseException e){
-				logger.info("Could not parse revision date string '"+releaseDate+"'. ");
+			} catch (ParseException e) {
+				logger.error(e.getMessage(), e);
+				logger.info(new StringBuilder().append("Could not parse revision date string '").append(releaseDate)
+						.append("'. ").toString());
 			}
 		}
 	}
 
-	/** 
-	 * Handler for
-	 * SEQRES record format
-	 * SEQRES records contain the amino acid or nucleic acid sequence of residues in each chain of the macromolecule that was studied.
+	/**
+	 * Handler for SEQRES record format SEQRES records contain the amino acid or
+	 * nucleic acid sequence of residues in each chain of the macromolecule that was
+	 * studied.
 	 * <p>
 	 * Record Format:
 	 * <p>
+	 * 
 	 * <pre>
 	 * COLUMNS        DATA TYPE       FIELD         DEFINITION
 	 * ---------------------------------------------------------------------------------
@@ -738,45 +770,43 @@ public class PDBFileParser  {
 	 * 64 - 66        Residue name    resName       Residue name.
 	 * 68 - 70        Residue name    resName       Residue name.
 	 * </pre>
+	 * 
 	 * @author Jules Jacobsen
 	 */
 	private void pdb_SEQRES_Handler(String line) {
 
 		/*
-		 *          1         2         3         4         5         6         7
-		 * 1234567890123456789012345678901234567890123456789012345678901234567890
-		 * SEQRES   1 A  376  LYS PRO VAL THR VAL LYS LEU VAL ASP SER GLN ALA THR
-		 * SEQRES   1 A   21  GLY ILE VAL GLU GLN CYS CYS THR SER ILE CYS SER LEU
-		 * SEQRES   2 A   21  TYR GLN LEU GLU ASN TYR CYS ASN
-		 * SEQRES   1 B   30  PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU
-		 * SEQRES   2 B   30  ALA LEU TYR LEU VAL CYS GLY GLU ARG GLY PHE PHE TYR
-		 * SEQRES   3 B   30  THR PRO LYS ALA
-		 * SEQRES   1 C   21  GLY ILE VAL GLU GLN CYS CYS THR SER ILE CYS SER LEU
-		 * SEQRES   2 C   21  TYR GLN LEU GLU ASN TYR CYS ASN
-		 * SEQRES   1 D   30  PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU
-		 * SEQRES   2 D   30  ALA LEU TYR LEU VAL CYS GLY GLU ARG GLY PHE PHE TYR
-		 * SEQRES   3 D   30  THR PRO LYS ALA
+		 * 1 2 3 4 5 6 7
+		 * 1234567890123456789012345678901234567890123456789012345678901234567890 SEQRES
+		 * 1 A 376 LYS PRO VAL THR VAL LYS LEU VAL ASP SER GLN ALA THR SEQRES 1 A 21 GLY
+		 * ILE VAL GLU GLN CYS CYS THR SER ILE CYS SER LEU SEQRES 2 A 21 TYR GLN LEU GLU
+		 * ASN TYR CYS ASN SEQRES 1 B 30 PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL
+		 * GLU SEQRES 2 B 30 ALA LEU TYR LEU VAL CYS GLY GLU ARG GLY PHE PHE TYR SEQRES
+		 * 3 B 30 THR PRO LYS ALA SEQRES 1 C 21 GLY ILE VAL GLU GLN CYS CYS THR SER ILE
+		 * CYS SER LEU SEQRES 2 C 21 TYR GLN LEU GLU ASN TYR CYS ASN SEQRES 1 D 30 PHE
+		 * VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU SEQRES 2 D 30 ALA LEU TYR LEU
+		 * VAL CYS GLY GLU ARG GLY PHE PHE TYR SEQRES 3 D 30 THR PRO LYS ALA
 		 */
 
 		String recordName = line.substring(0, 6).trim();
-		String chainID    = line.substring(11, 12);
-		String newLength   = line.substring(13,17).trim();
+		String chainID = line.substring(11, 12);
+		String newLength = line.substring(13, 17).trim();
 		String subSequence = line.substring(18);
 
-		if ( lengthCheck == -1 ){
+		if (lengthCheck == -1) {
 			lengthCheck = Integer.parseInt(newLength);
 		}
 
 		StringTokenizer subSequenceResidues = new StringTokenizer(subSequence);
 
 		Character aminoCode1 = null;
-		if (! recordName.equals(AminoAcid.SEQRESRECORD)) {
+		if (!recordName.equals(AminoAcid.SEQRESRECORD)) {
 			// should not have been called
 			return;
 		}
 
 		currentChain = isKnownChain(chainID, seqResChains);
-		if ( currentChain == null) {
+		if (currentChain == null) {
 
 			currentChain = new ChainImpl();
 			currentChain.setId(chainID);
@@ -790,16 +820,17 @@ public class PDBFileParser  {
 
 			aminoCode1 = StructureTools.get1LetterCode(threeLetter);
 
-			//if (aminoCode1 == null) {
+			// if (aminoCode1 == null) {
 			// could be a nucleotide...
-			// but getNewGroup takes care of that and converts ATOM records with aminoCode1 == nnull to nucleotide...
-			//}
+			// but getNewGroup takes care of that and converts ATOM records with aminoCode1
+			// == nnull to nucleotide...
+			// }
 			currentGroup = getNewGroup("ATOM", aminoCode1, threeLetter);
 
 			currentGroup.setPDBName(threeLetter);
 
-			if ( currentGroup instanceof AminoAcid){
-				AminoAcid aa = (AminoAcid)currentGroup;
+			if (currentGroup instanceof AminoAcid) {
+				AminoAcid aa = (AminoAcid) currentGroup;
 				aa.setRecordType(AminoAcid.SEQRESRECORD);
 			}
 			// add the current resNum to the new chain.
@@ -808,30 +839,30 @@ public class PDBFileParser  {
 		}
 		Chain test = isKnownChain(chainID, seqResChains);
 
-		if ( test == null)
+		if (test == null) {
 			seqResChains.add(currentChain);
+		}
 
-		if (currentGroup != null)
+		if (currentGroup != null) {
 			currentGroup.trimToSize();
+		}
 
 		currentGroup = null;
 		currentChain = null;
 
-		//		 the current chain is finished!
-		//if ( current_chain.getLength() != lengthCheck ){
-		//	System.err.println("the length of chain " + current_chain.getName() + "(" +
-		//			current_chain.getLength() + ") does not match the expected " + lengthCheck);
-		//}
+		// the current chain is finished!
+		// if ( current_chain.getLength() != lengthCheck ){
+		// System.err.println("the length of chain " + current_chain.getName() + "(" +
+		// current_chain.getLength() + ") does not match the expected " + lengthCheck);
+		// }
 
 		lengthCheck = Integer.parseInt(newLength);
 
 	}
 
-
-
-	/** 
-	 * Handler for
-	 * TITLE Record Format
+	/**
+	 * Handler for TITLE Record Format
+	 * 
 	 * <pre>
 	 COLUMNS        DATA TYPE       FIELD          DEFINITION
 	 ----------------------------------------------------------------------------------
@@ -840,23 +871,26 @@ public class PDBFileParser  {
 	 records.
 	 11 - 70        String          title          Title of the experiment.
 	 * </pre>
-     *
+	 *
 	 */
 	private void pdb_TITLE_Handler(String line) {
 		String title;
-		if ( line.length() > 79)
-			title = line.substring(10,80).trim();
-		else
-			title = line.substring(10,line.length()).trim();
+		if (line.length() > 79) {
+			title = line.substring(10, 80).trim();
+		} else {
+			title = line.substring(10, line.length()).trim();
+		}
 
 		String t = pdbHeader.getTitle();
-		if ( (t != null) && (! t.equals("")) ){
-			if (t.endsWith("-"))
+		if ((t != null) && (!"".equals(t))) {
+			if (t.endsWith("-")) {
 				t += ""; // if last line ends with a hyphen then we don't add space
-			else
+			} else {
 				t += " ";
+			}
+		} else {
+			t = "";
 		}
-		else t = "";
 
 		t += title;
 
@@ -864,12 +898,14 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * JRNL handler.
-	 * The JRNL record contains the primary literature citation that describes the experiment which resulted
-	 * in the deposited coordinate set. There is at most one JRNL reference per entry. If there is no primary
-	 * reference, then there is no JRNL reference. Other references are given in REMARK 1.
+	 * JRNL handler. The JRNL record contains the primary literature citation that
+	 * describes the experiment which resulted in the deposited coordinate set.
+	 * There is at most one JRNL reference per entry. If there is no primary
+	 * reference, then there is no JRNL reference. Other references are given in
+	 * REMARK 1.
 	 *
 	 * Record Format
+	 * 
 	 * <pre>
 	 * COLUMNS       DATA TYPE     FIELD         DEFINITION
 	 * -----------------------------------------------------------------------
@@ -879,13 +915,13 @@ public class PDBFileParser  {
 	 * </pre>
 	 */
 	private void pdb_JRNL_Handler(String line) {
-		//add the strings to the journalLines
-		//the actual JournalArticle is then built when the whole entry is being
-		//finalized with triggerEndFileChecks()
-		//JRNL        TITL   NMR SOLUTION STRUCTURE OF RECOMBINANT TICK           1TAP  10
+		// add the strings to the journalLines
+		// the actual JournalArticle is then built when the whole entry is being
+		// finalized with triggerEndFileChecks()
+		// JRNL TITL NMR SOLUTION STRUCTURE OF RECOMBINANT TICK 1TAP 10
 		if (line.substring(line.length() - 8, line.length() - 4).equals(pdbId)) {
-			//trim off the trailing PDB id from legacy files.
-			//are we really trying to still cater for these museum pieces?
+			// trim off the trailing PDB id from legacy files.
+			// are we really trying to still cater for these museum pieces?
 
 			logger.debug("trimming legacy PDB id from end of JRNL section line");
 
@@ -897,52 +933,52 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * This should not be accessed directly, other than by </code>makeCompounds</code>. It still deals with the same
-	 * lines in a similar manner but if not accessed from </code>makeCompounds</code> the last element will be
-	 * missing. Don't say I didn't warn you.
+	 * This should not be accessed directly, other than by
+	 * </code>makeCompounds</code>. It still deals with the same lines in a similar
+	 * manner but if not accessed from </code>makeCompounds</code> the last element
+	 * will be missing. Don't say I didn't warn you.
 	 *
 	 * @param line
 	 */
 	private void pdb_COMPND_Handler(String line) {
 
-		logger.debug("previousContinuationField  is "
-					+ previousContinuationField);
-		logger.debug("current continuationField  is "
-					+ continuationField);
-		logger.debug("current continuationString is "
-					+ continuationString);
-		logger.debug("current compound           is "
-					+ current_compound);
+		logger.debug("previousContinuationField  is " + previousContinuationField);
+		logger.debug("current continuationField  is " + continuationField);
+		logger.debug("current continuationString is " + continuationString);
+		logger.debug("current compound           is " + currentCompound);
 
-
-		// In legacy PDB files the line ends with the PDB code and a serial number, chop those off!
-		//format version 3.0 onwards will have 80 characters in a line
-		//		if (line.length() > 72) {
+		// In legacy PDB files the line ends with the PDB code and a serial number, chop
+		// those off!
+		// format version 3.0 onwards will have 80 characters in a line
+		// if (line.length() > 72) {
 		if (isLegacyFormat) {
-			//                    if (DEBUG) {
-			//                        System.out.println("We have a legacy file - truncating line length to 71 characters:");
-			//                        System.out.println(line);
-			//                    }
+			// if (DEBUG) {
+			// System.out.println("We have a legacy file - truncating line length to 71
+			// characters:");
+			// System.out.println(line);
+			// }
 			line = line.substring(0, 72);
 		}
 
 		line = line.substring(10, line.length());
 
-
 		String[] fieldList = line.trim().split("\\s+");
 		int fl = fieldList.length;
-		if ((fl >0 ) && compndFieldValues.contains(fieldList[0])) {
+		if ((fl > 0) && compndFieldValues.contains(fieldList[0])) {
 
 			continuationField = fieldList[0];
-			if (previousContinuationField.equals("")) {
+			if ("".equals(previousContinuationField)) {
 				previousContinuationField = continuationField;
 			}
 
-		} else if (fl>0) {
-			// the ':' character indicates the end of a field name and should be invalid as part the first data token
-			// e.g. obsolete file 1hhb has a malformed COMPND line that can only be caught with this kind of check
-			if (fieldList[0].contains(":") ) {
-				logger.info("COMPND line does not follow the PDB 3.0 format. Note that COMPND parsing is not supported any longer in format 2.3 or earlier");
+		} else if (fl > 0) {
+			// the ':' character indicates the end of a field name and should be invalid as
+			// part the first data token
+			// e.g. obsolete file 1hhb has a malformed COMPND line that can only be caught
+			// with this kind of check
+			if (fieldList[0].contains(":")) {
+				logger.info(
+						"COMPND line does not follow the PDB 3.0 format. Note that COMPND parsing is not supported any longer in format 2.3 or earlier");
 				return;
 			}
 
@@ -955,171 +991,183 @@ public class PDBFileParser  {
 
 		StringTokenizer compndTokens = new StringTokenizer(line);
 
-		//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
+		// System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line +
+		// "'");
 
 		while (compndTokens.hasMoreTokens()) {
 			String token = compndTokens.nextToken();
 
-			if (previousContinuationField.equals("")) {
+			if ("".equals(previousContinuationField)) {
 				previousContinuationField = continuationField;
 			}
 
-			if (previousContinuationField.equals(continuationField)
-					&& compndFieldValues.contains(continuationField)) {
+			if (previousContinuationField.equals(continuationField) && compndFieldValues.contains(continuationField)) {
 
 				logger.debug("Still in field " + continuationField);
 				logger.debug("token = " + token);
 
-				continuationString = continuationString.concat(token + " ");
+				continuationString = new StringBuilder().append(continuationString).append(token).append(" ")
+						.toString();
 
-				logger.debug("continuationString = "
-							+ continuationString);
+				logger.debug("continuationString = " + continuationString);
 
 			}
 			if (!continuationField.equals(previousContinuationField)) {
 
-				if (continuationString.equals("")) {
+				if ("".equals(continuationString)) {
 					continuationString = token;
 
 				} else {
 
-					compndValueSetter(previousContinuationField,
-							continuationString);
+					compndValueSetter(previousContinuationField, continuationString);
 					previousContinuationField = continuationField;
 					continuationString = token + " ";
 				}
 			} else if (ignoreCompndFieldValues.contains(token)) {
 				// this field shall be ignored
-				//continuationField = token;
+				// continuationField = token;
 			}
 		}
-		if (isLastCompndLine) {
-			// final line in the section - finish off the compound
-			//			System.out.println("[pdb_COMPND_Handler] Final COMPND line - Finishing off final MolID header.");
-			compndValueSetter(continuationField, continuationString);
-			continuationString = "";
-			if (current_compound!=null) entities.add(current_compound);
+		if (!isLastCompndLine) {
+			return;
+		}
+		// final line in the section - finish off the compound
+		// System.out.println("[pdb_COMPND_Handler] Final COMPND line - Finishing off
+		// final MolID header.");
+		compndValueSetter(continuationField, continuationString);
+		continuationString = "";
+		if (currentCompound != null) {
+			entities.add(currentCompound);
 		}
 	}
 
 	/**
 	 * Set the value in the current molId object
+	 * 
 	 * @param field
 	 * @param value
 	 */
 	private void compndValueSetter(String field, String value) {
 
 		value = value.trim().replace(";", "");
-		if (field.equals("MOL_ID:")) {
+		if ("MOL_ID:".equals(field)) {
 
 			int i = -1;
 			try {
 				i = Integer.valueOf(value);
-			} catch (NumberFormatException e){
-				logger.warn("Value '{}' does not look like a number, while trying to parse COMPND MOL_ID line.",value);
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+				logger.warn("Value '{}' does not look like a number, while trying to parse COMPND MOL_ID line.", value);
 			}
-			if (i>0 && prevMolId!=i) {
+			if (i > 0 && prevMolId != i) {
 
-				if (current_compound!=null) entities.add(current_compound);
+				if (currentCompound != null) {
+					entities.add(currentCompound);
+				}
 
 				logger.debug("Initialising new Compound with mol_id {}", i);
 
-				current_compound = new EntityInfo();
+				currentCompound = new EntityInfo();
 
-				current_compound.setMolId(i);
-				
-				// we will set polymer for all defined compounds in PDB file (non-polymer compounds are not defined in header) - JD 2016-03-25
-				current_compound.setType(EntityType.POLYMER);
+				currentCompound.setMolId(i);
+
+				// we will set polymer for all defined compounds in PDB file (non-polymer
+				// compounds are not defined in header) - JD 2016-03-25
+				currentCompound.setType(EntityType.POLYMER);
 
 				prevMolId = i;
 			}
 
 		}
 
-		// if for some reason (e.g. missing mol_id line) the current_compound is null we can't add anything to it, return
-		if (current_compound==null) {
+		// if for some reason (e.g. missing mol_id line) the current_compound is null we
+		// can't add anything to it, return
+		if (currentCompound == null) {
 			return;
 		}
 
-		if (field.equals("MOLECULE:")) {
-			current_compound.setDescription(value);
+		if ("MOLECULE:".equals(field)) {
+			currentCompound.setDescription(value);
 
 		}
-		if (field.equals("CHAIN:")) {
-			//System.out.println(value);
+		if ("CHAIN:".equals(field)) {
+			// System.out.println(value);
 			StringTokenizer chainTokens = new StringTokenizer(value, ",");
-			List<String> chains = new ArrayList<String>();
+			List<String> chains = new ArrayList<>();
 
 			while (chainTokens.hasMoreTokens()) {
 				String chainID = chainTokens.nextToken().trim();
 				// NULL is used in old PDB files to represent empty chain DI
-				if (chainID.equals("NULL"))
+				if ("NULL".equals(chainID)) {
 					chainID = " ";
+				}
 				chains.add(chainID);
 			}
-			compoundMolIds2chainIds.put(current_compound.getMolId(),chains);
+			compoundMolIds2chainIds.put(currentCompound.getMolId(), chains);
 
 		}
-		if (field.equals("SYNONYM:")) {
+		if ("SYNONYM:".equals(field)) {
 
 			StringTokenizer synonyms = new StringTokenizer(value, ",");
-			List<String> names = new ArrayList<String>();
+			List<String> names = new ArrayList<>();
 
 			while (synonyms.hasMoreTokens()) {
 				names.add(synonyms.nextToken());
 
-				current_compound.setSynonyms(names);
+				currentCompound.setSynonyms(names);
 			}
 
 		}
 
-		if (field.equals("EC:")) {
+		if ("EC:".equals(field)) {
 
 			StringTokenizer ecNumTokens = new StringTokenizer(value, ",");
-			List<String> ecNums = new ArrayList<String>();
+			List<String> ecNums = new ArrayList<>();
 
 			while (ecNumTokens.hasMoreTokens()) {
 				ecNums.add(ecNumTokens.nextToken());
 
-				current_compound.setEcNums(ecNums);
+				currentCompound.setEcNums(ecNums);
 			}
 
 		}
-		if (field.equals("FRAGMENT:")) {
+		if ("FRAGMENT:".equals(field)) {
 
-			current_compound.setFragment(value);
-
-		}
-		if (field.equals("ENGINEERED:")) {
-
-			current_compound.setEngineered(value);
+			currentCompound.setFragment(value);
 
 		}
-		if (field.equals("MUTATION:")) {
+		if ("ENGINEERED:".equals(field)) {
 
-			current_compound.setMutation(value);
-
-		}
-		if (field.equals("BIOLOGICAL_UNIT:")) {
-
-			current_compound.setBiologicalUnit(value);
+			currentCompound.setEngineered(value);
 
 		}
-		if (field.equals("OTHER_DETAILS:")) {
+		if ("MUTATION:".equals(field)) {
 
-			current_compound.setDetails(value);
+			currentCompound.setMutation(value);
+
+		}
+		if ("BIOLOGICAL_UNIT:".equals(field)) {
+
+			currentCompound.setBiologicalUnit(value);
+
+		}
+		if ("OTHER_DETAILS:".equals(field)) {
+
+			currentCompound.setDetails(value);
 
 		}
 
 	}
 
-
-	/** 
-	 * Handler for
-	 * SOURCE Record format
+	/**
+	 * Handler for SOURCE Record format
 	 *
-	 * The SOURCE record specifies the biological and/or chemical source of each biological molecule in the entry. Sources are described by both the common name and the scientific name, e.g., genus and species. Strain and/or cell-line for immortalized cells are given when they help to uniquely identify the biological entity studied.
-	 * Record Format
+	 * The SOURCE record specifies the biological and/or chemical source of each
+	 * biological molecule in the entry. Sources are described by both the common
+	 * name and the scientific name, e.g., genus and species. Strain and/or
+	 * cell-line for immortalized cells are given when they help to uniquely
+	 * identify the biological entity studied. Record Format
+	 * 
 	 * <pre>
 	 * COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 * -------------------------------------------------------------------------------
@@ -1128,25 +1176,18 @@ public class PDBFileParser  {
 	 * 11 - 70   Specification     srcName        Identifies the source of the macromolecule in
 	 *            list                            a token: value format.
 	 * </pre>
+	 * 
 	 * @param line the line to be parsed
 	 */
 	private void pdb_SOURCE_Handler(String line) {
 		// works in the same way as the pdb_COMPND_Handler.
 		String continuationNr = line.substring(9, 10).trim();
 
-
-
-		logger.debug("current continuationNo     is "
-				+ continuationNr);
-		logger.debug("previousContinuationField  is "
-				+ previousContinuationField);
-		logger.debug("current continuationField  is "
-				+ continuationField);
-		logger.debug("current continuationString is "
-				+ continuationString);
-		logger.debug("current compound           is "
-				+ current_compound);
-
+		logger.debug("current continuationNo     is " + continuationNr);
+		logger.debug("previousContinuationField  is " + previousContinuationField);
+		logger.debug("current continuationField  is " + continuationField);
+		logger.debug("current continuationString is " + continuationString);
+		logger.debug("current compound           is " + currentCompound);
 
 		// following the docs, the last valid character should be 79, chop off the rest
 		if (line.length() > 79) {
@@ -1155,32 +1196,33 @@ public class PDBFileParser  {
 
 		line = line.substring(10, line.length());
 
-		logger.debug("LINE: >" + line + "<");
+		logger.debug(new StringBuilder().append("LINE: >").append(line).append("<").toString());
 
 		String[] fieldList = line.split("\\s+");
 
-		if (!fieldList[0].equals("")
-				&& sourceFieldValues.contains(fieldList[0])) {
-			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[0] + "'");
+		if (!"".equals(fieldList[0]) && sourceFieldValues.contains(fieldList[0])) {
+			// System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting
+			// continuationField to '" + fieldList[0] + "'");
 			continuationField = fieldList[0];
-			if (previousContinuationField.equals("")) {
+			if ("".equals(previousContinuationField)) {
 				previousContinuationField = continuationField;
 			}
 
-		} else if ((fieldList.length > 1) && ( sourceFieldValues.contains(fieldList[1]))) {
-			//			System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting continuationField to '" + fieldList[1] + "'");
+		} else if ((fieldList.length > 1) && (sourceFieldValues.contains(fieldList[1]))) {
+			// System.out.println("[PDBFileParser.pdb_COMPND_Handler] Setting
+			// continuationField to '" + fieldList[1] + "'");
 			continuationField = fieldList[1];
-			if (previousContinuationField.equals("")) {
+			if ("".equals(previousContinuationField)) {
 				previousContinuationField = continuationField;
 			}
 
 		} else {
-			if (continuationNr.equals("")) {
+			if ("".equals(continuationNr)) {
 
 				logger.debug("looks like an old PDB file");
 
 				continuationField = "MOLECULE:";
-				if (previousContinuationField.equals("")) {
+				if ("".equals(previousContinuationField)) {
 					previousContinuationField = continuationField;
 				}
 			}
@@ -1191,55 +1233,56 @@ public class PDBFileParser  {
 
 		StringTokenizer compndTokens = new StringTokenizer(line);
 
-		//		System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line + "'");
+		// System.out.println("PDBFileParser.pdb_COMPND_Handler: Tokenizing '" + line +
+		// "'");
 
 		while (compndTokens.hasMoreTokens()) {
 			String token = compndTokens.nextToken();
 
-			if (previousContinuationField.equals("")) {
-				//				System.out.println("previousContinuationField is empty. Setting to : " + continuationField);
+			if ("".equals(previousContinuationField)) {
+				// System.out.println("previousContinuationField is empty. Setting to : " +
+				// continuationField);
 				previousContinuationField = continuationField;
 			}
 
-			if (previousContinuationField.equals(continuationField)
-					&& sourceFieldValues.contains(continuationField)) {
+			if (previousContinuationField.equals(continuationField) && sourceFieldValues.contains(continuationField)) {
 
 				logger.debug("Still in field " + continuationField);
 
-				continuationString = continuationString.concat(token + " ");
+				continuationString = new StringBuilder().append(continuationString).append(token).append(" ")
+						.toString();
 
-				logger.debug("continuationString = "
-							+ continuationString);
+				logger.debug("continuationString = " + continuationString);
 			}
 			if (!continuationField.equals(previousContinuationField)) {
 
-				if (continuationString.equals("")) {
+				if ("".equals(continuationString)) {
 					continuationString = token;
 
 				} else {
 
-					sourceValueSetter(previousContinuationField,
-							continuationString);
+					sourceValueSetter(previousContinuationField, continuationString);
 					previousContinuationField = continuationField;
 					continuationString = token + " ";
 				}
 			} else if (ignoreCompndFieldValues.contains(token)) {
 				// this field shall be ignored
-				//continuationField = token;
+				// continuationField = token;
 			}
 		}
-		if (isLastSourceLine) {
-			// final line in the section - finish off the compound
-			//			System.out.println("[pdb_SOURCE_Handler] Final SOURCE line - Finishing off final MolID header.");
-			sourceValueSetter(continuationField, continuationString);
-			continuationString = "";
-			//compounds.add(current_compound);
+		if (!isLastSourceLine) {
+			return;
 		}
+		// final line in the section - finish off the compound
+		// System.out.println("[pdb_SOURCE_Handler] Final SOURCE line - Finishing off
+		// final MolID header.");
+		sourceValueSetter(continuationField, continuationString);
+		continuationString = "";
+		// compounds.add(current_compound);
 
 	}
 
-
-	/** 
+	/**
 	 * Set the value in the current molId object
 	 *
 	 * @param field
@@ -1248,84 +1291,84 @@ public class PDBFileParser  {
 	private void sourceValueSetter(String field, String value) {
 
 		value = value.trim().replace(";", "");
-		//		System.out.println("[sourceValueSetter] " + field);
-		if (field.equals("MOL_ID:")) {
+		// System.out.println("[sourceValueSetter] " + field);
+		if ("MOL_ID:".equals(field)) {
 
 			try {
-				current_compound = entities.get(Integer.valueOf(value) - 1);
-			} catch (NumberFormatException e){
+				currentCompound = entities.get(Integer.valueOf(value) - 1);
+			} catch (NumberFormatException e) {
 				logger.info("could not process SOURCE MOL_ID record correctly:" + e.getMessage());
 				return;
 			}
 
-
-			//			System.out.println("[sourceValueSetter] Fetching compound " + value + " " + current_compound.getMolId());
+			// System.out.println("[sourceValueSetter] Fetching compound " + value + " " +
+			// current_compound.getMolId());
 
 		}
-		if (field.equals("SYNTHETIC:")) {
-			current_compound.setSynthetic(value);
-		} else if (field.equals("FRAGMENT:")) {
-			current_compound.setFragment(value);
-		} else if (field.equals("ORGANISM_SCIENTIFIC:")) {
-			current_compound.setOrganismScientific(value);
-		} else if (field.equals("ORGANISM_TAXID:")) {
-			current_compound.setOrganismTaxId(value);
-		} else if (field.equals("ORGANISM_COMMON:")) {
-			current_compound.setOrganismCommon(value);
-		} else if (field.equals("STRAIN:")) {
-			current_compound.setStrain(value);
-		} else if (field.equals("VARIANT:")) {
-			current_compound.setVariant(value);
-		} else if (field.equals("CELL_LINE:")) {
-			current_compound.setCellLine(value);
-		} else if (field.equals("ATCC:")) {
-			current_compound.setAtcc(value);
-		} else if (field.equals("ORGAN:")) {
-			current_compound.setOrgan(value);
-		} else if (field.equals("TISSUE:")) {
-			current_compound.setTissue(value);
-		} else if (field.equals("CELL:")) {
-			current_compound.setCell(value);
-		} else if (field.equals("ORGANELLE:")) {
-			current_compound.setOrganelle(value);
-		} else if (field.equals("SECRETION:")) {
-			current_compound.setSecretion(value);
-		} else if (field.equals("GENE:")) {
-			current_compound.setGene(value);
-		} else if (field.equals("CELLULAR_LOCATION:")) {
-			current_compound.setCellularLocation(value);
-		} else if (field.equals("EXPRESSION_SYSTEM:")) {
-			current_compound.setExpressionSystem(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_TAXID:")) {
-			current_compound.setExpressionSystemTaxId(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_STRAIN:")) {
-			current_compound.setExpressionSystemStrain(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_VARIANT:")) {
-			current_compound.setExpressionSystemVariant(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_CELL_LINE:")) {
-			current_compound.setExpressionSystemCellLine(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_ATCC_NUMBER:")) {
-			current_compound.setExpressionSystemAtccNumber(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_ORGAN:")) {
-			current_compound.setExpressionSystemOrgan(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_TISSUE:")) {
-			current_compound.setExpressionSystemTissue(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_CELL:")) {
-			current_compound.setExpressionSystemCell(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_ORGANELLE:")) {
-			current_compound.setExpressionSystemOrganelle(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_CELLULAR_LOCATION:")) {
-			current_compound.setExpressionSystemCellularLocation(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_VECTOR_TYPE:")) {
-			current_compound.setExpressionSystemVectorType(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_VECTOR:")) {
-			current_compound.setExpressionSystemVector(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_PLASMID:")) {
-			current_compound.setExpressionSystemPlasmid(value);
-		} else if (field.equals("EXPRESSION_SYSTEM_GENE:")) {
-			current_compound.setExpressionSystemGene(value);
-		} else if (field.equals("OTHER_DETAILS:")) {
-			current_compound.setExpressionSystemOtherDetails(value);
+		if ("SYNTHETIC:".equals(field)) {
+			currentCompound.setSynthetic(value);
+		} else if ("FRAGMENT:".equals(field)) {
+			currentCompound.setFragment(value);
+		} else if ("ORGANISM_SCIENTIFIC:".equals(field)) {
+			currentCompound.setOrganismScientific(value);
+		} else if ("ORGANISM_TAXID:".equals(field)) {
+			currentCompound.setOrganismTaxId(value);
+		} else if ("ORGANISM_COMMON:".equals(field)) {
+			currentCompound.setOrganismCommon(value);
+		} else if ("STRAIN:".equals(field)) {
+			currentCompound.setStrain(value);
+		} else if ("VARIANT:".equals(field)) {
+			currentCompound.setVariant(value);
+		} else if ("CELL_LINE:".equals(field)) {
+			currentCompound.setCellLine(value);
+		} else if ("ATCC:".equals(field)) {
+			currentCompound.setAtcc(value);
+		} else if ("ORGAN:".equals(field)) {
+			currentCompound.setOrgan(value);
+		} else if ("TISSUE:".equals(field)) {
+			currentCompound.setTissue(value);
+		} else if ("CELL:".equals(field)) {
+			currentCompound.setCell(value);
+		} else if ("ORGANELLE:".equals(field)) {
+			currentCompound.setOrganelle(value);
+		} else if ("SECRETION:".equals(field)) {
+			currentCompound.setSecretion(value);
+		} else if ("GENE:".equals(field)) {
+			currentCompound.setGene(value);
+		} else if ("CELLULAR_LOCATION:".equals(field)) {
+			currentCompound.setCellularLocation(value);
+		} else if ("EXPRESSION_SYSTEM:".equals(field)) {
+			currentCompound.setExpressionSystem(value);
+		} else if ("EXPRESSION_SYSTEM_TAXID:".equals(field)) {
+			currentCompound.setExpressionSystemTaxId(value);
+		} else if ("EXPRESSION_SYSTEM_STRAIN:".equals(field)) {
+			currentCompound.setExpressionSystemStrain(value);
+		} else if ("EXPRESSION_SYSTEM_VARIANT:".equals(field)) {
+			currentCompound.setExpressionSystemVariant(value);
+		} else if ("EXPRESSION_SYSTEM_CELL_LINE:".equals(field)) {
+			currentCompound.setExpressionSystemCellLine(value);
+		} else if ("EXPRESSION_SYSTEM_ATCC_NUMBER:".equals(field)) {
+			currentCompound.setExpressionSystemAtccNumber(value);
+		} else if ("EXPRESSION_SYSTEM_ORGAN:".equals(field)) {
+			currentCompound.setExpressionSystemOrgan(value);
+		} else if ("EXPRESSION_SYSTEM_TISSUE:".equals(field)) {
+			currentCompound.setExpressionSystemTissue(value);
+		} else if ("EXPRESSION_SYSTEM_CELL:".equals(field)) {
+			currentCompound.setExpressionSystemCell(value);
+		} else if ("EXPRESSION_SYSTEM_ORGANELLE:".equals(field)) {
+			currentCompound.setExpressionSystemOrganelle(value);
+		} else if ("EXPRESSION_SYSTEM_CELLULAR_LOCATION:".equals(field)) {
+			currentCompound.setExpressionSystemCellularLocation(value);
+		} else if ("EXPRESSION_SYSTEM_VECTOR_TYPE:".equals(field)) {
+			currentCompound.setExpressionSystemVectorType(value);
+		} else if ("EXPRESSION_SYSTEM_VECTOR:".equals(field)) {
+			currentCompound.setExpressionSystemVector(value);
+		} else if ("EXPRESSION_SYSTEM_PLASMID:".equals(field)) {
+			currentCompound.setExpressionSystemPlasmid(value);
+		} else if ("EXPRESSION_SYSTEM_GENE:".equals(field)) {
+			currentCompound.setExpressionSystemGene(value);
+		} else if ("OTHER_DETAILS:".equals(field)) {
+			currentCompound.setExpressionSystemOtherDetails(value);
 		}
 
 	}
@@ -1335,33 +1378,37 @@ public class PDBFileParser  {
 	 */
 	private void pdb_REMARK_Handler(String line) {
 
-		if ( line == null || line.length() < 11)
+		if (line == null || line.length() < 11) {
 			return;
-
+		}
 
 		if (line.startsWith("REMARK 800")) {
 			pdb_REMARK_800_Handler(line);
 
-		}  else if ( line.startsWith("REMARK 350")){
+		} else if (line.startsWith("REMARK 350")) {
 
-			if ( params.isParseBioAssembly()) {
+			if (params.isParseBioAssembly()) {
 
-				if (bioAssemblyParser == null){
+				if (bioAssemblyParser == null) {
 					bioAssemblyParser = new PDBBioAssemblyParser();
 				}
 
 				bioAssemblyParser.pdb_REMARK_350_Handler(line);
 			}
 
-		// REMARK 3 (for R free)
-		// note: if more than 1 value present (occurring in hybrid experimental technique entries, e.g. 3ins, 4n9m)
-		// then last one encountered will be taken
+			// REMARK 3 (for R free)
+			// note: if more than 1 value present (occurring in hybrid experimental
+			// technique entries, e.g. 3ins, 4n9m)
+			// then last one encountered will be taken
 		} else if (line.startsWith("REMARK   3   FREE R VALUE")) {
 
-			// Rfree annotation is not very consistent in PDB format, it varies depending on the software
+			// Rfree annotation is not very consistent in PDB format, it varies depending on
+			// the software
 			// Here we follow this strategy:
-			// a) take the '(NO CUTOFF)' value if the only one available (shelx software, e.g. 1x7q)
-			// b) don't take it if also a line without '(NO CUTOFF)' is present (CNX software, e.g. 3lak)
+			// a) take the '(NO CUTOFF)' value if the only one available (shelx software,
+			// e.g. 1x7q)
+			// b) don't take it if also a line without '(NO CUTOFF)' is present (CNX
+			// software, e.g. 3lak)
 
 			Pattern pR = Pattern.compile("^REMARK   3   FREE R VALUE\\s+(?:\\(NO CUTOFF\\))?\\s+:\\s+(\\d?\\.\\d+).*");
 			Matcher mR = pR.matcher(line);
@@ -1369,7 +1416,9 @@ public class PDBFileParser  {
 				try {
 					rfreeNoCutoffLine = Float.parseFloat(mR.group(1));
 				} catch (NumberFormatException e) {
-					logger.info("Rfree value "+mR.group(1)+" does not look like a number, will ignore it");
+					logger.error(e.getMessage(), e);
+					logger.info(new StringBuilder().append("Rfree value ").append(mR.group(1))
+							.append(" does not look like a number, will ignore it").toString());
 				}
 			}
 			pR = Pattern.compile("^REMARK   3   FREE R VALUE\\s+:\\s+(\\d?\\.\\d+).*");
@@ -1378,41 +1427,41 @@ public class PDBFileParser  {
 				try {
 					rfreeStandardLine = Float.parseFloat(mR.group(1));
 				} catch (NumberFormatException e) {
+					logger.error(e.getMessage(), e);
 					logger.info("Rfree value '{}' does not look like a number, will ignore it", mR.group(1));
 				}
 			}
 
-		// REMARK 3 RESOLUTION (contains more info than REMARK 2, for instance multiple resolutions in hybrid experimental technique entries)
-		// note: if more than 1 value present (occurring in hybrid experimental technique entries, e.g. 3ins, 4n9m)
-		// then last one encountered will be taken
-		} else if (line.startsWith("REMARK   3   RESOLUTION RANGE HIGH")){
+			// REMARK 3 RESOLUTION (contains more info than REMARK 2, for instance multiple
+			// resolutions in hybrid experimental technique entries)
+			// note: if more than 1 value present (occurring in hybrid experimental
+			// technique entries, e.g. 3ins, 4n9m)
+			// then last one encountered will be taken
+		} else if (line.startsWith("REMARK   3   RESOLUTION RANGE HIGH")) {
 			Pattern pR = Pattern.compile("^REMARK   3   RESOLUTION RANGE HIGH \\(ANGSTROMS\\) :\\s+(\\d+\\.\\d+).*");
 			Matcher mR = pR.matcher(line);
 			if (mR.matches()) {
 				try {
 					float res = Float.parseFloat(mR.group(1));
-					if (pdbHeader.getResolution()!=PDBHeader.DEFAULT_RESOLUTION) {
-						logger.warn("More than 1 resolution value present, will use last one {} and discard previous {} "
-								,mR.group(1), String.format("%4.2f",pdbHeader.getResolution()));
+					if (pdbHeader.getResolution() != PDBHeader.DEFAULT_RESOLUTION) {
+						logger.warn(
+								"More than 1 resolution value present, will use last one {} and discard previous {} ",
+								mR.group(1), String.format("%4.2f", pdbHeader.getResolution()));
 					}
 					pdbHeader.setResolution(res);
 				} catch (NumberFormatException e) {
-					logger.info("Could not parse resolution '{}', ignoring it",mR.group(1));
+					logger.error(e.getMessage(), e);
+					logger.info("Could not parse resolution '{}', ignoring it", mR.group(1));
 				}
 			}
 		}
 
 	}
 
-
-
-
-
-
-	/** 
-	 * Handler for
-	 * EXPDTA Record Format
-	<pre>
+	/**
+	 * Handler for EXPDTA Record Format
+	 * 
+	 * <pre>
 	 COLUMNS       DATA TYPE      FIELD         DEFINITION
 	 -------------------------------------------------------------------------------
 	 1 -  6       Record name    "EXPDTA"
@@ -1421,7 +1470,7 @@ public class PDBFileParser  {
 	 11 - 70       SList          technique     The experimental technique(s) with
 	 optional comment describing the
 	 sample or experiment.
-
+	
 	 allowed techniques are:
 	 ELECTRON DIFFRACTION
 	 FIBER DIFFRACTION
@@ -1430,29 +1479,30 @@ public class PDBFileParser  {
 	 NMR
 	 THEORETICAL MODEL
 	 X-RAY DIFFRACTION
-	</pre>
+	 * </pre>
 	 */
 	private void pdb_EXPDTA_Handler(String line) {
 
-		String technique  ;
-		if (line.length() > 69)
-			technique = line.substring (10, 70).trim() ;
-		else
+		String technique;
+		if (line.length() > 69) {
+			technique = line.substring(10, 70).trim();
+		} else {
 			technique = line.substring(10).trim();
+		}
 
-		for (String singleTechnique: technique.split(";\\s+")) {
+		for (String singleTechnique : technique.split(";\\s+")) {
 			pdbHeader.setExperimentalTechnique(singleTechnique);
 		}
 
-
 	}
 
-	/** 
-	 * Handler for
-	 * CRYST1 Record Format
-	 * The CRYST1 record presents the unit cell parameters, space group, and Z value.
-	 * If the entry describes a structure determined by a technique other than X-ray crystallography,
-	 * CRYST1 contains a = b = c = 1.0, alpha = beta = gamma = 90 degrees, space group = P 1, and Z =1.
+	/**
+	 * Handler for CRYST1 Record Format The CRYST1 record presents the unit cell
+	 * parameters, space group, and Z value. If the entry describes a structure
+	 * determined by a technique other than X-ray crystallography, CRYST1 contains a
+	 * = b = c = 1.0, alpha = beta = gamma = 90 degrees, space group = P 1, and Z
+	 * =1.
+	 * 
 	 * <pre>
 	 * COLUMNS DATA TYPE    FIELD          DEFINITION
 	 * -------------------------------------------------------------
@@ -1468,7 +1518,8 @@ public class PDBFileParser  {
 	 * </pre>
 	 */
 	private void pdb_CRYST1_Handler(String line) {
-		// for badly formatted files (e.g. phenix-produced ones), there's no z and the min length is 58 (e.g. for SG 'P 1')
+		// for badly formatted files (e.g. phenix-produced ones), there's no z and the
+		// min length is 58 (e.g. for SG 'P 1')
 		if (line.length() < 58) {
 			logger.warn("CRYST1 record has fewer than 58 columns: will ignore it");
 			return;
@@ -1483,22 +1534,24 @@ public class PDBFileParser  {
 		String spaceGroup = "";
 
 		try {
-			a = Float.parseFloat(line.substring(6,15).trim());
-			b = Float.parseFloat(line.substring(15,24).trim());
-			c = Float.parseFloat(line.substring(24,33).trim());
-			alpha = Float.parseFloat(line.substring(33,40).trim());
-			beta = Float.parseFloat(line.substring(40,47).trim());
-			gamma = Float.parseFloat(line.substring(47,54).trim());
+			a = Float.parseFloat(line.substring(6, 15).trim());
+			b = Float.parseFloat(line.substring(15, 24).trim());
+			c = Float.parseFloat(line.substring(24, 33).trim());
+			alpha = Float.parseFloat(line.substring(33, 40).trim());
+			beta = Float.parseFloat(line.substring(40, 47).trim());
+			gamma = Float.parseFloat(line.substring(47, 54).trim());
 		} catch (NumberFormatException e) {
-			logger.info("could not parse CRYST1 record ("+e.getMessage()+") from line and ignoring it " + line);
-			return ;
+			logger.info(new StringBuilder().append("could not parse CRYST1 record (").append(e.getMessage())
+					.append(") from line and ignoring it ").append(line).toString());
+			return;
 		}
-		if (line.length()>=66) {
+		if (line.length() >= 66) {
 			// for well formatted files
-			spaceGroup = line.substring(55,66).trim();
+			spaceGroup = line.substring(55, 66).trim();
 		} else {
-			// for not-so-well formatted files, e.g. phenix-produced ones: they lack a Z value
-			spaceGroup = line.substring(55,line.length()).trim();
+			// for not-so-well formatted files, e.g. phenix-produced ones: they lack a Z
+			// value
+			spaceGroup = line.substring(55, line.length()).trim();
 		}
 
 		CrystalCell xtalCell = new CrystalCell();
@@ -1510,18 +1563,22 @@ public class PDBFileParser  {
 		xtalCell.setGamma(gamma);
 
 		if (!xtalCell.isCellReasonable()) {
-			// If the entry describes a structure determined by a technique other than X-ray crystallography,
-		    // CRYST1 contains a = b = c = 1.0, alpha = beta = gamma = 90 degrees, space group = P 1, and Z =1.
+			// If the entry describes a structure determined by a technique other than X-ray
+			// crystallography,
+			// CRYST1 contains a = b = c = 1.0, alpha = beta = gamma = 90 degrees, space
+			// group = P 1, and Z =1.
 			// if so we don't add the crystal cell and it remains null
-			logger.debug("The crystal cell read from file does not have reasonable dimensions (at least one dimension is below {}), discarding it.",
+			logger.debug(
+					"The crystal cell read from file does not have reasonable dimensions (at least one dimension is below {}), discarding it.",
 					CrystalCell.MIN_VALID_CELL_SIZE);
 		} else {
 			crystallographicInfo.setCrystalCell(xtalCell);
 		}
 
 		SpaceGroup sg = SymoplibParser.getSpaceGroup(spaceGroup);
-		if (sg==null) {
-			logger.warn("Space group '"+spaceGroup+"' not recognised as a standard space group");
+		if (sg == null) {
+			logger.warn(new StringBuilder().append("Space group '").append(spaceGroup)
+					.append("' not recognised as a standard space group").toString());
 			crystallographicInfo.setNonStandardSg(true);
 		} else {
 			crystallographicInfo.setSpaceGroup(sg);
@@ -1530,9 +1587,11 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * Handler for MTRIXn records. They specify extra NCS operators (usually in virus entries)
+	 * Handler for MTRIXn records. They specify extra NCS operators (usually in
+	 * virus entries)
 	 *
 	 * See http://www.wwpdb.org/documentation/format33/sect8.html#MTRIXn
+	 * 
 	 * <pre>
 	 * COLUMNS        DATA TYPE     FIELD         DEFINITION
 	 * -------------------------------------------------------------
@@ -1546,6 +1605,7 @@ public class PDBFileParser  {
 	 * 60             Integer       iGiven        1
 	 *
 	 * </pre>
+	 * 
 	 * Note that we ignore operators with iGiven==1
 	 * 
 	 * @param line
@@ -1558,50 +1618,50 @@ public class PDBFileParser  {
 			return;
 		}
 
-
 		try {
 
-			int rowIndex = Integer.parseInt(line.substring(5,6));
-			double col1Value = Double.parseDouble(line.substring(10,20));
-			double col2Value = Double.parseDouble(line.substring(20,30));
-			double col3Value = Double.parseDouble(line.substring(30,40));
-			double translValue = Double.parseDouble(line.substring(45,55));
+			int rowIndex = Integer.parseInt(line.substring(5, 6));
+			double col1Value = Double.parseDouble(line.substring(10, 20));
+			double col2Value = Double.parseDouble(line.substring(20, 30));
+			double col3Value = Double.parseDouble(line.substring(30, 40));
+			double translValue = Double.parseDouble(line.substring(45, 55));
 			int iGiven = 0;
-			if (!line.substring(59,60).trim().equals("")) {
-				iGiven = Integer.parseInt(line.substring(59,60));
+			if (!"".equals(line.substring(59, 60).trim())) {
+				iGiven = Integer.parseInt(line.substring(59, 60));
 			}
 
-			if (iGiven == 1) return;
+			if (iGiven == 1) {
+				return;
+			}
 
-			if (ncsOperators==null) {
+			if (ncsOperators == null) {
 				// we initialise on first pass
-				ncsOperators = new ArrayList<Matrix4d>();
+				ncsOperators = new ArrayList<>();
 			}
 
-			if (currentNcsOp==null) {
-				currentNcsOp = new Matrix4d(1,0,0,0,  0,1,0,0,  0,0,1,0,  0,0,0,1); // initialised to identity
+			if (currentNcsOp == null) {
+				currentNcsOp = new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); // initialised to identity
 			}
 
-			currentNcsOp.setElement(rowIndex-1, 0, col1Value);
-			currentNcsOp.setElement(rowIndex-1, 1, col2Value);
-			currentNcsOp.setElement(rowIndex-1, 2, col3Value);
-			currentNcsOp.setElement(rowIndex-1, 3, translValue);
+			currentNcsOp.setElement(rowIndex - 1, 0, col1Value);
+			currentNcsOp.setElement(rowIndex - 1, 1, col2Value);
+			currentNcsOp.setElement(rowIndex - 1, 2, col3Value);
+			currentNcsOp.setElement(rowIndex - 1, 3, translValue);
 
-
-			if (rowIndex==3) {
+			if (rowIndex == 3) {
 				ncsOperators.add(currentNcsOp);
 				// we initialise for next matrix to come
-				currentNcsOp = new Matrix4d(1,0,0,0,  0,1,0,0,  0,0,1,0,  0,0,0,1); // initialised to identity
+				currentNcsOp = new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1); // initialised to identity
 			}
 
 		} catch (NumberFormatException e) {
-			logger.info("Could not parse a number in MTRIXn record ("+e.getMessage()+") from line: >" + line+"<");
+			logger.info(new StringBuilder().append("Could not parse a number in MTRIXn record (").append(e.getMessage())
+					.append(") from line: >").append(line).append("<").toString());
 		}
 	}
 
 	/**
-	 * Handler for ATOM.
-	 * Record Format:
+	 * Handler for ATOM. Record Format:
 	 *
 	 * <pre>
 	 * ATOM      1  N   ASP A  15     110.964  24.941  59.191  1.00 83.44           N
@@ -1626,29 +1686,31 @@ public class PDBFileParser  {
 	 * 79 - 80        LString(2)      charge        Charge on the atom.
 	 * </pre>
 	 */
-	private void  pdb_ATOM_Handler(String line)	{
+	private void pdb_ATOM_Handler(String line) {
 
-		if ( params.isHeaderOnly())
+		if (params.isHeaderOnly()) {
 			return;
+		}
 
-		// let's first get the chain name which will serve to identify if we are starting a new molecule
-		String chainName      = line.substring(21,22);
-		
-		if (chainName.equals(" ")) {
+		// let's first get the chain name which will serve to identify if we are
+		// starting a new molecule
+		String chainName = line.substring(21, 22);
+
+		if (" ".equals(chainName)) {
 			blankChainIdsPresent = true;
 		}
-		
-		if (currentChain!=null && !currentChain.getName().equals(chainName)) {
+
+		if (currentChain != null && !currentChain.getName().equals(chainName)) {
 			// new chain name: another molecule coming
 			startOfMolecule = true;
 		}
-		
+
 		if (startOfMolecule) {
 			// we add last chain if there was one
-			if (currentChain!=null) {
+			if (currentChain != null) {
 				currentModel.add(currentChain);
 				// let's not forget adding the last group to the finishing chain
-				if (currentGroup!=null) {
+				if (currentGroup != null) {
 					currentChain.addGroup(currentGroup);
 				}
 			}
@@ -1657,52 +1719,53 @@ public class PDBFileParser  {
 			// note that the chainId (asym id) is set properly later in assignAsymIds
 			currentChain.setId(chainName);
 			currentChain.setName(chainName);
-			
+
 		}
 
 		if (startOfModel) {
 			// we add last model if there was one
-			if (currentModel!=null) {
+			if (currentModel != null) {
 				allModels.add(currentModel);
 			}
 			// we initialise the model to come
 			currentModel = new ArrayList<>();
 		}
-		
-		
+
 		// let's get the residue number and see if we need to start a new group
 
-		String groupCode3     = line.substring(17,20).trim();
-		String resNum  = line.substring(22,26).trim();
-		Character iCode = line.substring(26,27).charAt(0);
-		if ( iCode == ' ')
+		String groupCode3 = line.substring(17, 20).trim();
+		String resNum = line.substring(22, 26).trim();
+		Character iCode = line.substring(26, 27).charAt(0);
+		if (iCode == ' ') {
 			iCode = null;
+		}
 		ResidueNumber residueNumber = new ResidueNumber(chainName, Integer.valueOf(resNum), iCode);
 
-		//recordName      groupCode3
-		//|                |    resNum
-		//|                |    |   iCode
-		//|     |          | |  |   ||
-		//ATOM      1  N   ASP A  15     110.964  24.941  59.191  1.00 83.44           N
-		//ATOM   1964  N   ARG H 221A      5.963 -16.715  27.669  1.00 28.59           N
+		// recordName groupCode3
+		// | | resNum
+		// | | | iCode
+		// | | | | | ||
+		// ATOM 1 N ASP A 15 110.964 24.941 59.191 1.00 83.44 N
+		// ATOM 1964 N ARG H 221A 5.963 -16.715 27.669 1.00 28.59 N
 
 		Character aminoCode1 = StructureTools.get1LetterCode(groupCode3);
 
-		String recordName     = line.substring (0, 6).trim ();
+		String recordName = line.substring(0, 6).trim();
 
 		boolean isHetAtomInFile = false;
-		
-		if (recordName.equals("HETATM") ){
+
+		if ("HETATM".equals(recordName)) {
 			// HETATOM RECORDS are treated slightly differently
 			// some modified amino acids that we want to treat as amino acids
 			// can be found as HETATOM records
-			if ( aminoCode1 != null && aminoCode1.equals(StructureTools.UNKNOWN_GROUP_LABEL))
-					aminoCode1 = null;
-			
+			if (aminoCode1 != null && aminoCode1.equals(StructureTools.UNKNOWN_GROUP_LABEL)) {
+				aminoCode1 = null;
+			}
+
 			isHetAtomInFile = true;
 		}
 
-		if ( startOfMolecule) {
+		if (startOfMolecule) {
 
 			currentGroup = getNewGroup(recordName, aminoCode1, groupCode3);
 
@@ -1711,18 +1774,16 @@ public class PDBFileParser  {
 			currentGroup.setHetAtomInFile(isHetAtomInFile);
 
 		}
-		
+
 		// resetting states
 		startOfModel = false;
 		startOfMolecule = false;
 
-
-		Character altLoc   = new Character(line.substring (16, 17).charAt(0));
+		Character altLoc = Character.valueOf(line.substring(16, 17).charAt(0));
 		Group altGroup = null;
 
-
 		// check if residue number is the same ...
-		if ( ! residueNumber.equals(currentGroup.getResidueNumber())) {
+		if (!residueNumber.equals(currentGroup.getResidueNumber())) {
 
 			currentChain.addGroup(currentGroup);
 			currentGroup.trimToSize();
@@ -1737,10 +1798,11 @@ public class PDBFileParser  {
 			// same residueNumber, but altLocs...
 
 			// test altLoc
-			if ( ! altLoc.equals(' ')) {
-				logger.debug("found altLoc! " + currentGroup + " " + altGroup);
-				altGroup = getCorrectAltLocGroup( altLoc,recordName,aminoCode1,groupCode3);
-				if ( altGroup.getChain() == null) {
+			if (!altLoc.equals(' ')) {
+				logger.debug(new StringBuilder().append("found altLoc! ").append(currentGroup).append(" ")
+						.append(altGroup).toString());
+				altGroup = getCorrectAltLocGroup(altLoc, recordName, aminoCode1, groupCode3);
+				if (altGroup.getChain() == null) {
 					// need to set current chain
 					altGroup.setChain(currentChain);
 				}
@@ -1750,128 +1812,131 @@ public class PDBFileParser  {
 
 		atomCount++;
 
-		if ( atomCount == atomCAThreshold ) {
+		if (atomCount == atomCAThreshold) {
 			// throw away the SEQRES lines - too much to deal with...
-			logger.warn("more than " + atomCAThreshold + " atoms in this structure, ignoring the SEQRES lines");
+			logger.warn(new StringBuilder().append("more than ").append(atomCAThreshold)
+					.append(" atoms in this structure, ignoring the SEQRES lines").toString());
 			seqResChains.clear();
 
 			switchCAOnly();
 
 		}
 
-
-
-		if ( atomCount == loadMaxAtoms){
-			logger.warn("File has more atoms than max specified in parsing parameters ({}). Ignoring atoms after line: {}", loadMaxAtoms, line);
+		if (atomCount == loadMaxAtoms) {
+			logger.warn(
+					"File has more atoms than max specified in parsing parameters ({}). Ignoring atoms after line: {}",
+					loadMaxAtoms, line);
 			return;
 		}
-		if ( atomCount > loadMaxAtoms){
+		if (atomCount > loadMaxAtoms) {
 			return;
 		}
 
+		// 1 2 3 4 5 6
+		// 012345678901234567890123456789012345678901234567890123456789
+		// ATOM 1 N MET 1 20.154 29.699 5.276 1.0
+		// ATOM 112 CA ASP 112 41.017 33.527 28.371 1.00 0.00
+		// ATOM 53 CA MET 7 23.772 33.989 -21.600 1.00 0.00 C
+		// ATOM 112 CA ASP 112 37.613 26.621 33.571 0 0
 
-		//          1         2         3         4         5         6
-		//012345678901234567890123456789012345678901234567890123456789
-		//ATOM      1  N   MET     1      20.154  29.699   5.276   1.0
-		//ATOM    112  CA  ASP   112      41.017  33.527  28.371  1.00  0.00
-		//ATOM     53  CA  MET     7      23.772  33.989 -21.600  1.00  0.00           C
-		//ATOM    112  CA  ASP   112      37.613  26.621  33.571     0     0
-
-
-		String fullname = line.substring (12, 16);
+		String fullname = line.substring(12, 16);
 
 		// check for CA only if requested
-		if ( parseCAonly ){
+		if (parseCAonly) {
 			// yes , user wants to get CA only
 			// only parse CA atoms...
-			if (! fullname.equals(" CA ")){
-				//System.out.println("ignoring " + line);
+			if (!" CA ".equals(fullname)) {
+				// System.out.println("ignoring " + line);
 				atomCount--;
 				return;
 			}
 		}
 
-		if ( params.getAcceptedAtomNames() != null) {
+		if (params.getAcceptedAtomNames() != null) {
 
 			boolean found = false;
-			for (String ok : params.getAcceptedAtomNames()){
-				//System.out.println(ok + "< >" + fullname +"<");
+			for (String ok : params.getAcceptedAtomNames()) {
+				// System.out.println(ok + "< >" + fullname +"<");
 
-				if ( ok.equals(fullname.trim())) {
+				if (ok.equals(fullname.trim())) {
 					found = true;
 					break;
 				}
 			}
-			if ( ! found) {
+			if (!found) {
 				atomCount--;
 				return;
 			}
 		}
 		// create new atom
 
-		int pdbnumber = Integer.parseInt (line.substring (6, 11).trim ());
-		AtomImpl atom = new AtomImpl() ;
-		atom.setPDBserial(pdbnumber) ;
+		int pdbnumber = Integer.parseInt(line.substring(6, 11).trim());
+		AtomImpl atom = new AtomImpl();
+		atom.setPDBserial(pdbnumber);
 
 		atom.setAltLoc(altLoc);
 		atom.setName(fullname.trim());
 
-		double x = Double.parseDouble (line.substring (30, 38).trim());
-		double y = Double.parseDouble (line.substring (38, 46).trim());
-		double z = Double.parseDouble (line.substring (46, 54).trim());
+		double x = Double.parseDouble(line.substring(30, 38).trim());
+		double y = Double.parseDouble(line.substring(38, 46).trim());
+		double z = Double.parseDouble(line.substring(46, 54).trim());
 
 		double[] coords = new double[3];
-		coords[0] = x ;
-		coords[1] = y ;
-		coords[2] = z ;
+		coords[0] = x;
+		coords[1] = y;
+		coords[2] = z;
 		atom.setCoords(coords);
 
-		float occu  = 1.0f;
-		if ( line.length() > 59 ) {
+		float occu = 1.0f;
+		if (line.length() > 59) {
 			try {
 				// occu and tempf are sometimes not used :-/
-				occu = Float.parseFloat (line.substring (54, 60).trim());
-			}  catch (NumberFormatException e){}
+				occu = Float.parseFloat(line.substring(54, 60).trim());
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 
 		float tempf = 0.0f;
-		if ( line.length() > 65) {
+		if (line.length() > 65) {
 			try {
-				tempf = Float.parseFloat (line.substring (60, 66).trim());
-			}  catch (NumberFormatException e){}
+				tempf = Float.parseFloat(line.substring(60, 66).trim());
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 
-		atom.setOccupancy(  occu  );
-		atom.setTempFactor( tempf );
-
-
-
+		atom.setOccupancy(occu);
+		atom.setTempFactor(tempf);
 
 		// Parse element from the element field. If this field is
 		// missing (i.e. misformatted PDB file), then parse the
 		// element from the chemical component.
 		Element element = Element.R;
 		boolean guessElement = true;
-		if ( line.length() > 77 ) {
+		if (line.length() > 77) {
 			// parse element from element field
 			String elementSymbol = line.substring(76, 78).trim();
 			if (elementSymbol.isEmpty()) {
 				logger.info("Element column was empty for atom {} {}. Assigning atom element "
 						+ "from Chemical Component Dictionary information", fullname.trim(), pdbnumber);
 			} else {
-			
+
 				try {
 					element = Element.valueOfIgnoreCase(elementSymbol);
 					guessElement = false;
-				}  catch (IllegalArgumentException e){
-					logger.info("Element {} of atom {} {} was not recognised. Assigning atom element "
-							+ "from Chemical Component Dictionary information", elementSymbol, 
-							fullname.trim(), pdbnumber);
+				} catch (IllegalArgumentException e) {
+					logger.error(e.getMessage(), e);
+					logger.info(
+							"Element {} of atom {} {} was not recognised. Assigning atom element "
+									+ "from Chemical Component Dictionary information",
+							elementSymbol, fullname.trim(), pdbnumber);
 				}
 			}
 		} else {
-			logger.info("Missformatted PDB file: element column of atom {} {} is not present. "
-					+ "Assigning atom element from Chemical Component Dictionary information",
+			logger.info(
+					"Missformatted PDB file: element column of atom {} {} is not present. "
+							+ "Assigning atom element from Chemical Component Dictionary information",
 					fullname.trim(), pdbnumber);
 		}
 		if (guessElement) {
@@ -1890,47 +1955,43 @@ public class PDBFileParser  {
 					try {
 						element = Element.valueOfIgnoreCase(elementSymbol);
 					} catch (IllegalArgumentException e) {
+						logger.error(e.getMessage(), e);
 						// this can still happen for cases like UNK
-						logger.info("Element symbol {} found in chemical component dictionary for Atom {} {} could not be recognised as a known element. "
-								+ "Assigning generic element R to it", elementSymbol, fullname.trim(), pdbnumber);
+						logger.info(
+								"Element symbol {} found in chemical component dictionary for Atom {} {} could not be recognised as a known element. "
+										+ "Assigning generic element R to it",
+								elementSymbol, fullname.trim(), pdbnumber);
 					}
-				}			
+				}
 			} else {
 				logger.warn("Chemical Component Dictionary information was not found for Atom name {}. "
 						+ "Assigning generic element R to it", fullname.trim());
 			}
-			
+
 		}
 		atom.setElement(element);
 
-
-		//see if chain_id is one of the previous chains ...
-		if ( altGroup != null) {
+		// see if chain_id is one of the previous chains ...
+		if (altGroup != null) {
 			altGroup.addAtom(atom);
 			altGroup = null;
-		}
-		else {
+		} else {
 			currentGroup.addAtom(atom);
 		}
-
 
 		// make sure that main group has all atoms
 		// GitHub issue: #76
-		if ( ! currentGroup.hasAtom(atom.getName())) {
+		if (!currentGroup.hasAtom(atom.getName())) {
 			currentGroup.addAtom(atom);
 		}
 
-
-
 	}
 
-
-	private Group getCorrectAltLocGroup( Character altLoc,
-			String recordName, Character aminoCode1, String groupCode3) {
+	private Group getCorrectAltLocGroup(Character altLoc, String recordName, Character aminoCode1, String groupCode3) {
 
 		// see if we know this altLoc already;
 		List<Atom> atoms = currentGroup.getAtoms();
-		if ( atoms.size() > 0) {
+		if (atoms.size() > 0) {
 			Atom a1 = atoms.get(0);
 			// we are just adding atoms to the current group
 			// probably there is a second group following later...
@@ -1941,11 +2002,11 @@ public class PDBFileParser  {
 		}
 
 		List<Group> altLocs = currentGroup.getAltLocs();
-		for ( Group altLocG : altLocs ){
+		for (Group altLocG : altLocs) {
 			atoms = altLocG.getAtoms();
-			if ( atoms.size() > 0) {
-				for ( Atom a1 : atoms) {
-					if (a1.getAltLoc().equals( altLoc)) {
+			if (atoms.size() > 0) {
+				for (Atom a1 : atoms) {
+					if (a1.getAltLoc().equals(altLoc)) {
 
 						return altLocG;
 					}
@@ -1956,24 +2017,25 @@ public class PDBFileParser  {
 		// no matching altLoc group found.
 		// build it up.
 
-		if ( groupCode3.equals(currentGroup.getPDBName())) {
-			if ( currentGroup.getAtoms().size() == 0) {
-				//System.out.println("current group is empty " + current_group + " " + altLoc);
+		if (groupCode3.equals(currentGroup.getPDBName())) {
+			if (currentGroup.getAtoms().size() == 0) {
+				// System.out.println("current group is empty " + current_group + " " + altLoc);
 				return currentGroup;
 			}
-			//System.out.println("cloning current group " + current_group + " " + current_group.getAtoms().get(0).getAltLoc() + " altLoc " + altLoc);
+			// System.out.println("cloning current group " + current_group + " " +
+			// current_group.getAtoms().get(0).getAltLoc() + " altLoc " + altLoc);
 			Group altLocG = (Group) currentGroup.clone();
 			// drop atoms from cloned group...
 			// https://redmine.open-bio.org/issues/3307
-			altLocG.setAtoms(new ArrayList<Atom>());
+			altLocG.setAtoms(new ArrayList<>());
 			altLocG.getAltLocs().clear();
 			currentGroup.addAltLoc(altLocG);
 			return altLocG;
 		}
 
-		//	System.out.println("new  group " + recordName + " " + aminoCode1 + " " +groupCode3);
-		Group altLocG = getNewGroup(recordName,aminoCode1,groupCode3);
-
+		// System.out.println("new group " + recordName + " " + aminoCode1 + " "
+		// +groupCode3);
+		Group altLocG = getNewGroup(recordName, aminoCode1, groupCode3);
 
 		altLocG.setPDBName(groupCode3);
 
@@ -1982,43 +2044,44 @@ public class PDBFileParser  {
 		return altLocG;
 	}
 
-	private void switchCAOnly(){
+	private void switchCAOnly() {
 		parseCAonly = true;
-
 
 		currentModel = CAConverter.getRepresentativeAtomsOnly(currentModel);
 
-		for ( int i =0; i< structure.nrModels() ; i++){
-			//  iterate over all known models ...
+		for (int i = 0; i < structure.nrModels(); i++) {
+			// iterate over all known models ...
 			List<Chain> model = structure.getModel(i);
 			model = CAConverter.getRepresentativeAtomsOnly(model);
-			structure.setModel(i,model);
+			structure.setModel(i, model);
 		}
 
 		currentChain = CAConverter.getRepresentativeAtomsOnly(currentChain);
 
 	}
 
-
 	/** safes repeating a few lines ... */
-	private Integer conect_helper (String line,int start,int end) {
-		if (line.length() < end) return null;
-		
-		String sbond = line.substring(start,end).trim();
-		int bond  = -1 ;
-		Integer b = null ;
-
-		if ( ! sbond.equals("")) {
-			bond = Integer.parseInt(sbond);
-			b = new Integer(bond);
+	private Integer conect_helper(String line, int start, int end) {
+		if (line.length() < end) {
+			return null;
 		}
 
-		return b ;
+		String sbond = line.substring(start, end).trim();
+		int bond = -1;
+		Integer b = null;
+
+		if (!"".equals(sbond)) {
+			bond = Integer.parseInt(sbond);
+			b = Integer.valueOf(bond);
+		}
+
+		return b;
 	}
 
 	/**
 	 * Handler for CONECT Record Format
-	<pre>
+	 * 
+	 * <pre>
 	 COLUMNS         DATA TYPE        FIELD           DEFINITION
 	 ---------------------------------------------------------------------------------
 	 1 -  6         Record name      "CONECT"
@@ -2039,56 +2102,79 @@ public class PDBFileParser  {
 	 atom
 	 57 - 61         Integer          serial          Serial number of salt bridged
 	 atom
-	 </pre>
+	 * </pre>
 	 */
 	private void pdb_CONECT_Handler(String line) {
 
-		if ( atomOverflow) {
-			return ;
+		if (atomOverflow) {
+			return;
 		}
 		if (params.isHeaderOnly()) {
 			return;
 		}
-		
+
 		// this try .. catch is e.g. to catch 1gte which has wrongly formatted lines...
 		try {
-			int atomserial = Integer.parseInt (line.substring(6 ,11).trim());
-			Integer bond1      = conect_helper(line,11,16);
-			Integer bond2      = conect_helper(line,16,21);
-			Integer bond3      = conect_helper(line,21,26);
-			Integer bond4      = conect_helper(line,26,31);
-			Integer hyd1       = conect_helper(line,31,36);
-			Integer hyd2       = conect_helper(line,36,41);
-			Integer salt1      = conect_helper(line,41,46);
-			Integer hyd3       = conect_helper(line,46,51);
-			Integer hyd4       = conect_helper(line,51,56);
-			Integer salt2      = conect_helper(line,56,61);
+			int atomserial = Integer.parseInt(line.substring(6, 11).trim());
+			Integer bond1 = conect_helper(line, 11, 16);
+			Integer bond2 = conect_helper(line, 16, 21);
+			Integer bond3 = conect_helper(line, 21, 26);
+			Integer bond4 = conect_helper(line, 26, 31);
+			Integer hyd1 = conect_helper(line, 31, 36);
+			Integer hyd2 = conect_helper(line, 36, 41);
+			Integer salt1 = conect_helper(line, 41, 46);
+			Integer hyd3 = conect_helper(line, 46, 51);
+			Integer hyd4 = conect_helper(line, 51, 56);
+			Integer salt2 = conect_helper(line, 56, 61);
 
-			//System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+" "+
-			//		   hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
-			HashMap<String, Integer> cons = new HashMap<String, Integer>();
-			cons.put("atomserial",new Integer(atomserial));
+			// System.out.println(atomserial+ " "+ bond1 +" "+bond2+ " " +bond3+" "+bond4+"
+			// "+
+			// hyd1+" "+hyd2 +" "+salt1+" "+hyd3+" "+hyd4+" "+salt2);
+			HashMap<String, Integer> cons = new HashMap<>();
+			cons.put("atomserial", Integer.valueOf(atomserial));
 
-			if ( bond1 != null) cons.put("bond1",bond1);
-			if ( bond2 != null) cons.put("bond2",bond2);
-			if ( bond3 != null) cons.put("bond3",bond3);
-			if ( bond4 != null) cons.put("bond4",bond4);
-			if ( hyd1  != null) cons.put("hydrogen1",hyd1);
-			if ( hyd2  != null) cons.put("hydrogen2",hyd2);
-			if ( salt1 != null) cons.put("salt1",salt1);
-			if ( hyd3  != null) cons.put("hydrogen3",hyd3);
-			if ( hyd4  != null) cons.put("hydrogen4",hyd4);
-			if ( salt2 != null) cons.put("salt2",salt2);
+			if (bond1 != null) {
+				cons.put("bond1", bond1);
+			}
+			if (bond2 != null) {
+				cons.put("bond2", bond2);
+			}
+			if (bond3 != null) {
+				cons.put("bond3", bond3);
+			}
+			if (bond4 != null) {
+				cons.put("bond4", bond4);
+			}
+			if (hyd1 != null) {
+				cons.put("hydrogen1", hyd1);
+			}
+			if (hyd2 != null) {
+				cons.put("hydrogen2", hyd2);
+			}
+			if (salt1 != null) {
+				cons.put("salt1", salt1);
+			}
+			if (hyd3 != null) {
+				cons.put("hydrogen3", hyd3);
+			}
+			if (hyd4 != null) {
+				cons.put("hydrogen4", hyd4);
+			}
+			if (salt2 != null) {
+				cons.put("salt2", salt2);
+			}
 
 			connects.add(cons);
-		} catch (NumberFormatException e){
-			logger.info("could not parse CONECT line correctly ("+e.getMessage()+"), at line : " + line);
+		} catch (NumberFormatException e) {
+			logger.info(new StringBuilder().append("could not parse CONECT line correctly (").append(e.getMessage())
+					.append("), at line : ").append(line).toString());
 			return;
 		}
 	}
 
 	/**
 	 * Handler for MODEL Record Format
+	 * 
 	 * <pre>
 	 * COLUMNS       DATA TYPE      FIELD         DEFINITION
 	 * ----------------------------------------------------------------------
@@ -2098,26 +2184,28 @@ public class PDBFileParser  {
 	 */
 	private void pdb_MODEL_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
-		
+		if (params.isHeaderOnly()) {
+			return;
+		}
+
 		// new model: we start a new molecule
 		startOfMolecule = true;
 		startOfModel = true;
 
 	}
-	
+
 	/**
-	 * Handler for TER record. The record is used in deposited PDB files and many others,
-	 * but it's often forgotten by some softwares. In any case it helps identifying the 
-	 * start of ligand molecules so we use it for that.
+	 * Handler for TER record. The record is used in deposited PDB files and many
+	 * others, but it's often forgotten by some softwares. In any case it helps
+	 * identifying the start of ligand molecules so we use it for that.
 	 */
 	private void pdb_TER_Handler() {
-		startOfMolecule = true;		
+		startOfMolecule = true;
 	}
-
 
 	/**
 	 * DBREF handler
+	 * 
 	 * <pre>
 	 * COLUMNS       DATA TYPE          FIELD          DEFINITION
 	 * ----------------------------------------------------------------
@@ -2148,29 +2236,30 @@ public class PDBFileParser  {
 	 *                                                 the reference.
 	 * </pre>
 	 */
-	private void pdb_DBREF_Handler(String line){
+	private void pdb_DBREF_Handler(String line) {
 
 		logger.debug("Parsing DBREF " + line);
 
 		DBRef dbref = new DBRef();
-		String idCode      = line.substring(7,11);
-		String chainName     = line.substring(12,13);
-		String seqBegin    = line.substring(14,18);
-		String insertBegin = line.substring(18,19);
-		String seqEnd      = line.substring(20,24);
-		String insertEnd   = line.substring(24,25);
-		String database    = line.substring(26,32);
-		String dbAccession = line.substring(33,41);
-		String dbIdCode    = line.substring(42,54);
-		String dbseqBegin  = line.substring(55,60);
-		String idbnsBeg    = line.substring(60,61);
-		String dbseqEnd    = line.substring(62,67);
+		String idCode = line.substring(7, 11);
+		String chainName = line.substring(12, 13);
+		String seqBegin = line.substring(14, 18);
+		String insertBegin = line.substring(18, 19);
+		String seqEnd = line.substring(20, 24);
+		String insertEnd = line.substring(24, 25);
+		String database = line.substring(26, 32);
+		String dbAccession = line.substring(33, 41);
+		String dbIdCode = line.substring(42, 54);
+		String dbseqBegin = line.substring(55, 60);
+		String idbnsBeg = line.substring(60, 61);
+		String dbseqEnd = line.substring(62, 67);
 		// Support implicit space character at end
 		String dbinsEnd;
-		if(line.length() >= 68)
-			dbinsEnd       = line.substring(67,68);
-		else
-			dbinsEnd       = " ";
+		if (line.length() >= 68) {
+			dbinsEnd = line.substring(67, 68);
+		} else {
+			dbinsEnd = " ";
+		}
 
 		dbref.setIdCode(idCode);
 		dbref.setChainName(chainName);
@@ -2186,10 +2275,9 @@ public class PDBFileParser  {
 		dbref.setDbSeqEnd(intFromString(dbseqEnd));
 		dbref.setIdbnsEnd(dbinsEnd.charAt(0));
 
-		//System.out.println(dbref.toPDB());
+		// System.out.println(dbref.toPDB());
 		dbrefs.add(dbref);
 	}
-
 
 	/**
 	 * Process the disulfide bond info provided by an SSBOND record
@@ -2211,38 +2299,45 @@ public class PDBFileParser  {
 	67 - 72        SymOP           sym2         Symmetry oper for 2nd resid
 	 * </pre>
 	 */
-	private void pdb_SSBOND_Handler(String line){
+	private void pdb_SSBOND_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		if (line.length()<36) {
+		if (line.length() < 36) {
 			logger.info("SSBOND line has length under 36. Ignoring it.");
 			return;
 		}
 
-		String chain1      = line.substring(15,16);
-		String seqNum1     = line.substring(17,21).trim();
-		String icode1      = line.substring(21,22);
-		String chain2      = line.substring(29,30);
-		String seqNum2     = line.substring(31,35).trim();
-		String icode2      = line.substring(35,36);
+		String chain1 = line.substring(15, 16);
+		String seqNum1 = line.substring(17, 21).trim();
+		String icode1 = line.substring(21, 22);
+		String chain2 = line.substring(29, 30);
+		String seqNum2 = line.substring(31, 35).trim();
+		String icode2 = line.substring(35, 36);
 
-		if (line.length()>=72) {
+		if (line.length() >= 72) {
 			String symop1 = line.substring(59, 65).trim();
 			String symop2 = line.substring(66, 72).trim();
 
-			// until we implement proper treatment of symmetry in biojava #220, we can't deal with sym-related parteners properly, skipping them
-			if (!symop1.equals("") && !symop2.equals("") && // in case the field is missing
-					(!symop1.equals("1555") || !symop2.equals("1555")) ) {
-				logger.info("Skipping ss bond between groups {} and {} belonging to different symmetry partners, because it is not supported yet", seqNum1+icode1, seqNum2+icode2);
+			// until we implement proper treatment of symmetry in biojava #220, we can't
+			// deal with sym-related parteners properly, skipping them
+			if (!"".equals(symop1) && !"".equals(symop2) && // in case the field is missing
+					(!"1555".equals(symop1) || !"1555".equals(symop2))) {
+				logger.info(
+						"Skipping ss bond between groups {} and {} belonging to different symmetry partners, because it is not supported yet",
+						seqNum1 + icode1, seqNum2 + icode2);
 				return;
 			}
 		}
 
-		if (icode1.equals(" "))
+		if (" ".equals(icode1)) {
 			icode1 = "";
-		if (icode2.equals(" "))
+		}
+		if (" ".equals(icode2)) {
 			icode2 = "";
+		}
 
 		SSBondImpl ssbond = new SSBondImpl();
 
@@ -2254,7 +2349,6 @@ public class PDBFileParser  {
 		ssbond.setInsCode2(icode2);
 		ssbonds.add(ssbond);
 	}
-
 
 	/**
 	 * Takes care of LINK records. These take the format of:
@@ -2285,16 +2379,18 @@ public class PDBFileParser  {
 	 */
 	private void pdb_LINK_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
-		
+		if (params.isHeaderOnly()) {
+			return;
+		}
+
 		// Check for the minimal set of fields.
-		if (line.length()<56) {
+		if (line.length() < 56) {
 			logger.info("LINK line has length under 56. Ignoring it.");
 			return;
 		}
 
 		int len = line.length();
-		
+
 		String name1 = line.substring(12, 16).trim();
 		String altLoc1 = line.substring(16, 17).trim();
 		String resName1 = line.substring(17, 20).trim();
@@ -2307,18 +2403,22 @@ public class PDBFileParser  {
 		String resName2 = line.substring(47, 50).trim();
 		String chainID2 = line.substring(51, 52).trim();
 		String resSeq2 = line.substring(52, 56).trim();
-		String iCode2 = null;  // Might get trimmed if blank.
-		if (len > 56) iCode2 = line.substring(56, 57).trim();
+		String iCode2 = null; // Might get trimmed if blank.
+		if (len > 56) {
+			iCode2 = line.substring(56, 57).trim();
+		}
 
 		String sym1 = null;
-		if (len > 64) sym1 = line.substring(59, 65).trim();
+		if (len > 64) {
+			sym1 = line.substring(59, 65).trim();
+		}
 		String sym2 = null;
-		if (len > 71) sym2 = line.substring(66, 72).trim();
+		if (len > 71) {
+			sym2 = line.substring(66, 72).trim();
+		}
 
-		linkRecords.add(new LinkRecord(
-				name1, altLoc1, resName1, chainID1, resSeq1, iCode1,
-				name2, altLoc2, resName2, chainID2, resSeq2, iCode2,
-				sym1, sym2));
+		linkRecords.add(new LinkRecord(name1, altLoc1, resName1, chainID1, resSeq1, iCode1, name2, altLoc2, resName2,
+				chainID2, resSeq2, iCode2, sym1, sym2));
 	}
 
 	/**
@@ -2351,49 +2451,51 @@ public class PDBFileParser  {
 	 * SITE     2 AC4 11 LEU A 198 THR A  199  THR A 200  TRP A 209
 	 * SITE     3 AC4 11 HOH A 572 HOH A  582  HOH A 635
 	 * </pre>
+	 * 
 	 * @param line the SITE line record being currently read
 	 * @author Amr AL-Hossary
 	 * @author Jules Jacobsen
 	 */
-	private void pdb_SITE_Handler(String line){
+	private void pdb_SITE_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		//  make a map of: SiteId to List<ResidueNumber>
+		// make a map of: SiteId to List<ResidueNumber>
 
-		logger.debug("Site Line:"+line);
-
+		logger.debug("Site Line:" + line);
 
 		String siteID = line.substring(11, 14);
-		//fetch the siteResidues from the map
+		// fetch the siteResidues from the map
 		List<ResidueNumber> siteResidues = siteToResidueMap.get(siteID);
 
-		//if the siteResidues doesn't yet exist, make a new one.
-		if (siteResidues == null || ! siteToResidueMap.containsKey(siteID.trim())){
-			siteResidues = new ArrayList<ResidueNumber>();
+		// if the siteResidues doesn't yet exist, make a new one.
+		if (siteResidues == null || !siteToResidueMap.containsKey(siteID.trim())) {
+			siteResidues = new ArrayList<>();
 			siteToResidueMap.put(siteID.trim(), siteResidues);
 
-			logger.debug(String.format("New Site made: %s %s", siteID,  siteResidues));
-			logger.debug("Now made " + siteMap.size() + " sites");
+			logger.debug(String.format("New Site made: %s %s", siteID, siteResidues));
+			logger.debug(new StringBuilder().append("Now made ").append(siteMap.size()).append(" sites").toString());
 
 		}
 
 		logger.debug(String.format("SiteId: %s", siteID));
 
-
-		//line = 'SITE     1 AC1  6 ARG H 221A LYS H 224  HOH H 403  HOH H 460'
-		//line.substring(18) = 'ARG H 221A LYS H 224  HOH H 403  HOH H 460'
+		// line = 'SITE 1 AC1 6 ARG H 221A LYS H 224 HOH H 403 HOH H 460'
+		// line.substring(18) = 'ARG H 221A LYS H 224 HOH H 403 HOH H 460'
 		line = line.substring(18);
 		String groupString = null;
-		//groupString = 'ARG H 221A'
-		//keep iterating through chunks of 10 characters - these are the groups in the siteResidues
-		while (!(groupString = line.substring(0, 10)).equals("          ")) {
-			//groupstring: 'ARG H 221A'
+		// groupString = 'ARG H 221A'
+		// keep iterating through chunks of 10 characters - these are the groups in the
+		// siteResidues
+		while (!"          ".equals((groupString = line.substring(0, 10)))) {
+			// groupstring: 'ARG H 221A'
 
-			logger.debug("groupString: '" + groupString + "'");
+			logger.debug(new StringBuilder().append("groupString: '").append(groupString).append("'").toString());
 
-			//set the residue name
-			//residueName = 'ARG'
+			// set the residue name
+			// residueName = 'ARG'
 			String residueName = groupString.substring(0, 3);
 			Character aminoCode1 = StructureTools.get1LetterCode(residueName);
 			if (aminoCode1 != null) {
@@ -2402,155 +2504,144 @@ public class PDBFileParser  {
 				}
 			}
 
-			//this is already in the right format, so no need to fiddle with it...
-			//pdbCode = 'H 221A'
-			//                    String pdbCode = groupString.substring(4, 10).trim();
+			// this is already in the right format, so no need to fiddle with it...
+			// pdbCode = 'H 221A'
+			// String pdbCode = groupString.substring(4, 10).trim();
 			String chainId = groupString.substring(4, 5);
 			Integer resNum = Integer.valueOf(groupString.substring(5, 9).trim());
 			Character insCode = groupString.substring(9, 10).charAt(0);
-			//set insCode to null as a measure to prevent storing thousands of empty Strings
-			//- the empty value is returned using Group.getInsCode()
-			//                    if (insCode.equals(" ")) {
-			//                        insCode = null;
-			//                    }
+			// set insCode to null as a measure to prevent storing thousands of empty
+			// Strings
+			// - the empty value is returned using Group.getInsCode()
+			// if (insCode.equals(" ")) {
+			// insCode = null;
+			// }
 
-			logger.debug(String.format("Site: %s: 'resName:%s resNum:%s insCode:%s'", siteID, residueName, resNum, insCode));
+			logger.debug(
+					String.format("Site: %s: 'resName:%s resNum:%s insCode:%s'", siteID, residueName, resNum, insCode));
 
-			//make a new resNum with the data - this will be linked up with a site later
+			// make a new resNum with the data - this will be linked up with a site later
 			ResidueNumber residueNumber = new ResidueNumber();
 
-
-			logger.debug("pdbCode: '" + resNum + insCode + "'");
+			logger.debug(
+					new StringBuilder().append("pdbCode: '").append(resNum).append(insCode).append("'").toString());
 
 			residueNumber.setChainName(chainId);
 			residueNumber.setSeqNum(resNum);
 			residueNumber.setInsCode(insCode);
-			//add the resNum to the groups
+			// add the resNum to the groups
 			siteResidues.add(residueNumber);
 
-			logger.debug("Adding residueNumber " + residueNumber + " to site " + siteID);
+			logger.debug(new StringBuilder().append("Adding residueNumber ").append(residueNumber).append(" to site ")
+					.append(siteID).toString());
 
 			line = line.substring(11);
 		}
 
-		logger.debug("Current SiteMap (contains "+ siteToResidueMap.keySet().size() + " sites):");
-		for (String key : siteToResidueMap.keySet()) {
-			logger.debug(key + " : " + siteToResidueMap.get(key));
-		}
+		logger.debug(new StringBuilder().append("Current SiteMap (contains ").append(siteToResidueMap.keySet().size())
+				.append(" sites):").toString());
+		siteToResidueMap.keySet().forEach(key -> logger
+				.debug(new StringBuilder().append(key).append(" : ").append(siteToResidueMap.get(key)).toString()));
 
 	}
 
-	//Site variable related to parsing the REMARK 800 records.
-	Site site;
-	private void pdb_REMARK_800_Handler(String line){
+	private void pdb_REMARK_800_Handler(String line) {
 
-		if (params.isHeaderOnly()) return;
+		if (params.isHeaderOnly()) {
+			return;
+		}
 
-		// 'REMARK 800 SITE_IDENTIFIER: CAT                                                 '
+		// 'REMARK 800 SITE_IDENTIFIER: CAT '
 		line = line.substring(11);
 		String[] fields = line.split(": ");
 
-		if (fields.length == 2) {
-			if (fields[0].equals("SITE_IDENTIFIER")) {
-				//                    remark800Counter++;
-				String siteID = fields[1].trim();
+		if (fields.length != 2) {
+			return;
+		}
+		if ("SITE_IDENTIFIER".equals(fields[0])) {
+			// remark800Counter++;
+			String siteID = fields[1].trim();
 
-				logger.debug("siteID: '" + siteID +"'");
+			logger.debug(new StringBuilder().append("siteID: '").append(siteID).append("'").toString());
 
-				//fetch the siteResidues from the map
-				site = siteMap.get(siteID);
+			// fetch the siteResidues from the map
+			site = siteMap.get(siteID);
 
-				//if the siteResidues doesn't yet exist, make a new one.
-				if (site == null || !siteID.equals(site.getSiteID())) {
-					site = new Site(siteID, new ArrayList<Group>());
-					siteMap.put(site.getSiteID(), site);
+			// if the siteResidues doesn't yet exist, make a new one.
+			if (site == null || !siteID.equals(site.getSiteID())) {
+				site = new Site(siteID, new ArrayList<Group>());
+				siteMap.put(site.getSiteID(), site);
 
-					logger.debug("New Site made: " + site);
-					logger.debug("Now made " + siteMap.size() + " sites");
-
-				}
-			}
-			if (fields[0].equals("EVIDENCE_CODE")) {
-				//                    remark800Counter++;
-				String evCode = fields[1].trim();
-
-				logger.debug("evCode: '" + evCode +"'");
-
-				//fetch the siteResidues from the map
-				site.setEvCode(evCode);
-			}
-			if (fields[0].equals("SITE_DESCRIPTION")) {
-				//                    remark800Counter++;
-				String desc = fields[1].trim();
-
-				logger.debug("desc: '" + desc +"'");
-
-				//fetch the siteResidues from the map
-				site.setDescription(desc);
-
-				logger.debug("Finished making REMARK 800 for site " + site.getSiteID());
-				logger.debug(site.remark800toPDB());
+				logger.debug("New Site made: " + site);
+				logger.debug(
+						new StringBuilder().append("Now made ").append(siteMap.size()).append(" sites").toString());
 
 			}
 		}
+		if ("EVIDENCE_CODE".equals(fields[0])) {
+			// remark800Counter++;
+			String evCode = fields[1].trim();
+
+			logger.debug(new StringBuilder().append("evCode: '").append(evCode).append("'").toString());
+
+			// fetch the siteResidues from the map
+			site.setEvCode(evCode);
+		}
+		if ("SITE_DESCRIPTION".equals(fields[0])) {
+			// remark800Counter++;
+			String desc = fields[1].trim();
+
+			logger.debug(new StringBuilder().append("desc: '").append(desc).append("'").toString());
+
+			// fetch the siteResidues from the map
+			site.setDescription(desc);
+
+			logger.debug("Finished making REMARK 800 for site " + site.getSiteID());
+			logger.debug(site.remark800toPDB());
+
+		}
 	}
 
-	private int intFromString(String intString){
+	private int intFromString(String intString) {
 		int val = Integer.MIN_VALUE;
 		try {
 			val = Integer.parseInt(intString.trim());
-		} catch (NumberFormatException ex){
+		} catch (NumberFormatException ex) {
 			logger.info("Could not parse a number: " + ex.getMessage());
 		}
 		return val;
 	}
 
-
-
-	/** 
-	 * Finds in the given list of chains the first one that has as name the given chainID.
-	 * If no such Chain can be found it returns null.
+	/**
+	 * Finds in the given list of chains the first one that has as name the given
+	 * chainID. If no such Chain can be found it returns null.
 	 */
-	private static Chain isKnownChain(String chainID, List<Chain> chains){
+	private static Chain isKnownChain(String chainID, List<Chain> chains) {
 
-		for (int i = 0; i< chains.size();i++){
-			Chain testchain =  chains.get(i);
-			if (chainID.equals(testchain.getName())) {
-				return testchain;
-			}
-		}
-
-		return null;
+		return chains.stream().filter(testchain -> chainID.equals(testchain.getName())).findFirst().orElse(null);
 	}
 
+	private BufferedReader getBufferedReader(InputStream inStream) throws IOException {
 
-
-	private BufferedReader getBufferedReader(InputStream inStream)
-			throws IOException {
-
-		BufferedReader buf ;
+		BufferedReader buf;
 		if (inStream == null) {
-			throw new IOException ("input stream is null!");
+			throw new IOException("input stream is null!");
 		}
 
-		buf = new BufferedReader (new InputStreamReader (inStream));
-		return buf ;
+		buf = new BufferedReader(new InputStreamReader(inStream));
+		return buf;
 
 	}
-
-
 
 	/**
-	 * Parse a PDB file and return a datastructure implementing
-	 * PDBStructure interface.
+	 * Parse a PDB file and return a datastructure implementing PDBStructure
+	 * interface.
 	 *
-	 * @param inStream  an InputStream object
+	 * @param inStream an InputStream object
 	 * @return a Structure object
 	 * @throws IOException
 	 */
-	public Structure parsePDBFile(InputStream inStream)
-			throws IOException
-	{
+	public Structure parsePDBFile(InputStream inStream) throws IOException {
 
 		BufferedReader buf = getBufferedReader(inStream);
 
@@ -2559,40 +2650,38 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * Parse a PDB file and return a datastructure implementing
-	 * PDBStructure interface.
+	 * Parse a PDB file and return a datastructure implementing PDBStructure
+	 * interface.
 	 *
-	 * @param buf  a BufferedReader object
+	 * @param buf a BufferedReader object
 	 * @return the Structure object
 	 * @throws IOException ...
 	 */
-	public  Structure parsePDBFile(BufferedReader buf)
-			throws IOException
-	{
+	public Structure parsePDBFile(BufferedReader buf) throws IOException {
 		// set the correct max values for parsing...
 		loadMaxAtoms = params.getMaxAtoms();
 		atomCAThreshold = params.getAtomCaThreshold();
 
-
 		// (re)set structure
 
 		allModels = new ArrayList<>();
-		structure     = new StructureImpl() ;
-		currentModel  = null;
-		currentChain  = null;
-		currentGroup  = null;
-		// we initialise to true since at the beginning of the file we are always starting a new molecule 
+		structure = new StructureImpl();
+		currentModel = null;
+		currentChain = null;
+		currentGroup = null;
+		// we initialise to true since at the beginning of the file we are always
+		// starting a new molecule
 		startOfMolecule = true;
 		startOfModel = true;
 
-		seqResChains  = new ArrayList<Chain>();
-		siteMap = new LinkedHashMap<String, Site>();
-		pdbHeader     = new PDBHeader();
-		connects      = new ArrayList<Map<String,Integer>>();
+		seqResChains = new ArrayList<>();
+		siteMap = new LinkedHashMap<>();
+		pdbHeader = new PDBHeader();
+		connects = new ArrayList<>();
 		previousContinuationField = "";
 		continuationField = "";
 		continuationString = "";
-		current_compound = null;
+		currentCompound = null;
 		sourceLines.clear();
 		compndLines.clear();
 		isLastCompndLine = false;
@@ -2605,9 +2694,9 @@ public class PDBFileParser  {
 		lengthCheck = -1;
 		atomCount = 0;
 		atomOverflow = false;
-		linkRecords = new ArrayList<LinkRecord>();
+		linkRecords = new ArrayList<>();
 		siteToResidueMap.clear();
-		
+
 		blankChainIdsPresent = false;
 
 		parseCAonly = params.isParseCAOnly();
@@ -2617,79 +2706,84 @@ public class PDBFileParser  {
 		while ((line = buf.readLine()) != null) {
 
 			// ignore empty lines
-			if ( line.equals("") ||
-					(line.equals(NEWLINE))){
+			if ("".equals(line) || (line.equals(NEWLINE))) {
 				continue;
 			}
-
 
 			// ignore short TER and END lines
-			if ( line.startsWith("END")) {
+			if (line.startsWith("END")) {
 				continue;
 			}
 
-			if ( line.length() < 6 && !line.startsWith("TER")) {
-				logger.info("Found line length below 6. Ignoring it, line: >" + line +"<" );
+			if (line.length() < 6 && !line.startsWith("TER")) {
+				logger.info(new StringBuilder().append("Found line length below 6. Ignoring it, line: >").append(line)
+						.append("<").toString());
 				continue;
 			}
 
 			String recordName = null;
-			if (line.length()<6)
+			if (line.length() < 6) {
 				recordName = line.trim();
-			else
-				recordName = line.substring (0, 6).trim ();
+			} else {
+				recordName = line.substring(0, 6).trim();
+			}
 
 			try {
-				if (recordName.equals("ATOM"))
+				if ("ATOM".equals(recordName)) {
 					pdb_ATOM_Handler(line);
-				else if (recordName.equals("SEQRES"))
+				} else if ("SEQRES".equals(recordName)) {
 					pdb_SEQRES_Handler(line);
-				else if (recordName.equals("HETATM"))
+				} else if ("HETATM".equals(recordName)) {
 					pdb_ATOM_Handler(line);
-				else if (recordName.equals("MODEL"))
+				} else if ("MODEL".equals(recordName)) {
 					pdb_MODEL_Handler(line);
-				else if (recordName.equals("TER"))
+				} else if ("TER".equals(recordName)) {
 					pdb_TER_Handler();
-				else if (recordName.equals("HEADER"))
+				} else if ("HEADER".equals(recordName)) {
 					pdb_HEADER_Handler(line);
-				else if (recordName.equals("AUTHOR"))
+				} else if ("AUTHOR".equals(recordName)) {
 					pdb_AUTHOR_Handler(line);
-				else if (recordName.equals("TITLE"))
+				} else if ("TITLE".equals(recordName)) {
 					pdb_TITLE_Handler(line);
-				else if (recordName.equals("SOURCE"))
-					sourceLines.add(line); //pdb_SOURCE_Handler
-				else if (recordName.equals("COMPND"))
-					compndLines.add(line); //pdb_COMPND_Handler
-				else if (recordName.equals("JRNL"))
+				} else if ("SOURCE".equals(recordName)) {
+					sourceLines.add(line); // pdb_SOURCE_Handler
+				} else if ("COMPND".equals(recordName)) {
+					compndLines.add(line); // pdb_COMPND_Handler
+				} else if ("JRNL".equals(recordName)) {
 					pdb_JRNL_Handler(line);
-				else if (recordName.equals("EXPDTA"))
+				} else if ("EXPDTA".equals(recordName)) {
 					pdb_EXPDTA_Handler(line);
-				else if (recordName.equals("CRYST1"))
+				} else if ("CRYST1".equals(recordName)) {
 					pdb_CRYST1_Handler(line);
-				else if (recordName.startsWith("MTRIX"))
+				} else if (recordName.startsWith("MTRIX")) {
 					pdb_MTRIXn_Handler(line);
-				else if (recordName.equals("REMARK"))
+				} else if ("REMARK".equals(recordName)) {
 					pdb_REMARK_Handler(line);
-				else if (recordName.equals("CONECT"))
+				} else if ("CONECT".equals(recordName)) {
 					pdb_CONECT_Handler(line);
-				else if (recordName.equals("REVDAT"))
+				} else if ("REVDAT".equals(recordName)) {
 					pdb_REVDAT_Handler(line);
-				else if (recordName.equals("DBREF"))
+				} else if ("DBREF".equals(recordName)) {
 					pdb_DBREF_Handler(line);
-				else if (recordName.equals("SITE"))
+				} else if ("SITE".equals(recordName)) {
 					pdb_SITE_Handler(line);
-				else if (recordName.equals("SSBOND"))
+				} else if ("SSBOND".equals(recordName)) {
 					pdb_SSBOND_Handler(line);
-				else if (recordName.equals("LINK"))
+				} else if ("LINK".equals(recordName)) {
 					pdb_LINK_Handler(line);
-				else if ( params.isParseSecStruc()) {
-					if ( recordName.equals("HELIX") ) pdb_HELIX_Handler (  line ) ;
-					else if (recordName.equals("SHEET")) pdb_SHEET_Handler(line ) ;
-					else if (recordName.equals("TURN")) pdb_TURN_Handler(   line ) ;
+				} else if (params.isParseSecStruc()) {
+					if ("HELIX".equals(recordName)) {
+						pdb_HELIX_Handler(line);
+					} else if ("SHEET".equals(recordName)) {
+						pdb_SHEET_Handler(line);
+					} else if ("TURN".equals(recordName)) {
+						pdb_TURN_Handler(line);
+					}
 				}
 			} catch (StringIndexOutOfBoundsException | NullPointerException ex) {
-				logger.info("Unable to parse [" + line + "]");
-			} 
+				logger.error(ex.getMessage(), ex);
+				logger.info(new StringBuilder().append("Unable to parse [").append(line).append("]").toString());
+			}
 		}
 
 		makeCompounds(compndLines, sourceLines);
@@ -2700,12 +2794,13 @@ public class PDBFileParser  {
 			formBonds();
 		}
 
-		if ( params.shouldCreateAtomCharges()) {
+		if (params.shouldCreateAtomCharges()) {
 			addCharges();
 		}
 
-		if ( params.isParseSecStruc() && !params.isHeaderOnly())
+		if (params.isParseSecStruc() && !params.isHeaderOnly()) {
 			setSecStruc();
+		}
 
 		// Now correct the alternate location group
 		StructureTools.cleanUpAltLocs(structure);
@@ -2713,7 +2808,6 @@ public class PDBFileParser  {
 		return structure;
 
 	}
-
 
 	/**
 	 * Add the charges to the Structure
@@ -2723,37 +2817,39 @@ public class PDBFileParser  {
 	}
 
 	/**
-	 * This is the new method for building the COMPND and SOURCE records. Now each method is self-contained.
+	 * This is the new method for building the COMPND and SOURCE records. Now each
+	 * method is self-contained.
+	 * 
 	 * @author Jules Jacobsen
-	 * @param  compoundList
-	 * @param  sourceList
+	 * @param compoundList
+	 * @param sourceList
 	 */
-	private void makeCompounds(List<String> compoundList,
-			List<String> sourceList) {
-		//		System.out.println("[makeCompounds] making compounds from compoundLines");
+	private void makeCompounds(List<String> compoundList, List<String> sourceList) {
+		// System.out.println("[makeCompounds] making compounds from compoundLines");
 
-		for (String line : compoundList) {
+		compoundList.forEach(line -> {
 			if (compoundList.indexOf(line) + 1 == compoundList.size()) {
-				//				System.out.println("[makeCompounds] Final line in compoundLines.");
+				// System.out.println("[makeCompounds] Final line in compoundLines.");
 				isLastCompndLine = true;
 			}
 			pdb_COMPND_Handler(line);
 
-		}
-		//		System.out.println("[makeCompounds] adding sources to compounds from sourceLines");
+		});
+		// System.out.println("[makeCompounds] adding sources to compounds from
+		// sourceLines");
 		// since we're starting again from the first compound, reset it here
-		if ( entities.size() == 0){
-			current_compound = new EntityInfo();
+		if (entities.size() == 0) {
+			currentCompound = new EntityInfo();
 		} else {
-			current_compound = entities.get(0);
+			currentCompound = entities.get(0);
 		}
-		for (String line : sourceList) {
+		sourceList.forEach(line -> {
 			if (sourceList.indexOf(line) + 1 == sourceList.size()) {
-				//				System.out.println("[makeCompounds] Final line in sourceLines.");
+				// System.out.println("[makeCompounds] Final line in sourceLines.");
 				isLastSourceLine = true;
 			}
 			pdb_SOURCE_Handler(line);
-		}
+		});
 
 	}
 
@@ -2767,137 +2863,127 @@ public class PDBFileParser  {
 	private void formBonds() {
 
 		BondMaker maker = new BondMaker(structure, params);
-		
+
 		// LINK records should be preserved, they are the way that
-		// inter-residue bonds are created for ligands such as trisaccharides, unusual polymers.
-        // The analogy in mmCIF is the _struct_conn record.
-		for (LinkRecord linkRecord : linkRecords) {
-            maker.formLinkRecordBond(linkRecord);
-        }
+		// inter-residue bonds are created for ligands such as trisaccharides, unusual
+		// polymers.
+		// The analogy in mmCIF is the _struct_conn record.
+		linkRecords.forEach(maker::formLinkRecordBond);
 
 		maker.formDisulfideBonds(ssbonds);
 
 		maker.makeBonds();
 	}
 
+	private void triggerEndFileChecks() {
 
-
-	private void triggerEndFileChecks(){
-
-		// we need to add the last chain and model, checking for nulls (e.g. the file could be completely empty of ATOM lines)
-		if (currentChain!=null && currentGroup!=null) {
+		// we need to add the last chain and model, checking for nulls (e.g. the file
+		// could be completely empty of ATOM lines)
+		if (currentChain != null && currentGroup != null) {
 			currentChain.addGroup(currentGroup);
 		}
-		if (currentModel!=null && currentChain!=null) {
+		if (currentModel != null && currentChain != null) {
 			currentModel.add(currentChain);
 		}
-		if (currentModel!=null) {
+		if (currentModel != null) {
 			allModels.add(currentModel);
 		}
-		
+
 		if (blankChainIdsPresent) {
-			// from biojava 5.0 there's limited support for old pdb files with blank chain ids
-			logger.warn("Found some blank chain ids in PDB file. Please note that support for them has been discontinued and things might not work properly.");
+			// from biojava 5.0 there's limited support for old pdb files with blank chain
+			// ids
+			logger.warn(
+					"Found some blank chain ids in PDB file. Please note that support for them has been discontinued and things might not work properly.");
 		}
 
 		// reordering chains following the mmcif model and assigning entities
 		assignChainsAndEntities();
 		structure.setEntityInfos(entities);
-		
 
-		
 		// header data
-		
+
 		Date modDate = pdbHeader.getModDate();
-		if ( modDate.equals(new Date(0)) ) {
+		if (modDate.equals(new Date(0))) {
 			// modification date = deposition date
 			Date depositionDate = pdbHeader.getDepDate();
 
-			if (! depositionDate.equals(modDate)){
+			if (!depositionDate.equals(modDate)) {
 				// depDate is 0000-00-00
 				pdbHeader.setDepDate(depositionDate);
 			}
 
 		}
-		
+
 		structure.setPDBHeader(pdbHeader);
 		structure.setCrystallographicInfo(crystallographicInfo);
 
-		//set the JournalArticle, if there is one
+		// set the JournalArticle, if there is one
 		if (!journalLines.isEmpty()) {
 			buildjournalArticle();
 			pdbHeader.setJournalArticle(journalArticle);
 		}
-		
+
 		structure.setDBRefs(dbrefs);
 
 		// Only align if requested (default) and not when headerOnly mode with no Atoms.
 		// Otherwise, we store the empty SeqRes Groups unchanged in the right chains.
-		if ( params.isAlignSeqRes() && !params.isHeaderOnly() && !seqResChains.isEmpty()){
+		if (params.isAlignSeqRes() && !params.isHeaderOnly() && !seqResChains.isEmpty()) {
 			logger.debug("Parsing mode align_seqres, will parse SEQRES and align to ATOM sequence");
 			SeqRes2AtomAligner aligner = new SeqRes2AtomAligner();
-			aligner.align(structure,seqResChains);
+			aligner.align(structure, seqResChains);
 
 		} else {
 			logger.debug("Parsing mode unalign_seqres, will parse SEQRES but not align it to ATOM sequence");
 			SeqRes2AtomAligner.storeUnAlignedSeqRes(structure, seqResChains, params.isHeaderOnly());
 		}
 
-
-		
-		//associate the temporary Groups in the siteMap to the ones
+		// associate the temporary Groups in the siteMap to the ones
 		if (!params.isHeaderOnly()) {
 			// Only can link SITES if Atom Groups were parsed.
 			linkSitesToGroups(); // will work now that setSites is called
 		}
 
-		if ( bioAssemblyParser != null){
+		if (bioAssemblyParser != null) {
 			bioAssemblyParser.setMacromolecularSizes();
 			pdbHeader.setBioAssemblies(bioAssemblyParser.getTransformationMap());
 		}
 
-		if (ncsOperators !=null && ncsOperators.size()>0) {
-			crystallographicInfo.setNcsOperators(
-				ncsOperators.toArray(new Matrix4d[ncsOperators.size()]));
+		if (ncsOperators != null && ncsOperators.size() > 0) {
+			crystallographicInfo.setNcsOperators(ncsOperators.toArray(new Matrix4d[ncsOperators.size()]));
 		}
 
-
 		// rfree end file check
-		// Rfree annotation is not very consistent in PDB format, it varies depending on the software
+		// Rfree annotation is not very consistent in PDB format, it varies depending on
+		// the software
 		// Here we follow this strategy:
-		// a) take the '(NO CUTOFF)' value if the only one available (shelx software, e.g. 1x7q)
-		// b) don't take it if also a line without '(NO CUTOFF)' is present (CNX software, e.g. 3lak)
+		// a) take the '(NO CUTOFF)' value if the only one available (shelx software,
+		// e.g. 1x7q)
+		// b) don't take it if also a line without '(NO CUTOFF)' is present (CNX
+		// software, e.g. 3lak)
 
-		if (rfreeNoCutoffLine>0 && rfreeStandardLine<0) {
+		if (rfreeNoCutoffLine > 0 && rfreeStandardLine < 0) {
 			pdbHeader.setRfree(rfreeNoCutoffLine);
-		} else if (rfreeNoCutoffLine>0 && rfreeStandardLine>0) {
+		} else if (rfreeNoCutoffLine > 0 && rfreeStandardLine > 0) {
 			pdbHeader.setRfree(rfreeStandardLine);
-		} else if (rfreeNoCutoffLine<0 && rfreeStandardLine>0) {
+		} else if (rfreeNoCutoffLine < 0 && rfreeStandardLine > 0) {
 			pdbHeader.setRfree(rfreeStandardLine);
 		} // otherwise it remains default value: PDBHeader.DEFAULT_RFREE
 
-
-		
 	}
 
-	private void setSecStruc(){
+	private void setSecStruc() {
 
-		setSecElement(helixList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT,
-				SecStrucType.helix4);
-		setSecElement(strandList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT,
-				SecStrucType.extended);
-		setSecElement(turnList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT,
-				SecStrucType.turn);
+		setSecElement(helixList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT, SecStrucType.helix4);
+		setSecElement(strandList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT, SecStrucType.extended);
+		setSecElement(turnList, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT, SecStrucType.turn);
 
-		//Now insert random coil to the Groups that did not have SS information
+		// Now insert random coil to the Groups that did not have SS information
 		GroupIterator gi = new GroupIterator(structure);
-		while (gi.hasNext()){
+		while (gi.hasNext()) {
 			Group g = gi.next();
-			if (g.hasAminoAtoms()){
-				if (g.getProperty(Group.SEC_STRUC) == null){
-					SecStrucInfo ss = new SecStrucInfo(g,
-							SecStrucInfo.PDB_AUTHOR_ASSIGNMENT,
-							SecStrucType.coil);
+			if (g.hasAminoAtoms()) {
+				if (g.getProperty(Group.SEC_STRUC) == null) {
+					SecStrucInfo ss = new SecStrucInfo(g, SecStrucInfo.PDB_AUTHOR_ASSIGNMENT, SecStrucType.coil);
 					g.setProperty(Group.SEC_STRUC, ss);
 				}
 			}
@@ -2905,62 +2991,63 @@ public class PDBFileParser  {
 
 	}
 
-	private void setSecElement(List<Map<String,String>> secList, String assignment, SecStrucType type){
+	private void setSecElement(List<Map<String, String>> secList, String assignment, SecStrucType type) {
 
+		Iterator<Map<String, String>> iter = secList.iterator();
+		nextElement: while (iter.hasNext()) {
+			Map<String, String> m = iter.next();
 
-		Iterator<Map<String,String>> iter = secList.iterator();
-		nextElement:
-			while (iter.hasNext()){
-				Map<String,String> m = iter.next();
+			// assign all residues in this range to this secondary structure type
+			// String initResName = (String)m.get("initResName");
+			String initChainId = m.get("initChainId");
+			String initSeqNum = m.get("initSeqNum");
+			String initICode = m.get("initICode");
+			// String endResName = (String)m.get("endResName" );
+			String endChainId = m.get("endChainId");
+			String endSeqNum = m.get("endSeqNum");
+			String endICode = m.get("endICode");
 
-				// assign all residues in this range to this secondary structure type
-				// String initResName = (String)m.get("initResName");
-				String initChainId = m.get("initChainId");
-				String initSeqNum  = m.get("initSeqNum" );
-				String initICode   = m.get("initICode" );
-				// String endResName  = (String)m.get("endResName" );
-				String endChainId  = m.get("endChainId" );
-				String endSeqNum   = m.get("endSeqNum");
-				String endICode    = m.get("endICode");
+			if (" ".equals(initICode)) {
+				initICode = "";
+			}
+			if (" ".equals(endICode)) {
+				endICode = "";
+			}
 
-				if (initICode.equals(" "))
-					initICode = "";
-				if (endICode.equals(" "))
-					endICode = "";
+			GroupIterator gi = new GroupIterator(structure);
+			boolean inRange = false;
+			while (gi.hasNext()) {
+				Group g = gi.next();
+				Chain c = g.getChain();
 
-				GroupIterator gi = new GroupIterator(structure);
-				boolean inRange = false;
-				while (gi.hasNext()){
-					Group g = gi.next();
-					Chain c = g.getChain();
+				if (c.getName().equals(initChainId)) {
 
-					if (c.getName().equals(initChainId)){
-
-						String pdbCode = initSeqNum + initICode;
-						if ( g.getResidueNumber().toString().equals(pdbCode)  ) {
-							inRange = true;
-						}
+					String pdbCode = initSeqNum + initICode;
+					if (g.getResidueNumber().toString().equals(pdbCode)) {
+						inRange = true;
 					}
-					if ( inRange){
-						if (g.hasAminoAtoms()) {
-							SecStrucInfo ss = new SecStrucInfo(g, assignment, type);
-							g.setProperty(Group.SEC_STRUC, ss);
-						}
-
+				}
+				if (inRange) {
+					if (g.hasAminoAtoms()) {
+						SecStrucInfo ss = new SecStrucInfo(g, assignment, type);
+						g.setProperty(Group.SEC_STRUC, ss);
 					}
-					if ( c.getName().equals(endChainId)){
-						String pdbCode = endSeqNum + endICode;
-						if (pdbCode.equals(g.getResidueNumber().toString())){
-							inRange = false;
-							continue nextElement;
-						}
+
+				}
+				if (c.getName().equals(endChainId)) {
+					String pdbCode = endSeqNum + endICode;
+					if (pdbCode.equals(g.getResidueNumber().toString())) {
+						inRange = false;
+						continue nextElement;
 					}
 				}
 			}
+		}
 	}
 
 	/**
 	 * Gets all chains with given chainName from given models list
+	 * 
 	 * @param chainName
 	 * @param polyModels
 	 * @return
@@ -2968,134 +3055,139 @@ public class PDBFileParser  {
 	private static List<List<Chain>> findChains(String chainName, List<List<Chain>> polyModels) {
 		List<List<Chain>> models = new ArrayList<>();
 
-		for (List<Chain> chains:polyModels) {
+		polyModels.forEach(chains -> {
 			List<Chain> matchingChains = new ArrayList<>();
 			models.add(matchingChains);
-			for (Chain c:chains) {
-				if (c.getName().equals(chainName)) {
-					matchingChains.add(c);
-				}
-			}
-		}
+			matchingChains
+					.addAll(chains.stream().filter(c -> c.getName().equals(chainName)).collect(Collectors.toList()));
+		});
 		return models;
 	}
-	
+
 	/**
-	 * Split the given chain (containing non-polymer groups and water groups only) 
-	 * into individual chains per non-polymer group and individual chains per contiguous sets of water groups. 
+	 * Split the given chain (containing non-polymer groups and water groups only)
+	 * into individual chains per non-polymer group and individual chains per
+	 * contiguous sets of water groups.
+	 * 
 	 * @param chain
-	 * @return a list of lists of size 2: first list is the split non-poly chains, second list is the split water chains 
+	 * @return a list of lists of size 2: first list is the split non-poly chains,
+	 *         second list is the split water chains
 	 */
 	private static List<List<Chain>> splitNonPolyChain(Chain chain) {
 		List<Chain> splitNonPolys = new ArrayList<>();
 		List<Chain> waterChains = new ArrayList<>();
-		
+
 		Chain split = null;
 		boolean previousGroupIsWater = false;
-		
-		for (Group g:chain.getAtomGroups()){
-			
+
+		for (Group g : chain.getAtomGroups()) {
+
 			if (!previousGroupIsWater) {
 				// add last one if there's one
-				if (split!=null) {
+				if (split != null) {
 					splitNonPolys.add(split);
 				}
 				split = new ChainImpl();
 				split.setName(chain.getName());
-			} else if (!g.isWater()) { 
-				// previous group is water and this group is not water: we change from a water chain to a non-poly
+			} else if (!g.isWater()) {
+				// previous group is water and this group is not water: we change from a water
+				// chain to a non-poly
 				// we'll need to add now the water chain to the list of water chains
 				waterChains.add(split);
 				split = new ChainImpl();
 				split.setName(chain.getName());
 			}
-			
+
 			if (g.isWater()) {
 				previousGroupIsWater = true;
 			} else {
 				previousGroupIsWater = false;
-				
+
 			}
-						
+
 			// this should include alt locs (referenced from the main group)
 			split.addGroup(g);
-			
-		}
-		
-		// adding the last split chain: either to water or non-poly depending on what was the last seen group
-		if (split!=null) {
-			if (previousGroupIsWater)
-				waterChains.add(split);
-			else
-				splitNonPolys.add(split);
+
 		}
 
-		
+		// adding the last split chain: either to water or non-poly depending on what
+		// was the last seen group
+		if (split != null) {
+			if (previousGroupIsWater) {
+				waterChains.add(split);
+			} else {
+				splitNonPolys.add(split);
+			}
+		}
+
 		List<List<Chain>> all = new ArrayList<>(2);
 		all.add(splitNonPolys);
 		all.add(waterChains);
 
 		return all;
 	}
-	
+
 	/**
-	 * Assign asym ids following the rules used by the PDB to assign asym ids in mmCIF files
+	 * Assign asym ids following the rules used by the PDB to assign asym ids in
+	 * mmCIF files
+	 * 
 	 * @param polys
 	 * @param nonPolys
 	 * @param waters
 	 */
 	private void assignAsymIds(List<List<Chain>> polys, List<List<Chain>> nonPolys, List<List<Chain>> waters) {
-		
-		for (int i=0; i<polys.size(); i++) {
-			String asymId = "A";		
 
-			for (Chain poly:polys.get(i)) {
+		for (int i = 0; i < polys.size(); i++) {
+			String asymId = "A";
+
+			for (Chain poly : polys.get(i)) {
 				poly.setId(asymId);
 				asymId = getNextAsymId(asymId);
 			}
-			for (Chain nonPoly:nonPolys.get(i)) {
+			for (Chain nonPoly : nonPolys.get(i)) {
 				nonPoly.setId(asymId);
-				asymId = getNextAsymId(asymId);			
+				asymId = getNextAsymId(asymId);
 			}
-			for (Chain water:waters.get(i)) {
+			for (Chain water : waters.get(i)) {
 				water.setId(asymId);
-				asymId = getNextAsymId(asymId);			
+				asymId = getNextAsymId(asymId);
 			}
 		}
 	}
-	
+
 	/**
-	 * Gets the next asym id given an asymId, according to the convention followed by 
-	 * mmCIF files produced by the PDB
-	 * i.e.: A,B,...,Z,AA,BA,CA,...,ZA,AB,BB,CB,...,ZB,.......,ZZ,AAA,BAA,CAA,...
+	 * Gets the next asym id given an asymId, according to the convention followed
+	 * by mmCIF files produced by the PDB i.e.:
+	 * A,B,...,Z,AA,BA,CA,...,ZA,AB,BB,CB,...,ZB,.......,ZZ,AAA,BAA,CAA,...
+	 * 
 	 * @param asymId
 	 * @return
 	 */
 	private String getNextAsymId(String asymId) {
-		if (asymId.length()==1) {
-			if (!asymId.equals("Z")) {
+		if (asymId.length() == 1) {
+			if (!"Z".equals(asymId)) {
 				return Character.toString(getNextChar(asymId.charAt(0)));
 			} else {
 				return "AA";
 			}
-		} else if (asymId.length()==2) {
-			if (asymId.equals("ZZ")) {
+		} else if (asymId.length() == 2) {
+			if ("ZZ".equals(asymId)) {
 				return "AAA";
 			}
 			char[] c = new char[2];
 			asymId.getChars(0, 2, c, 0);
 			c[0] = getNextChar(c[0]);
-			if (c[0]=='A') {
+			if (c[0] == 'A') {
 				c[1] = getNextChar(c[1]);
-			} 
+			}
 			return new String(c);
-		} else if (asymId.length()==3) {
+		} else if (asymId.length() == 3) {
 			char[] c = new char[3];
 			asymId.getChars(0, 3, c, 0);
 			c[0] = getNextChar(c[0]);
-			if (c[0]=='A') {
+			if (c[0] == 'A') {
 				c[1] = getNextChar(c[1]);
-				if (c[1]=='A') {
+				if (c[1] == 'A') {
 					c[2] = getNextChar(c[2]);
 				}
 			}
@@ -3103,43 +3195,44 @@ public class PDBFileParser  {
 		}
 		return null;
 	}
-	
+
 	private char getNextChar(char c) {
-		if (c!='Z') {
-			return ((char)(c+1));
+		if (c != 'Z') {
+			return ((char) (c + 1));
 		} else {
 			return 'A';
 		}
 	}
-	
-	/** 
-	 * Here we assign chains following the mmCIF data model:
-	 * one chain per polymer, one chain per non-polymer group and 
-	 * several water chains.
+
+	/**
+	 * Here we assign chains following the mmCIF data model: one chain per polymer,
+	 * one chain per non-polymer group and several water chains.
 	 * <p>
-	 * Subsequently we assign entities for them: either from those read from 
-	 * COMPOUND records or from those found heuristically through {@link EntityFinder} 
+	 * Subsequently we assign entities for them: either from those read from
+	 * COMPOUND records or from those found heuristically through
+	 * {@link EntityFinder}
 	 *
 	 */
-	private void assignChainsAndEntities(){
-		
+	private void assignChainsAndEntities() {
+
 		List<List<Chain>> polyModels = new ArrayList<>();
 		List<List<Chain>> nonPolyModels = new ArrayList<>();
 		List<List<Chain>> waterModels = new ArrayList<>();
 
-		for (List<Chain> model:allModels) {
-			
+		allModels.forEach(model -> {
+
 			List<Chain> polyChains = new ArrayList<>();
 			List<Chain> nonPolyChains = new ArrayList<>();
 			List<Chain> waterChains = new ArrayList<>();
-			
+
 			polyModels.add(polyChains);
 			nonPolyModels.add(nonPolyChains);
 			waterModels.add(waterChains);
-			
-			for (Chain c:model) {
 
-				// we only have entities for polymeric chains, all others are ignored for assigning entities
+			model.forEach(c -> {
+
+				// we only have entities for polymeric chains, all others are ignored for
+				// assigning entities
 				if (c.isWaterOnly()) {
 					waterChains.add(c);
 
@@ -3149,44 +3242,44 @@ public class PDBFileParser  {
 				} else {
 					polyChains.add(c);
 				}
-			}
-		}
-		
+			});
+		});
+
 		List<List<Chain>> splitNonPolyModels = new ArrayList<>();
-		for (int i=0; i<nonPolyModels.size(); i++) {
+		for (int i = 0; i < nonPolyModels.size(); i++) {
 			List<Chain> nonPolyModel = nonPolyModels.get(i);
 			List<Chain> waterModel = waterModels.get(i);
-			
+
 			List<Chain> splitNonPolys = new ArrayList<>();
 			splitNonPolyModels.add(splitNonPolys);
-			
-			for (Chain nonPoly:nonPolyModel) {
-				List<List<Chain>> splits = splitNonPolyChain(nonPoly);
+
+			nonPolyModel.stream().map(PDBFileParser::splitNonPolyChain).forEach(splits -> {
 				splitNonPolys.addAll(splits.get(0));
 				waterModel.addAll(splits.get(1));
-			}
+			});
 		}
-		
-		
-		// now we have all chains as in mmcif, let's assign ids following the mmcif rules
+
+		// now we have all chains as in mmcif, let's assign ids following the mmcif
+		// rules
 		assignAsymIds(polyModels, splitNonPolyModels, waterModels);
-		
 
 		if (!entities.isEmpty()) {
-			// if the file contained COMPOUND records then we can assign entities to the poly chains
-			for (EntityInfo comp : entities){
+			// if the file contained COMPOUND records then we can assign entities to the
+			// poly chains
+			for (EntityInfo comp : entities) {
 				List<String> chainIds = compoundMolIds2chainIds.get(comp.getMolId());
-				if ( chainIds == null)
+				if (chainIds == null) {
 					continue;
-				for ( String chainId : chainIds) {
+				}
+				chainIds.forEach(chainId -> {
 
 					List<List<Chain>> models = findChains(chainId, polyModels);
 
-					for (List<Chain> matchingChains:models) {
-						for (Chain chain:matchingChains) {
+					models.forEach(matchingChains -> {
+						matchingChains.forEach(chain -> {
 							comp.addChain(chain);
 							chain.setEntityInfo(comp);
-						}
+						});
 
 						if (matchingChains.isEmpty()) {
 							// usually if this happens something is wrong with the PDB header
@@ -3194,32 +3287,34 @@ public class PDBFileParser  {
 							// Some bona-fide cases exist, e.g. 2ja5, chain N is described in SEQRES
 							// but the authors didn't observe in the density so it's completely missing
 							// from the ATOM lines
-							logger.warn("Could not find polymeric chain {} to link to entity {}. The chain will be missing in the entity.", chainId, comp.getMolId());
+							logger.warn(
+									"Could not find polymeric chain {} to link to entity {}. The chain will be missing in the entity.",
+									chainId, comp.getMolId());
 						}
-					}
-				}
+					});
+				});
 			}
-			
+
 		} else {
 
 			logger.info("Entity information (COMPOUND record) not found in file. Will assign entities heuristically");
-			// if no entity information was present in file we then go and find the entities heuristically with EntityFinder
+			// if no entity information was present in file we then go and find the entities
+			// heuristically with EntityFinder
 			entities = EntityFinder.findPolyEntities(polyModels);
 
 		}
-		
+
 		// now we assign entities to the nonpoly and water chains
 		EntityFinder.createPurelyNonPolyEntities(splitNonPolyModels, waterModels, entities);
 
-
-		// in some rare cases purely non-polymer or purely water chain are present in pdb files
+		// in some rare cases purely non-polymer or purely water chain are present in
+		// pdb files
 		// see https://github.com/biojava/biojava/pull/394
 		// these case should be covered by the above
 
-		
 		// now that we have entities in chains we add the chains to the structure
-		
-		for (int i=0;i<allModels.size();i++) {
+
+		for (int i = 0; i < allModels.size(); i++) {
 			List<Chain> model = new ArrayList<>();
 			model.addAll(polyModels.get(i));
 			model.addAll(splitNonPolyModels.get(i));
@@ -3227,184 +3322,193 @@ public class PDBFileParser  {
 			structure.addModel(model);
 		}
 
-
 	}
-	
+
 	/**
 	 * Links the Sites in the siteMap to the Groups in the Structure via the
 	 * siteToResidueMap ResidueNumber.
+	 * 
 	 * @author Jules Jacobsen
 	 * @return
 	 */
 	private void linkSitesToGroups() {
 
-		//System.out.println("LINK SITES TO GROUPS:" + siteToResidueMap.keySet().size());
+		// System.out.println("LINK SITES TO GROUPS:" +
+		// siteToResidueMap.keySet().size());
 
-		//link the map of siteIds : <ResidueNumber> with the sites by using ResidueNumber to get the correct group back.
-		//the return list
+		// link the map of siteIds : <ResidueNumber> with the sites by using
+		// ResidueNumber to get the correct group back.
+		// the return list
 
-		if ( siteMap == null || siteToResidueMap == null){
+		if (siteMap == null || siteToResidueMap == null) {
 			logger.info("Sites can not be linked to residues!");
 
 			return;
 		}
 
 		List<Site> sites = null;
-		//check that there are chains with which to associate the groups
+		// check that there are chains with which to associate the groups
 		if (structure.getChains().isEmpty()) {
-			sites = new ArrayList<Site>(siteMap.values());
+			sites = new ArrayList<>(siteMap.values());
 			logger.info("No chains to link Site Groups with - Sites will not be present in the Structure");
 			return;
 		}
 
-		//check that the keys in the siteMap and SiteToResidueMap are equal
-		if (! siteMap.keySet().equals(siteToResidueMap.keySet())) {
-			logger.info("Not all sites have been properly described in the PDB " + pdbId + " header - some Sites will not be present in the Structure");
-			logger.debug(siteMap.keySet() + " | " + siteToResidueMap.keySet());
-			//return;
+		// check that the keys in the siteMap and SiteToResidueMap are equal
+		if (!siteMap.keySet().equals(siteToResidueMap.keySet())) {
+			logger.info(new StringBuilder().append("Not all sites have been properly described in the PDB ")
+					.append(pdbId).append(" header - some Sites will not be present in the Structure").toString());
+			logger.debug(new StringBuilder().append(siteMap.keySet()).append(" | ").append(siteToResidueMap.keySet())
+					.toString());
+			// return;
 		}
 
-		//so we have chains - associate the siteResidues-related groups with the ones
-		//already in in the chains
+		// so we have chains - associate the siteResidues-related groups with the ones
+		// already in in the chains
 		for (String key : siteMap.keySet()) {
 			Site currentSite = siteMap.get(key);
 			List<ResidueNumber> linkedGroups = siteToResidueMap.get(key);
-			if ( linkedGroups == null)
+			if (linkedGroups == null) {
 				continue;
+			}
 			for (ResidueNumber residueNumber : linkedGroups) {
 
 				String pdbCode = residueNumber.toString();
 				String chain = residueNumber.getChainName();
-				//                    System.out.println("chain: '" + chain + "'");
-				//                    String resNum = resNum.getSeqNum().toString();
-				//                    System.out.println("resNum: '" + resNum + "'");
+				// System.out.println("chain: '" + chain + "'");
+				// String resNum = resNum.getSeqNum().toString();
+				// System.out.println("resNum: '" + resNum + "'");
 
 				Group linkedGroup = null;
 				try {
-					//TODO: implement findGroup(ResidueNumber resNum)
+					// TODO: implement findGroup(ResidueNumber resNum)
 					linkedGroup = structure.findGroup(chain, pdbCode);
 				} catch (StructureException ex) {
-					logger.info("Can't find group " + pdbCode + " in chain " + chain + " in order to link up SITE records (PDB ID " + pdbId +")");
+					logger.error(ex.getMessage(), ex);
+					logger.info(new StringBuilder().append("Can't find group ").append(pdbCode).append(" in chain ")
+							.append(chain).append(" in order to link up SITE records (PDB ID ").append(pdbId)
+							.append(")").toString());
 					continue;
 				}
 
-				//                    System.out.println("Adding group: " + linkedGroup.getSeqNum() + " to site " + site.getSiteID());
+				// System.out.println("Adding group: " + linkedGroup.getSeqNum() + " to site " +
+				// site.getSiteID());
 				currentSite.getGroups().add(linkedGroup);
 			}
 		}
 
-		//System.out.println("SITEMAP: " + siteMap);
+		// System.out.println("SITEMAP: " + siteMap);
 
-		sites = new ArrayList<Site>(siteMap.values());
+		sites = new ArrayList<>(siteMap.values());
 		structure.setSites(sites);
-		//System.out.println("STRUCTURE SITES: " + structure.getSites().size());
-		//            for (Site site : structure.getSites()) {
-		//                System.out.println(site);
-		//            }
-		//            System.out.println("Linked Site Groups with Chains");
+		// System.out.println("STRUCTURE SITES: " + structure.getSites().size());
+		// for (Site site : structure.getSites()) {
+		// System.out.println(site);
+		// }
+		// System.out.println("Linked Site Groups with Chains");
 
 	}
 
 	private void buildjournalArticle() {
 
 		logger.debug("building new JournalArticle");
-		//            for (String line : journalLines) {
-		//                System.out.println(line);
-		//            }
+		// for (String line : journalLines) {
+		// System.out.println(line);
+		// }
 
 		this.journalArticle = new JournalArticle();
-		//        JRNL        AUTH   M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
-		//        JRNL        AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
-		//        JRNL        TITL   A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
-		//        JRNL        TITL 2 STAPHYLOCOCCUS AUREUS.
-		//        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
-		//        JRNL        REFN                   ISSN 1529-2908
-		//        JRNL        PMID   17351618
-		//        JRNL        DOI    10.1038/NI1450
-		StringBuffer auth = new StringBuffer();
-		StringBuffer titl = new StringBuffer();
-		StringBuffer edit = new StringBuffer();
-		StringBuffer ref = new StringBuffer();
-		StringBuffer publ = new StringBuffer();
-		StringBuffer refn = new StringBuffer();
-		StringBuffer pmid = new StringBuffer();
-		StringBuffer doi = new StringBuffer();
+		// JRNL AUTH M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
+		// JRNL AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
+		// JRNL TITL A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
+		// JRNL TITL 2 STAPHYLOCOCCUS AUREUS.
+		// JRNL REF NAT.IMMUNOL. V. 8 430 2007
+		// JRNL REFN ISSN 1529-2908
+		// JRNL PMID 17351618
+		// JRNL DOI 10.1038/NI1450
+		StringBuilder auth = new StringBuilder();
+		StringBuilder titl = new StringBuilder();
+		StringBuilder edit = new StringBuilder();
+		StringBuilder ref = new StringBuilder();
+		StringBuilder publ = new StringBuilder();
+		StringBuilder refn = new StringBuilder();
+		StringBuilder pmid = new StringBuilder();
+		StringBuilder doi = new StringBuilder();
 
 		for (String line : journalLines) {
-			if ( line.length() < 19 ) {
+			if (line.length() < 19) {
 				logger.info("can not process Journal line: " + line);
 				continue;
 			}
-			//            System.out.println("'" + line + "'");
+			// System.out.println("'" + line + "'");
 			String subField = line.substring(12, 16);
-			//            System.out.println("'" + subField + "'");
-			if (subField.equals("AUTH")) {
+			// System.out.println("'" + subField + "'");
+			if ("AUTH".equals(subField)) {
 				auth.append(line.substring(19, line.length()).trim());
 
-				logger.debug("AUTH '" + auth.toString() + "'");
+				logger.debug(new StringBuilder().append("AUTH '").append(auth.toString()).append("'").toString());
 
 			}
-			if (subField.equals("TITL")) {
-				//add a space to the end of a line so that when wrapped the
-				//words on the join won't be concatenated
+			if ("TITL".equals(subField)) {
+				// add a space to the end of a line so that when wrapped the
+				// words on the join won't be concatenated
 				titl.append(line.substring(19, line.length()).trim()).append(" ");
 
-				logger.debug("TITL '" + titl.toString() + "'");
+				logger.debug(new StringBuilder().append("TITL '").append(titl.toString()).append("'").toString());
 
 			}
-			if (subField.equals("EDIT")) {
+			if ("EDIT".equals(subField)) {
 				edit.append(line.substring(19, line.length()).trim());
 
-				logger.debug("EDIT '" + edit.toString() + "'");
+				logger.debug(new StringBuilder().append("EDIT '").append(edit.toString()).append("'").toString());
 
 			}
-			//        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
-			if (subField.equals("REF ")) {
+			// JRNL REF NAT.IMMUNOL. V. 8 430 2007
+			if ("REF ".equals(subField)) {
 				ref.append(line.substring(19, line.length()).trim()).append(" ");
 
-				logger.debug("REF '" + ref.toString() + "'");
+				logger.debug(new StringBuilder().append("REF '").append(ref.toString()).append("'").toString());
 
 			}
-			if (subField.equals("PUBL")) {
+			if ("PUBL".equals(subField)) {
 				publ.append(line.substring(19, line.length()).trim()).append(" ");
 
-				logger.debug("PUBL '" + publ.toString() + "'");
+				logger.debug(new StringBuilder().append("PUBL '").append(publ.toString()).append("'").toString());
 
 			}
-			//        JRNL        REFN                   ISSN 1529-2908
-			if (subField.equals("REFN")) {
-				if ( line.length() < 35 ) {
+			// JRNL REFN ISSN 1529-2908
+			if ("REFN".equals(subField)) {
+				if (line.length() < 35) {
 					logger.info("can not process Journal REFN line: " + line);
 					continue;
 				}
 				refn.append(line.substring(35, line.length()).trim());
 
-				logger.debug("REFN '" + refn.toString() + "'");
+				logger.debug(new StringBuilder().append("REFN '").append(refn.toString()).append("'").toString());
 
 			}
-			//        JRNL        PMID   17351618
-			if (subField.equals("PMID")) {
+			// JRNL PMID 17351618
+			if ("PMID".equals(subField)) {
 				pmid.append(line.substring(19, line.length()).trim());
 
-				logger.debug("PMID '" + pmid.toString() + "'");
+				logger.debug(new StringBuilder().append("PMID '").append(pmid.toString()).append("'").toString());
 
 			}
-			//        JRNL        DOI    10.1038/NI1450
-			if (subField.equals("DOI ")) {
+			// JRNL DOI 10.1038/NI1450
+			if ("DOI ".equals(subField)) {
 				doi.append(line.substring(19, line.length()).trim());
 
-				logger.debug("DOI '" + doi.toString() + "'");
+				logger.debug(new StringBuilder().append("DOI '").append(doi.toString()).append("'").toString());
 
 			}
 		}
 
-		//now set the parts of the JournalArticle
+		// now set the parts of the JournalArticle
 		journalArticle.setAuthorList(authorBuilder(auth.toString()));
 		journalArticle.setEditorList(authorBuilder(edit.toString()));
 		journalArticle.setRef(ref.toString());
 		JournalParser journalParser = new JournalParser(ref.toString());
 		journalArticle.setJournalName(journalParser.getJournalName());
-		if (!journalArticle.getJournalName().equals("TO BE PUBLISHED")) {
+		if (!"TO BE PUBLISHED".equals(journalArticle.getJournalName())) {
 			journalArticle.setIsPublished(true);
 		}
 		journalArticle.setVolume(journalParser.getVolume());
@@ -3416,27 +3520,127 @@ public class PDBFileParser  {
 		journalArticle.setPmid(pmid.toString().trim());
 		journalArticle.setDoi(doi.toString().trim());
 
-
 		logger.debug("Made JournalArticle:");
 		logger.debug(journalArticle.toString());
 
 	}
 
-	//inner class to deal with all the journal info
+	private List<Author> authorBuilder(String authorString) {
+		ArrayList<Author> authorList = new ArrayList<>();
+
+		if ("".equals(authorString)) {
+			return authorList;
+		}
+
+		String[] authors = authorString.split(",");
+		// if (DEBUG) {
+		// for (int i = 0; i < authors.length; i++) {
+		// String string = authors[i];
+		// System.out.println("authorBuilder author: '" + string + "'");
+		// }
+		// }
+		// AUTH SEATTLE STRUCTURAL GENOMICS CENTER FOR INFECTIOUS
+		// AUTH 2 DISEASE (SSGCID)
+		// or
+		// AUTH E.DOBROVETSKY,A.DONG,A.SEITOVA,B.DUNCAN,L.CROMBET,
+		// AUTH 2 M.SUNDSTROM,C.H.ARROWSMITH,A.M.EDWARDS,C.BOUNTRA,
+		// AUTH 3 A.BOCHKAREV,D.COSSAR,
+		// AUTH 4 STRUCTURAL GENOMICS CONSORTIUM (SGC)
+		// or
+		// AUTH T.-C.MOU,S.R.SPRANG,N.MASADA,D.M.F.COOPER
+		if (authors.length == 1) {
+			// only one element means it's a consortium only
+			Author author = new Author();
+			author.setSurname(authors[0]);
+
+			logger.debug("Set consortium author name " + author.getSurname());
+
+			authorList.add(author);
+		} else {
+			for (String authorFullName : authors) {
+				logger.debug("Building author " + authorFullName);
+
+				Author author = new Author();
+				String regex = "\\.";
+				String[] authorNames = authorFullName.split(regex);
+				// if (DEBUG) {
+				// System.out.println("authorNames size " + authorNames.length);
+				// for (int j = 0; j < authorNames.length; j++) {
+				// String name = authorNames[j];
+				// System.out.println("split authName '" + name + "'");
+				//
+				// }
+				// }
+				if (authorNames.length == 0) {
+					author.setSurname(authorFullName);
+
+					logger.debug(new StringBuilder().append("Unable to split using '").append(regex)
+							.append("' Setting whole name ").append(author.getSurname()).toString());
+
+				}
+				// again there might be a consortium name so there may be no elements
+				else if (authorNames.length == 1) {
+					author.setSurname(authorNames[0]);
+
+					logger.debug("Set consortium author name in multiple author block " + author.getSurname());
+
+				} else {
+					String initials = "";
+					for (int j = 0; j < authorNames.length - 1; j++) {
+						String initial = authorNames[j];
+						// if (DEBUG) {
+						// System.out.println("adding initial '" + initial + "'");
+						// }
+						// build the initials back up again
+						initials += initial + ".";
+					}
+
+					logger.debug(
+							new StringBuilder().append("built initials '").append(initials).append("'").toString());
+
+					author.setInitials(initials);
+					// surname is always last
+					int lastName = authorNames.length - 1;
+					String surname = authorNames[lastName];
+
+					logger.debug("built author surname " + surname);
+
+					author.setSurname(surname);
+
+				}
+				authorList.add(author);
+			}
+		}
+		return authorList;
+	}
+
+	public void setFileParsingParameters(FileParsingParameters params) {
+		this.params = params;
+
+		// set the correct max values for parsing...
+		loadMaxAtoms = params.getMaxAtoms();
+		atomCAThreshold = params.getAtomCaThreshold();
+
+	}
+
+	public FileParsingParameters getFileParsingParameters() {
+		return params;
+	}
+
+	// inner class to deal with all the journal info
 	private class JournalParser {
 
+		private final Logger logger1 = LoggerFactory.getLogger(JournalParser.class);
 		private String journalName;
 		private String volume;
 		private String startPage;
 		private int publicationDate;
 
-
 		public JournalParser(String ref) {
 
-			logger.debug("JournalParser init '" + ref + "'");
+			logger.debug(new StringBuilder().append("JournalParser init '").append(ref).append("'").toString());
 
-
-			if (ref.equals("TO BE PUBLISHED ")) {
+			if ("TO BE PUBLISHED ".equals(ref)) {
 				journalName = ref.trim();
 
 				logger.debug(String.format("JournalParser found journalString '%s'", journalName));
@@ -3452,75 +3656,84 @@ public class PDBFileParser  {
 				publicationDate = 0;
 				return;
 			}
-			//can be multi line:
-			//REF    PHILOS.TRANS.R.SOC.LONDON,    V. 293    53 1981
-			//REF  2 SER.B
+			// can be multi line:
+			// REF PHILOS.TRANS.R.SOC.LONDON, V. 293 53 1981
+			// REF 2 SER.B
 
-			//or
+			// or
 
-			//REF    GLYCOGEN PHOSPHORYLASE B:                1 1991
-			//REF  2 DESCRIPTION OF THE PROTEIN
-			//REF  3 STRUCTURE
+			// REF GLYCOGEN PHOSPHORYLASE B: 1 1991
+			// REF 2 DESCRIPTION OF THE PROTEIN
+			// REF 3 STRUCTURE
 
-			//but usually single line
-			//REF    NUCLEIC ACIDS RES.                         2009
-			//REF    MOL.CELL                                   2009
-			//REF    NAT.STRUCT.MOL.BIOL.          V.  16   238 2009
-			//REF    ACTA CRYSTALLOGR.,SECT.F      V.  65   199 2009
-			//check if the date is present at the end of the line.
-			//                             09876543210987654321
-			//'J.BIOL.CHEM.                  V. 280 23000 2005 '
-			//'J.AM.CHEM.SOC.                V. 130 16011 2008 '
-			//'NAT.STRUCT.MOL.BIOL.          V.  16   238 2009'
+			// but usually single line
+			// REF NUCLEIC ACIDS RES. 2009
+			// REF MOL.CELL 2009
+			// REF NAT.STRUCT.MOL.BIOL. V. 16 238 2009
+			// REF ACTA CRYSTALLOGR.,SECT.F V. 65 199 2009
+			// check if the date is present at the end of the line.
+			// 09876543210987654321
+			// 'J.BIOL.CHEM. V. 280 23000 2005 '
+			// 'J.AM.CHEM.SOC. V. 130 16011 2008 '
+			// 'NAT.STRUCT.MOL.BIOL. V. 16 238 2009'
 			String volumeInformation = ref.substring(30, 48);
 
 			logger.debug(String.format("Parsing volumeInformation: '%s'", volumeInformation));
 
-			//volumeInformation: 'V. 293    53 1981 '
-			//                      String dateString = ref.substring(ref.length() - 5 , ref.length() - 1).trim();
-			//			String startPageString = ref.substring(ref.length() - 11 , ref.length() - 6).trim();
-			//			String volumeString = ref.substring(ref.length() - 16 , ref.length() - 12).trim();
-			//			String journalString = ref.substring(0 , ref.length() - 18).trim();
-			String dateString = volumeInformation.substring(volumeInformation.length() - 5 , volumeInformation.length() - 1).trim();
-			String startPageString = volumeInformation.substring(volumeInformation.length() - 11 , volumeInformation.length() - 6).trim();
-			String volumeString = volumeInformation.substring(volumeInformation.length() - 16 , volumeInformation.length() - 12).trim();
-			//for the journal string we need to remove the volume information which might be in the middle of the string (e.g. 1gpb, 3pfk)
-			String journalString = ref.substring(0 , 29).trim() + " " + ref.substring(30, ref.length() - 1).replace(volumeInformation.trim(), "").trim();
+			// volumeInformation: 'V. 293 53 1981 '
+			// String dateString = ref.substring(ref.length() - 5 , ref.length() -
+			// 1).trim();
+			// String startPageString = ref.substring(ref.length() - 11 , ref.length() -
+			// 6).trim();
+			// String volumeString = ref.substring(ref.length() - 16 , ref.length() -
+			// 12).trim();
+			// String journalString = ref.substring(0 , ref.length() - 18).trim();
+			String dateString = volumeInformation
+					.substring(volumeInformation.length() - 5, volumeInformation.length() - 1).trim();
+			String startPageString = volumeInformation
+					.substring(volumeInformation.length() - 11, volumeInformation.length() - 6).trim();
+			String volumeString = volumeInformation
+					.substring(volumeInformation.length() - 16, volumeInformation.length() - 12).trim();
+			// for the journal string we need to remove the volume information which might
+			// be in the middle of the string (e.g. 1gpb, 3pfk)
+			String journalString = new StringBuilder().append(ref.substring(0, 29).trim()).append(" ")
+					.append(ref.substring(30, ref.length() - 1).replace(volumeInformation.trim(), "").trim())
+					.toString();
 			journalString = journalString.trim();
-			//                        System.out.println("journalString: " + journalString);
+			// System.out.println("journalString: " + journalString);
 
 			logger.debug(String.format("JournalParser found volumeString '%s'", volumeString));
 			logger.debug(String.format("JournalParser found startPageString '%s'", startPageString));
 			logger.debug(String.format("JournalParser found dateString '%s'", dateString));
 			logger.debug(String.format("JournalParser found journalString '%s'", journalString));
 
-
-			if (!dateString.equals("    ")) {
+			if (!"    ".equals(dateString)) {
 				try {
 					publicationDate = Integer.valueOf(dateString);
 				} catch (NumberFormatException nfe) {
+					logger1.error(nfe.getMessage(), nfe);
 					logger.info(dateString + " is not a valid integer for a date in JRNL sub-section REF line 1");
 				}
-				//				if (DEBUG) {
-				//					System.out.println("JournalParser set date " + publicationDate);
-				//				}
+				// if (DEBUG) {
+				// System.out.println("JournalParser set date " + publicationDate);
+				// }
 			}
 
-			if (!startPageString.equals("    ")) {
+			if (!"    ".equals(startPageString)) {
 				startPage = startPageString;
-				//				if (DEBUG) {
-				//					System.out.println("JournalParser set startPage " + startPage);
-				//				}
+				// if (DEBUG) {
+				// System.out.println("JournalParser set startPage " + startPage);
+				// }
 			}
 
-			if (!volumeString.equals("    ")) {
+			if (!"    ".equals(volumeString)) {
 				volume = volumeString;
-				//				if (DEBUG) {
-				//					System.out.println("JournalParser set volume " + volume);
-				//				}
+				// if (DEBUG) {
+				// System.out.println("JournalParser set volume " + volume);
+				// }
 			}
 
-			if (!journalString.equals("    ")) {
+			if (!"    ".equals(journalString)) {
 				journalName = journalString;
 
 				logger.debug("JournalParser set journalName " + journalName);
@@ -3544,110 +3757,5 @@ public class PDBFileParser  {
 			return volume;
 		}
 	}
-
-	private List<Author> authorBuilder(String authorString) {
-		ArrayList<Author> authorList = new ArrayList<Author>();
-
-		if (authorString.equals("")) {
-			return authorList;
-		}
-
-		String[] authors = authorString.split(",");
-		//        if (DEBUG) {
-		//            for (int i = 0; i < authors.length; i++) {
-		//                String string = authors[i];
-		//                System.out.println("authorBuilder author: '" + string + "'");
-		//            }
-		//        }
-		//        AUTH   SEATTLE STRUCTURAL GENOMICS CENTER FOR INFECTIOUS
-		//        AUTH 2 DISEASE (SSGCID)
-		//        or
-		//        AUTH   E.DOBROVETSKY,A.DONG,A.SEITOVA,B.DUNCAN,L.CROMBET,
-		//        AUTH 2 M.SUNDSTROM,C.H.ARROWSMITH,A.M.EDWARDS,C.BOUNTRA,
-		//        AUTH 3 A.BOCHKAREV,D.COSSAR,
-		//        AUTH 4 STRUCTURAL GENOMICS CONSORTIUM (SGC)
-		//        or
-		//        AUTH   T.-C.MOU,S.R.SPRANG,N.MASADA,D.M.F.COOPER
-		if (authors.length == 1) {
-			//only one element means it's a consortium only
-			Author author = new Author();
-			author.setSurname(authors[0]);
-
-			logger.debug("Set consortium author name " + author.getSurname());
-
-			authorList.add(author);
-		} else {
-			for (int i = 0; i < authors.length; i++) {
-				String authorFullName = authors[i];
-
-				logger.debug("Building author " + authorFullName);
-
-				Author author = new Author();
-				String regex = "\\.";
-				String[] authorNames = authorFullName.split(regex);
-				//                if (DEBUG) {
-				//                    System.out.println("authorNames size " + authorNames.length);
-				//                    for (int j = 0; j < authorNames.length; j++) {
-				//                        String name = authorNames[j];
-				//                        System.out.println("split authName '" + name + "'");
-				//
-				//                    }
-				//                }
-				if (authorNames.length == 0) {
-					author.setSurname(authorFullName);
-
-					logger.debug("Unable to split using '" + regex + "' Setting whole name " + author.getSurname());
-
-				}
-				//again there might be a consortium name so there may be no elements
-				else if (authorNames.length == 1) {
-					author.setSurname(authorNames[0]);
-
-					logger.debug("Set consortium author name in multiple author block " + author.getSurname
-								());
-
-				} else {
-					String initials = "";
-					for (int j = 0; j < authorNames.length - 1; j++) {
-						String initial = authorNames[j];
-						//                        if (DEBUG) {
-						//                            System.out.println("adding initial '" + initial + "'");
-						//                        }
-						//build the initials back up again
-						initials += initial + ".";
-					}
-
-					logger.debug("built initials '" + initials + "'");
-
-					author.setInitials(initials);
-					//surname is always last
-					int lastName = authorNames.length - 1;
-					String surname = authorNames[lastName];
-
-					logger.debug("built author surname " + surname);
-
-					author.setSurname(surname);
-
-				}
-				authorList.add(author);
-			}
-		}
-		return authorList;
-	}
-
-	public void setFileParsingParameters(FileParsingParameters params)
-	{
-		this.params= params;
-
-		// set the correct max values for parsing...
-		loadMaxAtoms = params.getMaxAtoms();
-		atomCAThreshold = params.getAtomCaThreshold();
-
-	}
-
-	public FileParsingParameters getFileParsingParameters(){
-		return params;
-	}
-
 
 }

@@ -27,12 +27,14 @@ import java.util.Locale;
 /**
  * Holds the data of sites presented in PDB files. <br/>
  * Example from the PDB flatfile:
+ * 
  * <pre>
 	SITE     1 AC1  3 GLY A  65  CYS A  67  HOH A 180
 	SITE     1 AC2 10 HIS C  37  ALA C  39  THR C 152  LEU C 153
 	SITE     2 AC2 10 HIS D  37  ALA D  39  THR D 152  LEU D 153
 	SITE     3 AC2 10 SER D 154  GOL D 172
-	</pre>
+ * </pre>
+ * 
  * @author Amr AL-Hossary
  * @author Jules Jacobsen
  */
@@ -42,8 +44,8 @@ public class Site implements PDBRecord, Comparable<Site> {
 	private static final String lineEnd = System.getProperty("line.separator");
 
 	private String siteID = "";
-	private List<Group> groups = new ArrayList<Group>();
-	//variables for REMARK 800
+	private List<Group> groups = new ArrayList<>();
+	// variables for REMARK 800
 	private String evCode = "";
 	private String description = "";
 
@@ -55,23 +57,17 @@ public class Site implements PDBRecord, Comparable<Site> {
 		this.groups = groups;
 	}
 
-
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder("SITE ");
 		stringBuilder.append(siteID).append(" ").append(groups.size()).append(" ");
-		for (Group group : groups) {
-			// 012345678910
-			//'ARG H 221A '
-			String groupString = String.format("%s %s",
-						group.getPDBName(),
-						group.getResidueNumber().toPDB());
-			stringBuilder.append(groupString);
-		}
+		// 012345678910
+		// 'ARG H 221A '
+		groups.stream().map(group -> String.format("%s %s", group.getPDBName(), group.getResidueNumber().toPDB()))
+				.forEach(stringBuilder::append);
 		stringBuilder.append(lineEnd);
 		return stringBuilder.toString();
 	}
-
 
 	@Override
 	public String toPDB() {
@@ -80,25 +76,24 @@ public class Site implements PDBRecord, Comparable<Site> {
 		return buffer.toString();
 	}
 
-
 	@Override
 	public void toPDB(StringBuffer buf) {
 		if (groups == null || groups.size() < 1) {
 			return;
 		}
 
-		//SITE     1 CAT  3 HIS H  57  ASP H 102  SER H 195
-		//SITE     1 AC1  6 ARG H 221A LYS H 224  HOH H 403  HOH H 460
-		//SITE     2 AC1  6 HOH H 464  HOH H 497
-		//         ^  ^   ^
-		//     cont# id  group size
-		//max 4 groups per line
+		// SITE 1 CAT 3 HIS H 57 ASP H 102 SER H 195
+		// SITE 1 AC1 6 ARG H 221A LYS H 224 HOH H 403 HOH H 460
+		// SITE 2 AC1 6 HOH H 464 HOH H 497
+		// ^ ^ ^
+		// cont# id group size
+		// max 4 groups per line
 
-		//counters for tracking where we are
+		// counters for tracking where we are
 		int seqNum = 0;
 		int groupsWritten = 0;
 		int groupNum = 0;
-		//new StringBuilder for adding the groups to
+		// new StringBuilder for adding the groups to
 		StringBuilder stringBuilder = new StringBuilder();
 
 		while (groupsWritten < groups.size()) {
@@ -106,8 +101,8 @@ public class Site implements PDBRecord, Comparable<Site> {
 			for (int i = 0; i < 4 && groupsWritten < groups.size(); i++) {
 				Group group = groups.get(groupNum);
 				// Make sure the pdbName is formatted as 3 width string.
-				String groupString = String.format(Locale.UK, "%3s %s",
-						group.getPDBName(), group.getResidueNumber().toPDB());
+				String groupString = String.format(Locale.UK, "%3s %s", group.getPDBName(),
+						group.getResidueNumber().toPDB());
 				groupsWritten++;
 				groupNum++;
 				if (i == 3 || groupsWritten == groups.size()) {
@@ -116,8 +111,9 @@ public class Site implements PDBRecord, Comparable<Site> {
 				}
 				groupsString.append(groupString);
 			}
-			stringBuilder.append(String.format(Locale.UK, "SITE   %3d %3s %2d %-62s", seqNum + 1, siteID, groups.size(), groupsString.toString()));
-			//iterate the line counter, add the end of line character
+			stringBuilder.append(String.format(Locale.UK, "SITE   %3d %3s %2d %-62s", seqNum + 1, siteID, groups.size(),
+					groupsString.toString()));
+			// iterate the line counter, add the end of line character
 			seqNum++;
 			stringBuilder.append(lineEnd);
 		}
@@ -129,17 +125,15 @@ public class Site implements PDBRecord, Comparable<Site> {
 	 * Appends the REMARK 800 section pertaining to the site onto the end of the
 	 * StringBuffer provided.
 	 *
-	 * For example in pdb 1a4w:
-	 * REMARK 800 SITE_IDENTIFIER: CAT
-	 * REMARK 800 EVIDENCE_CODE: UNKNOWN
-	 * REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
+	 * For example in pdb 1a4w: REMARK 800 SITE_IDENTIFIER: CAT REMARK 800
+	 * EVIDENCE_CODE: UNKNOWN REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
 	 *
 	 * @param stringBuffer
 	 */
 	public void remark800toPDB(StringBuffer stringBuffer) {
-		//REMARK 800 SITE_IDENTIFIER: CAT
-		//REMARK 800 EVIDENCE_CODE: UNKNOWN
-		//REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
+		// REMARK 800 SITE_IDENTIFIER: CAT
+		// REMARK 800 EVIDENCE_CODE: UNKNOWN
+		// REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
 
 		stringBuffer.append(String.format(Locale.UK, "REMARK 800 SITE_IDENTIFIER: %-52s%s", siteID, lineEnd));
 		stringBuffer.append(String.format(Locale.UK, "REMARK 800 EVIDENCE_CODE: %-54s%s", evCode, lineEnd));
@@ -150,10 +144,8 @@ public class Site implements PDBRecord, Comparable<Site> {
 	/**
 	 * Provides REMARK 800 section pertaining to the site as a string.
 	 *
-	 * For example in pdb 1a4w:
-	 * REMARK 800 SITE_IDENTIFIER: CAT
-	 * REMARK 800 EVIDENCE_CODE: UNKNOWN
-	 * REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
+	 * For example in pdb 1a4w: REMARK 800 SITE_IDENTIFIER: CAT REMARK 800
+	 * EVIDENCE_CODE: UNKNOWN REMARK 800 SITE_DESCRIPTION: ACTIVE SITE
 	 *
 	 *
 	 */
@@ -164,16 +156,14 @@ public class Site implements PDBRecord, Comparable<Site> {
 	}
 
 	/**
-	 * @param siteID the siteID to set
-	 * e.g. CAT, AC1, AC2...
+	 * @param siteID the siteID to set e.g. CAT, AC1, AC2...
 	 */
 	public void setSiteID(String siteID) {
 		this.siteID = siteID;
 	}
 
 	/**
-	 * @return the siteID
-	 * e.g. CAT, AC1, AC2...
+	 * @return the siteID e.g. CAT, AC1, AC2...
 	 */
 	public String getSiteID() {
 		return siteID;
@@ -193,9 +183,9 @@ public class Site implements PDBRecord, Comparable<Site> {
 		this.groups = residues;
 	}
 
-
 	/**
 	 * gets the REMARK 800 description of the site
+	 * 
 	 * @return description
 	 */
 	public String getDescription() {
@@ -211,6 +201,7 @@ public class Site implements PDBRecord, Comparable<Site> {
 
 	/**
 	 * gets the REMARK 800 EVIDENCE CODE for the site.
+	 * 
 	 * @return evidence code
 	 */
 	public String getEvCode() {
@@ -257,8 +248,6 @@ public class Site implements PDBRecord, Comparable<Site> {
 		hash = 37 * hash + (this.description != null ? this.description.hashCode() : 0);
 		return hash;
 	}
-
-
 
 	@Override
 	public int compareTo(Site other) {

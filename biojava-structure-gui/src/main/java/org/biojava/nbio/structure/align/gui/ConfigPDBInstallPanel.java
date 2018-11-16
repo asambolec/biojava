@@ -34,27 +34,32 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import javax.swing.UIManager;
 
-public class ConfigPDBInstallPanel extends JPanel
-{
+public class ConfigPDBInstallPanel extends JPanel {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConfigPDBInstallPanel.class);
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -1055193854675583808L;
 
-	JCheckBox fromFtp;
-	JComboBox fileType;
-
-	JTextField pdbDir;
-
 	private static ConfigPDBInstallPanel instance = new ConfigPDBInstallPanel();
 
 	static JDialog dialog;
 
-	private ConfigPDBInstallPanel(){
+	JCheckBox fromFtp;
 
-		UserConfiguration   config = WebStartMain.getWebStartConfig();
+	JComboBox fileType;
+
+	JTextField pdbDir;
+
+	private ConfigPDBInstallPanel() {
+
+		UserConfiguration config = WebStartMain.getWebStartConfig();
 
 		fileType = PDBUploadPanel.getFileFormatSelect();
 
@@ -64,20 +69,20 @@ public class ConfigPDBInstallPanel extends JPanel
 		pdbDir = new JTextField(20);
 
 		String conf = System.getProperty(UserConfiguration.PDB_DIR);
-		if ( conf != null){
+		if (conf != null) {
 			pdbDir.setText(conf);
 		}
 
 		JLabel l01 = new JLabel("Directory containing PDBs");
-		//panel.add(l01);
-		//panel.add(f);
+		// panel.add(l01);
+		// panel.add(f);
 
 		hBox.add(l01);
 		hBox.add(pdbDir);
 		vBox.add(hBox);
 
-		if ( config != null) {
-			pdbDir.setText( config.getPdbFilePath() );
+		if (config != null) {
+			pdbDir.setText(config.getPdbFilePath());
 		}
 
 		Action action = new ChooseDirAction(pdbDir, config);
@@ -90,8 +95,9 @@ public class ConfigPDBInstallPanel extends JPanel
 		fromFtp = new JCheckBox();
 		fromFtp.setMnemonic(KeyEvent.VK_F);
 		fromFtp.setSelected(true);
-		if ( config != null)
+		if (config != null) {
 			fromFtp.setSelected(config.getFetchBehavior() != FetchBehavior.LOCAL_ONLY);
+		}
 
 		JLabel ftype = new JLabel("File format:");
 
@@ -107,27 +113,26 @@ public class ConfigPDBInstallPanel extends JPanel
 
 	}
 
-	public static void showDialog(){
-		if ( dialog != null) {
+	public static void showDialog() {
+		if (dialog != null) {
 
 			dialog.setVisible(true);
 			return;
 		}
 
 		dialog = new JDialog();
-		dialog.setSize(new Dimension(600,300));
+		dialog.setSize(new Dimension(600, 300));
 		Box vBox = Box.createVerticalBox();
 
 		vBox.add(instance);
 
-
 		UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
 		JPanel panel = new JPanel();
 
-		for(int i = 0; i < lookAndFeels.length; i++){
-		  JButton button = new JButton(lookAndFeels[i].getName());
-		  button.addActionListener(new MyAction(dialog));
-		  panel.add(button);
+		for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+			JButton button = new JButton(lookAndFeel.getName());
+			button.addActionListener(new MyAction(dialog));
+			panel.add(button);
 		}
 
 		JTabbedPane jTab = new JTabbedPane();
@@ -137,27 +142,19 @@ public class ConfigPDBInstallPanel extends JPanel
 		vBox.add(Box.createGlue());
 
 		JButton apply = new JButton("Apply");
-		apply.addActionListener(new ActionListener(){
-			@Override
-		public void actionPerformed(ActionEvent event) {
-				instance.applyValues();
-				dialog.dispose();
-			}
+		apply.addActionListener((ActionEvent event) -> {
+			instance.applyValues();
+			dialog.dispose();
 		});
 
 		JButton close = new JButton("Cancel");
 
-		close.addActionListener(new ActionListener(){
-			@Override
-		public void actionPerformed(ActionEvent event) {
-			  dialog.dispose();
-			}
-		});
+		close.addActionListener((ActionEvent event) -> dialog.dispose());
 
 		Box hBoxb = Box.createHorizontalBox();
 		hBoxb.add(Box.createGlue());
-		hBoxb.add(close,BorderLayout.EAST);
-		hBoxb.add(apply,BorderLayout.EAST);
+		hBoxb.add(close, BorderLayout.EAST);
+		hBoxb.add(apply, BorderLayout.EAST);
 		vBox.add(hBoxb);
 
 		dialog.getContentPane().add(vBox);
@@ -165,76 +162,71 @@ public class ConfigPDBInstallPanel extends JPanel
 
 	}
 
-	protected void applyValues()
-	{
+	protected void applyValues() {
 		UserConfiguration config = WebStartMain.getWebStartConfig();
 
 		String dir = pdbDir.getText();
 		config.setPdbFilePath(dir);
 		boolean fromFtpF = fromFtp.isSelected();
-		if(fromFtpF) {
+		if (fromFtpF) {
 			config.setFetchBehavior(FetchBehavior.FETCH_REMEDIATED);
 		} else {
 			config.setFetchBehavior(FetchBehavior.LOCAL_ONLY);
 		}
-		String fileFormat = (String)fileType.getSelectedItem();
+		String fileFormat = (String) fileType.getSelectedItem();
 		config.setFileFormat(fileFormat);
 
-		
-
 	}
 
-	public JCheckBox getFromFtp()
-	{
+	public JCheckBox getFromFtp() {
 		return fromFtp;
 	}
-	public void setFromFtp(JCheckBox fromFtp)
-	{
-		System.out.println(fromFtp);
+
+	public void setFromFtp(JCheckBox fromFtp) {
+		logger.info(String.valueOf(fromFtp));
 		this.fromFtp = fromFtp;
 	}
-	public JTextField getPDBDirField(){
+
+	public JTextField getPDBDirField() {
 		return pdbDir;
 	}
-	public void setPDBDirField(JTextField dir){
+
+	public void setPDBDirField(JTextField dir) {
 		pdbDir = dir;
 	}
 
-
-
-
 }
 
-class MyAction implements ActionListener{
+class MyAction implements ActionListener {
+	private static final Logger logger = LoggerFactory.getLogger(MyAction.class);
 	JDialog dialog;
 
 	public MyAction(JDialog dialog) {
-		this.dialog= dialog;
+		this.dialog = dialog;
 	}
-
 
 	@Override
 	@SuppressWarnings("unused")
-	public void actionPerformed(ActionEvent ae){
+	public void actionPerformed(ActionEvent ae) {
 		Object EventSource = ae.getSource();
 		String lookAndFeelClassName = null;
 		UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
-		for(int i = 0; i < looks.length; i++){
-			if(ae.getActionCommand().equals(looks[i].getName())){
-				lookAndFeelClassName = looks[i].getClassName();
+		for (UIManager.LookAndFeelInfo look : looks) {
+			if (ae.getActionCommand().equals(look.getName())) {
+				lookAndFeelClassName = look.getClassName();
 				break;
 			}
 		}
-		try{
+		try {
 			UIManager.setLookAndFeel(lookAndFeelClassName);
 
 			SwingUtilities.updateComponentTreeUI(dialog);
 
-			SwingUtilities.updateComponentTreeUI( AlignmentGui.getInstanceNoVisibilityChange());
-		}
-		catch(Exception e){
-			JOptionPane.showMessageDialog(dialog, "Can't change look and feel:"
-					+ lookAndFeelClassName, "Invalid PLAF", JOptionPane.ERROR_MESSAGE);
+			SwingUtilities.updateComponentTreeUI(AlignmentGui.getInstanceNoVisibilityChange());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			JOptionPane.showMessageDialog(dialog, "Can't change look and feel:" + lookAndFeelClassName, "Invalid PLAF",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

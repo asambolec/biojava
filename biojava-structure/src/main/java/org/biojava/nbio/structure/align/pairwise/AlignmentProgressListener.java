@@ -28,29 +28,31 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** A class to listen to progress of the structure alignment calculations
+/**
+ * A class to listen to progress of the structure alignment calculations
  *
  * @author andreas
  *
  */
-public class AlignmentProgressListener
-{
+public class AlignmentProgressListener {
 
+	private static final Logger logger = LoggerFactory.getLogger(AlignmentProgressListener.class);
 	String n1;
 	String n2;
 	int l1;
 	int l2;
 
-	Atom[] ca1 ;
+	Atom[] ca1;
 	Atom[] ca2;
 
-	public AlignmentProgressListener(){
+	public AlignmentProgressListener() {
 
 	}
 
-	public void startingAlignment(String name1, Atom[] ca1, String name2, Atom[] ca2){
+	public void startingAlignment(String name1, Atom[] ca1, String name2, Atom[] ca2) {
 		n1 = name1;
 		n2 = name2;
 		l1 = ca1.length;
@@ -59,107 +61,85 @@ public class AlignmentProgressListener
 		this.ca2 = ca2;
 	}
 
-	public void calculatedFragmentPairs(List<FragmentPair> fragments){
-		System.out.println("got: " + fragments.size() + " fragments");
+	public void calculatedFragmentPairs(List<FragmentPair> fragments) {
+		logger.info(new StringBuilder().append("got: ").append(fragments.size()).append(" fragments").toString());
 
-		String title = "Initial FragmentPairs for:" +  n1 + "("+l1+")"+ " vs. " + n2 + " ("+l2+")";
+		String title = new StringBuilder().append("Initial FragmentPairs for:").append(n1).append("(").append(l1)
+				.append(")").append(" vs. ").append(n2).append(" (").append(l2).append(")").toString();
 		// ScaleableMatrixPanel panel = new ScaleableMatrixPanel();
 
+		Matrix m = new Matrix(l1, l2, 99);
 
-		Matrix m = new Matrix(l1,l2,99);
-
-		for (FragmentPair p : fragments){
-			for (FragmentPair pair2: fragments){
-
-
-				//Atom v2 = tmpfidx[j].getCenter2();
-				Atom v1 = p.getUnitv();
-				Atom v2 = pair2.getUnitv();
-				//System.out.println("v1: "+v1);
-				//System.out.println("v2: "+v2);
-
-				double dist = Calc.getDistance(v1,v2);
-				for (int i =0 ; i < p.getLength(); i++){
-					int p1 = p.getPos1();
-					int p2 = p.getPos2();
-					m.set(p1+i,p2+i,dist);
-				}
-				for (int i =0 ; i < pair2.getLength(); i++){
-					int p1 = pair2.getPos1();
-					int p2 = pair2.getPos2();
-					m.set(p1+i,p2+i,dist);
-				}
-
-
+		// Atom v2 = tmpfidx[j].getCenter2();
+		// System.out.println("v1: "+v1);
+		// System.out.println("v2: "+v2);
+		fragments.forEach(p -> fragments.forEach(pair2 -> {
+			Atom v1 = p.getUnitv();
+			Atom v2 = pair2.getUnitv();
+			double dist = Calc.getDistance(v1, v2);
+			for (int i = 0; i < p.getLength(); i++) {
+				int p1 = p.getPos1();
+				int p2 = p.getPos2();
+				m.set(p1 + i, p2 + i, dist);
 			}
-
-		}
-		//  panel.setMatrix(m);
-		JFrame frame = new JFrame();
-
-		frame.setTitle(title);
-
-		frame.addWindowListener(new WindowAdapter(){
-			@Override
-			public void windowClosing(WindowEvent e){
-				JFrame f = (JFrame) e.getSource();
-				f.setVisible(false);
-				f.dispose();
+			for (int i = 0; i < pair2.getLength(); i++) {
+				int p1 = pair2.getPos1();
+				int p2 = pair2.getPos2();
+				m.set(p1 + i, p2 + i, dist);
 			}
-
-
-
-		});
-		//frame.getContentPane().add(panel);
-		frame.pack();
-		frame.setVisible(true);
-
-
-
-	}
-
-
-	public void jointFragments(JointFragments[] fragments){
-		System.out.println("numberof Joint fragments: " + fragments.length);
-
-		String title = "JointFragment for:" +  n1 + "("+l1+")"+ " vs. " + n2 + " ("+l2+")";
-		// ScaleableMatrixPanel panel = new ScaleableMatrixPanel();
-
-		Matrix m = new Matrix(l1,l2,99);
-
-		for (JointFragments p : fragments){
-			for (int[] idx : p.getIdxlist() ){
-				m.set(idx[0],idx[1],p.getRms());
-			}
-		}
+		}));
 		// panel.setMatrix(m);
 		JFrame frame = new JFrame();
 
 		frame.setTitle(title);
 
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e){
+			public void windowClosing(WindowEvent e) {
 				JFrame f = (JFrame) e.getSource();
 				f.setVisible(false);
 				f.dispose();
 			}
-
-
 
 		});
 		// frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
 
+	}
 
+	public void jointFragments(JointFragments[] fragments) {
+		logger.info("numberof Joint fragments: " + fragments.length);
 
+		String title = new StringBuilder().append("JointFragment for:").append(n1).append("(").append(l1).append(")")
+				.append(" vs. ").append(n2).append(" (").append(l2).append(")").toString();
+		// ScaleableMatrixPanel panel = new ScaleableMatrixPanel();
 
-		for (JointFragments f : fragments){
-			System.out.println(f);
+		Matrix m = new Matrix(l1, l2, 99);
+
+		for (JointFragments p : fragments) {
+			p.getIdxlist().forEach(idx -> m.set(idx[0], idx[1], p.getRms()));
+		}
+		// panel.setMatrix(m);
+		JFrame frame = new JFrame();
+
+		frame.setTitle(title);
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				JFrame f = (JFrame) e.getSource();
+				f.setVisible(false);
+				f.dispose();
+			}
+
+		});
+		// frame.getContentPane().add(panel);
+		frame.pack();
+		frame.setVisible(true);
+
+		for (JointFragments f : fragments) {
+			logger.info(String.valueOf(f));
 		}
 	}
 }
-
-
-

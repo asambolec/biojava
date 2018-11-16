@@ -29,78 +29,74 @@ import org.biojava.nbio.structure.align.util.ConfigurationException;
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-
-
-/** A Web Start wrapper for a FarmJobRunnable.
+/**
+ * A Web Start wrapper for a FarmJobRunnable.
  *
  */
-public class WebStartDBSearch  {
+public class WebStartDBSearch {
 
-	private static final String[] mandParams = new String[] {"pdbFilePath"};
+	private static final Logger logger = LoggerFactory.getLogger(WebStartDBSearch.class);
 
-	private static final List<String> mandatoryArgs= Arrays.asList(mandParams);
+	private static final String[] mandParams = new String[] { "pdbFilePath" };
 
-	public WebStartDBSearch(){
+	private static final List<String> mandatoryArgs = Arrays.asList(mandParams);
+
+	public WebStartDBSearch() {
 	}
-
-
 
 	public static void main(String[] argv) {
 
 		FarmJob job = new FarmJob();
 
-
-		if (argv.length  == 0 ) {
+		if (argv.length == 0) {
 			job.printHelp();
-			JOptionPane.showMessageDialog(null,
-					"Not enough arguments!");
+			JOptionPane.showMessageDialog(null, "Not enough arguments!");
 			return;
-
 
 		}
 
-		if ( argv.length == 1){
-			if (argv[0].equalsIgnoreCase("-h") || argv[0].equalsIgnoreCase("-help")|| argv[0].equalsIgnoreCase("--help")){
+		if (argv.length == 1) {
+			if ("-h".equalsIgnoreCase(argv[0]) || "-help".equalsIgnoreCase(argv[0])
+					|| "--help".equalsIgnoreCase(argv[0])) {
 				job.printHelp();
-				JOptionPane.showMessageDialog(null,
-				"Help not supported...");
+				JOptionPane.showMessageDialog(null, "Help not supported...");
 				return;
 			}
 		}
 
 		FarmJobParameters params = new FarmJobParameters();
 
-
-		for (int i = 0 ; i < argv.length; i++){
-			String arg   = argv[i];
+		for (int i = 0; i < argv.length; i++) {
+			String arg = argv[i];
 
 			String value = null;
-			if ( i < argv.length -1)
-				value = argv[i+1];
+			if (i < argv.length - 1) {
+				value = argv[i + 1];
+			}
 
 			// if value starts with - then the arg does not have a value.
-			if (value != null && value.startsWith("-"))
+			if (value != null && value.startsWith("-")) {
 				value = null;
-			else
+			} else {
 				i++;
+			}
 
-
-			String[] tmp = {arg,value};
+			String[] tmp = { arg, value };
 
 			try {
 
 				CliTools.configureBean(params, tmp);
 
-			} catch (ConfigurationException e){
+			} catch (ConfigurationException e) {
 
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 
-				if ( mandatoryArgs.contains(arg) ) {
+				if (mandatoryArgs.contains(arg)) {
 					// there must not be a ConfigurationException with mandatory arguments.
-					JOptionPane.showMessageDialog(null,
-							e.getMessage());
+					JOptionPane.showMessageDialog(null, e.getMessage());
 					return;
 
 				} else {
@@ -112,13 +108,9 @@ public class WebStartDBSearch  {
 		params.setRunBackground(true);
 		GUIFarmJobRunnable runnable = new GUIFarmJobRunnable(params);
 
-		//javax.swing.SwingUtilities.invokeLater(runnable);
+		// javax.swing.SwingUtilities.invokeLater(runnable);
 		runnable.run();
 
-
-
-
 	}
-
 
 }

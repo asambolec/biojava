@@ -39,6 +39,7 @@ import java.io.InputStream;
 
 /**
  * Package-level static utilities for parsing XML.
+ * 
  * @author dmyerstu
  */
 public class ReadUtils {
@@ -53,7 +54,9 @@ public class ReadUtils {
 	 * @return {@code s}, or null if {@code s} is the empty string
 	 */
 	static String toStr(String s) {
-		if (s.isEmpty()) return null;
+		if (s.isEmpty()) {
+			return null;
+		}
 		return s;
 	}
 
@@ -90,7 +93,9 @@ public class ReadUtils {
 	}
 
 	static Double toDouble(String s) {
-		if (s.isEmpty()) return null;
+		if (s.isEmpty()) {
+			return null;
+		}
 		try {
 			return Double.parseDouble(s);
 		} catch (NumberFormatException e) {
@@ -100,7 +105,9 @@ public class ReadUtils {
 	}
 
 	static Integer toInt(String s) {
-		if (s.isEmpty()) return null;
+		if (s.isEmpty()) {
+			return null;
+		}
 		try {
 			return Integer.parseInt(s);
 		} catch (NumberFormatException e) {

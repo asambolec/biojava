@@ -37,18 +37,18 @@ import org.biojava.nbio.structure.jama.Matrix;
  *
  */
 public class Matrices {
-	
+
 	/** Prevent instantiation */
-	private Matrices(){}
+	private Matrices() {
+	}
 
 	/**
-	 * Convert a transformation matrix into a JAMA rotation matrix. Because the
-	 * JAMA matrix is a pre-multiplication matrix and the Vecmath matrix is a
-	 * post-multiplication one, the rotation matrix is transposed to ensure that
-	 * the transformation they produce is the same.
+	 * Convert a transformation matrix into a JAMA rotation matrix. Because the JAMA
+	 * matrix is a pre-multiplication matrix and the Vecmath matrix is a
+	 * post-multiplication one, the rotation matrix is transposed to ensure that the
+	 * transformation they produce is the same.
 	 *
-	 * @param transform
-	 *            Matrix4d with transposed rotation matrix
+	 * @param transform Matrix4d with transposed rotation matrix
 	 * @return rotation matrix as JAMA object
 	 */
 	public static Matrix getRotationJAMA(Matrix4d transform) {
@@ -61,12 +61,11 @@ public class Matrices {
 		}
 		return rot;
 	}
-	
+
 	/**
 	 * Convert a transformation matrix into a rotation matrix.
 	 *
-	 * @param transform
-	 *            Matrix4d
+	 * @param transform Matrix4d
 	 * @return rotation matrix
 	 */
 	public static Matrix3d getRotationMatrix(Matrix4d transform) {
@@ -79,8 +78,7 @@ public class Matrices {
 	/**
 	 * Extract the translational vector of a transformation matrix.
 	 *
-	 * @param transform
-	 *            Matrix4d
+	 * @param transform Matrix4d
 	 * @return Vector3d translation vector
 	 */
 	public static Vector3d getTranslationVector(Matrix4d transform) {
@@ -88,22 +86,19 @@ public class Matrices {
 		transform.get(transl);
 		return transl;
 	}
-	
+
 	/**
 	 * Convert JAMA rotation and translation to a Vecmath transformation matrix.
-	 * Because the JAMA matrix is a pre-multiplication matrix and the Vecmath
-	 * matrix is a post-multiplication one, the rotation matrix is transposed to
-	 * ensure that the transformation they produce is the same.
+	 * Because the JAMA matrix is a pre-multiplication matrix and the Vecmath matrix
+	 * is a post-multiplication one, the rotation matrix is transposed to ensure
+	 * that the transformation they produce is the same.
 	 *
-	 * @param rot
-	 *            3x3 Rotation matrix
-	 * @param trans
-	 *            3x1 Translation matrix
+	 * @param rot   3x3 Rotation matrix
+	 * @param trans 3x1 Translation matrix
 	 * @return 4x4 transformation matrix
 	 */
 	public static Matrix4d getTransformation(Matrix rot, Matrix trans) {
-		return new Matrix4d(new Matrix3d(rot.getColumnPackedCopy()),
-				new Vector3d(trans.getColumnPackedCopy()), 1.0);
+		return new Matrix4d(new Matrix3d(rot.getColumnPackedCopy()), new Vector3d(trans.getColumnPackedCopy()), 1.0);
 	}
 
 }

@@ -27,10 +27,10 @@ import org.biojava.nbio.core.sequence.template.SequenceMixin;
 import org.biojava.nbio.core.sequence.template.SequenceProxyView;
 
 /**
- * For a given sequence this class will return the base at the reversed
- * position i.e. in a sequence of size 10, if you request base 2 you will get
- * back the base at position 9. Sub-views can be made of this class which
- * also respect the reversed calls.
+ * For a given sequence this class will return the base at the reversed position
+ * i.e. in a sequence of size 10, if you request base 2 you will get back the
+ * base at position 9. Sub-views can be made of this class which also respect
+ * the reversed calls.
  *
  * @author Andy Yates
  * @param <C> Must be a subtype of @{link Compound}

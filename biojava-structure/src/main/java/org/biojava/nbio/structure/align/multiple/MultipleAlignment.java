@@ -56,8 +56,8 @@ public interface MultipleAlignment extends ScoresCache {
 	public MultipleAlignment clone();
 
 	/**
-	 * Returns the parent Ensemble of the MultipleAlignment. Returns null if
-	 * there is no referenced object.
+	 * Returns the parent Ensemble of the MultipleAlignment. Returns null if there
+	 * is no referenced object.
 	 *
 	 * @return MultipleAlignmentEnsemble the parent MultipleAlignment of the
 	 *         BlockSet, or null.
@@ -68,19 +68,18 @@ public interface MultipleAlignment extends ScoresCache {
 	/**
 	 * Set the back-reference to its parent Ensemble.
 	 * <p>
-	 * Neither removes this alignment from its previous ensemble, if any, nor
-	 * adds it to the new parent. Calling code should assure that links to and
-	 * from the ensemble are consistent and free of memory leaks.
+	 * Neither removes this alignment from its previous ensemble, if any, nor adds
+	 * it to the new parent. Calling code should assure that links to and from the
+	 * ensemble are consistent and free of memory leaks.
 	 *
-	 * @param parent
-	 *            the parent MultipleAlignmentEnsemble.
+	 * @param parent the parent MultipleAlignmentEnsemble.
 	 * @see #getEnsemble()
 	 */
 	public void setEnsemble(MultipleAlignmentEnsemble parent);
 
 	/**
-	 * Returns the BlockSet List of the multiple structure alignment.
-	 * Initializes the variable if it is null.
+	 * Returns the BlockSet List of the multiple structure alignment. Initializes
+	 * the variable if it is null.
 	 *
 	 * @return List of BlockSets that describe the aligned residues of all the
 	 *         structures.
@@ -91,11 +90,10 @@ public interface MultipleAlignment extends ScoresCache {
 
 	/**
 	 * Returns the BlockSet with the specified index of the MultipleAlignment.
-	 * Throws an Exception if the index is out of bounds, like accessing a
-	 * normal List.
+	 * Throws an Exception if the index is out of bounds, like accessing a normal
+	 * List.
 	 *
-	 * @param index
-	 *            of the BlockSet
+	 * @param index of the BlockSet
 	 * @return BlockSets at the specified index
 	 * @see #getBlocks()
 	 * @see #getBlockSets()
@@ -105,8 +103,7 @@ public interface MultipleAlignment extends ScoresCache {
 	/**
 	 * Sets the List of BlockSet List of the specified alignment.
 	 *
-	 * @param blockSets
-	 *            the List of BlockSets that describe the aligned residues.
+	 * @param blockSets the List of BlockSets that describe the aligned residues.
 	 * @see #getBlockSets()
 	 */
 	public void setBlockSets(List<BlockSet> blockSets);
@@ -122,12 +119,10 @@ public interface MultipleAlignment extends ScoresCache {
 	public List<Block> getBlocks();
 
 	/**
-	 * Returns the Block with the specified index of the MultipleAlignment.
-	 * Throws an Exception if the index is out of bounds, like accessing a
-	 * normal List.
+	 * Returns the Block with the specified index of the MultipleAlignment. Throws
+	 * an Exception if the index is out of bounds, like accessing a normal List.
 	 *
-	 * @param index
-	 *            of the BlockSet
+	 * @param index of the BlockSet
 	 * @return Block at the specified index
 	 * @see #getBlocks()
 	 * @see #getBlockSets()
@@ -136,8 +131,8 @@ public interface MultipleAlignment extends ScoresCache {
 
 	/**
 	 * Returns the array of Atoms for each structure from its parent Ensemble.
-	 * Throws an Exception if the parent ensemble is null or the Atom variables
-	 * are not previously set.
+	 * Throws an Exception if the parent ensemble is null or the Atom variables are
+	 * not previously set.
 	 *
 	 * @return List of Atom arrays
 	 * @see #getEnsemble()
@@ -145,9 +140,9 @@ public interface MultipleAlignment extends ScoresCache {
 	public List<Atom[]> getAtomArrays();
 
 	/**
-	 * Returns the StructureIdentifier associated with the structure index from
-	 * its parent Ensemble. Throws an Exception if the parent ensemble is null
-	 * or the StructureIdentifiers are not previously set.
+	 * Returns the StructureIdentifier associated with the structure index from its
+	 * parent Ensemble. Throws an Exception if the parent ensemble is null or the
+	 * StructureIdentifiers are not previously set.
 	 *
 	 * @return StructureIdentifier
 	 * @see #getEnsemble()
@@ -184,16 +179,16 @@ public interface MultipleAlignment extends ScoresCache {
 	public int getCoreLength();
 
 	/**
-	 * Returns the number of non null positions (residues) of each structure in
-	 * the alignment. The values can be used to compute the coverages.
+	 * Returns the number of non null positions (residues) of each structure in the
+	 * alignment. The values can be used to compute the coverages.
 	 * 
 	 * @return List of residue counts for each structure
 	 */
 	public List<Integer> getAlignResCounts();
 
 	/**
-	 * Returns the coverage of the alignment for each structure in the
-	 * alignment as a fraction between 0.0 and 1.0.
+	 * Returns the coverage of the alignment for each structure in the alignment as
+	 * a fraction between 0.0 and 1.0.
 	 * 
 	 * @return List coverage for each structure
 	 */

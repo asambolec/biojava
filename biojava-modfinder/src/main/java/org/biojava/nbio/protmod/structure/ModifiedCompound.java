@@ -37,7 +37,8 @@ import java.util.Set;
  */
 public interface ModifiedCompound {
 
-	/** return a description of this compound
+	/**
+	 * return a description of this compound
 	 *
 	 * @return a description
 	 */
@@ -68,8 +69,6 @@ public interface ModifiedCompound {
 	 */
 	public Set<StructureGroup> getGroups(boolean isAminoAcid);
 
-
-
 	/**
 	 *
 	 * @return a set of atom linkages.
@@ -78,7 +77,8 @@ public interface ModifiedCompound {
 	 */
 	public Set<StructureAtomLinkage> getAtomLinkages();
 
-	/** Set atom linkages
+	/**
+	 * Set atom linkages
 	 *
 	 * @return
 	 */
@@ -86,6 +86,7 @@ public interface ModifiedCompound {
 
 	/**
 	 * Add a linkage. Add new the involved groups first using {@link addGroup}.
+	 * 
 	 * @param linkage an atom linkage.
 	 * @return true if this linkage was not already contained.
 	 * @see StructureAtomLinkage
@@ -94,16 +95,15 @@ public interface ModifiedCompound {
 
 	/**
 	 * Add a collections of linkages.
+	 * 
 	 * @param linkages an atom linkage.
 	 */
 	public void addAtomLinkages(Collection<StructureAtomLinkage> linkages);
-
 
 	/**
 	 *
 	 * @return true if groups from multiple chains were involved
 	 */
 	public boolean crossChains();
-
 
 }

@@ -23,8 +23,10 @@ package org.biojava.nbio.core.sequence.compound;
 
 import org.biojava.nbio.core.sequence.template.AbstractCompound;
 import org.biojava.nbio.core.sequence.template.Compound;
+
 /**
  * Define a codon
+ * 
  * @author Andy Yates
  */
 public class CodonCompound extends AbstractCompound {
@@ -34,9 +36,8 @@ public class CodonCompound extends AbstractCompound {
 	private final NucleotideCompound three;
 	private final boolean start;
 
-	public CodonCompound(NucleotideCompound one, NucleotideCompound two,
-			NucleotideCompound three, boolean start) {
-		super(one.toString()+two.toString()+three.toString());
+	public CodonCompound(NucleotideCompound one, NucleotideCompound two, NucleotideCompound three, boolean start) {
+		super(new StringBuilder().append(one.toString()).append(two.toString()).append(three.toString()).toString());
 		this.one = one;
 		this.two = two;
 		this.three = three;
@@ -44,7 +45,7 @@ public class CodonCompound extends AbstractCompound {
 	}
 
 	@Override
-public boolean equalsIgnoreCase(Compound compound) {
+	public boolean equalsIgnoreCase(Compound compound) {
 		if (compound == null) {
 			return false;
 		}
@@ -56,19 +57,19 @@ public boolean equalsIgnoreCase(Compound compound) {
 	}
 
 	@Override
-public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof CodonCompound)) {
 			return false;
 		}
-		CodonCompound them = (CodonCompound)obj;
+		CodonCompound them = (CodonCompound) obj;
 		return toString().equals(them.toString());
 	}
 
 	@Override
-public int hashCode() {
+	public int hashCode() {
 		return toString().hashCode();
 	}
 
@@ -89,49 +90,49 @@ public int hashCode() {
 	}
 
 	@Override
-public String getDescription() {
+	public String getDescription() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-public String getLongName() {
+	public String getLongName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-public Float getMolecularWeight() {
+	public Float getMolecularWeight() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-public String getShortName() {
+	public String getShortName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-public void setDescription(String description) {
+	public void setDescription(String description) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-public void setLongName(String longName) {
+	public void setLongName(String longName) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-public void setMolecularWeight(Float molecularWeight) {
+	public void setMolecularWeight(Float molecularWeight) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-public void setShortName(String shortName) {
+	public void setShortName(String shortName) {
 		// TODO Auto-generated method stub
 
 	}

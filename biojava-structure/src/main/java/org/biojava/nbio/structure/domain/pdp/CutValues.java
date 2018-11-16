@@ -20,8 +20,6 @@
  */
 package org.biojava.nbio.structure.domain.pdp;
 
-
-
 public class CutValues {
 	public double s_min;
 	public int site2;
@@ -29,7 +27,7 @@ public class CutValues {
 
 	public double AD;
 
-	public CutValues(){
+	public CutValues() {
 		s_min = 100;
 		site2 = 0;
 		first_cut = true;
@@ -37,11 +35,8 @@ public class CutValues {
 
 	@Override
 	public String toString() {
-		return "CutValues [s_min=" + s_min + ", site2=" + site2 +
-		", AD=" + AD
-		+ "]";
+		return new StringBuilder().append("CutValues [s_min=").append(s_min).append(", site2=").append(site2)
+				.append(", AD=").append(AD).append("]").toString();
 	}
-
-
 
 }

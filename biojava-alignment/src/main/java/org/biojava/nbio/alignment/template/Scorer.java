@@ -31,16 +31,18 @@ package org.biojava.nbio.alignment.template;
 public interface Scorer {
 
 	/**
-	 * Returns score as a distance between 0.0 and 1.0.  This equals ({@link #getMaxScore()} - {@link #getScore()}) /
-	 * ({@link #getMaxScore()} - {@link #getMinScore()}).
+	 * Returns score as a distance between 0.0 and 1.0. This equals
+	 * ({@link #getMaxScore()} - {@link #getScore()}) / ({@link #getMaxScore()} -
+	 * {@link #getMinScore()}).
 	 *
 	 * @return score as a distance between 0.0 and 1.0
 	 */
 	double getDistance();
 
 	/**
-	 * Returns score as a distance between 0.0 and scale.  This equals scale * ({@link #getMaxScore()} -
-	 * {@link #getScore()}) / ({@link #getMaxScore()} - {@link #getMinScore()}).
+	 * Returns score as a distance between 0.0 and scale. This equals scale *
+	 * ({@link #getMaxScore()} - {@link #getScore()}) / ({@link #getMaxScore()} -
+	 * {@link #getMinScore()}).
 	 *
 	 * @param scale maximum distance
 	 * @return score as a distance between 0.0 and scale
@@ -62,24 +64,27 @@ public interface Scorer {
 	double getMinScore();
 
 	/**
-	 * Returns score resulting from algorithm.  This should normalize between 0 and 1 by calculating
-	 * ({@link #getScore()} - {@link #getMinScore()}) / ({@link #getMaxScore()} - {@link #getMinScore()}).
+	 * Returns score resulting from algorithm. This should normalize between 0 and 1
+	 * by calculating ({@link #getScore()} - {@link #getMinScore()}) /
+	 * ({@link #getMaxScore()} - {@link #getMinScore()}).
 	 *
 	 * @return score resulting from algorithm
 	 */
 	double getScore();
 
 	/**
-	 * Returns score as a similarity between 0.0 and 1.0.  This equals ({@link #getScore()} - {@link #getMinScore()}) /
-	 * ({@link #getMaxScore()} - {@link #getMinScore()}).
+	 * Returns score as a similarity between 0.0 and 1.0. This equals
+	 * ({@link #getScore()} - {@link #getMinScore()}) / ({@link #getMaxScore()} -
+	 * {@link #getMinScore()}).
 	 *
 	 * @return score as a similarity between 0.0 and 1.0
 	 */
 	double getSimilarity();
 
 	/**
-	 * Returns score as a similarity between 0.0 and scale.  This equals scale * ({@link #getScore()} -
-	 * {@link #getMinScore()}) / ({@link #getMaxScore()} - {@link #getMinScore()}).
+	 * Returns score as a similarity between 0.0 and scale. This equals scale *
+	 * ({@link #getScore()} - {@link #getMinScore()}) / ({@link #getMaxScore()} -
+	 * {@link #getMinScore()}).
 	 *
 	 * @param scale maximum similarity
 	 * @return score as a similarity between 0.0 and scale

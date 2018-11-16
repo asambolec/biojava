@@ -26,76 +26,79 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** A utility class that defines which set of atoms are considered
- * to be on equivalent positions.
+/**
+ * A utility class that defines which set of atoms are considered to be on
+ * equivalent positions.
  *
  *
  */
 public class JointFragments {
 
+	private static final Logger logger = LoggerFactory.getLogger(JointFragments.class);
 
-		double rms;
+	double rms;
 
-		List<int[]> idxlist;
-		public JointFragments(){
-			idxlist = new ArrayList<int[]>();
-			rms = 999;
+	List<int[]> idxlist;
+
+	public JointFragments() {
+		idxlist = new ArrayList<>();
+		rms = 999;
+	}
+
+	/**
+	 * Stores the alignment between the residues of several fragments. Each int[]
+	 * stores the residue numbers of several equivalent residues.
+	 */
+	public void setIdxlist(List<int[]> idxs) {
+		Iterator<int[]> iter = idxs.iterator();
+		while (iter.hasNext()) {
+			int[] e = iter.next();
+			idxlist.add(e);
 		}
+	}
 
-		/**
-		 * Stores the alignment between the residues of several fragments.
-		 * Each int[] stores the residue numbers of several equivalent residues.
-		 */
-		public void setIdxlist(List<int[]> idxs) {
-			Iterator<int[]> iter = idxs.iterator();
-			while (iter.hasNext()){
-				int[] e = iter.next();
-				idxlist.add(e);
-			}
-		}
+	public double getRms() {
+		return rms;
+	}
 
+	public void setRms(double rms) {
+		this.rms = rms;
+	}
 
+	public List<int[]> getIdxlist() {
+		return idxlist;
+	}
 
-		public double getRms() {
-			return rms;
-		}
+	public void add(int p1, int p2, int start, int end) {
+		// System.out.println("JointFragments add " +p1 + " " + p2 + " " + start + " " +
+		// end);
+		for (int k = start; k < end; k++) {
+			// e = (f[0]+k,f[1]+k)
+			// e = (f[0]+k,f[1]+k);
+			int[] e = new int[] { p1 + k, p2 + k };
 
-		public void setRms(double rms) {
-			this.rms = rms;
-		}
-
-		public List<int[]> getIdxlist(){
-			return idxlist;
-		}
-		public void add(int p1, int p2,int start,int end){
-			//System.out.println("JointFragments add " +p1 + " " + p2 + " " + start + " " + end);
-			for ( int k = start;k< end ; k++){
-				//e = (f[0]+k,f[1]+k)
-				//e = (f[0]+k,f[1]+k);
-				int[] e = new int[] {p1+k,p2+k};
-
-				// check if already known ...
-				Iterator<int[]> iter = idxlist.iterator();
-				while (iter.hasNext()){
-					int[] kno = iter.next();
-					if ((kno[0] == e[0]) && ( kno[1] == e[1])){
-						System.err.println("already known index pair, not adding a 2nd time." + e[0] + " " + e[1]);
-						return;
-					}
+			// check if already known ...
+			Iterator<int[]> iter = idxlist.iterator();
+			while (iter.hasNext()) {
+				int[] kno = iter.next();
+				if ((kno[0] == e[0]) && (kno[1] == e[1])) {
+					logger.error(new StringBuilder().append("already known index pair, not adding a 2nd time.")
+							.append(e[0]).append(" ").append(e[1]).toString());
+					return;
 				}
-				idxlist.add(e);
-				Collections.sort(idxlist, new IdxComparator());
 			}
+			idxlist.add(e);
+			Collections.sort(idxlist, new IdxComparator());
 		}
+	}
 
-
-		@Override
-		public String toString(){
-			String s = "Joint Fragment idxlist len: " +idxlist.size();
-			return s;
-		}
-
+	@Override
+	public String toString() {
+		String s = "Joint Fragment idxlist len: " + idxlist.size();
+		return s;
+	}
 
 }

@@ -32,6 +32,8 @@ import org.biojava.nbio.structure.align.util.RotationAxis;
 import org.biojava.nbio.structure.jama.Matrix;
 
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A demo for how to use {@link RotationAxis} to display the rotation for an
@@ -43,6 +45,8 @@ import java.io.IOException;
  */
 public final class DemoRotationAxis {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoRotationAxis.class);
+
 	public static void main(String[] args) {
 
 		// Compare two chains of a dimer to force CE to give a symmetric alignment.
@@ -50,9 +54,9 @@ public final class DemoRotationAxis {
 		String name2 = "1AVD.B";
 		String display = "1AVD";
 
-		//		name1 = "4HHB.A:,B:";
-		//		name2 = "4HHB.C:,D:";
-		//		display = "4HHB";
+		// name1 = "4HHB.A:,B:";
+		// name2 = "4HHB.C:,D:";
+		// display = "4HHB";
 
 		AtomCache cache = new AtomCache();
 		try {
@@ -68,11 +72,11 @@ public final class DemoRotationAxis {
 			// Calculate the axis of rotation
 			Matrix mat = afpChain.getBlockRotationMatrix()[0];
 			Atom shift = afpChain.getBlockShiftVector()[0];
-			RotationAxis axis = new RotationAxis(mat,shift);
+			RotationAxis axis = new RotationAxis(mat, shift);
 
 			// Print the angle of rotation
 			double theta = Math.toDegrees(axis.getAngle());
-			System.out.format("Angle: %f degrees%n",theta);
+			System.out.format("Angle: %f degrees%n", theta);
 
 			// Display the alignment with Jmol
 			StructureAlignmentJmol jmolPanel = new StructureAlignmentJmol();
@@ -87,41 +91,40 @@ public final class DemoRotationAxis {
 			String jmolString = axis.getJmolScript(caD);
 			jmolPanel.evalString(jmolString);
 
-
-
 			/*
-			// draw intermediate vectors for debugging
-			double width = .5;
-			Atom s = axis.getRotationPos();
-			Atom u = axis.getRotationAxis();
-			jmolPanel.evalString(String.format("draw ID s VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR orange \">s\";",
-					s.getX(),s.getY(),s.getZ(), width ));
+			 * // draw intermediate vectors for debugging double width = .5; Atom s =
+			 * axis.getRotationPos(); Atom u = axis.getRotationAxis();
+			 * jmolPanel.evalString(String.
+			 * format("draw ID s VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR orange \">s\";",
+			 * s.getX(),s.getY(),s.getZ(), width ));
+			 * 
+			 * Atom perp = axis.getOtherTranslation(); Atom screw =
+			 * axis.getScrewTranslation();
+			 * 
+			 * double uScale = 10; jmolPanel.evalString(String.
+			 * format("draw ID u VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR orange \">u\";",
+			 * uScale*u.getX(),uScale*u.getY(),uScale*u.getZ(), width ));
+			 * 
+			 * jmolPanel.evalString(String.
+			 * format("draw ID perp VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">tPerp\";"
+			 * , perp.getX(),perp.getY(),perp.getZ(), width)); jmolPanel.evalString(String.
+			 * format("draw ID screw VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">screw\";"
+			 * , screw.getX(),screw.getY(),screw.getZ(), width));
+			 * 
+			 * jmolPanel.evalString(String.
+			 * format("draw ID t VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">t\";",
+			 * shift.getX(),shift.getY(),shift.getZ(), width));
+			 * 
+			 * // draw coordinate axes jmolPanel.
+			 * evalString("draw ID x VECTOR {0,0,0} {5,0,0} WIDTH 0.5 COLOR red \">x\";");
+			 * jmolPanel.
+			 * evalString("draw ID y VECTOR {0,0,0} {0,5,0} WIDTH 0.5 COLOR green \">y\";");
+			 * jmolPanel.
+			 * evalString("draw ID z VECTOR {0,0,0} {0,0,5} WIDTH 0.5 COLOR blue \">z\";");
+			 */
 
-			Atom perp = axis.getOtherTranslation();
-			Atom screw = axis.getScrewTranslation();
-
-			double uScale = 10;
-			jmolPanel.evalString(String.format("draw ID u VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR orange \">u\";",
-					uScale*u.getX(),uScale*u.getY(),uScale*u.getZ(), width ));
-
-			jmolPanel.evalString(String.format("draw ID perp VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">tPerp\";",
-					perp.getX(),perp.getY(),perp.getZ(), width));
-			jmolPanel.evalString(String.format("draw ID screw VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">screw\";",
-					screw.getX(),screw.getY(),screw.getZ(), width));
-
-			jmolPanel.evalString(String.format("draw ID t VECTOR {0,0,0} {%f,%f,%f} WIDTH %f COLOR yellow \">t\";",
-					shift.getX(),shift.getY(),shift.getZ(), width));
-
-			// draw coordinate axes
-			jmolPanel.evalString("draw ID x VECTOR {0,0,0} {5,0,0} WIDTH 0.5 COLOR red \">x\";");
-			jmolPanel.evalString("draw ID y VECTOR {0,0,0} {0,5,0} WIDTH 0.5 COLOR green \">y\";");
-			jmolPanel.evalString("draw ID z VECTOR {0,0,0} {0,0,5} WIDTH 0.5 COLOR blue \">z\";");
-			*/
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (StructureException e) {
-			e.printStackTrace();
+		} catch (StructureException | IOException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }
