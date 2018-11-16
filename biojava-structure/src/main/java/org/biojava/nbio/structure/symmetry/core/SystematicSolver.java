@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  *
  * @author Peter
@@ -50,10 +49,10 @@ public class SystematicSolver implements QuatSymmetrySolver {
 	private RotationGroup rotations = new RotationGroup();
 	private Vector3d centroid = new Vector3d();
 	private Matrix4d centroidInverse = new Matrix4d();
-	private Set<List<Integer>> hashCodes = new HashSet<List<Integer>>();
+	private Set<List<Integer>> hashCodes = new HashSet<>();
 
 	public SystematicSolver(QuatSymmetrySubunits subunits, QuatSymmetryParameters parameters) {
-		if (subunits.getSubunitCount()== 2) {
+		if (subunits.getSubunitCount() == 2) {
 			throw new IllegalArgumentException("SystematicSolver cannot be applied to subunits with 2 centers");
 		}
 		this.subunits = subunits;
@@ -77,12 +76,12 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		// loop over all permutations
 		while (g.hasMore()) {
 			int[] perm = g.getNext();
-			List<Integer> permutation = new ArrayList<Integer>(perm.length);
+			List<Integer> permutation = new ArrayList<>(perm.length);
 			for (int j = 0; j < n; j++) {
 				permutation.add(perm[j]);
 			}
 
-			if (! isValidPermutation(permutation)) {
+			if (!isValidPermutation(permutation)) {
 				continue;
 			}
 
@@ -99,6 +98,7 @@ public class SystematicSolver implements QuatSymmetrySolver {
 
 	/**
 	 * Adds translational component to rotation matrix
+	 * 
 	 * @param rotTrans
 	 * @param rotation
 	 * @return
@@ -108,9 +108,10 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		rotation.mul(rotation, centroidInverse);
 	}
 
-	private Rotation createSymmetryOperation(List<Integer> permutation, Matrix4d transformation, AxisAngle4d axisAngle, int fold, QuatSymmetryScores scores) {
+	private Rotation createSymmetryOperation(List<Integer> permutation, Matrix4d transformation, AxisAngle4d axisAngle,
+			int fold, QuatSymmetryScores scores) {
 		Rotation s = new Rotation();
-		s.setPermutation(new ArrayList<Integer>(permutation));
+		s.setPermutation(new ArrayList<>(permutation));
 		s.setTransformation(new Matrix4d(transformation));
 		s.setAxisAngle(new AxisAngle4d(axisAngle));
 		s.setFold(fold);
@@ -126,19 +127,22 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		}
 		g.completeGroup();
 
-//   	System.out.println("Completing rotation group from: " +symmetryOperations.getSymmetryOperationCount() + " to " + g.getPermutationCount());
+		// System.out.println("Completing rotation group from: "
+		// +symmetryOperations.getSymmetryOperationCount() + " to " +
+		// g.getPermutationCount());
 
 		// the group is complete, nothing to do
 		if (g.getOrder() == rotations.getOrder()) {
 			return;
 		}
 
-//  	System.out.println("complete group: " +  rotations.getOrder() +"/" + g.getOrder());
+		// System.out.println("complete group: " + rotations.getOrder() +"/" +
+		// g.getOrder());
 		// try to complete the group
 		for (int i = 0; i < g.getOrder(); i++) {
 			List<Integer> permutation = g.getPermutation(i);
 			if (isValidPermutation(permutation)) {
-				  // perform permutation of subunits
+				// perform permutation of subunits
 				evaluatePermutation(permutation);
 			}
 		}
@@ -155,7 +159,7 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		}
 
 		// check if permutation is pseudosymmetric
-		if (! isAllowedPermuation(permutation)) {
+		if (!isAllowedPermuation(permutation)) {
 			return false;
 		}
 
@@ -176,7 +180,7 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		List<Integer> seqClusterId = subunits.getClusterIds();
 		for (int i = 0; i < permutation.size(); i++) {
 			int j = permutation.get(i);
-			if (seqClusterId.get(i) != seqClusterId.get(j)) {
+			if (!seqClusterId.get(i).equals(seqClusterId.get(j))) {
 				return false;
 			}
 		}
@@ -190,16 +194,15 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		}
 
 		int fold = PermutationGroup.getOrder(permutation);
-		
+
 		// TODO implement this piece of code using at origin superposition
-		Quat4d quat = UnitQuaternions.relativeOrientation(
-				originalCoords, transformedCoords);
+		Quat4d quat = UnitQuaternions.relativeOrientation(originalCoords, transformedCoords);
 		AxisAngle4d axisAngle = new AxisAngle4d();
 		Matrix4d transformation = new Matrix4d();
-		
+
 		transformation.set(quat);
 		axisAngle.set(quat);
-		
+
 		Vector3d axis = new Vector3d(axisAngle.x, axisAngle.y, axisAngle.z);
 		if (axis.lengthSquared() < 1.0E-6) {
 			axisAngle.x = 0;
@@ -212,25 +215,24 @@ public class SystematicSolver implements QuatSymmetrySolver {
 			axisAngle.y = axis.y;
 			axisAngle.z = axis.z;
 		}
-		
+
 		CalcPoint.transform(transformation, transformedCoords);
-		
+
 		double subunitRmsd = CalcPoint.rmsd(transformedCoords, originalCoords);
 
-		if (subunitRmsd <parameters.getRmsdThreshold()) {
-			// transform to original coordinate system
-			combineWithTranslation(transformation);
-			QuatSymmetryScores scores = QuatSuperpositionScorer.calcScores(subunits, transformation, permutation);
-			if (scores.getRmsd() < 0.0 || scores.getRmsd() > parameters.getRmsdThreshold()) {
-				return false;
-			}
-
-			scores.setRmsdCenters(subunitRmsd);
-			Rotation symmetryOperation = createSymmetryOperation(permutation, transformation, axisAngle, fold, scores);
-			rotations.addRotation(symmetryOperation);
-			return true;
+		if (subunitRmsd >= parameters.getRmsdThreshold()) {
+			return false;
 		}
-		return false;
+		// transform to original coordinate system
+		combineWithTranslation(transformation);
+		QuatSymmetryScores scores = QuatSuperpositionScorer.calcScores(subunits, transformation, permutation);
+		if (scores.getRmsd() < 0.0 || scores.getRmsd() > parameters.getRmsdThreshold()) {
+			return false;
+		}
+		scores.setRmsdCenters(subunitRmsd);
+		Rotation symmetryOperation = createSymmetryOperation(permutation, transformation, axisAngle, fold, scores);
+		rotations.addRotation(symmetryOperation);
+		return true;
 	}
 
 	private void initialize() {
@@ -241,7 +243,8 @@ public class SystematicSolver implements QuatSymmetrySolver {
 		Vector3d reverse = new Vector3d(centroid);
 		reverse.negate();
 		centroidInverse.set(reverse);
-		// Make sure matrix element m33 is 1.0. An old version vecmath did not set this element.
+		// Make sure matrix element m33 is 1.0. An old version vecmath did not set this
+		// element.
 		centroidInverse.setElement(3, 3, 1.0);
 
 		List<Point3d> centers = subunits.getCenters();

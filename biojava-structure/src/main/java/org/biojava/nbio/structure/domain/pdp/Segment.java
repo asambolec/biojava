@@ -22,8 +22,6 @@ package org.biojava.nbio.structure.domain.pdp;
 
 import java.io.Serializable;
 
-
-
 public class Segment implements Serializable, Comparable<Segment> {
 	/**
 	 *
@@ -33,19 +31,15 @@ public class Segment implements Serializable, Comparable<Segment> {
 	private Integer to;
 	double score;
 
-	public Segment(){
+	public Segment() {
 
 	}
-
-
 
 	@Override
 	public String toString() {
-		return "Segment [from=" + from + ", to=" + to + ", score=" + score
-				+ "]";
+		return new StringBuilder().append("Segment [from=").append(from).append(", to=").append(to).append(", score=")
+				.append(score).append("]").toString();
 	}
-
-
 
 	public Integer getFrom() {
 		return from;
@@ -71,8 +65,6 @@ public class Segment implements Serializable, Comparable<Segment> {
 		this.score = score;
 	}
 
-
-
 	@Override
 	public int compareTo(Segment o) {
 
@@ -80,8 +72,9 @@ public class Segment implements Serializable, Comparable<Segment> {
 		Integer s2 = o.getFrom();
 
 		int comp = s1.compareTo(s2);
-		if ( comp != 0)
+		if (comp != 0) {
 			return comp;
+		}
 
 		Integer e1 = getTo();
 		Integer e2 = o.getTo();
@@ -89,6 +82,5 @@ public class Segment implements Serializable, Comparable<Segment> {
 		return e1.compareTo(e2);
 
 	}
-
 
 }

@@ -20,7 +20,6 @@
  */
 package org.biojava.nbio.structure.io.mmcif.model;
 
-
 /**
  * A class containing the _struct_ncs_oper data
  * 
@@ -39,7 +38,7 @@ package org.biojava.nbio.structure.io.mmcif.model;
  *	_struct_ncs_oper.matrix[3][3] 
  *	_struct_ncs_oper.vector[1] 
  *	_struct_ncs_oper.vector[2] 
- *	_struct_ncs_oper.vector[3] 
+ *	_struct_ncs_oper.vector[3]
  * </pre>
  * 
  * @author Jose Duarte
@@ -49,44 +48,43 @@ public class StructNcsOper extends AbstractBean {
 	private String id;
 	private String code;
 	private String details;
-	
-	@CIFLabel(label="matrix[1][1]")
+
+	@CIFLabel(label = "matrix[1][1]")
 	private String matrix11;
-	
-	@CIFLabel(label="matrix[1][2]")
+
+	@CIFLabel(label = "matrix[1][2]")
 	private String matrix12;
-	
-	@CIFLabel(label="matrix[1][3]")
+
+	@CIFLabel(label = "matrix[1][3]")
 	private String matrix13;
-	
-	@CIFLabel(label="matrix[2][1]")
+
+	@CIFLabel(label = "matrix[2][1]")
 	private String matrix21;
-	
-	@CIFLabel(label="matrix[2][2]")
+
+	@CIFLabel(label = "matrix[2][2]")
 	private String matrix22;
-	
-	@CIFLabel(label="matrix[2][3]")
+
+	@CIFLabel(label = "matrix[2][3]")
 	private String matrix23;
-	
-	@CIFLabel(label="matrix[3][1]")
+
+	@CIFLabel(label = "matrix[3][1]")
 	private String matrix31;
-	
-	@CIFLabel(label="matrix[3][2]")
+
+	@CIFLabel(label = "matrix[3][2]")
 	private String matrix32;
-	
-	@CIFLabel(label="matrix[3][3]")
+
+	@CIFLabel(label = "matrix[3][3]")
 	private String matrix33;
-	
-	@CIFLabel(label="vector[1]")
+
+	@CIFLabel(label = "vector[1]")
 	private String vector1;
-	
-	@CIFLabel(label="vector[2]")
+
+	@CIFLabel(label = "vector[2]")
 	private String vector2;
-	
-	@CIFLabel(label="vector[3]")
+
+	@CIFLabel(label = "vector[3]")
 	private String vector3;
-	
-	
+
 	public String getId() {
 		return id;
 	}

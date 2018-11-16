@@ -32,55 +32,52 @@ import java.util.zip.GZIPInputStream;
 /**
  * Created by andreas on 6/6/16.
  */
-public class MetalBondParser  {
+public class MetalBondParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(MetalBondParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(MetalBondParser.class);
 
-    private static final String BONDS_FILE = "org/biojava/nbio/structure/bond_distance_limits.cif.gz";
+	private static final String BONDS_FILE = "org/biojava/nbio/structure/bond_distance_limits.cif.gz";
 
+	static Map<String, List<MetalBondDistance>> definitions;
 
-    static Map<String,List<MetalBondDistance>> definitions;
+	static {
+		definitions = init();
+	}
 
-    static {
-         definitions = init();
-    }
+	public static Map<String, List<MetalBondDistance>> getMetalBondDefinitions() {
+		return definitions;
 
+	}
 
-    public static Map<String,List<MetalBondDistance>> getMetalBondDefinitions(){
-        return definitions;
+	private static Map<String, List<MetalBondDistance>> init() {
 
-    }
+		InputStream inputStream = MetalBondParser.class.getClassLoader().getResourceAsStream(BONDS_FILE);
 
+		if (inputStream == null) {
+			throw new RuntimeException(new StringBuilder().append("Could not find resource ").append(BONDS_FILE)
+					.append(".  This probably means that your biojava.jar file is corrupt or incorrectly built.")
+					.toString());
+		}
 
-    private static Map<String,List<MetalBondDistance>> init(){
+		try {
+			GZIPInputStream gzIS = new GZIPInputStream(inputStream);
 
-        InputStream inputStream = MetalBondParser.class.getClassLoader().getResourceAsStream(BONDS_FILE);
+			SimpleMMcifParser parser = new SimpleMMcifParser();
 
-        if (inputStream == null) {
-            throw new RuntimeException("Could not find resource "+BONDS_FILE+".  This probably means that your biojava.jar file is corrupt or incorrectly built.");
-        }
+			MetalBondConsumer consumer = new MetalBondConsumer();
+			parser.addMMcifConsumer(consumer);
 
-        try {
-            GZIPInputStream gzIS = new GZIPInputStream(inputStream);
+			parser.parse(gzIS);
 
-            SimpleMMcifParser parser = new SimpleMMcifParser();
+			Map<String, List<MetalBondDistance>> defs = consumer.getDefinitions();
 
-            MetalBondConsumer consumer = new MetalBondConsumer();
-            parser.addMMcifConsumer(consumer);
+			return defs;
 
-            parser.parse(gzIS);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 
-            Map<String,List<MetalBondDistance>> defs = consumer.getDefinitions();
-
-            return defs;
-
-        } catch ( Exception e){
-            logger.error(e.getMessage(),e);
-
-        }
-        return null;
-    }
-
-
+		}
+		return null;
+	}
 
 }

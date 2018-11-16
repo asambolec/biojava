@@ -32,16 +32,16 @@ public class SpaceGroupMapElements {
 	@XmlElement
 	public Integer key;
 
-	@XmlElement(name="SpaceGroup", namespace="http://www.biojava.org")
+	@XmlElement(name = "SpaceGroup", namespace = "http://www.biojava.org")
 	public SpaceGroup value;
 
-	@SuppressWarnings("unused")
-	private SpaceGroupMapElements(){
-
-	}
-
-	public SpaceGroupMapElements(Integer key, SpaceGroup value){
+	public SpaceGroupMapElements(Integer key, SpaceGroup value) {
 		this.key = key;
 		this.value = value;
+	}
+
+	@SuppressWarnings("unused")
+	private SpaceGroupMapElements() {
+
 	}
 }

@@ -42,12 +42,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This class represents the storage container of a sequence stored in a fasta file where
- * the initial parsing of the file we store the offset and length of the sequence. When a call
- * is made to any method that needs sequence data then the file will be opened and the sequence
- * loaded. This class could be improved by using the hints or a some algorithm that indicates
- * the sequence data once loaded should stay loaded. Could keep track of the last time sequence
- * data was loaded and then after X amount of time clear the contents to free up memory.
+ * This class represents the storage container of a sequence stored in a fasta
+ * file where the initial parsing of the file we store the offset and length of
+ * the sequence. When a call is made to any method that needs sequence data then
+ * the file will be opened and the sequence loaded. This class could be improved
+ * by using the hints or a some algorithm that indicates the sequence data once
+ * loaded should stay loaded. Could keep track of the last time sequence data
+ * was loaded and then after X amount of time clear the contents to free up
+ * memory.
  *
  *
  * @author Scooter Willis <willishf at gmail dot com>
@@ -57,24 +59,25 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 
 	SequenceParserInterface sequenceParser;
 	private CompoundSet<C> compoundSet;
-	private List<C> parsedCompounds = new ArrayList<C>();
+	private List<C> parsedCompounds = new ArrayList<>();
 	File file;
 	long sequenceStartIndex = -1;
 	int sequenceLength = -1;
-	//private boolean initialized = false;
+	// private boolean initialized = false;
 
 	/**
 	 *
-	 * @param file The file where the sequence will be found
-	 * @param sequenceParser The parser to use to load the sequence
+	 * @param file               The file where the sequence will be found
+	 * @param sequenceParser     The parser to use to load the sequence
 	 * @param sequenceStartIndex The file offset to the start of the sequence
-	 * @param sequenceLength The length of the sequence
+	 * @param sequenceLength     The length of the sequence
 	 * @param compoundSet
-	 * @throws IOException if problems occur while reading the file
-	 * @throws CompoundNotFoundException if a compound in the sequence can't be found in the given compoundSet
+	 * @throws IOException               if problems occur while reading the file
+	 * @throws CompoundNotFoundException if a compound in the sequence can't be
+	 *                                   found in the given compoundSet
 	 */
-	public SequenceFileProxyLoader(File file, SequenceParserInterface sequenceParser, long sequenceStartIndex, int sequenceLength, CompoundSet<C> compoundSet)
-			throws IOException, CompoundNotFoundException {
+	public SequenceFileProxyLoader(File file, SequenceParserInterface sequenceParser, long sequenceStartIndex,
+			int sequenceLength, CompoundSet<C> compoundSet) throws IOException, CompoundNotFoundException {
 		this.sequenceParser = sequenceParser;
 		this.file = file;
 		this.sequenceStartIndex = sequenceStartIndex;
@@ -94,7 +97,8 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 	}
 
 	/**
-	 *  Load the sequence
+	 * Load the sequence
+	 * 
 	 * @return
 	 */
 	private boolean init() throws IOException, CompoundNotFoundException {
@@ -120,12 +124,14 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 		for (int i = 0; i < sequence.length();) {
 			String compoundStr = null;
 			C compound = null;
-			for (int compoundStrLength = 1; compound == null && compoundStrLength <= compoundSet.getMaxSingleCompoundStringLength(); compoundStrLength++) {
+			for (int compoundStrLength = 1; compound == null
+					&& compoundStrLength <= compoundSet.getMaxSingleCompoundStringLength(); compoundStrLength++) {
 				compoundStr = sequence.substring(i, i + compoundStrLength);
 				compound = compoundSet.getCompoundForString(compoundStr);
 			}
 			if (compound == null) {
-				throw new CompoundNotFoundException("Compound "+compoundStr+" not found");
+				throw new CompoundNotFoundException(
+						new StringBuilder().append("Compound ").append(compoundStr).append(" not found").toString());
 			} else {
 				i += compoundStr.length();
 			}
@@ -204,7 +210,7 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 	 */
 	public String getSequenceAsString(Integer bioBegin, Integer bioEnd, Strand strand) {
 
-		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<C>();
+		SequenceAsStringHelper<C> sequenceAsStringHelper = new SequenceAsStringHelper<>();
 		return sequenceAsStringHelper.getSequenceAsString(this.parsedCompounds, compoundSet, bioBegin, bioEnd, strand);
 	}
 
@@ -222,31 +228,34 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 	@Override
 	public boolean equals(Object o) {
 
-		if(! Equals.classEqual(this, o)) {
+		if (!Equals.classEqual(this, o)) {
 			return false;
 		}
 
-		Sequence<C> other = (Sequence<C>)o;
-		if ( other.getCompoundSet() != getCompoundSet())
+		Sequence<C> other = (Sequence<C>) o;
+		if (other.getCompoundSet() != getCompoundSet()) {
 			return false;
+		}
 
 		List<C> rawCompounds = getAsList();
 		List<C> otherCompounds = other.getAsList();
 
-		if ( rawCompounds.size() != otherCompounds.size())
+		if (rawCompounds.size() != otherCompounds.size()) {
 			return false;
+		}
 
-		for (int i = 0 ; i < rawCompounds.size() ; i++){
+		for (int i = 0; i < rawCompounds.size(); i++) {
 			Compound myCompound = rawCompounds.get(i);
 			Compound otherCompound = otherCompounds.get(i);
-			if ( ! myCompound.equalsIgnoreCase(otherCompound))
+			if (!myCompound.equalsIgnoreCase(otherCompound)) {
 				return false;
+			}
 		}
 		return true;
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		String s = getSequenceAsString();
 		return s.hashCode();
 	}
@@ -260,7 +269,7 @@ public class SequenceFileProxyLoader<C extends Compound> implements ProxySequenc
 	@Override
 	public SequenceView<C> getSubSequence(final Integer bioBegin, final Integer bioEnd) {
 
-		return new SequenceProxyView<C>(SequenceFileProxyLoader.this, bioBegin, bioEnd);
+		return new SequenceProxyView<>(SequenceFileProxyLoader.this, bioBegin, bioEnd);
 	}
 
 	/**

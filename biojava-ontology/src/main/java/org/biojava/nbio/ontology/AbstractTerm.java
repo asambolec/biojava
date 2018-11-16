@@ -21,25 +21,22 @@
 
 package org.biojava.nbio.ontology;
 
-
-
-
 /**
  * Abstract implementation of term
  *
- * This provides basic change-forwarding functionality from
- *                the annotation and ontology properties.
+ * This provides basic change-forwarding functionality from the annotation and
+ * ontology properties.
  *
  * @author Thomas Down
  * @since 1.4
  */
 
-public abstract class AbstractTerm  implements Term {
+public abstract class AbstractTerm implements Term {
 
 	protected String description;
 
 	@Override
-	public  void setDescription(String description){
+	public void setDescription(String description) {
 		this.description = description;
 	}
 }

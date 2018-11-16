@@ -28,14 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * It is common to have a numerical value or values associated with a feature. This can then
- * be used in heat maps or other visual indicators when viewing a sequence. Multiple quantities
- * could represent a time corse study and display a color gradient
+ * It is common to have a numerical value or values associated with a feature.
+ * This can then be used in heat maps or other visual indicators when viewing a
+ * sequence. Multiple quantities could represent a time corse study and display
+ * a color gradient
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class QuantityFeature<S extends AbstractSequence<C>, C extends Compound> extends AbstractFeature<S, C> {
 
-	private List<Number> quantities = new ArrayList<Number>();
+	private List<Number> quantities = new ArrayList<>();
 
 	/**
 	 *

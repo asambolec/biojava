@@ -31,6 +31,8 @@ import org.biojava.nbio.structure.secstruc.DSSPParser;
 import org.biojava.nbio.structure.secstruc.SecStrucCalc;
 import org.biojava.nbio.structure.secstruc.SecStrucInfo;
 import org.biojava.nbio.structure.secstruc.SecStrucTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Demonstration of how to load a Structure with the SS information, either from
@@ -42,8 +44,9 @@ import org.biojava.nbio.structure.secstruc.SecStrucTools;
  */
 public class DemoLoadSecStruc {
 
-	public static void main(String[] args) throws IOException,
-			StructureException {
+	private static final Logger logger = LoggerFactory.getLogger(DemoLoadSecStruc.class);
+
+	public static void main(String[] args) throws IOException, StructureException {
 
 		String pdbID = "5pti";
 
@@ -61,31 +64,29 @@ public class DemoLoadSecStruc {
 		Structure s = cache.getStructure(pdbID);
 
 		// Print the Author's assignment (from PDB file)
-		System.out.println("Author's assignment: ");
+		logger.info("Author's assignment: ");
 		printSecStruc(s);
 
 		// If the more detailed DSSP prediction is required call this
 		DSSPParser.fetch(pdbID, s, true);
 
 		// Print the assignment residue by residue
-		System.out.println("DSSP assignment: ");
+		logger.info("DSSP assignment: ");
 		printSecStruc(s);
 
 		// finally use BioJava's built in DSSP-like secondary structure assigner
 		SecStrucCalc secStrucCalc = new SecStrucCalc();
 
 		// calculate and assign
-		secStrucCalc.calculate(s,true);
+		secStrucCalc.calculate(s, true);
 		printSecStruc(s);
 
 	}
 
-	public static void printSecStruc(Structure s){
+	public static void printSecStruc(Structure s) {
 		List<SecStrucInfo> ssi = SecStrucTools.getSecStrucInfo(s);
-		for (SecStrucInfo ss : ssi) {
-			System.out.println(ss.getGroup().getChain().getName() + " "
-					+ ss.getGroup().getResidueNumber() + " "
-					+ ss.getGroup().getPDBName() + " -> " + ss.toString());
-		}
+		ssi.forEach(ss -> logger.info(new StringBuilder().append(ss.getGroup().getChain().getName()).append(" ")
+				.append(ss.getGroup().getResidueNumber()).append(" ").append(ss.getGroup().getPDBName()).append(" -> ")
+				.append(ss.toString()).toString()));
 	}
 }

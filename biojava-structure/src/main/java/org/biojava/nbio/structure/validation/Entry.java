@@ -25,7 +25,6 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
@@ -34,11 +33,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -168,7 +169,6 @@ public class Entry {
 	@XmlAttribute(name = "relative-percentile-DCC_Rfree", required = false)
 	protected BigDecimal relativePercentileDCCRfree;
 
-
 	@XmlAttribute(name = "RNAsuiteness", required = false)
 	protected BigDecimal rnaSuiteness;
 
@@ -177,7 +177,6 @@ public class Entry {
 
 	@XmlAttribute(name = "relative-percentile-RNAsuiteness", required = false)
 	protected BigDecimal relativePercentileRNAsuiteness;
-
 
 	@XmlAttribute(name = "acentric_outliers", required = true)
 	protected BigInteger acentricOutliers;
@@ -221,9 +220,7 @@ public class Entry {
 	/**
 	 * Gets the value of the ccp4Version property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getCCP4Version() {
@@ -233,9 +230,7 @@ public class Entry {
 	/**
 	 * Sets the value of the ccp4Version property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setCCP4Version(String value) {
@@ -245,9 +240,7 @@ public class Entry {
 	/**
 	 * Gets the value of the dccr property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getDCCR() {
@@ -257,9 +250,7 @@ public class Entry {
 	/**
 	 * Sets the value of the dccr property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setDCCR(BigDecimal value) {
@@ -269,9 +260,7 @@ public class Entry {
 	/**
 	 * Gets the value of the dccRfree property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getDCCRfree() {
@@ -281,9 +270,7 @@ public class Entry {
 	/**
 	 * Sets the value of the dccRfree property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setDCCRfree(String value) {
@@ -293,9 +280,7 @@ public class Entry {
 	/**
 	 * Gets the value of the dccRefinementProgram property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getDCCRefinementProgram() {
@@ -305,9 +290,7 @@ public class Entry {
 	/**
 	 * Sets the value of the dccRefinementProgram property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setDCCRefinementProgram(String value) {
@@ -317,9 +300,7 @@ public class Entry {
 	/**
 	 * Gets the value of the dataAnisotropy property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getDataAnisotropy() {
@@ -329,9 +310,7 @@ public class Entry {
 	/**
 	 * Sets the value of the dataAnisotropy property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setDataAnisotropy(BigDecimal value) {
@@ -341,9 +320,7 @@ public class Entry {
 	/**
 	 * Gets the value of the dataCompleteness property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getDataCompleteness() {
@@ -353,9 +330,7 @@ public class Entry {
 	/**
 	 * Sets the value of the dataCompleteness property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setDataCompleteness(BigDecimal value) {
@@ -365,9 +340,7 @@ public class Entry {
 	/**
 	 * Gets the value of the edsr property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getEDSR() {
@@ -377,9 +350,7 @@ public class Entry {
 	/**
 	 * Sets the value of the edsr property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setEDSR(BigDecimal value) {
@@ -389,9 +360,7 @@ public class Entry {
 	/**
 	 * Gets the value of the edsResolution property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getEDSResolution() {
@@ -401,9 +370,7 @@ public class Entry {
 	/**
 	 * Sets the value of the edsResolution property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setEDSResolution(BigDecimal value) {
@@ -413,9 +380,7 @@ public class Entry {
 	/**
 	 * Gets the value of the edsResolutionLow property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getEDSResolutionLow() {
@@ -425,9 +390,7 @@ public class Entry {
 	/**
 	 * Sets the value of the edsResolutionLow property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setEDSResolutionLow(BigDecimal value) {
@@ -437,9 +400,7 @@ public class Entry {
 	/**
 	 * Gets the value of the foFcCorrelation property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getFoFcCorrelation() {
@@ -449,9 +410,7 @@ public class Entry {
 	/**
 	 * Sets the value of the foFcCorrelation property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setFoFcCorrelation(BigDecimal value) {
@@ -461,9 +420,7 @@ public class Entry {
 	/**
 	 * Gets the value of the ioverSigma property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getIoverSigma() {
@@ -473,9 +430,7 @@ public class Entry {
 	/**
 	 * Sets the value of the ioverSigma property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setIoverSigma(String value) {
@@ -485,9 +440,7 @@ public class Entry {
 	/**
 	 * Gets the value of the pdbRevisionNumber property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getPDBRevisionNumber() {
@@ -497,9 +450,7 @@ public class Entry {
 	/**
 	 * Sets the value of the pdbRevisionNumber property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setPDBRevisionNumber(BigInteger value) {
@@ -509,9 +460,7 @@ public class Entry {
 	/**
 	 * Gets the value of the refmacVersion property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getRefmacVersion() {
@@ -521,9 +470,7 @@ public class Entry {
 	/**
 	 * Sets the value of the refmacVersion property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setRefmacVersion(String value) {
@@ -533,9 +480,7 @@ public class Entry {
 	/**
 	 * Gets the value of the restypesNotcheckedForBondAngleGeometry property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getRestypesNotcheckedForBondAngleGeometry() {
@@ -545,9 +490,7 @@ public class Entry {
 	/**
 	 * Sets the value of the restypesNotcheckedForBondAngleGeometry property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setRestypesNotcheckedForBondAngleGeometry(String value) {
@@ -557,9 +500,7 @@ public class Entry {
 	/**
 	 * Gets the value of the transNCS property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getTransNCS() {
@@ -569,9 +510,7 @@ public class Entry {
 	/**
 	 * Sets the value of the transNCS property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setTransNCS(String value) {
@@ -581,9 +520,7 @@ public class Entry {
 	/**
 	 * Gets the value of the twinFraction property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getTwinFraction() {
@@ -593,9 +530,7 @@ public class Entry {
 	/**
 	 * Sets the value of the twinFraction property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setTwinFraction(String value) {
@@ -605,9 +540,7 @@ public class Entry {
 	/**
 	 * Gets the value of the twinL property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getTwinL() {
@@ -617,9 +550,7 @@ public class Entry {
 	/**
 	 * Sets the value of the twinL property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setTwinL(BigDecimal value) {
@@ -629,9 +560,7 @@ public class Entry {
 	/**
 	 * Gets the value of the twinL2 property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getTwinL2() {
@@ -641,9 +570,7 @@ public class Entry {
 	/**
 	 * Sets the value of the twinL2 property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setTwinL2(BigDecimal value) {
@@ -653,9 +580,7 @@ public class Entry {
 	/**
 	 * Gets the value of the wilsonBaniso property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getWilsonBaniso() {
@@ -665,9 +590,7 @@ public class Entry {
 	/**
 	 * Sets the value of the wilsonBaniso property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setWilsonBaniso(String value) {
@@ -677,9 +600,7 @@ public class Entry {
 	/**
 	 * Gets the value of the wilsonBestimate property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getWilsonBestimate() {
@@ -689,9 +610,7 @@ public class Entry {
 	/**
 	 * Sets the value of the wilsonBestimate property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setWilsonBestimate(BigDecimal value) {
@@ -701,9 +620,7 @@ public class Entry {
 	/**
 	 * Gets the value of the xmLcreationDate property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getXMLcreationDate() {
@@ -713,9 +630,7 @@ public class Entry {
 	/**
 	 * Sets the value of the xmLcreationDate property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setXMLcreationDate(String value) {
@@ -725,9 +640,7 @@ public class Entry {
 	/**
 	 * Gets the value of the absolutePercentileClashscore property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getAbsolutePercentileClashscore() {
@@ -737,9 +650,7 @@ public class Entry {
 	/**
 	 * Sets the value of the absolutePercentileClashscore property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setAbsolutePercentileClashscore(BigDecimal value) {
@@ -749,9 +660,7 @@ public class Entry {
 	/**
 	 * Gets the value of the absolutePercentilePercentRSRZOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getAbsolutePercentilePercentRSRZOutliers() {
@@ -761,9 +670,7 @@ public class Entry {
 	/**
 	 * Sets the value of the absolutePercentilePercentRSRZOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setAbsolutePercentilePercentRSRZOutliers(BigDecimal value) {
@@ -773,9 +680,7 @@ public class Entry {
 	/**
 	 * Gets the value of the absolutePercentilePercentRamaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getAbsolutePercentilePercentRamaOutliers() {
@@ -785,9 +690,7 @@ public class Entry {
 	/**
 	 * Sets the value of the absolutePercentilePercentRamaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setAbsolutePercentilePercentRamaOutliers(BigDecimal value) {
@@ -797,9 +700,7 @@ public class Entry {
 	/**
 	 * Gets the value of the absolutePercentilePercentRotaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getAbsolutePercentilePercentRotaOutliers() {
@@ -809,9 +710,7 @@ public class Entry {
 	/**
 	 * Sets the value of the absolutePercentilePercentRotaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setAbsolutePercentilePercentRotaOutliers(BigDecimal value) {
@@ -822,8 +721,7 @@ public class Entry {
 		return absolutePercentileDCCRfree;
 	}
 
-	public void setAbsolutePercentileDCCRfree(
-			BigDecimal absolutePercentileDCCRfree) {
+	public void setAbsolutePercentileDCCRfree(BigDecimal absolutePercentileDCCRfree) {
 		this.absolutePercentileDCCRfree = absolutePercentileDCCRfree;
 	}
 
@@ -831,17 +729,14 @@ public class Entry {
 		return relativePercentileDCCRfree;
 	}
 
-	public void setRelativePercentileDCCRfree(
-			BigDecimal relativePercentileDCCRfree) {
+	public void setRelativePercentileDCCRfree(BigDecimal relativePercentileDCCRfree) {
 		this.relativePercentileDCCRfree = absolutePercentileDCCRfree;
 	}
 
 	/**
 	 * Gets the value of the acentricOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getAcentricOutliers() {
@@ -851,9 +746,7 @@ public class Entry {
 	/**
 	 * Sets the value of the acentricOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setAcentricOutliers(BigInteger value) {
@@ -863,9 +756,7 @@ public class Entry {
 	/**
 	 * Gets the value of the attemptedValidationSteps property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAttemptedValidationSteps() {
@@ -875,9 +766,7 @@ public class Entry {
 	/**
 	 * Sets the value of the attemptedValidationSteps property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAttemptedValidationSteps(String value) {
@@ -887,9 +776,7 @@ public class Entry {
 	/**
 	 * Gets the value of the bulkSolventB property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getBulkSolventB() {
@@ -899,9 +786,7 @@ public class Entry {
 	/**
 	 * Sets the value of the bulkSolventB property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setBulkSolventB(BigDecimal value) {
@@ -911,9 +796,7 @@ public class Entry {
 	/**
 	 * Gets the value of the bulkSolventK property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getBulkSolventK() {
@@ -923,9 +806,7 @@ public class Entry {
 	/**
 	 * Sets the value of the bulkSolventK property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setBulkSolventK(BigDecimal value) {
@@ -935,9 +816,7 @@ public class Entry {
 	/**
 	 * Gets the value of the centricOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getCentricOutliers() {
@@ -947,9 +826,7 @@ public class Entry {
 	/**
 	 * Sets the value of the centricOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setCentricOutliers(BigInteger value) {
@@ -959,9 +836,7 @@ public class Entry {
 	/**
 	 * Gets the value of the clashscore property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getClashscore() {
@@ -971,9 +846,7 @@ public class Entry {
 	/**
 	 * Sets the value of the clashscore property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setClashscore(BigDecimal value) {
@@ -983,9 +856,7 @@ public class Entry {
 	/**
 	 * Gets the value of the numHReduce property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNumHReduce() {
@@ -995,9 +866,7 @@ public class Entry {
 	/**
 	 * Sets the value of the numHReduce property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNumHReduce(BigInteger value) {
@@ -1007,9 +876,7 @@ public class Entry {
 	/**
 	 * Gets the value of the numFreeReflections property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNumFreeReflections() {
@@ -1019,9 +886,7 @@ public class Entry {
 	/**
 	 * Sets the value of the numFreeReflections property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNumFreeReflections(BigInteger value) {
@@ -1031,9 +896,7 @@ public class Entry {
 	/**
 	 * Gets the value of the numMillerIndices property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNumMillerIndices() {
@@ -1043,9 +906,7 @@ public class Entry {
 	/**
 	 * Sets the value of the numMillerIndices property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNumMillerIndices(BigInteger value) {
@@ -1055,9 +916,7 @@ public class Entry {
 	/**
 	 * Gets the value of the percentRSRZOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPercentRSRZOutliers() {
@@ -1067,9 +926,7 @@ public class Entry {
 	/**
 	 * Sets the value of the percentRSRZOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPercentRSRZOutliers(BigDecimal value) {
@@ -1079,9 +936,7 @@ public class Entry {
 	/**
 	 * Gets the value of the percentFreeReflections property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPercentFreeReflections() {
@@ -1091,9 +946,7 @@ public class Entry {
 	/**
 	 * Sets the value of the percentFreeReflections property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPercentFreeReflections(BigDecimal value) {
@@ -1103,9 +956,7 @@ public class Entry {
 	/**
 	 * Gets the value of the percentRamaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPercentRamaOutliers() {
@@ -1115,9 +966,7 @@ public class Entry {
 	/**
 	 * Sets the value of the percentRamaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPercentRamaOutliers(BigDecimal value) {
@@ -1127,9 +976,7 @@ public class Entry {
 	/**
 	 * Gets the value of the percentRotaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getPercentRotaOutliers() {
@@ -1139,9 +986,7 @@ public class Entry {
 	/**
 	 * Sets the value of the percentRotaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setPercentRotaOutliers(BigDecimal value) {
@@ -1151,9 +996,7 @@ public class Entry {
 	/**
 	 * Gets the value of the relativePercentileClashscore property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRelativePercentileClashscore() {
@@ -1163,9 +1006,7 @@ public class Entry {
 	/**
 	 * Sets the value of the relativePercentileClashscore property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRelativePercentileClashscore(BigDecimal value) {
@@ -1175,9 +1016,7 @@ public class Entry {
 	/**
 	 * Gets the value of the relativePercentilePercentRSRZOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRelativePercentilePercentRSRZOutliers() {
@@ -1187,9 +1026,7 @@ public class Entry {
 	/**
 	 * Sets the value of the relativePercentilePercentRSRZOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRelativePercentilePercentRSRZOutliers(BigDecimal value) {
@@ -1199,9 +1036,7 @@ public class Entry {
 	/**
 	 * Gets the value of the relativePercentilePercentRamaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRelativePercentilePercentRamaOutliers() {
@@ -1211,9 +1046,7 @@ public class Entry {
 	/**
 	 * Sets the value of the relativePercentilePercentRamaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRelativePercentilePercentRamaOutliers(BigDecimal value) {
@@ -1223,9 +1056,7 @@ public class Entry {
 	/**
 	 * Gets the value of the relativePercentilePercentRotaOutliers property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getRelativePercentilePercentRotaOutliers() {
@@ -1235,9 +1066,7 @@ public class Entry {
 	/**
 	 * Sets the value of the relativePercentilePercentRotaOutliers property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setRelativePercentilePercentRotaOutliers(BigDecimal value) {
@@ -1247,9 +1076,7 @@ public class Entry {
 	/**
 	 * Gets the value of the xtriageInputColumns property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getXtriageInputColumns() {
@@ -1259,9 +1086,7 @@ public class Entry {
 	/**
 	 * Sets the value of the xtriageInputColumns property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setXtriageInputColumns(String value) {
@@ -1280,8 +1105,7 @@ public class Entry {
 		return absolutePercentialRNAsuiteness;
 	}
 
-	public void setAbsolutePercentialRNAsuiteness(
-			BigDecimal absolutePercentialRNAsuiteness) {
+	public void setAbsolutePercentialRNAsuiteness(BigDecimal absolutePercentialRNAsuiteness) {
 		this.absolutePercentialRNAsuiteness = absolutePercentialRNAsuiteness;
 	}
 
@@ -1289,11 +1113,8 @@ public class Entry {
 		return relativePercentileRNAsuiteness;
 	}
 
-	public void setRelativePercentileRNAsuiteness(
-			BigDecimal relativePercentileRNAsuiteness) {
+	public void setRelativePercentileRNAsuiteness(BigDecimal relativePercentileRNAsuiteness) {
 		this.relativePercentileRNAsuiteness = relativePercentileRNAsuiteness;
 	}
-
-
 
 }

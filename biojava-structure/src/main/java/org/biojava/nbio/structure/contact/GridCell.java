@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.vecmath.Point3d;
 
-
 /**
  * A grid cell to be used in contact calculation via spatial hashing algorithm.
  *
@@ -34,22 +33,21 @@ import javax.vecmath.Point3d;
  */
 public class GridCell {
 
-
 	private Grid grid;
 	private ArrayList<Integer> iIndices;
 	private ArrayList<Integer> jIndices;
 
-	public GridCell(Grid parent){
-		iIndices = new ArrayList<Integer>();
-		jIndices = new ArrayList<Integer>();
+	public GridCell(Grid parent) {
+		iIndices = new ArrayList<>();
+		jIndices = new ArrayList<>();
 		this.grid = parent;
 	}
 
-	public void addIindex(int serial){
+	public void addIindex(int serial) {
 		iIndices.add(serial);
 	}
 
-	public void addJindex(int serial){
+	public void addJindex(int serial) {
 		jIndices.add(serial);
 	}
 
@@ -62,117 +60,132 @@ public class GridCell {
 	}
 
 	/**
-	 * Calculates all distances of atoms within this cell returning those that are within the given cutoff
-	 * as a list of Contacts containing the indices of the pair and the calculated distance.
+	 * Calculates all distances of atoms within this cell returning those that are
+	 * within the given cutoff as a list of Contacts containing the indices of the
+	 * pair and the calculated distance.
 	 * 
 	 * If {@link Grid#getJAtoms()} is null, distances are within the iAtoms only
+	 * 
 	 * @return
 	 */
-	public List<Contact> getContactsWithinCell(){
+	public List<Contact> getContactsWithinCell() {
 
-		List<Contact> contacts = new ArrayList<Contact>();
-		
+		List<Contact> contacts = new ArrayList<>();
+
 		Point3d[] iAtoms = grid.getIAtoms();
 		Point3d[] jAtoms = grid.getJAtoms();
 		double cutoff = grid.getCutoff();
 
-		if (jAtoms==null) {
-			for (int i:iIndices) {
-				for (int j:iIndices) {
-					if (j>i) {
-						double distance = iAtoms[i].distance(iAtoms[j]);
-						if (distance<cutoff) contacts.add(new Contact(i, j, distance));
-					}
-				}
-			}
+		if (jAtoms == null) {
+			iIndices.stream().mapToInt(Integer::valueOf)
+					.forEach(i -> iIndices.stream().mapToInt(Integer::valueOf).forEach(j -> {
+						if (j > i) {
+							double distance = iAtoms[i].distance(iAtoms[j]);
+							if (distance < cutoff) {
+								contacts.add(new Contact(i, j, distance));
+							}
+						}
+					}));
 
 		} else {
-			for (int i:iIndices) {
-				for (int j:jIndices) {
-					double distance = iAtoms[i].distance(jAtoms[j]);
-					if (distance<cutoff) contacts.add(new Contact(i, j, distance));
-				}
-			}
+			iIndices.stream().mapToInt(Integer::valueOf)
+					.forEach(i -> jIndices.stream().mapToInt(Integer::valueOf).forEach(j -> {
+						double distance = iAtoms[i].distance(jAtoms[j]);
+						if (distance < cutoff) {
+							contacts.add(new Contact(i, j, distance));
+						}
+					}));
 		}
 
 		return contacts;
 	}
 
 	/**
-	 * Calculates all distances of atoms between this cell and the given cell returning those that are
-	 * within the given cutoff as a list of Contacts containing the indices of the pair and the calculated distance.
+	 * Calculates all distances of atoms between this cell and the given cell
+	 * returning those that are within the given cutoff as a list of Contacts
+	 * containing the indices of the pair and the calculated distance.
 	 * 
 	 * @param otherCell
-	 * @param iAtoms the first set of atom coordinates to which the iIndices correspond
-	 * @param jAtoms the second set of atom coordinates to which the jIndices correspond, if null distances are within the iAtoms only
+	 * @param iAtoms    the first set of atom coordinates to which the iIndices
+	 *                  correspond
+	 * @param jAtoms    the second set of atom coordinates to which the jIndices
+	 *                  correspond, if null distances are within the iAtoms only
 	 * @param cutoff
 	 * @return
 	 */
-	public List<Contact> getContactsToOtherCell(GridCell otherCell){
+	public List<Contact> getContactsToOtherCell(GridCell otherCell) {
 
-		List<Contact> contacts = new ArrayList<Contact>();
+		List<Contact> contacts = new ArrayList<>();
 
 		Point3d[] iAtoms = grid.getIAtoms();
 		Point3d[] jAtoms = grid.getJAtoms();
 		double cutoff = grid.getCutoff();
 
-		
-		if (jAtoms==null) {
+		if (jAtoms == null) {
 
-			for (int i:iIndices) {
-				for (int j:otherCell.iIndices) {
-					if (j>i) {
-						double distance = iAtoms[i].distance(iAtoms[j]);
-						if (distance<cutoff) contacts.add(new Contact(i, j, distance));
-					}
-				}
-			}
+			iIndices.stream().mapToInt(Integer::valueOf)
+					.forEach(i -> otherCell.iIndices.stream().mapToInt(Integer::valueOf).forEach(j -> {
+						if (j > i) {
+							double distance = iAtoms[i].distance(iAtoms[j]);
+							if (distance < cutoff) {
+								contacts.add(new Contact(i, j, distance));
+							}
+						}
+					}));
 
 		} else {
 
-			for (int i:iIndices) {
-				for (int j:otherCell.jIndices) {
-					double distance = iAtoms[i].distance(jAtoms[j]);
-					if (distance<cutoff) contacts.add(new Contact(i, j, distance));
-				}
-			}
+			iIndices.stream().mapToInt(Integer::valueOf)
+					.forEach(i -> otherCell.jIndices.stream().mapToInt(Integer::valueOf).forEach(j -> {
+						double distance = iAtoms[i].distance(jAtoms[j]);
+						if (distance < cutoff) {
+							contacts.add(new Contact(i, j, distance));
+						}
+					}));
 
 		}
 
 		return contacts;
 	}
-	
+
 	/**
-	 * Tests whether any atom in this cell has a contact with the specified query atom
+	 * Tests whether any atom in this cell has a contact with the specified query
+	 * atom
+	 * 
 	 * @param iAtoms the first set of atoms to which the iIndices correspond
-	 * @param jAtoms the second set of atoms to which the jIndices correspond, or null
-	 * @param query test point
+	 * @param jAtoms the second set of atoms to which the jIndices correspond, or
+	 *               null
+	 * @param query  test point
 	 * @param cutoff
 	 * @return
 	 */
 	public boolean hasContactToAtom(Point3d[] iAtoms, Point3d[] jAtoms, Point3d query, double cutoff) {
-		for( int i : iIndices ) {
+		for (int i : iIndices) {
 			double distance = iAtoms[i].distance(query);
-			if( distance<cutoff)
+			if (distance < cutoff) {
 				return true;
+			}
 		}
-		if (jAtoms!=null) {
-			for( int i : jIndices ) {
+		if (jAtoms != null) {
+			for (int i : jIndices) {
 				double distance = jAtoms[i].distance(query);
-				if( distance<cutoff)
+				if (distance < cutoff) {
 					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return String.format("GridCell [%d iAtoms,%d jAtoms]",iIndices.size(),jIndices==null?"-":jIndices.size());
+		return String.format("GridCell [%d iAtoms,%d jAtoms]", iIndices.size(),
+				jIndices == null ? "-" : jIndices.size());
 	}
 
-	
 }

@@ -32,8 +32,11 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** A class to wrap some of the strucutre.gui classes using Reflection
+/**
+ * A class to wrap some of the strucutre.gui classes using Reflection
  *
  * @author Andreas Prlic
  *
@@ -41,10 +44,12 @@ import java.util.List;
 
 public class GuiWrapper {
 
+	private static final Logger logger = LoggerFactory.getLogger(GuiWrapper.class);
+
 	static final String guiPackage = "org.biojava.nbio.structure.gui";
 
 	static final String strucAlignmentDisplay = "org.biojava.nbio.structure.align.gui.StructureAlignmentDisplay";
-	static final String displayAFP   = "org.biojava.nbio.structure.align.gui.DisplayAFP" ;
+	static final String displayAFP = "org.biojava.nbio.structure.align.gui.DisplayAFP";
 	static final String alignmentGUI = "org.biojava.nbio.structure.align.gui.AlignmentGui";
 	static final String strucAligJmol = "org.biojava.nbio.structure.align.gui.jmol.StructureAlignmentJmol";
 	static final String abstractAligJmol = "org.biojava.nbio.structure.align.gui.jmol.AbstractAlignmentJmol";
@@ -52,12 +57,13 @@ public class GuiWrapper {
 	static final String scaleMatrixPanel = "org.biojava.nbio.structure.gui.ScaleableMatrixPanel";
 
 	@SuppressWarnings("rawtypes")
-	public static boolean isGuiModuleInstalled(){
+	public static boolean isGuiModuleInstalled() {
 		String className = displayAFP;
 		try {
 			@SuppressWarnings("unused")
 			Class c = Class.forName(className);
-		} catch (ClassNotFoundException ex){
+		} catch (ClassNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
 			return false;
 		}
 		return true;
@@ -65,71 +71,65 @@ public class GuiWrapper {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Object display(AFPChain afpChain, Atom[] ca1, Atom[] ca2)
-			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException{
+			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
 		Class c = Class.forName(strucAlignmentDisplay);
 
-		Method display = c.getMethod("display", new Class[]{AFPChain.class, Atom[].class,
-				Atom[].class});
+		Method display = c.getMethod("display", new Class[] { AFPChain.class, Atom[].class, Atom[].class });
 
-		Object structureAlignmentJmol = display.invoke(null, afpChain,ca1,ca2);
+		Object structureAlignmentJmol = display.invoke(null, afpChain, ca1, ca2);
 
 		return structureAlignmentJmol;
 	}
 
-
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void showAlignmentImage(AFPChain afpChain, Atom[] ca1,
-			Atom[] ca2, Object jmol)
-					throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException{
+	public static void showAlignmentImage(AFPChain afpChain, Atom[] ca1, Atom[] ca2, Object jmol)
+			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
 		Class abstractAligJmolC = Class.forName(abstractAligJmol);
 
 		Class c = Class.forName(displayAFP);
-		Method show = c.getMethod("showAlignmentPanel", new Class[] {AFPChain.class, Atom[].class, Atom[].class, abstractAligJmolC});
+		Method show = c.getMethod("showAlignmentPanel",
+				new Class[] { AFPChain.class, Atom[].class, Atom[].class, abstractAligJmolC });
 
-		show.invoke(null,afpChain, ca1, ca2, jmol);
+		show.invoke(null, afpChain, ca1, ca2, jmol);
 	}
 
-
-	/** Shows a structure in Jmol
+	/**
+	 * Shows a structure in Jmol
+	 * 
 	 * @since 3.0.5
 	 */
-	public static void showStructure(Structure structure)
-			throws ClassNotFoundException, NoSuchMethodException,
-			InvocationTargetException, IllegalAccessException, InstantiationException{
+	public static void showStructure(Structure structure) throws ClassNotFoundException, NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, InstantiationException {
 
 		Class<?> structureAlignmentJmol = Class.forName(strucAligJmol);
 
 		Object strucAligJ = structureAlignmentJmol.newInstance();
 
-		Method setS = structureAlignmentJmol.getMethod("setStructure", new Class[] {Structure.class});
+		Method setS = structureAlignmentJmol.getMethod("setStructure", new Class[] { Structure.class });
 
-		setS.invoke(strucAligJ,structure);
+		setS.invoke(strucAligJ, structure);
 	}
-
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void showAlignmentGUI()
 			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		// proxy for AlignmentGui.getInstance();
 
-
 		Class c = Class.forName(alignmentGUI);
-		Method m = c.getMethod("getInstance", (Class[])null);
-		m.invoke(c,(Object[])null);
+		Method m = c.getMethod("getInstance", (Class[]) null);
+		m.invoke(c, (Object[]) null);
 	}
 
-	@SuppressWarnings({"unused" })
+	@SuppressWarnings({ "unused" })
 	public static Structure getAlignedStructure(Atom[] ca1, Atom[] ca2)
-			throws ClassNotFoundException, NoSuchMethodException,
-			InvocationTargetException, IllegalAccessException{
+			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
 		Class<?> structureAlignmentJmol = Class.forName(strucAligJmol);
 
 		Class<?> c = Class.forName(displayAFP);
-		Method show = c.getMethod("getAlignedStructure", new Class[] { Atom[].class, Atom[].class});
+		Method show = c.getMethod("getAlignedStructure", new Class[] { Atom[].class, Atom[].class });
 
 		Structure s = (Structure) show.invoke(null, ca1, ca2);
 
@@ -137,13 +137,12 @@ public class GuiWrapper {
 
 	}
 
-	public static JPanel getScaleableMatrixPanel(Matrix m)
-			throws ClassNotFoundException, NoSuchMethodException,
-			InvocationTargetException, IllegalAccessException, InstantiationException{
+	public static JPanel getScaleableMatrixPanel(Matrix m) throws ClassNotFoundException, NoSuchMethodException,
+			InvocationTargetException, IllegalAccessException, InstantiationException {
 
 		Class<?> scaleMatrixPanelC = Class.forName(scaleMatrixPanel);
 
-		Method setMatrix = scaleMatrixPanelC.getMethod("setMatrix", new Class[] { Matrix.class});
+		Method setMatrix = scaleMatrixPanelC.getMethod("setMatrix", new Class[] { Matrix.class });
 
 		JPanel panel = (JPanel) scaleMatrixPanelC.newInstance();
 
@@ -155,13 +154,12 @@ public class GuiWrapper {
 
 	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	public static Atom[] getAtomArray(Atom[] ca, List<Group> hetatoms, List<Group> nucs)
-			throws ClassNotFoundException, NoSuchMethodException,
-			InvocationTargetException, IllegalAccessException{
+			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
 		Class structureAlignmentJmol = Class.forName(strucAligJmol);
 
 		Class c = Class.forName(displayAFP);
-		Method show = c.getMethod("getAtomArray", new Class[] { Atom[].class, List.class, List.class});
+		Method show = c.getMethod("getAtomArray", new Class[] { Atom[].class, List.class, List.class });
 
 		Atom[] atoms = (Atom[]) show.invoke(null, ca, hetatoms, nucs);
 
@@ -173,9 +171,10 @@ public class GuiWrapper {
 	 * @since 3.0.5
 	 */
 	public static void showDBResults(StartupParameters params) {
-		//System.err.println("not implemented full yet");
+		// System.err.println("not implemented full yet");
 
-		// We want to do this, but because we don't know if structure-gui.jar is in the classpath we use reflection to hide the calls
+		// We want to do this, but because we don't know if structure-gui.jar is in the
+		// classpath we use reflection to hide the calls
 
 		UserConfiguration config = UserConfiguration.fromStartupParams(params);
 
@@ -185,19 +184,19 @@ public class GuiWrapper {
 			Class<?> c = Class.forName(tableClass);
 			Object table = c.newInstance();
 
-			Method show = c.getMethod("show", new Class[]{File.class, UserConfiguration.class });
+			Method show = c.getMethod("show", new Class[] { File.class, UserConfiguration.class });
 
-			show.invoke(table, new File(params.getShowDBresult()),config);
+			show.invoke(table, new File(params.getShowDBresult()), config);
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 
-			System.err.println("Probably structure-gui.jar is not in the classpath, can't show results...");
+			logger.error("Probably structure-gui.jar is not in the classpath, can't show results...");
 		}
 
-		//DBResultTable table = new DBResultTable();
+		// DBResultTable table = new DBResultTable();
 
-		//table.show(new File(params.getShowDBresult()),config);
+		// table.show(new File(params.getShowDBresult()),config);
 
 	}
 

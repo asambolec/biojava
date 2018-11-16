@@ -20,8 +20,6 @@
  */
 package org.biojava.nbio.structure.align.ce;
 
-
-
 public interface MatrixListener {
 
 	public double[][] matrixInOptimizer(double[][] max);

@@ -25,8 +25,7 @@ package org.biojava.nbio.genome.io.fastq;
  *
  * @since 3.0.3
  */
-public final class Fastq
-{
+public final class Fastq {
 	/** Description of this FASTQ formatted sequence. */
 	private final String description;
 
@@ -39,35 +38,30 @@ public final class Fastq
 	/** FASTQ sequence format variant for this FASTQ formatted sequence. */
 	private final FastqVariant variant;
 
-
 	/**
-	 * Create a new FASTQ formatted sequence from the specified description, sequence, quality scores,
-	 * and sequence format variant.
+	 * Create a new FASTQ formatted sequence from the specified description,
+	 * sequence, quality scores, and sequence format variant.
 	 *
-	 * @param description description of this FASTQ formatted sequence, must not be null
-	 * @param sequence sequence for this FASTQ formatted sequence, must not be null
-	 * @param quality quality scores for this FASTQ formatted sequence, must not be null
-	 * @param variant FASTQ sequence format variant for this FASTQ formatted sequence, must not be null
+	 * @param description description of this FASTQ formatted sequence, must not be
+	 *                    null
+	 * @param sequence    sequence for this FASTQ formatted sequence, must not be
+	 *                    null
+	 * @param quality     quality scores for this FASTQ formatted sequence, must not
+	 *                    be null
+	 * @param variant     FASTQ sequence format variant for this FASTQ formatted
+	 *                    sequence, must not be null
 	 */
-	Fastq(final String description,
-		  final String sequence,
-		  final String quality,
-		  final FastqVariant variant)
-	{
-		if (description == null)
-		{
+	Fastq(final String description, final String sequence, final String quality, final FastqVariant variant) {
+		if (description == null) {
 			throw new IllegalArgumentException("description must not be null");
 		}
-		if (sequence == null)
-		{
+		if (sequence == null) {
 			throw new IllegalArgumentException("sequence must not be null");
 		}
-		if (quality == null)
-		{
+		if (quality == null) {
 			throw new IllegalArgumentException("quality must not be null");
 		}
-		if (variant == null)
-		{
+		if (variant == null) {
 			throw new IllegalArgumentException("variant must not be null");
 		}
 		this.description = description;
@@ -76,37 +70,33 @@ public final class Fastq
 		this.variant = variant;
 	}
 
-
 	/**
-	 * Return the description of this FASTQ formatted sequence.
-	 * The description will not be null.
+	 * Return the description of this FASTQ formatted sequence. The description will
+	 * not be null.
 	 *
 	 * @return the description of this FASTQ formatted sequence
 	 */
-	public String getDescription()
-	{
+	public String getDescription() {
 		return description;
 	}
 
 	/**
-	 * Return the sequence for this FASTQ formatted sequence.
-	 * The sequence will not be null.
+	 * Return the sequence for this FASTQ formatted sequence. The sequence will not
+	 * be null.
 	 *
 	 * @return the sequence for this FASTQ formatted sequence
 	 */
-	public String getSequence()
-	{
+	public String getSequence() {
 		return sequence;
 	}
 
 	/**
-	 * Return the quality scores for this FASTQ formatted sequence.
-	 * The quality scores will not be null.
+	 * Return the quality scores for this FASTQ formatted sequence. The quality
+	 * scores will not be null.
 	 *
 	 * @return the quality scores for this FASTQ formatted sequence
 	 */
-	public String getQuality()
-	{
+	public String getQuality() {
 		return quality;
 	}
 
@@ -116,8 +106,7 @@ public final class Fastq
 	 *
 	 * @return the FASTQ sequence format variant for this FASTQ formatted sequence
 	 */
-	public FastqVariant getVariant()
-	{
+	public FastqVariant getVariant() {
 		return variant;
 	}
 
@@ -127,22 +116,19 @@ public final class Fastq
 	 *
 	 * @since 4.2
 	 * @param variant FASTQ sequence format variant, must not be null
-	 * @return a new FASTQ formatted sequence from this converted to the
-	 *    specified FASTQ sequence format variant
+	 * @return a new FASTQ formatted sequence from this converted to the specified
+	 *         FASTQ sequence format variant
 	 */
-	public Fastq convertTo(final FastqVariant variant)
-	{
+	public Fastq convertTo(final FastqVariant variant) {
 		return FastqTools.convert(this, variant);
 	}
 
 	/**
-	 * Create and return a new FastqBuilder.
-	 * The FastqBuilder will not be null.
+	 * Create and return a new FastqBuilder. The FastqBuilder will not be null.
 	 *
 	 * @return a new FastqBuilder
 	 */
-	public static final FastqBuilder builder()
-	{
+	public static final FastqBuilder builder() {
 		return new FastqBuilder();
 	}
 }

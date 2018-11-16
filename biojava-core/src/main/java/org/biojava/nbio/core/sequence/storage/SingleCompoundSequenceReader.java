@@ -30,11 +30,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An implementation of the SequenceReader interface which for every
- * call will return only 1 compound (given to it during construction; a String
- * is also valid but will require a CompoundSet). The idea is to represent
- * large runs of a single compound without the memory footprint of storing these
- * compounds e.g. a run of 10KB of Ns in a DNASequence.
+ * An implementation of the SequenceReader interface which for every call will
+ * return only 1 compound (given to it during construction; a String is also
+ * valid but will require a CompoundSet). The idea is to represent large runs of
+ * a single compound without the memory footprint of storing these compounds
+ * e.g. a run of 10KB of Ns in a DNASequence.
  *
  * @author ayates
  */
@@ -103,27 +103,28 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 
 	@Override
 	public int getIndexOf(C compound) {
-		if(compound.equals(this.compound)) {
+		if (compound.equals(this.compound)) {
 			return 1;
 		}
 		return -1;
 	}
 
 	/**
-	 * Returns the length of the Sequence if the given compound was equal to
-	 * the one given during construction. Otherwise returns -1
+	 * Returns the length of the Sequence if the given compound was equal to the one
+	 * given during construction. Otherwise returns -1
 	 */
 
 	@Override
 	public int getLastIndexOf(C compound) {
-		if(compound.equals(this.compound)) {
+		if (compound.equals(this.compound)) {
 			return getLength();
 		}
 		return -1;
 	}
 
 	/**
-	 * Delegates to {@link SequenceMixin#toList(org.biojava.nbio.core.sequence.template.Sequence) }
+	 * Delegates to
+	 * {@link SequenceMixin#toList(org.biojava.nbio.core.sequence.template.Sequence) }
 	 */
 
 	@Override
@@ -132,7 +133,8 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 	}
 
 	/**
-	 * Delegates to {@link SequenceMixin#toList(org.biojava.nbio.core.sequence.template.Sequence) }
+	 * Delegates to
+	 * {@link SequenceMixin#toList(org.biojava.nbio.core.sequence.template.Sequence) }
 	 */
 
 	@Override
@@ -146,7 +148,7 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 
 	@Override
 	public SequenceView<C> getSubSequence(Integer start, Integer end) {
-		return new SequenceProxyView<C>(this, start, end);
+		return new SequenceProxyView<>(this, start, end);
 	}
 
 	/**
@@ -168,7 +170,8 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 	}
 
 	/**
-	 * Delegates to {@link SequenceMixin#countCompounds(org.biojava.nbio.core.sequence.template.Sequence, C[]) }
+	 * Delegates to
+	 * {@link SequenceMixin#countCompounds(org.biojava.nbio.core.sequence.template.Sequence, C[]) }
 	 */
 
 	@Override
@@ -182,7 +185,7 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 
 	@Override
 	public Iterator<C> iterator() {
-		return new SequenceMixin.SequenceIterator<C>(this);
+		return new SequenceMixin.SequenceIterator<>(this);
 	}
 
 	@Override
@@ -202,22 +205,20 @@ public class SingleCompoundSequenceReader<C extends Compound> implements ProxySe
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object o) {
-		if(Equals.classEqual(this, o)) {
-			SingleCompoundSequenceReader<C> that = (SingleCompoundSequenceReader<C>)o;
-			return  Equals.equal(compound, that.compound) &&
-					Equals.equal(compoundSet, that.compoundSet) &&
-					Equals.equal(length, that.length);
+		if (!Equals.classEqual(this, o)) {
+			return false;
 		}
-		return false;
+		SingleCompoundSequenceReader<C> that = (SingleCompoundSequenceReader<C>) o;
+		return Equals.equal(compound, that.compound) && Equals.equal(compoundSet, that.compoundSet)
+				&& Equals.equal(length, that.length);
 	}
 
 	public boolean equals(Sequence<C> o) {
-		if(Equals.classEqual(this, o)) {
-			SingleCompoundSequenceReader<C> that = (SingleCompoundSequenceReader<C>)o;
-			return  Equals.equal(compound, that.compound) &&
-					Equals.equal(compoundSet, that.compoundSet) &&
-					Equals.equal(length, that.length);
+		if (!Equals.classEqual(this, o)) {
+			return false;
 		}
-		return false;
+		SingleCompoundSequenceReader<C> that = (SingleCompoundSequenceReader<C>) o;
+		return Equals.equal(compound, that.compound) && Equals.equal(compoundSet, that.compoundSet)
+				&& Equals.equal(length, that.length);
 	}
 }

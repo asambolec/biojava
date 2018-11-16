@@ -26,12 +26,12 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.*;
 
-
-/** A in memory cache using soft references. (can be garbage collected)
+/**
+ * A in memory cache using soft references. (can be garbage collected)
  *
- * This code is based on: http://java-interview-faqs.blogspot.com/2008/09/building-faster-and-efficient-cache.html
- * */
-
+ * This code is based on:
+ * http://java-interview-faqs.blogspot.com/2008/09/building-faster-and-efficient-cache.html
+ */
 
 public class SoftHashMap<K, V> extends AbstractMap<K, V> {
 
@@ -41,19 +41,19 @@ public class SoftHashMap<K, V> extends AbstractMap<K, V> {
 
 	/** The internal HashMap that stores SoftReference to actual data. */
 
-	private final Map<K, SoftReference<V>> map = new HashMap<K, SoftReference<V>>();
+	private final Map<K, SoftReference<V>> map = new HashMap<>();
 
 	/** Maximum Number of references you dont want GC to collect. */
 
-	private final int max_limit;
+	private final int maxLimit;
 
 	/** The FIFO list of hard references, order of last access. */
 
-	private final LinkedList<V> hardCache = new LinkedList<V>();
+	private final LinkedList<V> hardCache = new LinkedList<>();
 
 	/** Reference queue for cleared SoftReference objects. */
 
-	private final ReferenceQueue<V> queue = new ReferenceQueue<V>();
+	private final ReferenceQueue<V> queue = new ReferenceQueue<>();
 
 	public SoftHashMap() {
 
@@ -63,12 +63,12 @@ public class SoftHashMap<K, V> extends AbstractMap<K, V> {
 
 	public SoftHashMap(int hardSize) {
 
-		max_limit = hardSize;
+		maxLimit = hardSize;
 
 	}
 
 	@Override
-public V get(Object key) {
+	public V get(Object key) {
 
 		V result = null;
 
@@ -108,10 +108,10 @@ public V get(Object key) {
 
 					// duplicates.
 
-					synchronized (hardCache){
+					synchronized (hardCache) {
 						hardCache.addFirst(result);
 
-						if (hardCache.size() > max_limit) {
+						if (hardCache.size() > maxLimit) {
 
 							// Remove the last entry if list greater than MAX_LIMIT
 
@@ -121,8 +121,8 @@ public V get(Object key) {
 					}
 
 				}
-			} catch (Exception e){
-			 logger.error("Exception: ", e);
+			} catch (Exception e) {
+				logger.error("Exception: ", e);
 			}
 
 		}
@@ -131,58 +131,14 @@ public V get(Object key) {
 
 	}
 
-
-
 	/**
-
-	 * We define our own subclass of SoftReference which contains not only the
-
-	 * value but also the key to make it easier to find the entry in the HashMap
-
-	 * after it's been garbage collected.
-
-	 */
-
-	private static class SoftValue<K, V> extends SoftReference<V> {
-
-		private final Object key; // always make data member final
-
-
-
-		/**
-
-		 * Did you know that an outer class can access private data members and
-
-		 * methods of an inner class? I didn't know that! I thought it was only
-
-		 * the inner class who could access the outer class's private
-
-		 * information. An outer class can also access private members of an
-
-		 * inner class inside its inner class.
-
-		 */
-
-		private SoftValue(V k, K key, ReferenceQueue<? super V> q) {
-
-			super(k, q);
-
-			this.key = key;
-
-		}
-
-	}
-
-
-
-	/**
-
+	 * 
 	 * Here we go through the ReferenceQueue and remove garbage collected
-
+	 * 
 	 * SoftValue objects from the HashMap by looking them up using the
-
+	 * 
 	 * SoftValue.key data member.
-
+	 * 
 	 */
 
 	@SuppressWarnings("unchecked") // every Reference in queue is stored as a SoftValue
@@ -198,18 +154,16 @@ public V get(Object key) {
 
 	}
 
-
-
 	/**
-
+	 * 
 	 * Here we put the key, value pair into the HashMap using a SoftValue
-
+	 * 
 	 * object.
-
+	 * 
 	 */
 
 	@Override
-public synchronized V put(K key, V value) {
+	public synchronized V put(K key, V value) {
 
 		clearGCCollected();
 
@@ -221,8 +175,6 @@ public synchronized V put(K key, V value) {
 
 	}
 
-
-
 	@Override
 	public V remove(Object key) {
 		clearGCCollected();
@@ -230,12 +182,10 @@ public synchronized V put(K key, V value) {
 		return map.remove(key).get();
 	}
 
-
-
 	@Override
-public void clear() {
+	public void clear() {
 
-		synchronized (hardCache){
+		synchronized (hardCache) {
 			hardCache.clear();
 		}
 
@@ -245,10 +195,8 @@ public void clear() {
 
 	}
 
-
-
 	@Override
-public int size() {
+	public int size() {
 
 		clearGCCollected();
 
@@ -256,12 +204,48 @@ public int size() {
 
 	}
 
-
-
 	@Override
-public Set<Map.Entry<K, V>> entrySet() {
+	public Set<Map.Entry<K, V>> entrySet() {
 
 		throw new UnsupportedOperationException();
+
+	}
+
+	/**
+	 * 
+	 * We define our own subclass of SoftReference which contains not only the
+	 * 
+	 * value but also the key to make it easier to find the entry in the HashMap
+	 * 
+	 * after it's been garbage collected.
+	 * 
+	 */
+
+	private static class SoftValue<K, V> extends SoftReference<V> {
+
+		private final Object key; // always make data member final
+
+		/**
+		 * 
+		 * Did you know that an outer class can access private data members and
+		 * 
+		 * methods of an inner class? I didn't know that! I thought it was only
+		 * 
+		 * the inner class who could access the outer class's private
+		 * 
+		 * information. An outer class can also access private members of an
+		 * 
+		 * inner class inside its inner class.
+		 * 
+		 */
+
+		private SoftValue(V k, K key, ReferenceQueue<? super V> q) {
+
+			super(k, q);
+
+			this.key = key;
+
+		}
 
 	}
 

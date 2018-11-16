@@ -30,7 +30,7 @@ public class DefaultAutoSuggestProvider implements AutoSuggestProvider {
 
 	@Override
 	public Vector<String> getSuggestion(String userInput) {
-		Vector<String> data = new Vector<String>();
+		Vector<String> data = new Vector<>();
 
 		data.add(userInput + " no AutoSuggestProvider registered yet!");
 		return data;
@@ -49,13 +49,12 @@ public class DefaultAutoSuggestProvider implements AutoSuggestProvider {
 	}
 
 	@Override
-	public void clear(){
+	public void clear() {
 
 	}
 
-
 	@Override
-	public void stop(){
+	public void stop() {
 
 	}
 }

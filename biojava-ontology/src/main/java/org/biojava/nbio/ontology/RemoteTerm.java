@@ -27,8 +27,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-
-
 /**
  * A term in another ontology.
  *
@@ -37,16 +35,16 @@ import java.util.TreeSet;
  * these ontologies are designed to be modular and self-contained, it is
  * expected that you would not copy terms from one ontology into another. The
  * best-practice way to represent terms from another ontology in your one is to
- * use RemoteTerm instances. Ontology has a method importTerm that does this
- * for you. By default, imported terms will have names composed from the source
+ * use RemoteTerm instances. Ontology has a method importTerm that does this for
+ * you. By default, imported terms will have names composed from the source
  * ontology and the imported term name. However, this should be over-rideable.
  * </p>
  *
  * <p>
  * The imported term will have the same name as the original term. They are
- * implicitly identical to each other. The most common use of imports will be
- * to slurp in the "core" ontology so that operations such as <code>is-a</code>
- * and <code>has-a</code> are available.
+ * implicitly identical to each other. The most common use of imports will be to
+ * slurp in the "core" ontology so that operations such as <code>is-a</code> and
+ * <code>has-a</code> are available.
  * </p>
  *
  * @author Thomas Down
@@ -57,6 +55,7 @@ import java.util.TreeSet;
 public interface RemoteTerm extends Term {
 	/**
 	 * Return the imported term
+	 * 
 	 * @return the term
 	 */
 
@@ -68,9 +67,7 @@ public interface RemoteTerm extends Term {
 	 * This can be used to implement Ontology.importTerm
 	 */
 
-	public final static class Impl
-	extends AbstractTerm
-	implements RemoteTerm, java.io.Serializable {
+	public final static class Impl extends AbstractTerm implements RemoteTerm, java.io.Serializable {
 		/**
 		 *
 		 */
@@ -91,8 +88,9 @@ public interface RemoteTerm extends Term {
 			if (remoteTerm == null) {
 				throw new NullPointerException("RemoteTerm must not be null");
 			}
-			if(name == null) {
-			  name = remoteTerm.getOntology().getName() + "." + remoteTerm.getName();
+			if (name == null) {
+				name = new StringBuilder().append(remoteTerm.getOntology().getName()).append(".")
+						.append(remoteTerm.getName()).toString();
 			}
 
 			this.ontology = ontology;
@@ -100,7 +98,9 @@ public interface RemoteTerm extends Term {
 			this.name = name;
 
 			this.synonyms = new TreeSet();
-			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+			if (synonyms != null) {
+				this.synonyms.addAll(Arrays.asList(synonyms));
+			}
 		}
 
 		@Override
@@ -120,7 +120,8 @@ public interface RemoteTerm extends Term {
 
 		@Override
 		public String getName() {
-			return getOntology().getName() + ":" + remoteTerm.getName();
+			return new StringBuilder().append(getOntology().getName()).append(":").append(remoteTerm.getName())
+					.toString();
 		}
 
 		@Override

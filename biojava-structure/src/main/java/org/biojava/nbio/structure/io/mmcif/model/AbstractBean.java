@@ -29,7 +29,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-/** a generic class that implements the toString method for a bean
+/**
+ * a generic class that implements the toString method for a bean
  *
  * @author Andreas Prlic
  *
@@ -39,63 +40,53 @@ public abstract class AbstractBean {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractBean.class);
 
 	@Override
-	@SuppressWarnings({  "unchecked" })
-	public String toString(){
-		StringBuffer buf = new StringBuffer();
+	@SuppressWarnings({ "unchecked" })
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
 		buf.append(this.getClass().getName()).append(": ");
-		/* disabled for the moment
-
-		buf.append(" chains: " );
-		Iterator<Chain> iter = chainList.iterator();
-		while (iter.hasNext()){
-			Chain c = iter.next();
-			buf.append (c.getName() + " ");
-		}
-
+		/*
+		 * disabled for the moment
+		 * 
+		 * buf.append(" chains: " ); Iterator<Chain> iter = chainList.iterator(); while
+		 * (iter.hasNext()){ Chain c = iter.next(); buf.append (c.getName() + " "); }
+		 * 
 		 */
 		try {
 			Class<? extends AbstractBean> c = this.getClass();
-			Method[] methods  = c.getMethods();
+			Method[] methods = c.getMethods();
 
-			for (int i = 0; i < methods.length; i++) {
-				Method m = methods[i];
-
+			for (Method m : methods) {
 				String name = m.getName();
-				if ( name.substring(0,3).equals("get")) {
+				if ("get".equals(name.substring(0, 3))) {
 
-					Object o  = m.invoke(this, new Object[]{});
-					if ( o instanceof String){
-						buf.append(name.substring(3, name.length())+": "+ o + " ");
-					}
-					else if ( o instanceof List){
+					Object o = m.invoke(this, new Object[] {});
+					if (o instanceof String) {
+						buf.append(new StringBuilder().append(name.substring(3, name.length())).append(": ").append(o)
+								.append(" ").toString());
+					} else if (o instanceof List) {
 						buf.append(name.substring(3, name.length())).append(": ");
 
-						List<Object>lst = (List<Object>)o;
-						for (Object obj : lst){
-							if ( obj instanceof Chain){
+						List<Object> lst = (List<Object>) o;
+						for (Object obj : lst) {
+							if (obj instanceof Chain) {
 								continue;
 							}
 							buf.append(obj).append(" ");
 						}
 
-					}
-					else {
+					} else {
 						// ignore...
 					}
 				}
 
 			}
 
-		} catch (InvocationTargetException e){
-			logger.error("Exception caught while producing toString",e);
-		} catch (IllegalAccessException e) {
-			logger.error("Exception caught while producing toString",e);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			logger.error("Exception caught while producing toString", e);
 		}
 
-
-		//if ( organismScientific != null)
-		//	buf.append(" organism scientific: " + organismScientific);
-
+		// if ( organismScientific != null)
+		// buf.append(" organism scientific: " + organismScientific);
 
 		return buf.toString();
 	}

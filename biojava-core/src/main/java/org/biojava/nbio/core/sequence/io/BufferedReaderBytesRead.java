@@ -27,67 +27,70 @@ import java.io.Reader;
 
 /**
  * Need to keep track of actual bytes read and take advantage of buffered reader
- * performance. Took java source for BufferedReader and added BytesRead functionality<br>
+ * performance. Took java source for BufferedReader and added BytesRead
+ * functionality<br>
  * ---------- original buffered reader ----------------------<BR>
  * Reads text from a character-input stream, buffering characters so as to
  * provide for the efficient reading of characters, arrays, and lines.
  *
- * <p> The buffer size may be specified, or the default size may be used.  The
+ * <p>
+ * The buffer size may be specified, or the default size may be used. The
  * default is large enough for most purposes.
  *
- * <p> In general, each read request made of a Reader causes a corresponding
- * read request to be made of the underlying character or byte stream.  It is
- * therefore advisable to wrap a BufferedReaderBytesRead around any Reader whose read()
- * operations may be costly, such as FileReaders and InputStreamReaders.  For
- * example,
+ * <p>
+ * In general, each read request made of a Reader causes a corresponding read
+ * request to be made of the underlying character or byte stream. It is
+ * therefore advisable to wrap a BufferedReaderBytesRead around any Reader whose
+ * read() operations may be costly, such as FileReaders and InputStreamReaders.
+ * For example,
  *
  * <pre>
- * BufferedReaderBytesRead in
- *   = new BufferedReaderBytesRead(new FileReader("foo.in"));
+ * BufferedReaderBytesRead in = new BufferedReaderBytesRead(new FileReader("foo.in"));
  * </pre>
  *
- * will buffer the input from the specified file.  Without buffering, each
+ * will buffer the input from the specified file. Without buffering, each
  * invocation of read() or readLine() could cause bytes to be read from the
  * file, converted into characters, and then returned, which can be very
  * inefficient.
  *
- * <p> Programs that use DataInputStreams for textual input can be localized by
+ * <p>
+ * Programs that use DataInputStreams for textual input can be localized by
  * replacing each DataInputStream with an appropriate BufferedReaderBytesRead.
  *
  * @see FileReader
  * @see InputStreamReader
  *
- * @version 	1.37, 06/03/15
- * @author	Mark Reinhold
+ * @version 1.37, 06/03/15
+ * @author Mark Reinhold
  * @author Scooter Willis &lt;willishf at gmail dot com&gt;
- * @since	JDK1.1
+ * @since JDK1.1
  */
 public class BufferedReaderBytesRead extends Reader {
 
-	private Reader in;
-	private char[] cb;
-	private int nChars, nextChar;
 	private static final int INVALIDATED = -2;
 	private static final int UNMARKED = -1;
+	private static int defaultCharBufferSize = 8192;
+	private static int defaultExpectedLineLength = 80;
+	private Reader in;
+	private char[] cb;
+	private int nChars;
+	private int nextChar;
 	private int markedChar = UNMARKED;
 	private int readAheadLimit = 0; /* Valid only when markedChar > 0 */
-
 	/** If the next character is a line feed, skip it */
 	private boolean skipLF = false;
 	/** The skipLF flag when the mark was set */
 	private boolean markedSkipLF = false;
-	private static int defaultCharBufferSize = 8192;
-	private static int defaultExpectedLineLength = 80;
 	long bytesRead = 0;
 
 	/**
-	 * Creates a buffering character-input stream that uses an input buffer of
-	 * the specified size.
+	 * Creates a buffering character-input stream that uses an input buffer of the
+	 * specified size.
 	 *
-	 * @param  in   A Reader
-	 * @param  sz   Input-buffer size
+	 * @param in A Reader
+	 * @param sz Input-buffer size
 	 *
-	 * @exception  IllegalArgumentException  If sz is &lt;= 0
+	 * @exception IllegalArgumentException If sz is &lt;= 0
 	 */
 	public BufferedReaderBytesRead(Reader in, int sz) {
 		super(in);
@@ -100,19 +103,20 @@ public class BufferedReaderBytesRead extends Reader {
 	}
 
 	/**
-	 * Creates a buffering character-input stream that uses a default-sized
-	 * input buffer.
+	 * Creates a buffering character-input stream that uses a default-sized input
+	 * buffer.
 	 *
-	 * @param  in   A Reader
+	 * @param in A Reader
 	 */
 	public BufferedReaderBytesRead(Reader in) {
 		this(in, defaultCharBufferSize);
 	}
 
 	/**
-	 * Keep track of bytesread via ReadLine to account for CR-LF in the stream. Does not keep track of position if
-	 * use methods other than ReadLine.
-	 * //TODO should override other methods and throw exception or keep track of bytes read
+	 * Keep track of bytesread via ReadLine to account for CR-LF in the stream. Does
+	 * not keep track of position if use methods other than ReadLine. //TODO should
+	 * override other methods and throw exception or keep track of bytes read
+	 * 
 	 * @return
 	 */
 	public long getBytesRead() {
@@ -164,19 +168,20 @@ public class BufferedReaderBytesRead extends Reader {
 		do {
 			n = in.read(cb, dst, cb.length - dst);
 		} while (n == 0);
-		if (n > 0) {
-			nChars = dst + n;
-			nextChar = dst;
+		if (n <= 0) {
+			return;
 		}
+		nChars = dst + n;
+		nextChar = dst;
 	}
 
 	/**
 	 * Reads a single character.
 	 *
-	 * @return The character read, as an integer in the range
-	 *         0 to 65535 (<tt>0x00-0xffff</tt>), or -1 if the
-	 *         end of the stream has been reached
-	 * @exception  IOException  If an I/O error occurs
+	 * @return The character read, as an integer in the range 0 to 65535
+	 *         (<tt>0x00-0xffff</tt>), or -1 if the end of the stream has been
+	 *         reached
+	 * @exception IOException If an I/O error occurs
 	 */
 	@Override
 	public int read() throws IOException {
@@ -209,11 +214,12 @@ public class BufferedReaderBytesRead extends Reader {
 	 */
 	private int read1(char[] cbuf, int off, int len) throws IOException {
 		if (nextChar >= nChars) {
-			/* If the requested length is at least as large as the buffer, and
-			if there is no mark/reset activity, and if line feeds are not
-			being skipped, do not bother to copy the characters into the
-			local buffer.  In this way buffered streams will cascade
-			harmlessly. */
+			/*
+			 * If the requested length is at least as large as the buffer, and if there is
+			 * no mark/reset activity, and if line feeds are not being skipped, do not
+			 * bother to copy the characters into the local buffer. In this way buffered
+			 * streams will cascade harmlessly.
+			 */
 			if (len >= cb.length && markedChar <= UNMARKED && !skipLF) {
 				return in.read(cbuf, off, len);
 			}
@@ -243,54 +249,56 @@ public class BufferedReaderBytesRead extends Reader {
 	/**
 	 * Reads characters into a portion of an array.
 	 *
-	 * <p> This method implements the general contract of the corresponding
+	 * <p>
+	 * This method implements the general contract of the corresponding
 	 * <code>{@link Reader#read(char[], int, int) read}</code> method of the
-	 * <code>{@link Reader}</code> class.  As an additional convenience, it
-	 * attempts to read as many characters as possible by repeatedly invoking
-	 * the <code>read</code> method of the underlying stream.  This iterated
+	 * <code>{@link Reader}</code> class. As an additional convenience, it attempts
+	 * to read as many characters as possible by repeatedly invoking the
+	 * <code>read</code> method of the underlying stream. This iterated
 	 * <code>read</code> continues until one of the following conditions becomes
-	 * true: <ul>
+	 * true:
+	 * <ul>
 	 *
-	 *   <li> The specified number of characters have been read,
+	 * <li>The specified number of characters have been read,
 	 *
-	 *   <li> The <code>read</code> method of the underlying stream returns
-	 *   <code>-1</code>, indicating end-of-file, or
+	 * <li>The <code>read</code> method of the underlying stream returns
+	 * <code>-1</code>, indicating end-of-file, or
 	 *
-	 *   <li> The <code>ready</code> method of the underlying stream
-	 *   returns <code>false</code>, indicating that further input requests
-	 *   would block.
+	 * <li>The <code>ready</code> method of the underlying stream returns
+	 * <code>false</code>, indicating that further input requests would block.
 	 *
-	 * </ul> If the first <code>read</code> on the underlying stream returns
+	 * </ul>
+	 * If the first <code>read</code> on the underlying stream returns
 	 * <code>-1</code> to indicate end-of-file then this method returns
-	 * <code>-1</code>.  Otherwise this method returns the number of characters
+	 * <code>-1</code>. Otherwise this method returns the number of characters
 	 * actually read.
 	 *
-	 * <p> Subclasses of this class are encouraged, but not required, to
-	 * attempt to read as many characters as possible in the same fashion.
+	 * <p>
+	 * Subclasses of this class are encouraged, but not required, to attempt to read
+	 * as many characters as possible in the same fashion.
 	 *
-	 * <p> Ordinarily this method takes characters from this stream's character
-	 * buffer, filling it from the underlying stream as necessary.  If,
-	 * however, the buffer is empty, the mark is not valid, and the requested
-	 * length is at least as large as the buffer, then this method will read
-	 * characters directly from the underlying stream into the given array.
-	 * Thus redundant <code>BufferedReaderBytesRead</code>s will not copy data
-	 * unnecessarily.
+	 * <p>
+	 * Ordinarily this method takes characters from this stream's character buffer,
+	 * filling it from the underlying stream as necessary. If, however, the buffer
+	 * is empty, the mark is not valid, and the requested length is at least as
+	 * large as the buffer, then this method will read characters directly from the
+	 * underlying stream into the given array. Thus redundant
+	 * <code>BufferedReaderBytesRead</code>s will not copy data unnecessarily.
 	 *
-	 * @param      cbuf  Destination buffer
-	 * @param      off   Offset at which to start storing characters
-	 * @param      len   Maximum number of characters to read
+	 * @param cbuf Destination buffer
+	 * @param off  Offset at which to start storing characters
+	 * @param len  Maximum number of characters to read
 	 *
-	 * @return     The number of characters read, or -1 if the end of the
-	 *             stream has been reached
+	 * @return The number of characters read, or -1 if the end of the stream has
+	 *         been reached
 	 *
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IOException If an I/O error occurs
 	 */
 	@Override
 	public int read(char[] cbuf, int off, int len) throws IOException {
 		synchronized (lock) {
 			ensureOpen();
-			if ((off < 0) || (off > cbuf.length) || (len < 0)
-					|| ((off + len) > cbuf.length) || ((off + len) < 0)) {
+			if ((off < 0) || (off > cbuf.length) || (len < 0) || ((off + len) > cbuf.length) || ((off + len) < 0)) {
 				throw new IndexOutOfBoundsException();
 			} else if (len == 0) {
 				return 0;
@@ -307,37 +315,36 @@ public class BufferedReaderBytesRead extends Reader {
 				}
 				n += n1;
 			}
-			bytesRead = bytesRead + n;
+			bytesRead += n;
 			return n;
 		}
 	}
 
 	/**
-	 * Reads a line of text.  A line is considered to be terminated by any one
-	 * of a line feed ('\n'), a carriage return ('\r'), or a carriage return
-	 * followed immediately by a linefeed.
+	 * Reads a line of text. A line is considered to be terminated by any one of a
+	 * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
+	 * immediately by a linefeed.
 	 *
-	 * @param      ignoreLF  If true, the next '\n' will be skipped
+	 * @param ignoreLF If true, the next '\n' will be skipped
 	 *
-	 * @return     A String containing the contents of the line, not including
-	 *             any line-termination characters, or null if the end of the
-	 *             stream has been reached
+	 * @return A String containing the contents of the line, not including any
+	 *         line-termination characters, or null if the end of the stream has
+	 *         been reached
 	 *
-	 * @see        java.io.LineNumberReader#readLine()
+	 * @see java.io.LineNumberReader#readLine()
 	 *
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IOException If an I/O error occurs
 	 */
 	@SuppressWarnings("unused")
 	private String readLine(boolean ignoreLF) throws IOException {
-		StringBuffer s = null;
+		StringBuilder s = null;
 		int startChar;
 
 		synchronized (lock) {
 			ensureOpen();
 			boolean omitLF = ignoreLF || skipLF;
 
-			bufferLoop:
-			for (;;) {
+			bufferLoop: for (;;) {
 
 				if (nextChar >= nChars) {
 					fill();
@@ -362,8 +369,7 @@ public class BufferedReaderBytesRead extends Reader {
 				skipLF = false;
 				omitLF = false;
 
-				charLoop:
-				for (i = nextChar; i < nChars; i++) {
+				charLoop: for (i = nextChar; i < nChars; i++) {
 					c = cb[i];
 					if ((c == '\n') || (c == '\r')) {
 						bytesRead++;
@@ -393,7 +399,7 @@ public class BufferedReaderBytesRead extends Reader {
 				}
 
 				if (s == null) {
-					s = new StringBuffer(defaultExpectedLineLength);
+					s = new StringBuilder(defaultExpectedLineLength);
 				}
 				s.append(cb, startChar, i - startChar);
 
@@ -402,20 +408,20 @@ public class BufferedReaderBytesRead extends Reader {
 	}
 
 	/**
-	 * Reads a line of text.  A line is considered to be terminated by any one
-	 * of a line feed ('\n'), a carriage return ('\r'), or a carriage return
-	 * followed immediately by a linefeed.
+	 * Reads a line of text. A line is considered to be terminated by any one of a
+	 * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
+	 * immediately by a linefeed.
 	 *
-	 * @return     A String containing the contents of the line, not including
-	 *             any line-termination characters, or null if the end of the
-	 *             stream has been reached
+	 * @return A String containing the contents of the line, not including any
+	 *         line-termination characters, or null if the end of the stream has
+	 *         been reached
 	 *
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IOException If an I/O error occurs
 	 */
 	public String readLine() throws IOException {
 		String line = readLine(false);
 		if (line != null) {
-			bytesRead = bytesRead + line.length();
+			bytesRead += line.length();
 		}
 		return line;
 	}
@@ -423,12 +429,12 @@ public class BufferedReaderBytesRead extends Reader {
 	/**
 	 * Skips characters.
 	 *
-	 * @param  n  The number of characters to skip
+	 * @param n The number of characters to skip
 	 *
-	 * @return    The number of characters actually skipped
+	 * @return The number of characters actually skipped
 	 *
-	 * @exception  IllegalArgumentException  If <code>n</code> is negative.
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IllegalArgumentException If <code>n</code> is negative.
+	 * @exception IOException              If an I/O error occurs
 	 */
 	@Override
 	public long skip(long n) throws IOException {
@@ -461,17 +467,17 @@ public class BufferedReaderBytesRead extends Reader {
 					nextChar = nChars;
 				}
 			}
-			bytesRead = bytesRead + (n - r);
+			bytesRead += (n - r);
 			return n - r;
 		}
 	}
 
 	/**
-	 * Tells whether this stream is ready to be read.  A buffered character
-	 * stream is ready if the buffer is not empty, or if the underlying
-	 * character stream is ready.
+	 * Tells whether this stream is ready to be read. A buffered character stream is
+	 * ready if the buffer is not empty, or if the underlying character stream is
+	 * ready.
 	 *
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IOException If an I/O error occurs
 	 */
 	@Override
 	public boolean ready() throws IOException {
@@ -479,12 +485,13 @@ public class BufferedReaderBytesRead extends Reader {
 			ensureOpen();
 
 			/*
-			 * If newline needs to be skipped and the next char to be read
-			 * is a newline character, then just skip it right away.
+			 * If newline needs to be skipped and the next char to be read is a newline
+			 * character, then just skip it right away.
 			 */
 			if (skipLF) {
-				/* Note that in.ready() will return true if and only if the next
-				 * read on the stream will not block.
+				/*
+				 * Note that in.ready() will return true if and only if the next read on the
+				 * stream will not block.
 				 */
 				if (nextChar >= nChars && in.ready()) {
 					fill();
@@ -509,20 +516,19 @@ public class BufferedReaderBytesRead extends Reader {
 	}
 
 	/**
-	 * Marks the present position in the stream.  Subsequent calls to reset()
-	 * will attempt to reposition the stream to this point.
+	 * Marks the present position in the stream. Subsequent calls to reset() will
+	 * attempt to reposition the stream to this point.
 	 *
-	 * @param readAheadLimit   Limit on the number of characters that may be
-	 *                         read while still preserving the mark. An attempt
-	 *                         to reset the stream after reading characters
-	 *                         up to this limit or beyond may fail.
-	 *                         A limit value larger than the size of the input
-	 *                         buffer will cause a new buffer to be allocated
-	 *                         whose size is no smaller than limit.
-	 *                         Therefore large values should be used with care.
+	 * @param readAheadLimit Limit on the number of characters that may be read
+	 *                       while still preserving the mark. An attempt to reset
+	 *                       the stream after reading characters up to this limit or
+	 *                       beyond may fail. A limit value larger than the size of
+	 *                       the input buffer will cause a new buffer to be
+	 *                       allocated whose size is no smaller than limit.
+	 *                       Therefore large values should be used with care.
 	 *
-	 * @exception  IllegalArgumentException  If readAheadLimit is < 0
-	 * @exception  IOException  If an I/O error occurs
+	 * @exception IllegalArgumentException If readAheadLimit is < 0
+	 * @exception IOException              If an I/O error occurs
 	 */
 	@Override
 	public void mark(int readAheadLimit) throws IOException {
@@ -540,17 +546,15 @@ public class BufferedReaderBytesRead extends Reader {
 	/**
 	 * Resets the stream to the most recent mark.
 	 *
-	 * @exception  IOException  If the stream has never been marked,
-	 *                          or if the mark has been invalidated
+	 * @exception IOException If the stream has never been marked, or if the mark
+	 *                        has been invalidated
 	 */
 	@Override
 	public void reset() throws IOException {
 		synchronized (lock) {
 			ensureOpen();
 			if (markedChar < 0) {
-				throw new IOException((markedChar == INVALIDATED)
-						? "Mark invalid"
-						: "Stream not marked");
+				throw new IOException((markedChar == INVALIDATED) ? "Mark invalid" : "Stream not marked");
 			}
 			nextChar = markedChar;
 			skipLF = markedSkipLF;
@@ -569,4 +573,3 @@ public class BufferedReaderBytesRead extends Reader {
 		}
 	}
 }
-

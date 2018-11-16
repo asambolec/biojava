@@ -1,4 +1,5 @@
 package org.biojava.nbio.core.exceptions;
+
 /*
  *                    BioJava development code
  *
@@ -23,6 +24,7 @@ package org.biojava.nbio.core.exceptions;
  */
 /**
  * General abstraction of different parsing errors
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class ParserException extends RuntimeException {

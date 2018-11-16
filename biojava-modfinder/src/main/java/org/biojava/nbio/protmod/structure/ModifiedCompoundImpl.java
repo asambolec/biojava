@@ -31,20 +31,24 @@ import org.biojava.nbio.protmod.io.ModifiedCompoundXMLConverter;
 
 import java.io.Serializable;
 import java.util.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Jianjiong Gao
  * @since 3.0
  */
-public class ModifiedCompoundImpl
-implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
+public class ModifiedCompoundImpl implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ModifiedCompoundImpl.class);
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1656563037849815427L;
+
+	public static final String newline = System.getProperty("line.separator");
 
 	ProteinModification originalModification;
 
@@ -54,28 +58,25 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 
 	Map<Set<StructureGroup>, Set<StructureAtomLinkage>> atomLinkages;
 
-	public static final String newline = System.getProperty("line.separator");
-
-	public ModifiedCompoundImpl(){
+	public ModifiedCompoundImpl() {
 
 	}
 
 	/**
-	 * Create a ModifiedCompoundImpl that has only one involved component.
-	 * Use this constructor for a modified residue.
-	 * @param modification {@link ProteinModification}.
+	 * Create a ModifiedCompoundImpl that has only one involved component. Use this
+	 * constructor for a modified residue.
+	 * 
+	 * @param modification    {@link ProteinModification}.
 	 * @param modifiedResidue modified group.
 	 * @return a {@link ModifiedCompound}.
 	 * @throws IllegalArgumentException if either argument is null.
 	 */
-	public ModifiedCompoundImpl (
-			ProteinModification modification,
-			StructureGroup modifiedResidue) {
-		if (modification==null || modifiedResidue==null) {
+	public ModifiedCompoundImpl(ProteinModification modification, StructureGroup modifiedResidue) {
+		if (modification == null || modifiedResidue == null) {
 			throw new IllegalArgumentException("Null argument(s)");
 		}
 
-		groups = new HashSet<StructureGroup>(1);
+		groups = new HashSet<>(1);
 		groups.add(modifiedResidue);
 
 		// is it possible that components be added by addLinkage later?
@@ -87,21 +88,20 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 	/**
 	 *
 	 * @param modification ProteinModification.
-	 * @param linkages a collection of atom linkages.
+	 * @param linkages     a collection of atom linkages.
 	 * @see ProteinModification
 	 * @see StructureAtomLinkage
 	 */
-	public ModifiedCompoundImpl( ProteinModification modification,
-			Collection<StructureAtomLinkage> linkages) {
-		if (modification==null) {
+	public ModifiedCompoundImpl(ProteinModification modification, Collection<StructureAtomLinkage> linkages) {
+		if (modification == null) {
 			throw new IllegalArgumentException("modification cannot be null");
 		}
 
-		if (linkages==null||linkages.isEmpty()) {
+		if (linkages == null || linkages.isEmpty()) {
 			throw new IllegalArgumentException("at least one linkage.");
 		}
 
-		this.groups = new HashSet<StructureGroup>();
+		this.groups = new HashSet<>();
 
 		addAtomLinkages(linkages);
 
@@ -110,7 +110,7 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 	}
 
 	@Override
-	public void setModification(ProteinModification protmod){
+	public void setModification(ProteinModification protmod) {
 		originalModification = protmod;
 
 		resetModification();
@@ -122,16 +122,16 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 	}
 
 	private void resetModification() {
-		if (originalModification == null)
+		if (originalModification == null) {
 			modification = originalModification;
-		else if (originalModification.getCategory()!=ModificationCategory.UNDEFINED)
+		} else if (originalModification.getCategory() != ModificationCategory.UNDEFINED) {
 			modification = originalModification;
-		else {
+		} else {
 			int nRes = 0;
-			Set<String> ligands = new HashSet<String>();
+			Set<String> ligands = new HashSet<>();
 			for (StructureGroup group : groups) {
 				if (group.isAminoAcid()) {
-					nRes ++;
+					nRes++;
 				} else {
 					ligands.add(group.getPDBName().trim());
 				}
@@ -140,212 +140,214 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 			ModificationCategory cat;
 			switch (nRes) {
 			case 0:
-				modification = originalModification; return;
+				modification = originalModification;
+				return;
 			case 1:
-				cat = ModificationCategory.ATTACHMENT; break;
+				cat = ModificationCategory.ATTACHMENT;
+				break;
 			case 2:
-				cat = ModificationCategory.CROSS_LINK_2; break;
+				cat = ModificationCategory.CROSS_LINK_2;
+				break;
 			case 3:
-				cat = ModificationCategory.CROSS_LINK_3; break;
+				cat = ModificationCategory.CROSS_LINK_3;
+				break;
 			case 4:
-				cat = ModificationCategory.CROSS_LINK_4; break;
+				cat = ModificationCategory.CROSS_LINK_4;
+				break;
 			case 5:
-				cat = ModificationCategory.CROSS_LINK_5; break;
+				cat = ModificationCategory.CROSS_LINK_5;
+				break;
 			case 6:
-				cat = ModificationCategory.CROSS_LINK_6; break;
+				cat = ModificationCategory.CROSS_LINK_6;
+				break;
 			case 7:
-				cat = ModificationCategory.CROSS_LINK_7; break;
+				cat = ModificationCategory.CROSS_LINK_7;
+				break;
 			default:
-				cat = ModificationCategory.CROSS_LINK_8_OR_LARGE; break;
+				cat = ModificationCategory.CROSS_LINK_8_OR_LARGE;
+				break;
 			}
 
-			modification = new ProteinModificationImpl.Builder(originalModification)
-					.setCategory(cat).addKeywords(ligands).build();
+			modification = new ProteinModificationImpl.Builder(originalModification).setCategory(cat)
+					.addKeywords(ligands).build();
 		}
 	}
 
 	@Override
 	public Set<StructureGroup> getGroups() {
-		if ( groups == null)
+		if (groups == null) {
 			return null;
+		}
 
 		return Collections.unmodifiableSet(groups);
 	}
 
 	@Override
 	public Set<StructureGroup> getGroups(boolean isAminoAcid) {
-		Set<StructureGroup> result = new HashSet<StructureGroup>();
-		for (StructureGroup group : groups) {
-			if (group.isAminoAcid() == isAminoAcid) {
-				result.add(group);
-			}
-		}
+		Set<StructureGroup> result = new HashSet<>();
+		groups.stream().filter(group -> group.isAminoAcid() == isAminoAcid).forEach(result::add);
 		return result;
 	}
 
 	@Override
-	public void setGroups(Set<StructureGroup> groups){
+	public void setGroups(Set<StructureGroup> groups) {
 		this.groups = groups;
 		resetModification();
 	}
 
 	@Override
 	public Set<StructureAtomLinkage> getAtomLinkages() {
-		if (atomLinkages==null) {
+		if (atomLinkages == null) {
 			return Collections.emptySet();
 		} else {
-			Set<StructureAtomLinkage> result = new HashSet<StructureAtomLinkage>();
-			for (Set<StructureAtomLinkage> linkages : atomLinkages.values()) {
-				result.addAll(linkages);
-			}
+			Set<StructureAtomLinkage> result = new HashSet<>();
+			atomLinkages.values().forEach(result::addAll);
 
 			return result;
 		}
 	}
 
-
 	@Override
 	public void setAtomLinkages(Set<StructureAtomLinkage> linkages) {
-		for (StructureAtomLinkage sali : linkages){
-			addAtomLinkage(sali);
-		}
+		linkages.forEach(this::addAtomLinkage);
 		resetModification();
 	}
 
 	@Override
 	public boolean addAtomLinkage(StructureAtomLinkage linkage) {
-		if (linkage==null) {
+		if (linkage == null) {
 			throw new IllegalArgumentException("Null linkage");
 		}
 
-		Set<StructureGroup> gs = new HashSet<StructureGroup>(2);
+		Set<StructureGroup> gs = new HashSet<>(2);
 		gs.add(linkage.getAtom1().getGroup());
 		gs.add(linkage.getAtom2().getGroup());
 
-		if (atomLinkages==null) {
-			atomLinkages = new HashMap<Set<StructureGroup>, Set<StructureAtomLinkage>>();
+		if (atomLinkages == null) {
+			atomLinkages = new HashMap<>();
 		}
 
 		Set<StructureAtomLinkage> linkages = atomLinkages.get(gs);
 		if (linkages == null) {
-			linkages = new HashSet<StructureAtomLinkage>();
+			linkages = new HashSet<>();
 			atomLinkages.put(gs, linkages);
 			groups.addAll(gs); // it's possible of new groups
-		};
+		}
 
 		return linkages.add(linkage);
 	}
 
 	@Override
 	public void addAtomLinkages(Collection<StructureAtomLinkage> linkages) {
-		if (linkages==null) {
+		if (linkages == null) {
 			throw new IllegalArgumentException("Null linkages");
 		}
 
-		for (StructureAtomLinkage link : linkages) {
-			addAtomLinkage(link);
-		}
+		linkages.forEach(this::addAtomLinkage);
 
 		resetModification();
 	}
 
 	@Override
 	public boolean crossChains() {
-		if (groups==null || groups.isEmpty())
+		if (groups == null || groups.isEmpty()) {
 			return false;
+		}
 
 		Iterator<StructureGroup> it = groups.iterator();
 		String chain = it.next().getChainId();
 		while (it.hasNext()) {
-			if (!it.next().getChainId().equals(chain))
+			if (!it.next().getChainId().equals(chain)) {
 				return true;
+			}
 		}
 
 		return false;
 	}
 
-
 	@Override
-	public String toString(){
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if ( originalModification == null)
+		if (originalModification == null) {
 			return "ModifiedCompoundImpl -- not initialized";
+		}
 
-		//sb.append("Modification_");
+		// sb.append("Modification_");
 		sb.append(originalModification.getId());
-		ModificationCategory cat ;
-		if (originalModification.getCategory()==ModificationCategory.UNDEFINED) {
+		ModificationCategory cat;
+		if (originalModification.getCategory() == ModificationCategory.UNDEFINED) {
 			cat = getModification().getCategory();
-		} else
+		} else {
 			cat = originalModification.getCategory();
+		}
 		sb.append("_");
 		sb.append(cat.toString());
 		return sb.toString();
 	}
 
-
 	@Override
 	public String getDescription() {
 
 		StringBuilder sb = new StringBuilder();
-		//sb.append("Category: ");
+		// sb.append("Category: ");
 
-		if ( getModification()  == null) {
+		if (getModification() == null) {
 			sb.append(" !!! not initialized !!!");
 			return sb.toString();
 		}
 
 		sb.append(originalModification.toString());
-//		sb.append(getModification().getCategory());
-//		if (!modification.getKeywords().isEmpty()) {
-//			sb.append("; ");
-//			sb.append(modification.getKeywords());
-//		}
-//		sb.append("; Modification ID: ");
-//		sb.append(modification.getId());
-//
-//		if (modification.getResidId()!=null) {
-//			sb.append("; RESID: ");
-//			sb.append(modification.getResidId());
-//			sb.append(" [");
-//			sb.append(modification.getResidName());
-//			sb.append(']');
-//		}
-//
-//		sb.append(" | ");
-//
-//		if (atomLinkages==null) {
-//			for (StructureGroup group : groups) {
-//				sb.append(group);
-//				sb.append(" | ");
-//			}
-//		} else {
-//			for (Set<StructureAtomLinkage> linkages : atomLinkages.values()) {
-//				for (StructureAtomLinkage linkage : linkages) {
-//					sb.append(linkage);
-//					sb.append(" | ");
-//				}
-//			}
-//		}
+		// sb.append(getModification().getCategory());
+		// if (!modification.getKeywords().isEmpty()) {
+		// sb.append("; ");
+		// sb.append(modification.getKeywords());
+		// }
+		// sb.append("; Modification ID: ");
+		// sb.append(modification.getId());
+		//
+		// if (modification.getResidId()!=null) {
+		// sb.append("; RESID: ");
+		// sb.append(modification.getResidId());
+		// sb.append(" [");
+		// sb.append(modification.getResidName());
+		// sb.append(']');
+		// }
+		//
+		// sb.append(" | ");
+		//
+		// if (atomLinkages==null) {
+		// for (StructureGroup group : groups) {
+		// sb.append(group);
+		// sb.append(" | ");
+		// }
+		// } else {
+		// for (Set<StructureAtomLinkage> linkages : atomLinkages.values()) {
+		// for (StructureAtomLinkage linkage : linkages) {
+		// sb.append(linkage);
+		// sb.append(" | ");
+		// }
+		// }
+		// }
 
 		return sb.toString();
 	}
 
 	@Override
-	public void setDescription(String desc){
+	public void setDescription(String desc) {
 		// do nothing....
 
 	}
 
 	@Override
-	public int compareTo(ModifiedCompound compound){
+	public int compareTo(ModifiedCompound compound) {
 		try {
 			// quite complex objects so the easiest is to just wrap it as XML
 			// and compare the two strings...
-			String xml  = ModifiedCompoundXMLConverter.toXML(this);
+			String xml = ModifiedCompoundXMLConverter.toXML(this);
 			String xml2 = ModifiedCompoundXMLConverter.toXML(compound);
 			return xml.compareTo(xml2);
-		} catch (Exception e){
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 
 		}
 		return this.toString().compareTo(compound.toString());
@@ -360,7 +362,7 @@ implements ModifiedCompound, Serializable, Comparable<ModifiedCompound> {
 			return false;
 		}
 
-		ModifiedCompound mci = (ModifiedCompound)obj;
+		ModifiedCompound mci = (ModifiedCompound) obj;
 		if (mci.getModification() != originalModification) {
 			return false;
 		}

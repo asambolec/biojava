@@ -32,26 +32,40 @@ import org.biojava.nbio.structure.AminoAcid;
  * A class that configures parameters that can be sent to the PDB file parsers
  *
  * <ul>
- * <li> {@link #setParseCAOnly(boolean)} - parse only the Atom records for C-alpha atoms</li>
- * <li> {@link #setParseSecStruc(boolean)} - a flag if the secondary structure information from the PDB file (author's assignment) should be parsed.
- *      If true the assignment can be accessed through {@link AminoAcid}.getSecStruc(); </li>
- * <li> {@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from the SEQRES
- *      and ATOM records of a PDB file be aligned? (default:yes)</li>
- * <li> {@link #setHeaderOnly(boolean)} - parse only the PDB/mmCIF file header, ignoring coordinates
- * </li>
- * <li> {@link #setCreateAtomBonds(boolean)} - create atom bonds from parsed bonds in PDB/mmCIF files and chemical component files
- * </li>
+ * <li>{@link #setParseCAOnly(boolean)} - parse only the Atom records for
+ * C-alpha atoms</li>
+ * <li>{@link #setParseSecStruc(boolean)} - a flag if the secondary structure
+ * information from the PDB file (author's assignment) should be parsed. If true
+ * the assignment can be accessed through {@link AminoAcid}.getSecStruc();</li>
+ * <li>{@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from
+ * the SEQRES and ATOM records of a PDB file be aligned? (default:yes)</li>
+ * <li>{@link #setHeaderOnly(boolean)} - parse only the PDB/mmCIF file header,
+ * ignoring coordinates</li>
+ * <li>{@link #setCreateAtomBonds(boolean)} - create atom bonds from parsed
+ * bonds in PDB/mmCIF files and chemical component files</li>
  * </ul>
  *
  * @author Andreas Prlic
  *
  */
-public class FileParsingParameters implements Serializable
-{
+public class FileParsingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5878292315163939027L;
 
+	/**
+	 * The maximum number of atoms that will be parsed before the parser switches to
+	 * a CA-only representation of the PDB file. If this limit is exceeded also the
+	 * SEQRES groups will be ignored.
+	 */
+	public static final int ATOM_CA_THRESHOLD = 500000;
 
+	/**
+	 * The maximum number of atoms we will add to a structure, this protects from
+	 * memory overflows in the few really big protein structures.
+	 */
+	public static final int MAX_ATOMS = Integer.MAX_VALUE; // no limit, we don't want to truncate molecules, but the
+															// user should make sure there is more memory available
+	// public static final int MAX_ATOMS = 700000; // tested with java -Xmx300M
 
 	/**
 	 * Flag to detect if the secondary structure info should be read
@@ -65,7 +79,8 @@ public class FileParsingParameters implements Serializable
 	private boolean alignSeqRes;
 
 	/**
-	 * Flag to control reading in only Calpha atoms - this is useful for parsing large structures like 1htq.
+	 * Flag to control reading in only Calpha atoms - this is useful for parsing
+	 * large structures like 1htq.
 	 */
 	private boolean parseCAOnly;
 
@@ -74,15 +89,7 @@ public class FileParsingParameters implements Serializable
 	 */
 	private boolean headerOnly;
 
-	/**
-	 * The maximum number of atoms that will be parsed before the parser switches to a CA-only
-	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be
-	 * ignored.
-	 */
-	public static final int ATOM_CA_THRESHOLD = 500000;
-
 	private int atomCaThreshold;
-
 
 	/**
 	 * Should we parse the biological assembly information from a file?
@@ -99,26 +106,19 @@ public class FileParsingParameters implements Serializable
 	 */
 	private boolean createAtomCharges;
 
-	/**
-	 * The maximum number of atoms we will add to a structure,
-	 * this protects from memory overflows in the few really big protein structures.
-	 */
-	public static final int MAX_ATOMS = Integer.MAX_VALUE; // no limit, we don't want to truncate molecules, but the user should make sure there is more memory available
-	//public static final int MAX_ATOMS = 700000; // tested with java -Xmx300M
-
-	int maxAtoms ;
+	int maxAtoms;
 
 	String[] fullAtomNames;
 
-	public FileParsingParameters(){
+	public FileParsingParameters() {
 		setDefault();
 	}
 
-	public void setDefault(){
+	public void setDefault() {
 
 		parseSecStruc = false;
 		// Default is to align / when false the unaligned SEQRES is stored.
-		alignSeqRes   = true;
+		alignSeqRes = true;
 		parseCAOnly = false;
 
 		headerOnly = false;
@@ -138,8 +138,8 @@ public class FileParsingParameters implements Serializable
 	}
 
 	/**
-	 * Is secondary structure assignment being parsed from the file?
-	 * default is null
+	 * Is secondary structure assignment being parsed from the file? default is null
+	 * 
 	 * @return boolean if HELIX STRAND and TURN fields are being parsed
 	 */
 	public boolean isParseSecStruc() {
@@ -147,29 +147,30 @@ public class FileParsingParameters implements Serializable
 	}
 
 	/**
-	 * A flag to tell the parser to parse the Author's secondary structure assignment from the file
-	 * default is set to false, i.e. do NOT parse.
+	 * A flag to tell the parser to parse the Author's secondary structure
+	 * assignment from the file default is set to false, i.e. do NOT parse.
+	 * 
 	 * @param parseSecStruc if HELIX STRAND and TURN fields are being parsed
 	 */
 	public void setParseSecStruc(boolean parseSecStruc) {
 		this.parseSecStruc = parseSecStruc;
 	}
 
-	/** Parse only the PDB file header out of the files
+	/**
+	 * Parse only the PDB file header out of the files
 	 *
 	 * @return flag
 	 */
-	public boolean isHeaderOnly()
-	{
+	public boolean isHeaderOnly() {
 		return headerOnly;
 	}
 
-	/** Parse only the PDB file header out of the files
+	/**
+	 * Parse only the PDB file header out of the files
 	 *
 	 * @param headerOnly flag
 	 */
-	public void setHeaderOnly(boolean headerOnly)
-	{
+	public void setHeaderOnly(boolean headerOnly) {
 		this.headerOnly = headerOnly;
 	}
 
@@ -181,6 +182,7 @@ public class FileParsingParameters implements Serializable
 	public boolean isParseCAOnly() {
 		return parseCAOnly;
 	}
+
 	/**
 	 * Flag if only the C-alpha atoms of the structure should be parsed.
 	 *
@@ -190,9 +192,8 @@ public class FileParsingParameters implements Serializable
 		this.parseCAOnly = parseCAOnly;
 	}
 
-
-
-	/** Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
+	/**
+	 * Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
 	 *
 	 * @return flag if SEQRES - ATOM amino acids alignment is enabled
 	 */
@@ -200,11 +201,10 @@ public class FileParsingParameters implements Serializable
 		return alignSeqRes;
 	}
 
-
-
 	/**
 	 * Define if the SEQRES in the structure should be aligned with the ATOM records
 	 * if yes, the AminoAcids in structure.getSeqRes will have the coordinates set.
+	 * 
 	 * @param alignSeqRes
 	 */
 	public void setAlignSeqRes(boolean alignSeqRes) {
@@ -212,28 +212,32 @@ public class FileParsingParameters implements Serializable
 	}
 
 	/**
-	 * By default the parser will read in all atoms (unless using the CAonly switch). This allows to specify a set of atoms to be read. e.g.
-	 * {"CA", "CB" }. Returns null if all atoms are accepted.
+	 * By default the parser will read in all atoms (unless using the CAonly
+	 * switch). This allows to specify a set of atoms to be read. e.g. {"CA", "CB"
+	 * }. Returns null if all atoms are accepted.
+	 * 
 	 * @return accepted atom names, or null if all atoms are accepted. default null
 	 */
 	public String[] getAcceptedAtomNames() {
 		return fullAtomNames;
 	}
 
-
 	/**
-	 * By default the parser will read in all atoms (unless using the CAonly switch). This allows to specify a set of atoms to be read. e.g.
-	 * {"CA", "CB" }. Returns null if all atoms are accepted.
-	 * @param fullAtomNames accepted atom names, or null if all atoms are accepted. default null
+	 * By default the parser will read in all atoms (unless using the CAonly
+	 * switch). This allows to specify a set of atoms to be read. e.g. {"CA", "CB"
+	 * }. Returns null if all atoms are accepted.
+	 * 
+	 * @param fullAtomNames accepted atom names, or null if all atoms are accepted.
+	 *                      default null
 	 */
 
 	public void setAcceptedAtomNames(String[] fullAtomNames) {
 		this.fullAtomNames = fullAtomNames;
 	}
 
-
 	/**
-	 * The maximum numbers of atoms to load in a protein structure (prevents memory overflows)
+	 * The maximum numbers of atoms to load in a protein structure (prevents memory
+	 * overflows)
 	 *
 	 * @return maximum nr of atoms to load, default Integer.MAX_VALUE;
 	 */
@@ -242,7 +246,8 @@ public class FileParsingParameters implements Serializable
 	}
 
 	/**
-	 * The maximum numbers of atoms to load in a protein structure (prevents memory overflows)
+	 * The maximum numbers of atoms to load in a protein structure (prevents memory
+	 * overflows)
 	 *
 	 * @param maxAtoms maximun nr of atoms to load
 	 */
@@ -250,11 +255,10 @@ public class FileParsingParameters implements Serializable
 		this.maxAtoms = maxAtoms;
 	}
 
-
 	/**
-	 * The maximum number of atoms that will be parsed before the parser switches to a CA-only
-	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be
-	 * ignored.
+	 * The maximum number of atoms that will be parsed before the parser switches to
+	 * a CA-only representation of the PDB file. If this limit is exceeded also the
+	 * SEQRES groups will be ignored.
 	 *
 	 *
 	 * @return atomCaThreshold.
@@ -263,19 +267,19 @@ public class FileParsingParameters implements Serializable
 		return atomCaThreshold;
 	}
 
-
 	/**
-	 * The maximum number of atoms that will be parsed before the parser switches to a CA-only
-	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be
-	 * ignored.
+	 * The maximum number of atoms that will be parsed before the parser switches to
+	 * a CA-only representation of the PDB file. If this limit is exceeded also the
+	 * SEQRES groups will be ignored.
+	 * 
 	 * @param atomCaThreshold maximum number of atoms for all atom representation.
 	 */
 	public void setAtomCaThreshold(int atomCaThreshold) {
 		this.atomCaThreshold = atomCaThreshold;
 	}
 
-
-	/** Should the biological assembly info (REMARK 350) be parsed from the PDB file?
+	/**
+	 * Should the biological assembly info (REMARK 350) be parsed from the PDB file?
 	 *
 	 * @return boolean flag yes/no
 	 */
@@ -283,9 +287,10 @@ public class FileParsingParameters implements Serializable
 		return parseBioAssembly;
 	}
 
-	/** Should the biological assembly info (REMARK 350) be parsed from the PDB file?
+	/**
+	 * Should the biological assembly info (REMARK 350) be parsed from the PDB file?
 	 *
-	 * @param parseBioAssembly  boolean flag yes/no
+	 * @param parseBioAssembly boolean flag yes/no
 	 */
 
 	public void setParseBioAssembly(boolean parseBioAssembly) {
@@ -302,12 +307,11 @@ public class FileParsingParameters implements Serializable
 	}
 
 	/**
-	 * Should we create bonds between atoms when parsing a file.
-	 * Will create intra-group bonds from information available in chemical component files and
+	 * Should we create bonds between atoms when parsing a file. Will create
+	 * intra-group bonds from information available in chemical component files and
 	 * some other bonds from struc_conn category in mmCIF file.
 	 *
-	 * @param createAtomBonds
-	 *            true if we should create the bonds, false if not
+	 * @param createAtomBonds true if we should create the bonds, false if not
 	 * @see BondMaker
 	 */
 	public void setCreateAtomBonds(boolean createAtomBonds) {
@@ -326,13 +330,10 @@ public class FileParsingParameters implements Serializable
 	/**
 	 * Should we create charges on atoms when parsing a file?
 	 *
-	 * @param createAtomCharges
-	 *            true if we should create the charges, false if not
+	 * @param createAtomCharges true if we should create the charges, false if not
 	 */
 	public void setCreateAtomCharges(boolean createAtomCharges) {
 		this.createAtomCharges = createAtomCharges;
 	}
-
-
 
 }

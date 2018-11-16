@@ -33,9 +33,7 @@ import java.util.Map;
  * @since 3.0
  */
 public enum ModificationOccurrenceType {
-	NATURAL("natural"),
-	HYPOTHETICAL("hypothetical"),
-	ARTIFACTUAL("artifactual");
+	NATURAL("natural"), HYPOTHETICAL("hypothetical"), ARTIFACTUAL("artifactual");
 
 	ModificationOccurrenceType(String label) {
 		this.label = label;
@@ -73,8 +71,8 @@ public enum ModificationOccurrenceType {
 
 	private static Map<String, ModificationOccurrenceType> mapLabelOcc;
 	static {
-		mapLabelOcc = new HashMap<String, ModificationOccurrenceType>();
-		for (ModificationOccurrenceType occ:ModificationOccurrenceType.values()) {
+		mapLabelOcc = new HashMap<>();
+		for (ModificationOccurrenceType occ : ModificationOccurrenceType.values()) {
 			mapLabelOcc.put(occ.label, occ);
 		}
 	}

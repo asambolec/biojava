@@ -25,6 +25,7 @@ package org.biojava.nbio.structure;
 
 /**
  * A nucleotide group is almost the same as a Hetatm group.
+ * 
  * @see HetatomImpl
  * @see AminoAcidImpl
  * @author Andreas Prlic
@@ -41,27 +42,29 @@ public class NucleotideImpl extends HetatomImpl {
 	 * inherits most from Hetero and has just a few extensions.
 	 */
 	public NucleotideImpl() {
-		super();
 
 	}
 
 	@Override
-	public GroupType getType(){ return type;}
-
+	public GroupType getType() {
+		return type;
+	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 
-		String str = "PDB: "+ pdb_name + " " + residueNumber +  " "+ pdb_flag;
+		String str = new StringBuilder().append("PDB: ").append(pdb_name).append(" ").append(residueNumber).append(" ")
+				.append(pdb_flag).toString();
 		if (pdb_flag) {
-			str = str + "atoms: "+atoms.size();
+			str = new StringBuilder().append(str).append("atoms: ").append(atoms.size()).toString();
 		}
-		return str ;
+		return str;
 
 	}
 
 	/**
 	 * Returns the O3' atom if present, otherwise null
+	 * 
 	 * @return O3' atom or null
 	 */
 	public Atom getO3Prime() {
@@ -72,6 +75,7 @@ public class NucleotideImpl extends HetatomImpl {
 
 	/**
 	 * Returns the O5' atom if present, otherwise null
+	 * 
 	 * @return O5' atom or null
 	 */
 	public Atom getO5Prime() {
@@ -82,6 +86,7 @@ public class NucleotideImpl extends HetatomImpl {
 
 	/**
 	 * Returns the P atom if present, otherwise null
+	 * 
 	 * @return P atom or null
 	 */
 	public Atom getP() {
@@ -90,8 +95,10 @@ public class NucleotideImpl extends HetatomImpl {
 
 	}
 
-	// note we need to implement a clone here, despite there's one in super class already,
-	// that's due to issue https://github.com/biojava/biojava/issues/631 - JD 2017-01-21
+	// note we need to implement a clone here, despite there's one in super class
+	// already,
+	// that's due to issue https://github.com/biojava/biojava/issues/631 - JD
+	// 2017-01-21
 	@Override
 	public Object clone() {
 
@@ -101,20 +108,17 @@ public class NucleotideImpl extends HetatomImpl {
 
 		n.setPDBName(getPDBName());
 
-		//clone atoms and bonds.
+		// clone atoms and bonds.
 		cloneAtomsAndBonds(n);
-		
-		// copying the alt loc groups if present, otherwise they stay null
-		if (getAltLocs()!=null && !getAltLocs().isEmpty()) {
-			for (Group altLocGroup:this.getAltLocs()) {
-				Group nAltLocGroup = (Group)altLocGroup.clone();
-				n.addAltLoc(nAltLocGroup);
-			}
-		}
-		
-		if (chemComp!=null)
-			n.setChemComp(chemComp);
 
+		// copying the alt loc groups if present, otherwise they stay null
+		if (getAltLocs() != null && !getAltLocs().isEmpty()) {
+			this.getAltLocs().stream().map(altLocGroup -> (Group) altLocGroup.clone()).forEach(n::addAltLoc);
+		}
+
+		if (chemComp != null) {
+			n.setChemComp(chemComp);
+		}
 
 		return n;
 	}

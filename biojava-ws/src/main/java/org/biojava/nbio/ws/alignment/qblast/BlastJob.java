@@ -35,6 +35,7 @@ public class BlastJob {
 
 	/**
 	 * Request id (RID) as received from QBlast server
+	 * 
 	 * @return
 	 */
 	public String getId() {

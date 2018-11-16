@@ -5,6 +5,8 @@ import org.biojava.nbio.structure.StructureTools;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.StructureIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  *                    BioJava development code
@@ -31,15 +33,19 @@ import org.biojava.nbio.structure.StructureIO;
 
 public class DemoShowLargeAssembly {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoShowLargeAssembly.class);
 
-		// This loads the PBCV-1 virus capsid, one of, if not the biggest biological assembly in terms on nr. of atoms.
+	public static void main(String[] args) {
+
+		// This loads the PBCV-1 virus capsid, one of, if not the biggest biological
+		// assembly in terms on nr. of atoms.
 		// The 1m4x.pdb1.gz file has 313 MB (compressed)
-		// This Structure requires a minimum of 9 GB of memory to be able to be loaded in memory.
+		// This Structure requires a minimum of 9 GB of memory to be able to be loaded
+		// in memory.
 
 		String pdbId = "1M4X";
 
-		Structure bigStructure = readStructure(pdbId,1);
+		Structure bigStructure = readStructure(pdbId, 1);
 
 		// let's take a look how much memory this consumes currently
 
@@ -48,28 +54,27 @@ public class DemoShowLargeAssembly {
 		// let's try to trigger the Java Garbage collector
 		r.gc();
 
-		System.out.println("Memory consumption after " + pdbId +
-				" structure has been loaded into memory:");
+		logger.info(new StringBuilder().append("Memory consumption after ").append(pdbId)
+				.append(" structure has been loaded into memory:").toString());
 
-		String mem = String.format("Total %dMB, Used %dMB, Free %dMB, Max %dMB",
-				r.totalMemory() / 1048576,
-				(r.totalMemory() - r.freeMemory()) / 1048576,
-				r.freeMemory() / 1048576,
-				r.maxMemory() / 1048576);
+		String mem = String.format("Total %dMB, Used %dMB, Free %dMB, Max %dMB", r.totalMemory() / 1048576,
+				(r.totalMemory() - r.freeMemory()) / 1048576, r.freeMemory() / 1048576, r.maxMemory() / 1048576);
 
-		System.out.println(mem);
+		logger.info(mem);
 
 		// 9693 atoms in the asymmetric unit * 1680 copies per assembly = 16284240 atoms
-		System.out.println("# atoms: " + StructureTools.getNrAtoms(bigStructure));
+		logger.info("# atoms: " + StructureTools.getNrAtoms(bigStructure));
 
 	}
-	/** Load a specific biological assembly for a PDB entry
+
+	/**
+	 * Load a specific biological assembly for a PDB entry
 	 *
-	 * @param pdbId .. the PDB ID
+	 * @param pdbId         .. the PDB ID
 	 * @param bioAssemblyId .. the first assembly has the bioAssemblyId 1
 	 * @return a Structure object or null if something went wrong.
 	 */
-	public static Structure  readStructure(String pdbId, int bioAssemblyId) {
+	public static Structure readStructure(String pdbId, int bioAssemblyId) {
 
 		// pre-computed files use lower case PDB IDs
 		pdbId = pdbId.toLowerCase();
@@ -82,7 +87,8 @@ public class DemoShowLargeAssembly {
 
 		// some bio assemblies are large, we want an all atom representation and avoid
 		// switching to a Calpha-only representation for large molecules
-		// note, this requires several GB of memory for some of the largest assemblies, such a 1MX4
+		// note, this requires several GB of memory for some of the largest assemblies,
+		// such a 1MX4
 		p.setAtomCaThreshold(Integer.MAX_VALUE);
 
 		// parse remark 350
@@ -92,9 +98,9 @@ public class DemoShowLargeAssembly {
 
 		Structure structure = null;
 		try {
-			structure = StructureIO.getBiologicalAssembly(pdbId,bioAssemblyId);
-		} catch (Exception e){
-			e.printStackTrace();
+			structure = StructureIO.getBiologicalAssembly(pdbId, bioAssemblyId);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 		return structure;

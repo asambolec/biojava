@@ -29,7 +29,6 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /*
  * _chem_comp_bond.comp_id
 _chem_comp_bond.atom_id_1
@@ -52,45 +51,59 @@ public class ChemCompBond implements Serializable {
 	String pdbx_aromatic_flag;
 	String pdbx_stereo_config;
 	String pdbx_ordinal;
+
 	public String getComp_id() {
 		return comp_id;
 	}
+
 	public void setComp_id(String comp_id) {
 		this.comp_id = comp_id;
 	}
+
 	public String getAtom_id_1() {
 		return atom_id_1;
 	}
+
 	public void setAtom_id_1(String atom_id_1) {
 		this.atom_id_1 = atom_id_1;
 	}
+
 	public String getAtom_id_2() {
 		return atom_id_2;
 	}
+
 	public void setAtom_id_2(String atom_id_2) {
 		this.atom_id_2 = atom_id_2;
 	}
+
 	public String getValue_order() {
 		return value_order;
 	}
+
 	public void setValue_order(String value_order) {
 		this.value_order = value_order;
 	}
+
 	public String getPdbx_aromatic_flag() {
 		return pdbx_aromatic_flag;
 	}
+
 	public void setPdbx_aromatic_flag(String pdbx_aromatic_flag) {
 		this.pdbx_aromatic_flag = pdbx_aromatic_flag;
 	}
+
 	public String getPdbx_stereo_config() {
 		return pdbx_stereo_config;
 	}
+
 	public void setPdbx_stereo_config(String pdbx_stereo_config) {
 		this.pdbx_stereo_config = pdbx_stereo_config;
 	}
+
 	public String getPdbx_ordinal() {
 		return pdbx_ordinal;
 	}
+
 	public void setPdbx_ordinal(String pdbx_ordinal) {
 		this.pdbx_ordinal = pdbx_ordinal;
 	}
@@ -112,21 +125,20 @@ public class ChemCompBond implements Serializable {
 	 * http://mmcif.rcsb.org/dictionaries/mmcif_mdb.dic/Items/_chem_comp_bond.
 	 * value_order.html)
 	 *
-	 * @return the numerical value of this ChemCompBond's bond order, or -1 if
-	 *         the value is non-numeric or unknown.
+	 * @return the numerical value of this ChemCompBond's bond order, or -1 if the
+	 *         value is non-numeric or unknown.
 	 */
 	public int getNumericalBondOrder() {
-		if (value_order.equals("SING")) {
+		if ("SING".equals(value_order)) {
 			return 1;
-		} else if (value_order.equals("DOUB")) {
+		} else if ("DOUB".equals(value_order)) {
 			return 2;
-		} else if (value_order.equals("TRIP")) {
+		} else if ("TRIP".equals(value_order)) {
 			return 3;
-		} else if (value_order.equals("QUAD")) {
+		} else if ("QUAD".equals(value_order)) {
 			return 4;
 		} else {
-			logger.error("Unknown or non-numeric value for value_order: "
-					+ value_order);
+			logger.error("Unknown or non-numeric value for value_order: " + value_order);
 			return -1;
 		}
 	}

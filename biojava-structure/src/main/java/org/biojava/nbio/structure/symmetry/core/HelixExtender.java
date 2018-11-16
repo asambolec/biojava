@@ -26,8 +26,11 @@ import javax.vecmath.Point3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HelixExtender {
+	private static final Logger logger = LoggerFactory.getLogger(HelixExtender.class);
 	private QuatSymmetrySubunits subunits = null;
 	private Helix helix = null;
 
@@ -40,28 +43,28 @@ public class HelixExtender {
 		List<List<Integer>> layerLines = helix.getLayerLines();
 
 		// get list of subunit indices to be used for helix extension
-		List<Integer> indices = new ArrayList<Integer>();
-		for (List<Integer> line: layerLines) {
+		List<Integer> indices = new ArrayList<>();
+		layerLines.forEach(line -> {
 			if (steps < 0) {
 				indices.add(line.get(0));
 			} else if (steps > 0) {
-				indices.add(line.get(line.size()-1));
+				indices.add(line.get(line.size() - 1));
 			}
-		}
-		System.out.println("Extending subunits: " + indices);
+		});
+		logger.info("Extending subunits: " + indices);
 
-		List<Point3d> points = new ArrayList<Point3d>();
+		List<Point3d> points = new ArrayList<>();
 		Matrix4d transformation = helix.getTransformation();
-		for (int index: indices) {
-	    	Point3d[] trace = subunits.getTraces().get(index);
-	    	Point3d[] copy = CalcPoint.clonePoint3dArray(trace);
-		    for (int i = 0; i < Math.abs(steps); i++) {
-		    	CalcPoint.transform(transformation, copy);
-		    }
-		    for (Point3d p: copy) {
-		    	points.add(p);
-		    }
-		}
+		indices.stream().mapToInt(Integer::valueOf).forEach(index -> {
+			Point3d[] trace = subunits.getTraces().get(index);
+			Point3d[] copy = CalcPoint.clonePoint3dArray(trace);
+			for (int i = 0; i < Math.abs(steps); i++) {
+				CalcPoint.transform(transformation, copy);
+			}
+			for (Point3d p : copy) {
+				points.add(p);
+			}
+		});
 		return points.toArray(new Point3d[0]);
 	}
 

@@ -42,8 +42,10 @@ import java.util.concurrent.Future;
  * Implements common code for an {@link Aligner} for a pair of {@link Profile}s.
  *
  * @author Mark Chapman
- * @param <S> each {@link Sequence} in the pair of alignment {@link Profile}s is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <S> each {@link Sequence} in the pair of alignment {@link Profile}s is
+ *        of type S
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C extends Compound>
 		extends AbstractMatrixAligner<S, C> implements ProfileProfileAligner<S, C> {
@@ -51,21 +53,28 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 	private final static Logger logger = LoggerFactory.getLogger(AbstractProfileProfileAligner.class);
 
 	// additional input fields
-	private Profile<S, C> query, target;
+	private Profile<S, C> query;
+
+	private Profile<S, C> target;
 
 	// concurrent execution fields
-	private Future<ProfilePair<S, C>> queryFuture, targetFuture;
+	private Future<ProfilePair<S, C>> queryFuture;
+
+	private Future<ProfilePair<S, C>> targetFuture;
 
 	// cached fields
 	private List<C> cslist;
-	private float[][] qfrac, tfrac;
+	private float[][] qfrac;
+
+	private float[][] tfrac;
 
 	// additional output field
 	protected ProfilePair<S, C> pair;
 
 	/**
 	 * Before running a profile-profile alignment, data must be sent in via calls to
-	 * {@link #setQuery(Profile)}, {@link #setTarget(Profile)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * {@link #setQuery(Profile)}, {@link #setTarget(Profile)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	protected AbstractProfileProfileAligner() {
@@ -74,10 +83,10 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 	/**
 	 * Prepares for a profile-profile alignment.
 	 *
-	 * @param query the first {@link Profile} of the pair to align
-	 * @param target the second {@link Profile} of the pair to align
+	 * @param query      the first {@link Profile} of the pair to align
+	 * @param target     the second {@link Profile} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	protected AbstractProfileProfileAligner(Profile<S, C> query, Profile<S, C> target, GapPenalty gapPenalty,
 			SubstitutionMatrix<C> subMatrix) {
@@ -90,10 +99,12 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align, still to be calculated
-	 * @param target the second {@link Profile} of the pair to align, still to be calculated
+	 * @param query      the first {@link Profile} of the pair to align, still to be
+	 *                   calculated
+	 * @param target     the second {@link Profile} of the pair to align, still to
+	 *                   be calculated
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	protected AbstractProfileProfileAligner(Future<ProfilePair<S, C>> query, Future<ProfilePair<S, C>> target,
 			GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
@@ -106,10 +117,11 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align
-	 * @param target the second {@link Profile} of the pair to align, still to be calculated
+	 * @param query      the first {@link Profile} of the pair to align
+	 * @param target     the second {@link Profile} of the pair to align, still to
+	 *                   be calculated
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	protected AbstractProfileProfileAligner(Profile<S, C> query, Future<ProfilePair<S, C>> target,
 			GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
@@ -122,10 +134,11 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 	/**
 	 * Prepares for a profile-profile alignment run concurrently.
 	 *
-	 * @param query the first {@link Profile} of the pair to align, still to be calculated
-	 * @param target the second {@link Profile} of the pair to align
+	 * @param query      the first {@link Profile} of the pair to align, still to be
+	 *                   calculated
+	 * @param target     the second {@link Profile} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	protected AbstractProfileProfileAligner(Future<ProfilePair<S, C>> query, Profile<S, C> target,
 			GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
@@ -200,8 +213,8 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 
 	@Override
 	protected int[] getScoreMatrixDimensions() {
-		return new int[] { query.getLength() + 1, target.getLength() + 1, (getGapPenalty().getType() == Type.LINEAR) ?
-				1 : 3 };
+		return new int[] { query.getLength() + 1, target.getLength() + 1,
+				(getGapPenalty().getType() == Type.LINEAR) ? 1 : 3 };
 	}
 
 	@Override
@@ -211,7 +224,8 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 
 	@Override
 	protected boolean isReady() {
-		// TODO when added to ConcurrencyTools, log completions and exceptions instead of printing stack traces
+		// TODO when added to ConcurrencyTools, log completions and exceptions instead
+		// of printing stack traces
 		try {
 			if (query == null && queryFuture != null) {
 				query = queryFuture.get();
@@ -225,32 +239,35 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 		} catch (ExecutionException e) {
 			logger.error("Execution Exception: ", e);
 		}
-		return query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null &&
-				query.getCompoundSet().equals(target.getCompoundSet());
+		return query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null
+				&& query.getCompoundSet().equals(target.getCompoundSet());
 	}
 
 	@Override
 	protected void reset() {
 		super.reset();
 		pair = null;
-		if (query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null &&
-				query.getCompoundSet().equals(target.getCompoundSet())) {
-			int maxq = 0, maxt = 0;
-			cslist = query.getCompoundSet().getAllCompounds();
-			qfrac = new float[query.getLength()][];
-			for (int i = 0; i < qfrac.length; i++) {
-				qfrac[i] = query.getCompoundWeightsAt(i + 1, cslist);
-				maxq += getSubstitutionScore(qfrac[i], qfrac[i]);
-			}
-			tfrac = new float[target.getLength()][];
-			for (int i = 0; i < tfrac.length; i++) {
-				tfrac[i] = target.getCompoundWeightsAt(i + 1, cslist);
-				maxt += getSubstitutionScore(tfrac[i], tfrac[i]);
-			}
-			max = Math.max(maxq, maxt);
-			score = min = isLocal() ? 0 : (int) (2 * getGapPenalty().getOpenPenalty() + (query.getLength() +
-					target.getLength()) * getGapPenalty().getExtensionPenalty());
+		if (!(query != null && target != null && getGapPenalty() != null && getSubstitutionMatrix() != null
+				&& query.getCompoundSet().equals(target.getCompoundSet()))) {
+			return;
 		}
+		int maxq = 0;
+		int maxt = 0;
+		cslist = query.getCompoundSet().getAllCompounds();
+		qfrac = new float[query.getLength()][];
+		for (int i = 0; i < qfrac.length; i++) {
+			qfrac[i] = query.getCompoundWeightsAt(i + 1, cslist);
+			maxq += getSubstitutionScore(qfrac[i], qfrac[i]);
+		}
+		tfrac = new float[target.getLength()][];
+		for (int i = 0; i < tfrac.length; i++) {
+			tfrac[i] = target.getCompoundWeightsAt(i + 1, cslist);
+			maxt += getSubstitutionScore(tfrac[i], tfrac[i]);
+		}
+		max = Math.max(maxq, maxt);
+		score = min = isLocal() ? 0
+				: (int) (2 * getGapPenalty().getOpenPenalty()
+						+ (query.getLength() + target.getLength()) * getGapPenalty().getExtensionPenalty());
 	}
 
 	// helper method that scores alignment of two column vectors
@@ -260,7 +277,7 @@ public abstract class AbstractProfileProfileAligner<S extends Sequence<C>, C ext
 			if (qv[q] > 0.0f) {
 				for (int t = 0; t < tv.length; t++) {
 					if (tv[t] > 0.0f) {
-						score += qv[q]*tv[t]*getSubstitutionMatrix().getValue(cslist.get(q), cslist.get(t));
+						score += qv[q] * tv[t] * getSubstitutionMatrix().getValue(cslist.get(q), cslist.get(t));
 					}
 				}
 			}

@@ -36,7 +36,8 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 public interface HierarchicalClusterer<S extends Sequence<C>, C extends Compound> {
 
 	/**
-	 * Returns the distance matrix used in clustering.  May be calculated from another original source.
+	 * Returns the distance matrix used in clustering. May be calculated from
+	 * another original source.
 	 *
 	 * @return the distance matrix input to clustering
 	 */

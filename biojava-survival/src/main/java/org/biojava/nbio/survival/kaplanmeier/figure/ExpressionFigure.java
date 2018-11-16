@@ -32,6 +32,8 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -39,9 +41,11 @@ import java.util.Collections;
  */
 public class ExpressionFigure extends JPanel {
 
+	private static final Logger logger = LoggerFactory.getLogger(ExpressionFigure.class);
+
 	private static final long serialVersionUID = 1L;
 
-	ArrayList<String> title = new ArrayList<String>();
+	ArrayList<String> title = new ArrayList<>();
 	/**
 	 *
 	 */
@@ -69,27 +73,30 @@ public class ExpressionFigure extends JPanel {
 	Double mean = 0.0;
 	FontMetrics fm;
 	KMFigureInfo kmfi = new KMFigureInfo();
-//    LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new LinkedHashMap<String, ArrayList<CensorStatus>>();
-	ArrayList<String> lineInfoList = new ArrayList<String>();
-	ArrayList<SurvivalInfo> siList = new ArrayList<SurvivalInfo>();
+	// LinkedHashMap<String, ArrayList<CensorStatus>> survivalData = new
+	// LinkedHashMap<String, ArrayList<CensorStatus>>();
+	ArrayList<String> lineInfoList = new ArrayList<>();
+	ArrayList<SurvivalInfo> siList = new ArrayList<>();
 	String variable = "";
 	private String fileName = "";
+
+	DecimalFormat df = new DecimalFormat("#.#");
 
 	/**
 	 *
 	 */
 	public ExpressionFigure() {
-		super();
 		setSize(500, 400);
 		setBackground(Color.WHITE);
 	}
 
 	/**
 	 * The data used to draw the graph
+	 * 
 	 * @return
 	 */
 
-	public ArrayList<SurvivalInfo> getSurvivalInfoList(){
+	public ArrayList<SurvivalInfo> getSurvivalInfoList() {
 		return siList;
 	}
 
@@ -120,7 +127,7 @@ public class ExpressionFigure extends JPanel {
 	 * @param variable
 	 */
 	public void setSurvivalInfo(ArrayList<String> title, ArrayList<SurvivalInfo> _siList, String variable) {
-		this.siList = new ArrayList<SurvivalInfo>();
+		this.siList = new ArrayList<>();
 		this.title = title;
 		this.variable = variable;
 
@@ -147,10 +154,8 @@ public class ExpressionFigure extends JPanel {
 		minY = (double) Math.floor(minY);
 		maxY = (double) Math.ceil(maxY);
 
-
 		this.repaint();
 	}
-	DecimalFormat df = new DecimalFormat("#.#");
 
 	private void setRenderingHints(Graphics2D g) {
 		RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -165,11 +170,11 @@ public class ExpressionFigure extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) // draw graphics in the panel
 	{
-		//int width = getWidth();             // width of window in pixels
-		//int height = getHeight();           // height of window in pixels
+		// int width = getWidth(); // width of window in pixels
+		// int height = getHeight(); // height of window in pixels
 		setFigureDimensions();
-		super.paintComponent(g);            // call superclass to make panel display correctly
-		Graphics2D g2 = (Graphics2D)g;
+		super.paintComponent(g); // call superclass to make panel display correctly
+		Graphics2D g2 = (Graphics2D) g;
 		setRenderingHints(g2);
 		drawExpressionLevels(g);
 		drawFigureLineInfo(g);
@@ -190,7 +195,7 @@ public class ExpressionFigure extends JPanel {
 
 		for (String line : lineInfoList) {
 			g.drawString(line, x, y);
-			y = y + fm.getHeight();
+			y += fm.getHeight();
 		}
 
 	}
@@ -221,17 +226,17 @@ public class ExpressionFigure extends JPanel {
 			}
 			py = y;
 
-			//    g2.setColor(Color.black);
-			//    double yt = getYFromPercentage(1.0 - ((double)x)/((double)siList.size())  );
-			//    g2.drawOval(getX(x) - 2, ((int)yt) - 2, 4, 4);
+			// g2.setColor(Color.black);
+			// double yt = getYFromPercentage(1.0 - ((double)x)/((double)siList.size()) );
+			// g2.drawOval(getX(x) - 2, ((int)yt) - 2, 4, 4);
 		}
 
 	}
 
-//    private int getYFromPercentage(double percentage) {
-//        double d = top + (((bottom - top) * percentage));
-//        return (int) d;
-//    }
+	// private int getYFromPercentage(double percentage) {
+	// double d = top + (((bottom - top) * percentage));
+	// return (int) d;
+	// }
 
 	private int getX(double value) {
 		double d = left + (((right - left) * value) / (maxX - minX));
@@ -275,9 +280,9 @@ public class ExpressionFigure extends JPanel {
 		double ySize = maxY - minY;
 		double increment = kmfi.yaxisPercentIncrement * ySize;
 		increment = Math.ceil(increment);
-		//  increment = increment * 10.0;
+		// increment = increment * 10.0;
 		double d = minY + increment;
-		//double graphHeight = top - bottom;
+		// double graphHeight = top - bottom;
 		String label = "";
 		while (d < maxY) {
 			int yvalue = getY(maxY - d);
@@ -285,7 +290,7 @@ public class ExpressionFigure extends JPanel {
 			g2.drawString(label, left - (fm.stringWidth(label)) - 20, yvalue + titleHeight / 6); //
 
 			g2.drawLine(left - 5, yvalue, left, yvalue);
-			d = d + (increment);
+			d += (increment);
 		}
 
 		label = df.format(maxY);
@@ -300,18 +305,19 @@ public class ExpressionFigure extends JPanel {
 		}
 		double adjustedPercentIncrement = timeInt / timeDistance;
 
-		d = adjustedPercentIncrement; //kmfi.xaxisPercentIncrement;
+		d = adjustedPercentIncrement; // kmfi.xaxisPercentIncrement;
 		while (d <= 1.0) {
 			label = df.format((minX * kmfi.timeScale) + d * ((maxX - minX) * kmfi.timeScale)); //
-			if (d + adjustedPercentIncrement > 1.0) { //if this is the last one then adjust
-				g2.drawString(label, left + (int) (d * (right - left)) - (int) (.5 * fm.stringWidth(label)), bottom + fm.getHeight() + 5);
+			if (d + adjustedPercentIncrement > 1.0) { // if this is the last one then adjust
+				g2.drawString(label, left + (int) (d * (right - left)) - (int) (.5 * fm.stringWidth(label)),
+						bottom + fm.getHeight() + 5);
 			} else {
-				g2.drawString(label, left + (int) (d * (right - left)) - (fm.stringWidth(label) / 2), bottom + fm.getHeight() + 5);
+				g2.drawString(label, left + (int) (d * (right - left)) - (fm.stringWidth(label) / 2),
+						bottom + fm.getHeight() + 5);
 			}
 			g2.drawLine(left + (int) (d * (right - left)), bottom, left + (int) (d * (right - left)), bottom + 5);
-			d = d + adjustedPercentIncrement; //kmfi.xaxisPercentIncrement;
+			d += adjustedPercentIncrement; // kmfi.xaxisPercentIncrement;
 		}
-
 
 		// draw the vertical and horizontal lines
 		g2.setStroke(kmfi.axisStroke);
@@ -321,10 +327,9 @@ public class ExpressionFigure extends JPanel {
 
 	private void setFigureDimensions() {
 		fm = getFontMetrics(getFont());
-		titleHeight = kmfi.titleHeight;//fm.getHeight();
+		titleHeight = kmfi.titleHeight;// fm.getHeight();
 		xAxisLabelHeight = titleHeight;
-		labelWidth = Math.max(fm.stringWidth(df.format(minY)),
-				fm.stringWidth(df.format(maxY))) + 5;
+		labelWidth = Math.max(fm.stringWidth(df.format(minY)), fm.stringWidth(df.format(maxY))) + 5;
 		top = kmfi.padding + titleHeight;
 		bottom = this.getHeight() - kmfi.padding - xAxisLabelHeight;
 		left = kmfi.padding + labelWidth;
@@ -348,7 +353,7 @@ public class ExpressionFigure extends JPanel {
 		try {
 			ImageIO.write(image, "png", new File(fileName));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error(ex.getMessage(), ex);
 		}
 
 	}
@@ -362,23 +367,21 @@ public class ExpressionFigure extends JPanel {
 
 			ExpressionFigure expressionFigure = new ExpressionFigure();
 
-
-
 			JFrame application = new JFrame();
 			application.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			application.add(expressionFigure);
 			expressionFigure.setSize(500, 400);
 
-			application.setSize(500, 400);         // window is 500 pixels wide, 400 high
+			application.setSize(500, 400); // window is 500 pixels wide, 400 high
 			application.setVisible(true);
 
-			ArrayList<String> titles = new ArrayList<String>();
+			ArrayList<String> titles = new ArrayList<>();
 			titles.add("Line 1");
 			titles.add("line 2");
 
-			ArrayList<String> figureInfo = new ArrayList<String>();
+			ArrayList<String> figureInfo = new ArrayList<>();
 
-			ArrayList<SurvivalInfo> survivalInfoList = new ArrayList<SurvivalInfo>();
+			ArrayList<SurvivalInfo> survivalInfoList = new ArrayList<>();
 
 			for (int i = 0; i < 600; i++) {
 				double r = Math.random();
@@ -395,7 +398,6 @@ public class ExpressionFigure extends JPanel {
 
 			}
 
-
 			expressionFigure.setSurvivalInfo(titles, survivalInfoList, "META_GENE");
 
 			expressionFigure.setFigureLineInfo(figureInfo);
@@ -403,7 +405,7 @@ public class ExpressionFigure extends JPanel {
 			expressionFigure.savePNG("/Users/Scooter/Downloads/test.png");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

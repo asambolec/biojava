@@ -35,7 +35,7 @@ import java.util.TreeMap;
  */
 public abstract class AbstractScoresCache implements ScoresCache {
 
-	private Map<String,Double> scores = null;
+	private Map<String, Double> scores = null;
 
 	protected AbstractScoresCache() {
 		scores = null;
@@ -47,15 +47,15 @@ public abstract class AbstractScoresCache implements ScoresCache {
 
 	@Override
 	public void putScore(String property, Double score) {
-		if(scores == null) {
-			scores = new TreeMap<String, Double>();
+		if (scores == null) {
+			scores = new TreeMap<>();
 		}
 		scores.put(property, score);
 	}
 
 	@Override
 	public Double getScore(String property) {
-		if(scores != null && scores.containsKey(property)) {
+		if (scores != null && scores.containsKey(property)) {
 			return scores.get(property);
 		}
 		return null;
@@ -63,7 +63,9 @@ public abstract class AbstractScoresCache implements ScoresCache {
 
 	@Override
 	public Set<String> getScores() {
-		if(scores == null) return Collections.emptySet();
+		if (scores == null) {
+			return Collections.emptySet();
+		}
 		return Collections.unmodifiableSet(scores.keySet());
 	}
 

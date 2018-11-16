@@ -41,30 +41,39 @@ public class PdbxChemCompDescriptor {
 	public String getComp_id() {
 		return comp_id;
 	}
+
 	public void setComp_id(String comp_id) {
 		this.comp_id = comp_id;
 	}
+
 	public String getType() {
 		return type;
 	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
+
 	public String getProgram() {
 		return program;
 	}
+
 	public void setProgram(String program) {
 		this.program = program;
 	}
+
 	public String getProgram_version() {
 		return program_version;
 	}
+
 	public void setProgram_version(String program_version) {
 		this.program_version = program_version;
 	}
+
 	public String getIdentifier() {
 		return identifier;
 	}
+
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 	}

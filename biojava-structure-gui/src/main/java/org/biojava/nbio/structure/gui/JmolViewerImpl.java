@@ -57,7 +57,7 @@ public class JmolViewerImpl implements StructureViewer {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				frame.dispose();
-				//System.exit(0);
+				// System.exit(0);
 			}
 		});
 
@@ -70,28 +70,25 @@ public class JmolViewerImpl implements StructureViewer {
 			jmolPanel = new JmolPanel();
 
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.err.println("Could not find Jmol in classpath, please install first. http://www.jmol.org");
+			logger.error(e.getMessage(), e);
+			logger.error("Could not find Jmol in classpath, please install first. http://www.jmol.org");
 			return;
 		}
 		jmolPanel.setPreferredSize(new Dimension(500, 500));
 		vBox.add(jmolPanel);
 
-
 		JTextField field = new JTextField();
 
 		field.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 		field.setText("enter RASMOL like command...");
-//        RasmolCommandListener listener = new RasmolCommandListener(jmolPanel, field);
+		// RasmolCommandListener listener = new RasmolCommandListener(jmolPanel, field);
 
-//        field.addActionListener(listener);
-//        field.addMouseListener(listener);
-//        field.addKeyListener(listener);
+		// field.addActionListener(listener);
+		// field.addMouseListener(listener);
+		// field.addKeyListener(listener);
 		vBox.add(field);
 
 		contentPane.add(vBox);
-
-
 
 		frame.pack();
 		frame.setVisible(true);
@@ -106,7 +103,7 @@ public class JmolViewerImpl implements StructureViewer {
 	@Override
 	public void setStructure(Structure structure) {
 		if (jmolPanel == null) {
-			System.err.println("please install Jmol first");
+			logger.error("please install Jmol first");
 			return;
 		}
 
@@ -116,13 +113,13 @@ public class JmolViewerImpl implements StructureViewer {
 		// just convert the structure to a PDB file
 
 		String pdb = structure.toPDB();
-		//System.out.println(s.isNmr());
+		// System.out.println(s.isNmr());
 
-		//System.out.println(pdb);
+		// System.out.println(pdb);
 		// Jmol could also read the file directly from your file system
-		//viewer.openFile("/Path/To/PDB/1tim.pdb");
+		// viewer.openFile("/Path/To/PDB/1tim.pdb");
 
-		//System.out.println(pdb);
+		// System.out.println(pdb);
 		jmolPanel.openStringInline(pdb);
 
 		// send the PDB file to Jmol.
@@ -172,6 +169,7 @@ public class JmolViewerImpl implements StructureViewer {
 	public void setZoom(int i) {
 		// TODO Auto-generated method stub
 	}
+
 	@SuppressWarnings("rawtypes")
 	static class JmolPanel extends JPanel {
 
@@ -180,20 +178,30 @@ public class JmolViewerImpl implements StructureViewer {
 		 */
 		private static final long serialVersionUID = -3661941083797644242L;
 
+		private final Logger logger1 = LoggerFactory.getLogger(JmolPanel.class);
+
 		Class viewerC;
 
 		Class adapterC;
 
-
 		Class smartAdapterC;
+
 		Object viewerO;
+
 		Object adapterO;
+
 		Method evalString;
+
 		Method renderScreenImage;
+
 		Method openStringInline;
 
-		//JmolSimpleViewer viewer;
-		//JmolAdapter adapter;
+		final Dimension currentSize = new Dimension();
+
+		final Rectangle rectClip = new Rectangle();
+
+		// JmolSimpleViewer viewer;
+		// JmolAdapter adapter;
 		@SuppressWarnings("unchecked")
 		JmolPanel() throws ClassNotFoundException {
 
@@ -203,37 +211,29 @@ public class JmolViewerImpl implements StructureViewer {
 				adapterC = Class.forName(adapter);
 				smartAdapterC = Class.forName(smartAdapter);
 
-				Method m = viewerC.getMethod("allocateSimpleViewer", new Class[]{Component.class, adapterC});
+				Method m = viewerC.getMethod("allocateSimpleViewer", new Class[] { Component.class, adapterC });
 
-				Constructor constructor = smartAdapterC.getConstructor(new Class[]{});
-				adapterO = constructor.newInstance(new Object[]{});
+				Constructor constructor = smartAdapterC.getConstructor(new Class[] {});
+				adapterO = constructor.newInstance(new Object[] {});
 
-				//viewerC = JmolSimpleViewer.allocateSimpleViewer(this, adapter);
+				// viewerC = JmolSimpleViewer.allocateSimpleViewer(this, adapter);
 				viewerO = m.invoke(viewerC, this, adapterO);
 
 				evalString = viewerC.getMethod("evalString", String.class);
 
 				renderScreenImage = viewerC.getMethod("renderScreenImage",
-						new Class[]{Graphics.class, Dimension.class, Rectangle.class});
+						new Class[] { Graphics.class, Dimension.class, Rectangle.class });
 
-				openStringInline = viewerC.getMethod("openStringInline", new Class[]{String.class});
+				openStringInline = viewerC.getMethod("openStringInline", new Class[] { String.class });
 
-			} catch (InstantiationException ex) {
-				logger.error("Exception caught", ex);
-			} catch (IllegalAccessException ex) {
-				logger.error("Exception caught", ex);
-			} catch (IllegalArgumentException ex) {
-				logger.error("Exception caught", ex);
-			} catch (InvocationTargetException ex) {
-				logger.error("Exception caught", ex);
-			} catch (NoSuchMethodException e) {
+			} catch (NoSuchMethodException | InvocationTargetException | IllegalArgumentException
+					| IllegalAccessException | InstantiationException e) {
 				logger.error("Exception caught", e);
 			}
 
 			evalString("set scriptQueue on;");
 
 		}
-
 
 		public Class getViewer() {
 			return viewerC;
@@ -243,7 +243,7 @@ public class JmolViewerImpl implements StructureViewer {
 			try {
 				evalString.invoke(viewerO, rasmolScript);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger1.error(e.getMessage(), e);
 			}
 		}
 
@@ -251,7 +251,7 @@ public class JmolViewerImpl implements StructureViewer {
 			try {
 				openStringInline.invoke(viewerO, pdbFile);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger1.error(e.getMessage(), e);
 			}
 		}
 
@@ -259,22 +259,20 @@ public class JmolViewerImpl implements StructureViewer {
 			try {
 				evalString.invoke(viewerO, rasmolScript);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger1.error(e.getMessage(), e);
 			}
 		}
-		final Dimension currentSize = new Dimension();
-		final Rectangle rectClip = new Rectangle();
 
 		@Override
 		public void paint(Graphics g) {
 			getSize(currentSize);
 			g.getClipBounds(rectClip);
-			//viewer.renderScreenImage(g, currentSize, rectClip);
+			// viewer.renderScreenImage(g, currentSize, rectClip);
 
 			try {
 				renderScreenImage.invoke(viewerO, g, currentSize, rectClip);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger1.error(e.getMessage(), e);
 			}
 		}
 	}

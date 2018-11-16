@@ -25,11 +25,7 @@ package org.biojava.nbio.structure.align.pairwise;
 import org.biojava.nbio.structure.align.helper.AligMatEl;
 import org.biojava.nbio.structure.align.helper.IndexPair;
 
-
-public class StrCompAlignment
-implements Alignable
-{
-
+public class StrCompAlignment implements Alignable {
 
 	AligMatEl[][] aligmat;
 	int rows;
@@ -42,23 +38,22 @@ implements Alignable
 	float gapExtRow;
 	float score;
 
-	public StrCompAlignment(int rows, int cols){
-		//System.out.println("new alignment " + rows + " " + cols);
+	public StrCompAlignment(int rows, int cols) {
+		// System.out.println("new alignment " + rows + " " + cols);
 		this.rows = rows;
 		this.cols = cols;
-		aligmat = new AligMatEl[rows+1][cols+1];
+		aligmat = new AligMatEl[rows + 1][cols + 1];
 
-		/*for (int i=0;i<rows+1;i++){
-			for(int j=0;j<cols+1;j++){
-				aligmat[i][j] = new AligMatEl();
-			}
-		}*/
+		/*
+		 * for (int i=0;i<rows+1;i++){ for(int j=0;j<cols+1;j++){ aligmat[i][j] = new
+		 * AligMatEl(); } }
+		 */
 		path = new IndexPair[0];
 		score = 0;
 	}
 
 	@Override
-	public int getRows(){
+	public int getRows() {
 		return rows;
 	}
 
@@ -67,23 +62,24 @@ implements Alignable
 		return cols;
 	}
 
-	public void setAligMat(int i, int j,AligMatEl el){
+	public void setAligMat(int i, int j, AligMatEl el) {
 		aligmat[i][j] = el;
 	}
-	public AligMatEl getAligMat(int i,int j){
+
+	public AligMatEl getAligMat(int i, int j) {
 		return aligmat[i][j];
 	}
 
 	@Override
-	public AligMatEl[][] getAligMat(){
+	public AligMatEl[][] getAligMat() {
 		return aligmat;
 	}
 
 	@Override
-	public void setAligMat(AligMatEl[][] al){
-		//System.out.println("setting alig mat: " + al.length + " " + al[0].length);
-		rows = al.length -1;
-		cols = al[0].length -1;
+	public void setAligMat(AligMatEl[][] al) {
+		// System.out.println("setting alig mat: " + al.length + " " + al[0].length);
+		rows = al.length - 1;
+		cols = al[0].length - 1;
 		aligmat = al;
 	}
 
@@ -129,13 +125,13 @@ implements Alignable
 
 	@Override
 	public float getScore() {
-	  return score;
+		return score;
 	}
 
 	@Override
 	public void setScore(float score) {
-		//System.out.println("StrCompAlig got score " +score);
-	   this.score = score;
+		// System.out.println("StrCompAlig got score " +score);
+		this.score = score;
 	}
 
 	@Override
@@ -158,11 +154,4 @@ implements Alignable
 		this.pathSize = pathSize;
 	}
 
-
-
 }
-
-
-
-
-

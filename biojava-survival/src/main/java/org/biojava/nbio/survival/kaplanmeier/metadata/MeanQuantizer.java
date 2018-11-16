@@ -22,12 +22,16 @@ package org.biojava.nbio.survival.kaplanmeier.metadata;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.biojava.nbio.survival.data.WorkSheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class MeanQuantizer implements DiscreteQuantizerInterface {
+
+	private static final Logger logger = LoggerFactory.getLogger(MeanQuantizer.class);
 
 	/**
 	 *
@@ -42,6 +46,7 @@ public class MeanQuantizer implements DiscreteQuantizerInterface {
 				Double d = Double.parseDouble(worksheet.getCell(row, column));
 				ds.addValue(d);
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		Double mean = ds.getMean();
@@ -54,9 +59,11 @@ public class MeanQuantizer implements DiscreteQuantizerInterface {
 					worksheet.addCell(row, column, "H");
 				}
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				try {
 					worksheet.addCell(row, column, "");
 				} catch (Exception e1) {
+					logger.error(e1.getMessage(), e1);
 				}
 			}
 		}

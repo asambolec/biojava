@@ -24,7 +24,6 @@
  */
 package org.biojava.nbio.structure.domain;
 
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -36,40 +35,43 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-@XmlRootElement(name = "AssignmentXML", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "AssignmentXML", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 
 public class AssignmentXMLSerializer {
 
-	Map<String, String> assignments;
+	private static final Logger logger = LoggerFactory.getLogger(AssignmentXMLSerializer.class);
 
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(AssignmentXMLSerializer.class);
-		} catch (Exception e){
-			e.printStackTrace();
+			jaxbContext = JAXBContext.newInstance(AssignmentXMLSerializer.class);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
-	public AssignmentXMLSerializer(){
-		assignments = new HashMap<String, String>();
+	Map<String, String> assignments;
+
+	public AssignmentXMLSerializer() {
+		assignments = new HashMap<>();
 
 	}
 
-	public void setAssignments(Map<String, String> assignments){
+	public void setAssignments(Map<String, String> assignments) {
 
 		this.assignments = assignments;
 
 	}
 
-	public Map<String, String> getAssignments(){
+	public Map<String, String> getAssignments() {
 		return assignments;
 	}
 
-	public  String toXML(){
+	public String toXML() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -81,18 +83,17 @@ public class AssignmentXMLSerializer {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static AssignmentXMLSerializer fromXML(String xml){
+	public static AssignmentXMLSerializer fromXML(String xml) {
 
 		AssignmentXMLSerializer job = null;
 
@@ -104,12 +105,11 @@ public class AssignmentXMLSerializer {
 
 			job = (AssignmentXMLSerializer) un.unmarshal(bais);
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return job;
 	}
-
 
 }

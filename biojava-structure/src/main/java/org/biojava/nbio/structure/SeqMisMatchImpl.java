@@ -25,7 +25,7 @@ import java.io.Serializable;
 /**
  * Created by andreas on 9/11/15.
  */
-public class SeqMisMatchImpl implements SeqMisMatch, Serializable{
+public class SeqMisMatchImpl implements SeqMisMatch, Serializable {
 
 	private static final long serialVersionUID = -3699285122925652562L;
 
@@ -109,26 +109,27 @@ public class SeqMisMatchImpl implements SeqMisMatch, Serializable{
 
 	@Override
 	public String toString() {
-		StringBuffer  s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 
 		s.append("SeqMisMatchImpl{");
-		s.append("seqNum=" );
-		s.append(seqNum );
-		s.append(", origGroup='" );
-		s.append(origGroup + '\'' );
-		s.append(", pdbGroup='" );
-		s.append(pdbGroup + '\'' );
-		s.append(", details='" );
-		s.append(details + '\'' );
-		s.append(", uniProtId='" );
-		s.append(uniProtId + '\'' );
-		s.append(", pdbResNum='" );
-		s.append(pdbResNum + '\'' );
+		s.append("seqNum=");
+		s.append(seqNum);
+		s.append(", origGroup='");
+		s.append(origGroup + '\'');
+		s.append(", pdbGroup='");
+		s.append(pdbGroup + '\'');
+		s.append(", details='");
+		s.append(details + '\'');
+		s.append(", uniProtId='");
+		s.append(uniProtId + '\'');
+		s.append(", pdbResNum='");
+		s.append(pdbResNum + '\'');
 
-		if ( insCode == null)
-			s.append(", insCode=null ") ;
-		else
-			s.append(", insCode='" + insCode + '\'') ;
+		if (insCode == null) {
+			s.append(", insCode=null ");
+		} else {
+			s.append(new StringBuilder().append(", insCode='").append(insCode).append('\'').toString());
+		}
 
 		s.append('}');
 		return s.toString();

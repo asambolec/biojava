@@ -32,8 +32,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class StatusDisplay extends JTextField implements AlignmentPositionListener, WindowListener  {
+public class StatusDisplay extends JTextField implements AlignmentPositionListener, WindowListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(StatusDisplay.class);
 
 	/**
 	 *
@@ -44,19 +48,16 @@ public class StatusDisplay extends JTextField implements AlignmentPositionListen
 	Atom[] ca1;
 	Atom[] ca2;
 
-
-
-	public StatusDisplay(){
-		super();
-
+	public StatusDisplay() {
 		this.setBackground(Color.white);
 		this.setEditable(false);
-		this.setMaximumSize(new Dimension(Short.MAX_VALUE,30));
+		this.setMaximumSize(new Dimension(Short.MAX_VALUE, 30));
 
 	}
-	public void destroy(){
+
+	public void destroy() {
 		afpChain = null;
-		ca1= null;
+		ca1 = null;
 		ca2 = null;
 
 	}
@@ -64,75 +65,77 @@ public class StatusDisplay extends JTextField implements AlignmentPositionListen
 	@Override
 	public void mouseOverPosition(AlignedPosition p) {
 
-		if ( afpChain == null)
+		if (afpChain == null) {
 			return;
+		}
 
-		char[] aligs1  = afpChain.getAlnseq1();
-		char[] aligs2  = afpChain.getAlnseq2();
+		char[] aligs1 = afpChain.getAlnseq1();
+		char[] aligs2 = afpChain.getAlnseq2();
 
 		char c1 = aligs1[p.getPos1()];
 		char c2 = aligs2[p.getPos2()];
 
 		try {
-			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, p.getPos1(), ca1,false);
-			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, p.getPos2(), ca2,true);
+			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, p.getPos1(), ca1, false);
+			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, p.getPos2(), ca2, true);
 
 			String pdbInfo1 = JmolTools.getPdbInfo(a1);
 			String pdbInfo2 = JmolTools.getPdbInfo(a2);
 
-			String msg = "alig pos:" + p.getPos1()+ " " +  pdbInfo1 + " ("+c1+") : " + pdbInfo2 + " ("+c2+")";
+			String msg = new StringBuilder().append("alig pos:").append(p.getPos1()).append(" ").append(pdbInfo1)
+					.append(" (").append(c1).append(") : ").append(pdbInfo2).append(" (").append(c2).append(")")
+					.toString();
 
 			this.setText(msg);
 
-
-
-		} catch (StructureException e){
-			e.printStackTrace();
+		} catch (StructureException e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		this.repaint();
 
 	}
 
-
-
 	@Override
 	public void positionSelected(AlignedPosition p) {
 		mouseOverPosition(p);
 
 	}
+
 	@Override
 	public void toggleSelection(AlignedPosition p) {
-		if ( afpChain == null)
+		if (afpChain == null) {
 			return;
+		}
 
-		char[] aligs1  = afpChain.getAlnseq1();
-		char[] aligs2  = afpChain.getAlnseq2();
+		char[] aligs1 = afpChain.getAlnseq1();
+		char[] aligs2 = afpChain.getAlnseq2();
 
 		char c1 = aligs1[p.getPos1()];
 		char c2 = aligs2[p.getPos2()];
 
 		try {
-			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, p.getPos1(), ca1,false);
-			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, p.getPos2(), ca2,true);
+			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, p.getPos1(), ca1, false);
+			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, p.getPos2(), ca2, true);
 
 			String pdbInfo1 = JmolTools.getPdbInfo(a1);
 			String pdbInfo2 = JmolTools.getPdbInfo(a2);
 
-			String msg = "Clicked pos:" + p.getPos1()+ " " + pdbInfo1 + " ("+c1+") : " + pdbInfo2 + " ("+c2+")";
+			String msg = new StringBuilder().append("Clicked pos:").append(p.getPos1()).append(" ").append(pdbInfo1)
+					.append(" (").append(c1).append(") : ").append(pdbInfo2).append(" (").append(c2).append(")")
+					.toString();
 
 			this.setText(msg);
-		} catch (StructureException e){
-			e.printStackTrace();
+		} catch (StructureException e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
-
 	@Override
 	public void rangeSelected(AlignedPosition start, AlignedPosition end) {
-		char[] aligs1  = afpChain.getAlnseq1();
-		char[] aligs2  = afpChain.getAlnseq2();
+		char[] aligs1 = afpChain.getAlnseq1();
+		char[] aligs2 = afpChain.getAlnseq2();
 
 		char c1 = aligs1[start.getPos1()];
 		char c3 = aligs1[end.getPos1()];
@@ -141,11 +144,11 @@ public class StatusDisplay extends JTextField implements AlignmentPositionListen
 		char c4 = aligs2[end.getPos2()];
 
 		try {
-			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, start.getPos1(), ca1,false);
-			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, start.getPos2(), ca2,true);
+			Atom a1 = DisplayAFP.getAtomForAligPos(afpChain, 0, start.getPos1(), ca1, false);
+			Atom a2 = DisplayAFP.getAtomForAligPos(afpChain, 1, start.getPos2(), ca2, true);
 
-			Atom a3 = DisplayAFP.getAtomForAligPos(afpChain, 0, end.getPos1(), ca1,false);
-			Atom a4 = DisplayAFP.getAtomForAligPos(afpChain, 1, end.getPos2(), ca2,true);
+			Atom a3 = DisplayAFP.getAtomForAligPos(afpChain, 0, end.getPos1(), ca1, false);
+			Atom a4 = DisplayAFP.getAtomForAligPos(afpChain, 1, end.getPos2(), ca2, true);
 
 			String pdbInfo1 = JmolTools.getPdbInfo(a1);
 			String pdbInfo2 = JmolTools.getPdbInfo(a2);
@@ -153,15 +156,15 @@ public class StatusDisplay extends JTextField implements AlignmentPositionListen
 			String pdbInfo3 = JmolTools.getPdbInfo(a3);
 			String pdbInfo4 = JmolTools.getPdbInfo(a4);
 
-			String msg =  "Selected range1: " + pdbInfo1 + " ("+c1+") - " + pdbInfo3 + " ("+c3+")";
-			msg       +=  " range2: "         + pdbInfo2 + " ("+c2+") - " + pdbInfo4 + " ("+c4+")";
-
+			String msg = new StringBuilder().append("Selected range1: ").append(pdbInfo1).append(" (").append(c1)
+					.append(") - ").append(pdbInfo3).append(" (").append(c3).append(")").toString();
+			msg += new StringBuilder().append(" range2: ").append(pdbInfo2).append(" (").append(c2).append(") - ")
+					.append(pdbInfo4).append(" (").append(c4).append(")").toString();
 
 			this.setText(msg);
-		} catch (StructureException e){
-			e.printStackTrace();
+		} catch (StructureException e) {
+			logger.error(e.getMessage(), e);
 		}
-
 
 	}
 
@@ -200,48 +203,47 @@ public class StatusDisplay extends JTextField implements AlignmentPositionListen
 	public void setCa2(Atom[] ca2) {
 		this.ca2 = ca2;
 	}
+
 	@Override
 	public void windowActivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void windowClosed(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void windowClosing(WindowEvent e) {
 		destroy();
 
 	}
+
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void windowDeiconified(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void windowIconified(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
+
 	@Override
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
 
 	}
-
-
-
-
-
-
-
-
 
 }

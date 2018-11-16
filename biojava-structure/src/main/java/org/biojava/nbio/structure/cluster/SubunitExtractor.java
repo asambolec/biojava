@@ -39,8 +39,7 @@ import java.util.List;
  */
 public class SubunitExtractor {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SubunitExtractor.class);
+	private static final Logger logger = LoggerFactory.getLogger(SubunitExtractor.class);
 
 	/** Prevent instantiation **/
 	private SubunitExtractor() {
@@ -52,75 +51,73 @@ public class SubunitExtractor {
 	 * {@link Chain#getId()}.
 	 * 
 	 * 
-	 * @param structure
-	 *            Structure object with protein Chains
-	 * @param absMinLen
-	 *            {@link SubunitClustererParameters#getAbsoluteMinimumSequenceLength()}
-	 * @param fraction
-	 *            {@link SubunitClustererParameters#getMinimumSequenceLengthFraction()}
-	 * @param minLen
-	 *            {@link SubunitClustererParameters#getMinimumSequenceLength()}
+	 * @param structure Structure object with protein Chains
+	 * @param absMinLen {@link SubunitClustererParameters#getAbsoluteMinimumSequenceLength()}
+	 * @param fraction  {@link SubunitClustererParameters#getMinimumSequenceLengthFraction()}
+	 * @param minLen    {@link SubunitClustererParameters#getMinimumSequenceLength()}
 	 * @return List of Subunits
 	 */
-	public static List<Subunit> extractSubunits(Structure structure,
-			int absMinLen, double fraction, int minLen) {
+	public static List<Subunit> extractSubunits(Structure structure, int absMinLen, double fraction, int minLen) {
 
 		// The extracted subunit container
-		List<Subunit> subunits = new ArrayList<Subunit>();
+		List<Subunit> subunits = new ArrayList<>();
 
 		for (Chain c : structure.getPolyChains()) {
 			// Only take protein chains
 			if (c.isProtein()) {
 				Atom[] ca = StructureTools.getRepresentativeAtomArray(c);
-				logger.debug("Chain " + c.getId() + "; CA Atoms: " + ca.length + "; SEQRES: " + c.getSeqResSequence());
-				if (ca.length==0)
+				logger.debug(new StringBuilder().append("Chain ").append(c.getId()).append("; CA Atoms: ")
+						.append(ca.length).append("; SEQRES: ").append(c.getSeqResSequence()).toString());
+				if (ca.length == 0) {
 					continue;
+				}
 				subunits.add(new Subunit(ca, c.getId(), null, structure));
 			}
 		}
 
 		// Calculate the minimum length of a Subunit
-		int adjustedMinLen = calcAdjustedMinimumSequenceLength(subunits,
-				absMinLen, fraction, minLen);
+		int adjustedMinLen = calcAdjustedMinimumSequenceLength(subunits, absMinLen, fraction, minLen);
 		logger.debug("Adjusted minimum sequence length: " + adjustedMinLen);
 
 		// Filter out short Subunits
 		for (int s = subunits.size() - 1; s >= 0; s--) {
-			if (subunits.get(s).size() < adjustedMinLen)
+			if (subunits.get(s).size() < adjustedMinLen) {
 				subunits.remove(s);
+			}
 		}
 
 		return subunits;
 	}
 
 	/**
-	 * Returns an adapted minimum sequence length. This method ensure that
-	 * structure that only have short chains are not excluded by the
-	 * minimumSequenceLength cutoff value.
+	 * Returns an adapted minimum sequence length. This method ensure that structure
+	 * that only have short chains are not excluded by the minimumSequenceLength
+	 * cutoff value.
 	 * 
 	 * @return adjustedMinimumSequenceLength
 	 */
-	private static int calcAdjustedMinimumSequenceLength(
-			List<Subunit> subunits, int absMinLen, double fraction, int minLen) {
+	private static int calcAdjustedMinimumSequenceLength(List<Subunit> subunits, int absMinLen, double fraction,
+			int minLen) {
 
 		int maxLength = Integer.MIN_VALUE;
 		int minLength = Integer.MAX_VALUE;
 
 		// Extract the length List, the min and the max
-		List<Integer> lengths = new ArrayList<Integer>();
-		for (int i = 0; i < subunits.size(); i++) {
-			if (subunits.get(i).size() >= absMinLen) {
-				maxLength = Math.max(subunits.get(i).size(), maxLength);
-				minLength = Math.min(subunits.get(i).size(), minLength);
-				lengths.add(subunits.get(i).size());
+		List<Integer> lengths = new ArrayList<>();
+		for (Subunit subunit : subunits) {
+			if (subunit.size() >= absMinLen) {
+				maxLength = Math.max(subunit.size(), maxLength);
+				minLength = Math.min(subunit.size(), minLength);
+				lengths.add(subunit.size());
 
 			}
 		}
 
 		int adjustedMinimumSequenceLength = minLen;
 
-		if (lengths.size() < 2)
+		if (lengths.size() < 2) {
 			return adjustedMinimumSequenceLength;
+		}
 
 		// Calculate the median of the lengths
 		double median = 0;

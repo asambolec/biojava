@@ -31,19 +31,22 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Needleman and Wunsch defined an algorithm for pairwise global sequence alignments (from the first until the last
- * {@link Compound} of each {@link Sequence}).  This class performs such global sequence comparisons efficiently by
- * dynamic programming.
+ * Needleman and Wunsch defined an algorithm for pairwise global sequence
+ * alignments (from the first until the last {@link Compound} of each
+ * {@link Sequence}). This class performs such global sequence comparisons
+ * efficiently by dynamic programming.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class NeedlemanWunsch<S extends Sequence<C>, C extends Compound> extends AnchoredPairwiseSequenceAligner<S, C> {
 
 	/**
-	 * Before running a pairwise global sequence alignment, data must be sent in via calls to
-	 * {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * Before running a pairwise global sequence alignment, data must be sent in via
+	 * calls to {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	public NeedlemanWunsch() {
@@ -52,10 +55,10 @@ public class NeedlemanWunsch<S extends Sequence<C>, C extends Compound> extends 
 	/**
 	 * Prepares for a pairwise global sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
+	 * @param query      the first {@link Sequence} of the pair to align
+	 * @param target     the second {@link Sequence} of the pair to align
 	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
+	 * @param subMatrix  the set of substitution scores used during alignment
 	 */
 	public NeedlemanWunsch(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
 		super(query, target, gapPenalty, subMatrix);

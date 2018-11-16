@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.nbio.ontology.utils;
 
 import java.io.NotSerializableException;
@@ -39,18 +38,15 @@ import java.util.*;
  */
 class EmptyAnnotation
 
-implements Annotation, Serializable {
+		implements Annotation, Serializable {
 	@Override
-	public Object getProperty(Object key) throws NoSuchElementException {
-		throw new NoSuchElementException(
-			"There are no keys in the Empty Annotation object: " +
-			key
-		);
+	public Object getProperty(Object key) {
+		throw new NoSuchElementException("There are no keys in the Empty Annotation object: " + key);
 	}
 
 	@Override
-	public void setProperty(Object key, Object value){
-		}
+	public void setProperty(Object key, Object value) {
+	}
 
 	@Override
 	public void removeProperty(Object key)
@@ -71,7 +67,7 @@ implements Annotation, Serializable {
 
 	@Override
 	public Map asMap() {
-		//return Collections.EMPTY_MAP; 1.3
+		// return Collections.EMPTY_MAP; 1.3
 		return new HashMap();
 	}
 
@@ -90,11 +86,10 @@ implements Annotation, Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (! (o instanceof Annotation)) {
+		if (!(o instanceof Annotation)) {
 			return false;
 		}
 
 		return ((Annotation) o).asMap().equals(asMap());
 	}
 }
-

@@ -33,9 +33,9 @@ package org.biojava.nbio.structure.io.util;
 public class PDBTemporaryStorageUtils {
 	/**
 	 * Temporary data storage for LINK records. This is necessary because LINK
-	 * records precede the atoms they correspond to in a PDB file, so we must
-	 * store the information encoded in a LINK record until we actually know
-	 * about the atoms a LINK refers to.
+	 * records precede the atoms they correspond to in a PDB file, so we must store
+	 * the information encoded in a LINK record until we actually know about the
+	 * atoms a LINK refers to.
 	 *
 	 * @author Ulysse Carion
 	 */
@@ -57,10 +57,9 @@ public class PDBTemporaryStorageUtils {
 		private String sym1;
 		private String sym2;
 
-		public LinkRecord(String name1, String altLoc1, String resName1,
-				String chainID1, String resSeq1, String iCode1, String name2,
-				String altLoc2, String resName2, String chainID2,
-				String resSeq2, String iCode2, String sym1, String sym2) {
+		public LinkRecord(String name1, String altLoc1, String resName1, String chainID1, String resSeq1, String iCode1,
+				String name2, String altLoc2, String resName2, String chainID2, String resSeq2, String iCode2,
+				String sym1, String sym2) {
 			this.name1 = name1;
 			this.altLoc1 = altLoc1;
 			this.resName1 = resName1;
@@ -138,20 +137,20 @@ public class PDBTemporaryStorageUtils {
 			String s = "[LINK Record:\n";
 
 			s += "Atom 1:\n";
-			s += "\tName: " + name1 + "\n";
-			s += "\tAlt Loc: " + altLoc1 + "\n";
-			s += "\tRes name: " + resName1 + "\n";
-			s += "\tChain ID: " + chainID1 + "\n";
-			s += "\tRes Seq: " + resSeq1 + "\n";
-			s += "\tIns Code: " + iCode1 + "\n";
+			s += new StringBuilder().append("\tName: ").append(name1).append("\n").toString();
+			s += new StringBuilder().append("\tAlt Loc: ").append(altLoc1).append("\n").toString();
+			s += new StringBuilder().append("\tRes name: ").append(resName1).append("\n").toString();
+			s += new StringBuilder().append("\tChain ID: ").append(chainID1).append("\n").toString();
+			s += new StringBuilder().append("\tRes Seq: ").append(resSeq1).append("\n").toString();
+			s += new StringBuilder().append("\tIns Code: ").append(iCode1).append("\n").toString();
 
 			s += "Atom 2:\n";
-			s += "\tName: " + name2 + "\n";
-			s += "\tAlt Loc: " + altLoc2 + "\n";
-			s += "\tRes name: " + resName2 + "\n";
-			s += "\tChain ID: " + chainID2 + "\n";
-			s += "\tRes Seq: " + resSeq2 + "\n";
-			s += "\tIns Code: " + iCode2 + "\n";
+			s += new StringBuilder().append("\tName: ").append(name2).append("\n").toString();
+			s += new StringBuilder().append("\tAlt Loc: ").append(altLoc2).append("\n").toString();
+			s += new StringBuilder().append("\tRes name: ").append(resName2).append("\n").toString();
+			s += new StringBuilder().append("\tChain ID: ").append(chainID2).append("\n").toString();
+			s += new StringBuilder().append("\tRes Seq: ").append(resSeq2).append("\n").toString();
+			s += new StringBuilder().append("\tIns Code: ").append(iCode2).append("\n").toString();
 
 			s += "]";
 

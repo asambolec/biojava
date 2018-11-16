@@ -32,9 +32,9 @@ import java.net.URL;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-
-/** 
- * Makes remote calls to the HMMER web service at the EBI web site and returns Pfam domain annotations for an input protein sequence.
+/**
+ * Makes remote calls to the HMMER web service at the EBI web site and returns
+ * Pfam domain annotations for an input protein sequence.
  *
  * @author Andreas Prlic
  * @since 3.0.3
@@ -42,16 +42,15 @@ import java.util.TreeSet;
 public class RemoteHmmerScan implements HmmerScan {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteHmmerScan.class);
-	
+
 	public static final String HMMER_SERVICE = "https://www.ebi.ac.uk/Tools/hmmer/search/hmmscan";
 
-	public RemoteHmmerScan(){
+	public RemoteHmmerScan() {
 
 	}
 
-
 	@Override
-	public  SortedSet<HmmerResult> scan(ProteinSequence sequence) throws IOException {
+	public SortedSet<HmmerResult> scan(ProteinSequence sequence) throws IOException {
 
 		URL url = new URL(HMMER_SERVICE);
 
@@ -59,7 +58,7 @@ public class RemoteHmmerScan implements HmmerScan {
 
 	}
 
-	/** 
+	/**
 	 * Scans a protein sequence for Pfam profile matches.
 	 *
 	 * @param sequence
@@ -67,22 +66,20 @@ public class RemoteHmmerScan implements HmmerScan {
 	 * @return
 	 * @throws IOException
 	 */
-	public SortedSet<HmmerResult> scan(ProteinSequence sequence, URL serviceLocation) throws IOException{
+	public SortedSet<HmmerResult> scan(ProteinSequence sequence, URL serviceLocation) throws IOException {
 
-		StringBuffer postContent = new StringBuffer();
+		StringBuilder postContent = new StringBuilder();
 
 		postContent.append("hmmdb=pfam");
 
-
-		// by default hmmscan runs with the HMMER3 cut_ga parameter enabled, the "gathering threshold", which depends on
+		// by default hmmscan runs with the HMMER3 cut_ga parameter enabled, the
+		// "gathering threshold", which depends on
 		// the cutoffs defined in the underlying HMM files.
 		// to request a different cutoff by e-value this could be enabled:
-		//postContent.append("&E=1");
-
+		// postContent.append("&E=1");
 
 		postContent.append("&seq=");
 		postContent.append(sequence.getSequenceAsString());
-
 
 		HttpURLConnection connection = (HttpURLConnection) serviceLocation.openConnection();
 		connection.setDoOutput(true);
@@ -92,25 +89,24 @@ public class RemoteHmmerScan implements HmmerScan {
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-		connection.setRequestProperty("Accept","application/json");
+		connection.setRequestProperty("Accept", "application/json");
 
-		connection.setRequestProperty("Content-Length", "" +
-				Integer.toString(postContent.toString().getBytes().length));
+		connection.setRequestProperty("Content-Length",
+				"" + Integer.toString(postContent.toString().getBytes().length));
 
-		//Send request
-		DataOutputStream wr = new DataOutputStream (
-				connection.getOutputStream ());
+		// Send request
+		DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 		wr.write(postContent.toString().getBytes());
-		wr.flush ();
-		wr.close ();
+		wr.flush();
+		wr.close();
 
-
-		//Now get the redirect URL
-		URL respUrl = new URL( connection.getHeaderField( "Location" ));
+		// Now get the redirect URL
+		URL respUrl = new URL(connection.getHeaderField("Location"));
 
 		int responseCode = connection.getResponseCode();
-		if ( responseCode == 500){
-			LOGGER.warn("Got 500 response code for URL {}. Response message: {}.", serviceLocation, connection.getResponseMessage());	
+		if (responseCode == 500) {
+			LOGGER.warn("Got 500 response code for URL {}. Response message: {}.", serviceLocation,
+					connection.getResponseMessage());
 		}
 
 		HttpURLConnection connection2 = (HttpURLConnection) respUrl.openConnection();
@@ -118,14 +114,12 @@ public class RemoteHmmerScan implements HmmerScan {
 		connection2.setRequestProperty("Accept", "application/json");
 		connection2.setConnectTimeout(60000); // 1 minute
 
-		//Get the response
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(
-						connection2.getInputStream()));
+		// Get the response
+		BufferedReader in = new BufferedReader(new InputStreamReader(connection2.getInputStream()));
 
 		String inputLine;
 
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		while ((inputLine = in.readLine()) != null) {
 			result.append(inputLine);
 		}
@@ -134,78 +128,74 @@ public class RemoteHmmerScan implements HmmerScan {
 
 		// process the response and build up a container for the data.
 
-		SortedSet<HmmerResult> results = new TreeSet<HmmerResult>();
+		SortedSet<HmmerResult> results = new TreeSet<>();
 		try {
-			JSONObject json =  JSONObject.fromObject(result.toString());
+			JSONObject json = JSONObject.fromObject(result.toString());
 
 			JSONObject hmresults = json.getJSONObject("results");
 
-
 			JSONArray hits = hmresults.getJSONArray("hits");
 
-			for(int i =0 ; i < hits.size() ; i++){
+			for (int i = 0; i < hits.size(); i++) {
 				JSONObject hit = hits.getJSONObject(i);
 
 				HmmerResult hmmResult = new HmmerResult();
 
 				Object dclO = hit.get("dcl");
 				Integer dcl = -1;
-				if ( dclO instanceof Long){
+				if (dclO instanceof Long) {
 					Long dclL = (Long) dclO;
 					dcl = dclL.intValue();
-				} else if ( dclO instanceof Integer){
+				} else if (dclO instanceof Integer) {
 					dcl = (Integer) dclO;
 				}
 
-
-				hmmResult.setAcc((String)hit.get("acc"));
+				hmmResult.setAcc((String) hit.get("acc"));
 				hmmResult.setDcl(dcl);
-				hmmResult.setDesc((String)hit.get("desc"));
-				hmmResult.setEvalue(Float.parseFloat((String)hit.get("evalue")));
-				hmmResult.setName((String)hit.get("name"));
-				hmmResult.setNdom((Integer)hit.get("ndom"));
-				hmmResult.setNreported((Integer)hit.get("nreported"));
-				hmmResult.setPvalue((Double)hit.get("pvalue"));
-				hmmResult.setScore(Float.parseFloat((String)hit.get("score")));
+				hmmResult.setDesc((String) hit.get("desc"));
+				hmmResult.setEvalue(Float.parseFloat((String) hit.get("evalue")));
+				hmmResult.setName((String) hit.get("name"));
+				hmmResult.setNdom((Integer) hit.get("ndom"));
+				hmmResult.setNreported((Integer) hit.get("nreported"));
+				hmmResult.setPvalue((Double) hit.get("pvalue"));
+				hmmResult.setScore(Float.parseFloat((String) hit.get("score")));
 
 				JSONArray hmmdomains = hit.getJSONArray("domains");
 
-				SortedSet<HmmerDomain> domains = new TreeSet<HmmerDomain>();
-				for ( int j= 0 ; j < hmmdomains.size() ; j++){
+				SortedSet<HmmerDomain> domains = new TreeSet<>();
+				for (int j = 0; j < hmmdomains.size(); j++) {
 					JSONObject d = hmmdomains.getJSONObject(j);
 					Integer is_included = getInteger(d.get("is_included"));
-					if ( is_included == 0) {
+					if (is_included == 0) {
 						continue;
 					}
 
-
 					// this filters out multiple hits to the same clan
 					Integer outcompeted = getInteger(d.get("outcompeted"));
-					if ( outcompeted != null && outcompeted == 1) {
+					if (outcompeted != null && outcompeted == 1) {
 						continue;
 					}
 
 					Integer significant = getInteger(d.get("significant"));
 
-					if (  significant != 1) {
+					if (significant != 1) {
 						continue;
 					}
 
 					HmmerDomain dom = new HmmerDomain();
-					dom.setAliLenth((Integer)d.get("aliL"));
-					dom.setHmmAcc((String)d.get("alihmmacc"));
-					dom.setHmmDesc((String)d.get("alihmmdesc"));
+					dom.setAliLenth((Integer) d.get("aliL"));
+					dom.setHmmAcc((String) d.get("alihmmacc"));
+					dom.setHmmDesc((String) d.get("alihmmdesc"));
 
 					dom.setHmmFrom(getInteger(d.get("alihmmfrom")));
 					dom.setHmmTo(getInteger(d.get("alihmmto")));
 					dom.setSimCount((Integer) d.get("aliSimCount"));
 					dom.setSqFrom(getInteger(d.get("alisqfrom")));
 					dom.setSqTo(getInteger(d.get("alisqto")));
-					dom.setHmmName((String)d.get("alihmmname"));
-					dom.setEvalue(Float.parseFloat((String)d.get("ievalue")));
+					dom.setHmmName((String) d.get("alihmmname"));
+					dom.setEvalue(Float.parseFloat((String) d.get("ievalue")));
 
 					domains.add(dom);
-
 
 				}
 
@@ -213,7 +203,7 @@ public class RemoteHmmerScan implements HmmerScan {
 
 				results.add(hmmResult);
 			}
-		} catch (NumberFormatException e){
+		} catch (NumberFormatException e) {
 			LOGGER.warn("Could not parse number in Hmmer web service json response: {}", e.getMessage());
 		}
 
@@ -221,12 +211,12 @@ public class RemoteHmmerScan implements HmmerScan {
 
 	}
 
-
 	private Integer getInteger(Object object) {
-		if ( object instanceof Integer)
+		if (object instanceof Integer) {
 			return (Integer) object;
-		else if( object instanceof String)
+		} else if (object instanceof String) {
 			return Integer.parseInt((String) object);
+		}
 
 		return null;
 	}

@@ -33,29 +33,35 @@ import org.biojava.nbio.core.sequence.template.Sequence;
 import java.util.List;
 
 /**
- * Implements a data structure for the results of the alignment of a pair of {@link Profile}s.
+ * Implements a data structure for the results of the alignment of a pair of
+ * {@link Profile}s.
  *
  * @author Mark Chapman
  * @author Paolo Pavan
  * @param <S> each element of an alignment {@link Profile} is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class SimpleProfilePair<S extends Sequence<C>, C extends Compound> extends SimpleProfile<S, C>
 		implements ProfilePair<S, C> {
 
-
 	private static final long serialVersionUID = 1L;
 
-	private Profile<S, C> query, target;
+	private Profile<S, C> query;
+
+	private Profile<S, C> target;
 
 	/**
 	 * Creates a pair profile for the given profiles.
 	 *
-	 * @param query the first profile of the pair
+	 * @param query  the first profile of the pair
 	 * @param target the second profile of the pair
-	 * @param sx lists whether the query profile aligns a {@link Compound} or gap at each index of the alignment
-	 * @param sy lists whether the target profile aligns a {@link Compound} or gap at each index of the alignment
-	 * @throws IllegalArgumentException if alignments differ in size or given profiles do not fit in alignments
+	 * @param sx     lists whether the query profile aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @param sy     lists whether the target profile aligns a {@link Compound} or
+	 *               gap at each index of the alignment
+	 * @throws IllegalArgumentException if alignments differ in size or given
+	 *                                  profiles do not fit in alignments
 	 */
 	public SimpleProfilePair(Profile<S, C> query, Profile<S, C> target, List<Step> sx, List<Step> sy) {
 		super(query, target, sx, sy);

@@ -24,8 +24,8 @@
 package org.biojava.nbio.structure;
 
 /**
- * AminoAcid inherits most from Hetatom.  Adds a few AminoAcid
- * specific methods.
+ * AminoAcid inherits most from Hetatom. Adds a few AminoAcid specific methods.
+ * 
  * @author Andreas Prlic
  * @author Jules Jacobsen
  * @since 1.4
@@ -39,37 +39,42 @@ public class AminoAcidImpl extends HetatomImpl implements AminoAcid {
 	/** this is an Amino acid. type is "amino". */
 	public static final GroupType type = GroupType.AMINOACID;
 
-	/** IUPAC amino acid residue names
+	/**
+	 * IUPAC amino acid residue names
 	 */
-	private Character amino_char ;
+	private Character aminoChar;
 
-	private String recordType; // allows to distinguish between AAs that have been created from SEQRES records and ATOM records
+	private String recordType; // allows to distinguish between AAs that have been created from SEQRES records
+								// and ATOM records
 
 	/**
 	 * inherits most from Hetero and has just a few extensions.
 	 */
 	public AminoAcidImpl() {
-		super();
-
-		amino_char = null;
+		aminoChar = null;
 		recordType = ATOMRECORD;
 	}
 
 	@Override
-	public GroupType getType(){ return type;}
+	public GroupType getType() {
+		return type;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Atom getN()    {return getAtom("N");  }
+	public Atom getN() {
+		return getAtom("N");
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Atom getCA()   {
-		// note CA can also be Calcium, but that can't happen in a standard aminoacid, so this should be safe
+	public Atom getCA() {
+		// note CA can also be Calcium, but that can't happen in a standard aminoacid,
+		// so this should be safe
 		return getAtom("CA");
 	}
 
@@ -77,35 +82,40 @@ public class AminoAcidImpl extends HetatomImpl implements AminoAcid {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Atom getC()    {return getAtom("C");  }
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Atom getO()    {return getAtom("O");  }
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Atom getCB()   {return getAtom("CB"); }
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public  Character getAminoType() {
-		return amino_char;
+	public Atom getC() {
+		return getAtom("C");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setAminoType(Character aa){
-		amino_char  = aa ;
+	public Atom getO() {
+		return getAtom("O");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Atom getCB() {
+		return getAtom("CB");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Character getAminoType() {
+		return aminoChar;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setAminoType(Character aa) {
+		aminoChar = aa;
 	}
 
 	/**
@@ -126,34 +136,39 @@ public class AminoAcidImpl extends HetatomImpl implements AminoAcid {
 
 	/** string representation. */
 	@Override
-	public String toString(){
+	public String toString() {
 
-		String str = "AminoAcid "+ recordType + ":"+ pdb_name + " " + amino_char +
-				" " + residueNumber +  " "+ pdb_flag + " " + recordType  ;
+		String str = new StringBuilder().append("AminoAcid ").append(recordType).append(":").append(pdb_name)
+				.append(" ").append(aminoChar).append(" ").append(residueNumber).append(" ").append(pdb_flag)
+				.append(" ").append(recordType).toString();
 		if (pdb_flag) {
-			str = str + " atoms: "+atoms.size();
+			str = new StringBuilder().append(str).append(" atoms: ").append(atoms.size()).toString();
 		}
-		if (!getAltLocs().isEmpty())
+		if (!getAltLocs().isEmpty()) {
 			str += " has altLocs :" + getAltLocs().size();
+		}
 
-		return str ;
+		return str;
 
 	}
-	/** set three character name of AminoAcid.
+
+	/**
+	 * set three character name of AminoAcid.
 	 *
-	 * @param s  a String specifying the PDBName value
+	 * @param s a String specifying the PDBName value
 	 * @see #getPDBName()
 	 */
 	@Override
 	public void setPDBName(String s) {
 
-		pdb_name =s ;
+		pdb_name = s;
 
 	}
 
-
-	/** returns and identical copy of this Group object .
-	 * @return  and identical copy of this Group object
+	/**
+	 * returns and identical copy of this Group object .
+	 * 
+	 * @return and identical copy of this Group object
 	 */
 	@Override
 	public Object clone() {
@@ -167,23 +182,19 @@ public class AminoAcidImpl extends HetatomImpl implements AminoAcid {
 		n.setAminoType(getAminoType());
 		n.setRecordType(recordType);
 
-		//clone atoms and bonds.
+		// clone atoms and bonds.
 		cloneAtomsAndBonds(n);
-		
-		// copying the alt loc groups if present, otherwise they stay null
-		if (getAltLocs()!=null && !getAltLocs().isEmpty()) {
-			for (Group altLocGroup:this.getAltLocs()) {
-				Group nAltLocGroup = (Group)altLocGroup.clone();
-				n.addAltLoc(nAltLocGroup);
-			}
-		}
-		
-		if (chemComp!=null)
-			n.setChemComp(chemComp);
 
+		// copying the alt loc groups if present, otherwise they stay null
+		if (getAltLocs() != null && !getAltLocs().isEmpty()) {
+			this.getAltLocs().stream().map(altLocGroup -> (Group) altLocGroup.clone()).forEach(n::addAltLoc);
+		}
+
+		if (chemComp != null) {
+			n.setChemComp(chemComp);
+		}
 
 		return n;
 	}
-
 
 }

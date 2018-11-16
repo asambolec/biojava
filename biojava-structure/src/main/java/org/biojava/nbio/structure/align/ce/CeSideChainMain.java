@@ -22,23 +22,23 @@ package org.biojava.nbio.structure.align.ce;
 
 import org.biojava.nbio.structure.align.StructureAlignment;
 import org.biojava.nbio.structure.align.util.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class CeSideChainMain extends CeMain {
 
-public class CeSideChainMain  extends CeMain implements StructureAlignment {
+	private static final Logger logger = LoggerFactory.getLogger(CeSideChainMain.class);
 
 	public static final String algorithmName = "jCE-sidechain";
 
 	/**
-	 *  version history:
-	 *  2.4 - Added more parameters to the command line, including -maxOptRMSD
-	 *  2.3 - Initial version
+	 * version history: 2.4 - Added more parameters to the command line, including
+	 * -maxOptRMSD 2.3 - Initial version
 	 */
 	private static final String version = "2.3";
 
-	public CeSideChainMain(){
-		super();
-
-		if ( params == null) {
+	public CeSideChainMain() {
+		if (params == null) {
 			CeSideChainUserArgumentProcessor proc = new CeSideChainUserArgumentProcessor();
 			params = (CeParameters) proc.getParameters();
 		}
@@ -62,9 +62,9 @@ public class CeSideChainMain  extends CeMain implements StructureAlignment {
 	}
 
 	@Override
-	public void setParameters(ConfigStrucAligParams params){
-		System.out.println("setting params : " + params);
-		if (! (params instanceof CeParameters )){
+	public void setParameters(ConfigStrucAligParams params) {
+		logger.info("setting params : " + params);
+		if (!(params instanceof CeParameters)) {
 			throw new IllegalArgumentException("provided parameter object is not of type CeParameter");
 		}
 		this.params = (CeParameters) params;

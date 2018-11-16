@@ -27,32 +27,35 @@ package org.biojava.nbio.structure.io;
  * @author Andreas Prlic, Thomas Down, Benjamin Schuster-B&ouml;ckler
  */
 
-public class PDBParseException extends Exception{
+public class PDBParseException extends Exception {
 	public static final long serialVersionUID = 219047230178423923l;
+
 	/**
 	 * Constructs a PDBParseException object.
 	 *
-	 * @param s  a String ...
+	 * @param s a String ...
 	 */
 
 	public PDBParseException(String s) {
 		super(s);
 	}
+
 	/**
 	 * Constructs a PDBParseException object.
 	 *
-	 * @param t  a Throwable object
-	 * @param s  a String ...
+	 * @param t a Throwable object
+	 * @param s a String ...
 	 */
-	public PDBParseException ( String s,Throwable t) {
+	public PDBParseException(String s, Throwable t) {
 		super(s, t);
 	}
+
 	/**
 	 * Constructs a PDBParseException object.
 	 *
-	 * @param t  a Throwable object
+	 * @param t a Throwable object
 	 */
-	public PDBParseException (Throwable t) {
+	public PDBParseException(Throwable t) {
 		super(t);
 	}
 }

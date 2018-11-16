@@ -37,25 +37,27 @@ public class RCSBUpdates {
 
 	/**
 	 *
-	 * @return A map mapping each field (defined by a separate FTP file) to the PDB ids in the field. The possible fields
-	 * are: added.models, added.nmr, added.pdb, added.sf, modified.cs, modified.models, modified.nmr, modified.pdb, modified.sf,
-	 * obsolete.cs, obsolete.models, obsolete.nmr, obsolete.pdb, obsolete.sf
+	 * @return A map mapping each field (defined by a separate FTP file) to the PDB
+	 *         ids in the field. The possible fields are: added.models, added.nmr,
+	 *         added.pdb, added.sf, modified.cs, modified.models, modified.nmr,
+	 *         modified.pdb, modified.sf, obsolete.cs, obsolete.models,
+	 *         obsolete.nmr, obsolete.pdb, obsolete.sf
 	 * @throws IOException
 	 */
-	public Map<String,String[]> getUpdates() throws IOException{
+	public Map<String, String[]> getUpdates() throws IOException {
 
-		Map<String,String[]> outMap = new HashMap<String, String[]>();
+		Map<String, String[]> outMap = new HashMap<>();
 		// A list of files to get
-		String[] newStringList = {"added.models","added.nmr","added.pdb","added.sf","modified.cs","modified.models",
-				"modified.nmr","modified.pdb","modified.sf","obsolete.cs","obsolete.models","obsolete.nmr","obsolete.pdb","obsolete.sf"};
-		for(String fileName: newStringList){
-			String[] thisList = readURL(baseURL+""+fileName);
+		String[] newStringList = { "added.models", "added.nmr", "added.pdb", "added.sf", "modified.cs",
+				"modified.models", "modified.nmr", "modified.pdb", "modified.sf", "obsolete.cs", "obsolete.models",
+				"obsolete.nmr", "obsolete.pdb", "obsolete.sf" };
+		for (String fileName : newStringList) {
+			String[] thisList = readURL(new StringBuilder().append(baseURL).append("").append(fileName).toString());
 			outMap.put(fileName, thisList);
 		}
 		return outMap;
 
 	}
-
 
 	/**
 	 *
@@ -63,8 +65,8 @@ public class RCSBUpdates {
 	 * @return A list of PDB ids as strings
 	 * @throws IOException
 	 */
-	private String[] readURL(String urlIn) throws IOException{
-		List<String> outList = new ArrayList<String>();
+	private String[] readURL(String urlIn) throws IOException {
+		List<String> outList = new ArrayList<>();
 		// create a url object
 		URL url = new URL(urlIn);
 
@@ -72,13 +74,13 @@ public class RCSBUpdates {
 		URLConnection urlConnection = url.openConnection();
 
 		// wrap the urlconnection in a bufferedreader
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
+		try (BufferedReader bufferedReader = new BufferedReader(
+				new InputStreamReader(urlConnection.getInputStream()))) {
 
 			String line;
 
 			// read from the urlconnection via the bufferedreader
-			while ((line = bufferedReader.readLine()) != null)
-			{
+			while ((line = bufferedReader.readLine()) != null) {
 				outList.add(line);
 			}
 

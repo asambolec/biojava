@@ -38,24 +38,20 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.List;
 
-
-
-@XmlRootElement(name = "ScopDescriptions", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "ScopDescriptions", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class ScopDescriptions implements Serializable{
-
+public class ScopDescriptions implements Serializable {
 
 	private static final long serialVersionUID = 4924350548761431852L;
 
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(ScopDescriptions.class);
-		} catch (Exception e){
+			jaxbContext = JAXBContext.newInstance(ScopDescriptions.class);
+		} catch (Exception e) {
 			throw new RuntimeException("Could not initialize JAXB context for " + ScopDescriptions.class, e);
 		}
 	}
-
 
 	List<ScopDescription> scopDescriptions;
 
@@ -67,7 +63,7 @@ public class ScopDescriptions implements Serializable{
 		this.scopDescriptions = descriptions;
 	}
 
-	public  String toXML(){
+	public String toXML() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -79,18 +75,19 @@ public class ScopDescriptions implements Serializable{
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			throw new RuntimeException("Could not convert " + getClass() + " to XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(
+					new StringBuilder().append("Could not convert ").append(getClass()).append(" to XML").toString(),
+					e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static ScopDescriptions fromXML(String xml){
+	public static ScopDescriptions fromXML(String xml) {
 
 		ScopDescriptions job = null;
 
@@ -102,12 +99,12 @@ public class ScopDescriptions implements Serializable{
 
 			job = (ScopDescriptions) un.unmarshal(bais);
 
-		} catch (Exception e){
-			throw new RuntimeException("Could not parse " + ScopDescriptions.class + " from XML", e);
+		} catch (Exception e) {
+			throw new RuntimeException(new StringBuilder().append("Could not parse ").append(ScopDescriptions.class)
+					.append(" from XML").toString(), e);
 		}
 
 		return job;
 	}
-
 
 }

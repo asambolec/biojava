@@ -22,9 +22,9 @@
  */
 package org.biojava.nbio.structure.gui.util;
 
-
-/** a class that manages the conversion of sequence coordinate system to
- * JPanel drawing coordinates
+/**
+ * a class that manages the conversion of sequence coordinate system to JPanel
+ * drawing coordinates
  *
  * @author Andreas Prlic
  * @since 1.7
@@ -32,57 +32,56 @@ package org.biojava.nbio.structure.gui.util;
  */
 public class CoordManager {
 
-
 	float scale;
 	int chainLength;
 
 	public CoordManager() {
-		super();
-		scale  = 1.0f;
+		scale = 1.0f;
 		chainLength = 0;
 	}
 
-	public void setLength(int length){
+	public void setLength(int length) {
 		chainLength = length;
 	}
 
-	public void setScale(float scale){
+	public void setScale(float scale) {
 		this.scale = scale;
 	}
 
-
-	/** start counting at 0...
+	/**
+	 * start counting at 0...
 	 *
 	 * @param panelPos
 	 * @return the sequence position
 	 */
-	protected int getSeqPos(int panelPos){
+	protected int getSeqPos(int panelPos) {
 
-
-		int seqPos = Math.round((panelPos - SequenceScalePanel.DEFAULT_X_START) / scale) ;
-		if ( seqPos < 0)
+		int seqPos = Math.round((panelPos - SequenceScalePanel.DEFAULT_X_START) / scale);
+		if (seqPos < 0) {
 			seqPos = 0;
-		//int length = chainLength;
-		//if ( seqPos >= length)
-		 //   seqPos = length-1;
+		}
+		// int length = chainLength;
+		// if ( seqPos >= length)
+		// seqPos = length-1;
 		return seqPos;
 	}
 
-	protected int getPanelPos(int seqPos){
+	protected int getPanelPos(int seqPos) {
 
-		if ( seqPos < 0 )
+		if (seqPos < 0) {
 			seqPos = 0;
+		}
 
-		//if ( seqPos >= length)
-		 //   seqPos = length-1;
+		// if ( seqPos >= length)
+		// seqPos = length-1;
 
-		int aminosize = Math.round(1*scale);
-		if ( aminosize < 1)
+		int aminosize = Math.round(1 * scale);
+		if (aminosize < 1) {
 			aminosize = 1;
+		}
 
-		int panelPos = Math.round(seqPos * scale) + SequenceScalePanel.DEFAULT_X_START ;
+		int panelPos = Math.round(seqPos * scale) + SequenceScalePanel.DEFAULT_X_START;
 		return panelPos;
 	}
-
 
 }

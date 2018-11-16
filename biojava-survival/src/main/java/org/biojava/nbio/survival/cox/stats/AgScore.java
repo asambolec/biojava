@@ -40,14 +40,15 @@ public class AgScore {
 	 * @param useStrata
 	 * @return
 	 */
-	public static double[][] process(CoxMethod method, ArrayList<SurvivalInfo> survivalInfoList, CoxInfo coxInfo, boolean useStrata) {
-		int i, k;
-		//double temp;
+	public static double[][] process(CoxMethod method, ArrayList<SurvivalInfo> survivalInfoList, CoxInfo coxInfo,
+			boolean useStrata) {
+		int i;
+		int k;
+		// double temp;
 		int n = survivalInfoList.size();
 
-		ArrayList<String> variables = new ArrayList<String>(coxInfo.getCoefficientsList().keySet());
+		ArrayList<String> variables = new ArrayList<>(coxInfo.getCoefficientsList().keySet());
 		int nvar = variables.size();
-
 
 		int dd;
 
@@ -75,13 +76,15 @@ public class AgScore {
 		double[][] covar = new double[nvar][n];
 		double[][] resid = new double[nvar][n];
 		double hazard;
-		double downwt, temp1, temp2, d2;
-
+		double downwt;
+		double temp1;
+		double temp2;
+		double d2;
 
 		int person = 0;
 
-		//  n = *nx;
-		//  nvar  = *nvarx;
+		// n = *nx;
+		// nvar = *nvarx;
 		for (int p = 0; p < n; p++) {
 			SurvivalInfo si = survivalInfoList.get(p);
 			stop[p] = si.getTime();
@@ -139,7 +142,7 @@ public class AgScore {
 					}
 				}
 
-				/* add things in for everyone in the risk set*/
+				/* add things in for everyone in the risk set */
 				if (deaths < 2 || method == CoxMethod.Breslow) {
 					/* easier case */
 					hazard = meanwt / denom;
@@ -167,13 +170,10 @@ public class AgScore {
 					}
 				} else {
 					/*
-					 ** If there are 3 deaths, let m1, m2, m3 be the three
-					 **   weighted means,  h1, h2, h3 be the three hazard jumps.
-					 ** Then temp1 = h1 + h2 + h3
-					 **      temp2 = h1 + (2/3)h2 + (1/3)h3
-					 **      mh1   = m1*h1 + m2*h2 + m3*h3
-					 **      mh2   = m1*h1 + (2/3)m2*h2 + (1/3)m3*h3
-					 **      mh3   = (1/3)*(m1+m2+m3)
+					 ** If there are 3 deaths, let m1, m2, m3 be the three weighted means, h1, h2, h3
+					 * be the three hazard jumps. Then temp1 = h1 + h2 + h3 temp2 = h1 + (2/3)h2 +
+					 * (1/3)h3 mh1 = m1*h1 + m2*h2 + m3*h3 mh2 = m1*h1 + (2/3)m2*h2 + (1/3)m3*h3 mh3
+					 * = (1/3)*(m1+m2+m3)
 					 */
 					temp1 = 0;
 					temp2 = 0;
@@ -224,8 +224,7 @@ public class AgScore {
 			}
 		}
 
-
-		//appears to be backward internally
+		// appears to be backward internally
 		double[][] flipresid = new double[n][nvar];
 
 		for (int s = 0; s < resid.length; s++) {

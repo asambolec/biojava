@@ -24,11 +24,13 @@
 package org.biojava.nbio.genome.parsers.cytoband;
 
 import java.io.Serializable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Cytoband implements Serializable, Comparable<Cytoband> {
 
-
-	 /**
+	private static final Logger logger = LoggerFactory.getLogger(Cytoband.class);
+	/**
 	 *
 	 */
 	private static final long serialVersionUID = 2805976387404499650L;
@@ -38,75 +40,59 @@ public class Cytoband implements Serializable, Comparable<Cytoband> {
 	String locus;
 	StainType type;
 
-
-
 	public String getChromosome() {
 		return chromosome;
 	}
-
-
 
 	public void setChromosome(String chromosome) {
 		this.chromosome = chromosome;
 	}
 
-
-
 	public Integer getStart() {
 		return start;
 	}
-
-
 
 	public void setStart(Integer start) {
 		this.start = start;
 	}
 
-
-
 	public Integer getEnd() {
 		return end;
 	}
-
-
 
 	public void setEnd(Integer end) {
 		this.end = end;
 	}
 
-
-
 	public StainType getType() {
 		return type;
 	}
-
-
 
 	public void setType(StainType type) {
 		this.type = type;
 	}
 
-
-
 	@Override
 	public int compareTo(Cytoband o) {
 
-		if ( this.chromosome.equals( o.chromosome)) {
+		if (this.chromosome.equals(o.chromosome)) {
 			return this.start.compareTo(o.start);
 		} else {
-
-
 
 			Short s1 = null;
 			try {
 				s1 = Short.parseShort(chromosome.substring(3));
-			} catch (NumberFormatException ex){}
+			} catch (NumberFormatException ex) {
+				logger.error(ex.getMessage(), ex);
+			}
 			Short s2 = null;
 			try {
 				s2 = Short.parseShort(o.chromosome.substring(3));
-			}catch (NumberFormatException ex){}
+			} catch (NumberFormatException ex) {
+				logger.error(ex.getMessage(), ex);
+			}
 
-			if (s1 == null || s2 == null){
+			if (s1 == null || s2 == null) {
 				return this.chromosome.compareTo(o.chromosome);
 			} else {
 				return s1.compareTo(s2);
@@ -115,30 +101,19 @@ public class Cytoband implements Serializable, Comparable<Cytoband> {
 
 	}
 
-
-
 	public String getLocus() {
 		return locus;
 	}
-
-
 
 	public void setLocus(String locus) {
 		this.locus = locus;
 	}
 
-
-
 	@Override
 	public String toString() {
-		return "Cytoband [chromosome=" + chromosome + ", start=" + start
-				+ ", end=" + end + ", locus=" + locus + ", type=" + type + "]";
+		return new StringBuilder().append("Cytoband [chromosome=").append(chromosome).append(", start=").append(start)
+				.append(", end=").append(end).append(", locus=").append(locus).append(", type=").append(type)
+				.append("]").toString();
 	}
-
-
-
-
-
-
 
 }

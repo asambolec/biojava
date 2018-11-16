@@ -72,8 +72,8 @@ public class QsAlignParameters {
 	}
 
 	/**
-	 * The maximum orientation angle between two equivalent Subunits, in
-	 * radians. Range [0, Pi].
+	 * The maximum orientation angle between two equivalent Subunits, in radians.
+	 * Range [0, Pi].
 	 * 
 	 * @return the maximum orientation angle
 	 */
@@ -82,11 +82,10 @@ public class QsAlignParameters {
 	}
 
 	/**
-	 * The maximum orientation angle between two equivalent Subunits, in
-	 * radians. Range [0, Pi].
+	 * The maximum orientation angle between two equivalent Subunits, in radians.
+	 * Range [0, Pi].
 	 * 
-	 * @param maxOrientationAngle
-	 *            maximum orientation angle
+	 * @param maxOrientationAngle maximum orientation angle
 	 */
 	public void setMaxOrientationAngle(double maxOrientationAngle) {
 		this.maxOrientationAngle = maxOrientationAngle;

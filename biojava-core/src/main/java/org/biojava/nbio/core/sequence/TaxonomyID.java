@@ -22,13 +22,12 @@
  */
 package org.biojava.nbio.core.sequence;
 
-
 /**
  * A sequence can be associated with a species or Taxonomy ID
+ * 
  * @author Scooter Willis
  */
 public class TaxonomyID {
-
 
 	private String id = null;
 	DataSource dataSource = DataSource.UNKNOWN;

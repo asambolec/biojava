@@ -38,20 +38,22 @@ import org.biojava.nbio.structure.align.util.AFPChainScorer;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.mmcif.ChemCompGroupFactory;
 import org.biojava.nbio.structure.io.mmcif.DownloadChemCompProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DemoCE
-{
+public class DemoCE {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoCE.class);
 
-	public static void main(String[] args){
-		//String name1 = "4hhb.A";
-		//String name2 = "4hhb.B";
+	public static void main(String[] args) {
+		// String name1 = "4hhb.A";
+		// String name2 = "4hhb.B";
 
 		String name1 = "d1pqsa_";
 		String name2 = "d1poha_";
 
-		//String name1 = "5AZQ.A";
-		//String name2 = "4ODC.A";
+		// String name1 = "5AZQ.A";
+		// String name2 = "4ODC.A";
 
 		AtomCache cache = new AtomCache();
 
@@ -65,7 +67,7 @@ public class DemoCE
 
 		try {
 
-			StructureAlignment algorithm  = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
+			StructureAlignment algorithm = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
 
 			structure1 = cache.getStructure(name1);
 			structure2 = cache.getStructure(name2);
@@ -82,30 +84,29 @@ public class DemoCE
 			// set the maximum gap size to unlimited
 			params.setMaxGapSize(-1);
 
-			AFPChain afpChain = algorithm.align(ca1,ca2,params);
+			AFPChain afpChain = algorithm.align(ca1, ca2, params);
 
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
 			// show a nice summary print
-			System.out.println(AfpChainWriter.toWebSiteDisplay(afpChain, ca1, ca2));
+			logger.info(AfpChainWriter.toWebSiteDisplay(afpChain, ca1, ca2));
 
 			// print rotation matrices
-			System.out.println(afpChain.toRotMat());
-			//System.out.println(afpChain.toCE(ca1, ca2));
+			logger.info(afpChain.toRotMat());
+			// System.out.println(afpChain.toCE(ca1, ca2));
 
 			// print XML representation
-			//System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
+			// System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
 
 			StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
-
 			double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2);
 			afpChain.setTMScore(tmScore);
-			System.out.println(AfpChainWriter.toScoresList(afpChain));
+			logger.info(AfpChainWriter.toScoresList(afpChain));
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 	}

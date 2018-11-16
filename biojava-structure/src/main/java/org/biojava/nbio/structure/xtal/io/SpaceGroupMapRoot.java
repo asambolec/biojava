@@ -36,14 +36,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.TreeMap;
 
-@XmlRootElement(name="SpaceGroupMapRoot", namespace ="http://www.biojava.org")
+@XmlRootElement(name = "SpaceGroupMapRoot", namespace = "http://www.biojava.org")
 
 public class SpaceGroupMapRoot {
 
 	private TreeMap<Integer, SpaceGroup> mapProperty;
 
 	public SpaceGroupMapRoot() {
-		mapProperty = new TreeMap<Integer, SpaceGroup>();
+		mapProperty = new TreeMap<>();
 	}
 
 	@XmlJavaTypeAdapter(SpaceGroupMapAdapter.class)
@@ -55,8 +55,7 @@ public class SpaceGroupMapRoot {
 		this.mapProperty = map;
 	}
 
-
-	public  String toXML() throws JAXBException {
+	public String toXML() throws JAXBException {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -65,13 +64,13 @@ public class SpaceGroupMapRoot {
 		JAXBContext jaxbContext = JAXBContext.newInstance(SpaceGroupMapRoot.class);
 
 		Marshaller xmlConverter = jaxbContext.createMarshaller();
-		xmlConverter.setProperty("jaxb.formatted.output",true);
-		xmlConverter.marshal(this,ps);
+		xmlConverter.setProperty("jaxb.formatted.output", true);
+		xmlConverter.marshal(this, ps);
 
 		return baos.toString();
 	}
 
-	public static SpaceGroupMapRoot fromXML(String xml) throws JAXBException{
+	public static SpaceGroupMapRoot fromXML(String xml) throws JAXBException {
 		SpaceGroupMapRoot job = null;
 
 		JAXBContext jaxbContext = JAXBContext.newInstance(SpaceGroupMapRoot.class);
@@ -81,7 +80,6 @@ public class SpaceGroupMapRoot {
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
 
 		job = (SpaceGroupMapRoot) un.unmarshal(bais);
-
 
 		return job;
 	}

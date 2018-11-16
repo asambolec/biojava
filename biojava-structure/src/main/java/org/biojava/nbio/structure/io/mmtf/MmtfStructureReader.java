@@ -62,10 +62,9 @@ import org.rcsb.mmtf.dataholders.MmtfStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * A biojava specific structure inflator for MMTF.
- * Should be ported to biojava code.
+ * A biojava specific structure inflator for MMTF. Should be ported to biojava
+ * code.
  *
  * @author Anthony Bradley
  */
@@ -103,13 +102,13 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 	private List<Chain> chainList;
 
 	/** All the chains as a list of maps */
-	private List<Map<String,Chain>> chainMap;
+	private List<Map<String, Chain>> chainMap;
 
 	private List<double[]> transformList;
 
 	private int bioassIndex;
 
-	private Map<String,String> chainSequenceMap;
+	private Map<String, String> chainSequenceMap;
 
 	/**
 	 * Instantiates a new bio java structure decoder.
@@ -136,7 +135,7 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 	@Override
 	public void finalizeStructure() {
 		// Number the remaining ones
-		int counter =0;
+		int counter = 0;
 		// Add the entity info
 		for (EntityInfo entityInfo : entityInfoList) {
 			counter++;
@@ -144,14 +143,16 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		}
 		structure.setEntityInfos(entityInfoList);
 		// Add the actual chains
-		for(int i=0; i<chainMap.size(); i++) {
+		for (int i = 0; i < chainMap.size(); i++) {
 			// Now add the chain information
 			Map<String, Chain> modelChainMap = chainMap.get(i);
-			for(Chain modelChain : modelChainMap.values()){
+			for (Chain modelChain : modelChainMap.values()) {
 				structure.addChain(modelChain, i);
 				String sequence = chainSequenceMap.get(modelChain.getId());
 				if (sequence == null) {
-					logger.warn("Sequence is null for chain with asym_id {}. Most likely the chain is non-polymeric. Will not add seqres groups for it.", modelChain.getId());
+					logger.warn(
+							"Sequence is null for chain with asym_id {}. Most likely the chain is non-polymeric. Will not add seqres groups for it.",
+							modelChain.getId());
 					continue;
 				}
 				MmtfUtils.addSeqRes(modelChain, sequence);
@@ -161,25 +162,27 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 	}
 
 	@Override
-	public void initStructure(int totalNumBonds, int totalNumAtoms, int totalNumGroups,
-			int totalNumChains, int totalNumModels, String modelId) {
+	public void initStructure(int totalNumBonds, int totalNumAtoms, int totalNumGroups, int totalNumChains,
+			int totalNumModels, String modelId) {
 		structure.setPDBCode(modelId);
 		allAtoms = new Atom[totalNumAtoms];
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.rcsb.mmtf.decoder.StructureDecoderInterface#setModelInfo(int, int)
 	 */
 	@Override
-	public void setModelInfo(int inputModelNumber,
-			int chainCount) {
+	public void setModelInfo(int inputModelNumber, int chainCount) {
 		modelNumber = inputModelNumber;
-		structure.addModel(new ArrayList<Chain>(chainCount));
+		structure.addModel(new ArrayList<>(chainCount));
 		chainMap.add(new HashMap<>());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.rcsb.mmtf.decoder.StructureDecoderInterface
 	 * #setChainInfo(java.lang.String, int)
 	 */
@@ -187,11 +190,11 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 	public void setChainInfo(String chainId, String chainName, int groupCount) {
 		// First check to see if the chain exists
 		Map<String, Chain> modelChainMap = chainMap.get(modelNumber);
-		if(modelChainMap.containsKey(chainId)){
+		if (modelChainMap.containsKey(chainId)) {
 			chain = modelChainMap.get(chainId);
 		}
 		// If we need to set a new chain do this
-		else{
+		else {
 			chain = new ChainImpl();
 			chain.setId(chainId.trim());
 			chain.setName(chainName);
@@ -201,15 +204,15 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		}
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.rcsb.mmtf.decoder.StructureDecoderInterface
 	 * #setGroupInfo(java.lang.String, int, char, int, int)
 	 */
 	@Override
-	public void setGroupInfo(String groupName, int groupNumber,
-			char insertionCode, String chemCompType, int atomCount, int bondCount,
-			char singleLetterCode, int sequenceIndexId, int secStructType) {
+	public void setGroupInfo(String groupName, int groupNumber, char insertionCode, String chemCompType, int atomCount,
+			int bondCount, char singleLetterCode, int sequenceIndexId, int secStructType) {
 		// Get the polymer type
 		ResidueType residueType = ResidueType.getResidueTypeFromString(chemCompType);
 		int polymerType = getGroupTypIndicator(residueType.polymerType);
@@ -227,7 +230,7 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 			group = new HetatomImpl();
 			break;
 		}
-		atomsInGroup = new ArrayList<Atom>();
+		atomsInGroup = new ArrayList<>();
 		ChemComp chemComp = new ChemComp();
 		chemComp.setOne_letter_code(String.valueOf(singleLetterCode));
 		chemComp.setType(chemCompType.toUpperCase());
@@ -238,11 +241,10 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		if (insertionCode == MmtfStructure.UNAVAILABLE_CHAR_VALUE) {
 			group.setResidueNumber(chain.getName().trim(), groupNumber, null);
 		} else {
-			group.setResidueNumber(chain.getName().trim(),
-					groupNumber, insertionCode);
+			group.setResidueNumber(chain.getName().trim(), groupNumber, insertionCode);
 		}
-		group.setAtoms(new ArrayList<Atom>(atomCount));
-		if (polymerType==1 || polymerType==2) {
+		group.setAtoms(new ArrayList<>(atomCount));
+		if (polymerType == 1 || polymerType == 2) {
 			MmtfUtils.insertSeqResGroup(chain, group, sequenceIndexId);
 		}
 		if (atomCount > 0) {
@@ -257,9 +259,9 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 	 */
 	private Group getGroupWithSameResNumButDiffPDBName() {
 		// If this chain already has this group number
-		for (Group g : chain.getAtomGroups() ) {
+		for (Group g : chain.getAtomGroups()) {
 			if (g.getResidueNumber().equals(group.getResidueNumber())) {
-				if( ! g.getPDBName().equals(group.getPDBName() )){
+				if (!g.getPDBName().equals(group.getPDBName())) {
 					return g;
 				}
 			}
@@ -267,23 +269,22 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.rcsb.mmtf.decoder.StructureDecoderInterface#
-	 * setAtomInfo(java.lang.String, int, char, float, float,
-	 * float, float, float, java.lang.String, int)
+	 * setAtomInfo(java.lang.String, int, char, float, float, float, float, float,
+	 * java.lang.String, int)
 	 */
 	@Override
-	public void setAtomInfo(String atomName,
-			int serialNumber, char alternativeLocationId, float x,
-			float y, float z, float occupancy,
-			float temperatureFactor,
-			String element, int charge) {
+	public void setAtomInfo(String atomName, int serialNumber, char alternativeLocationId, float x, float y, float z,
+			float occupancy, float temperatureFactor, String element, int charge) {
 		Atom atom = new AtomImpl();
 		Group altGroup = null;
 		atom.setPDBserial(serialNumber);
 		atom.setName(atomName.trim());
 		atom.setElement(Element.valueOfIgnoreCase(element));
-		if(alternativeLocationId==MmtfStructure.UNAVAILABLE_CHAR_VALUE){
+		if (alternativeLocationId == MmtfStructure.UNAVAILABLE_CHAR_VALUE) {
 			alternativeLocationId = ' ';
 		}
 		if (alternativeLocationId != ' ') {
@@ -308,11 +309,11 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 
 		// IF the main group doesn't have this atom
 		if (!group.hasAtom(atom.getName())) {
-			
+
 			// If it's not a microheterogenity case
 			if (group.getPDBName().equals(atom.getGroup().getPDBName())) {
-				// And it's not a deuterated case.  'nanoheterogenity'
-				if(!StructureTools.hasNonDeuteratedEquiv(atom,group)){
+				// And it's not a deuterated case. 'nanoheterogenity'
+				if (!StructureTools.hasNonDeuteratedEquiv(atom, group)) {
 					group.addAtom(atom);
 				}
 			}
@@ -322,13 +323,14 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		atomCounter++;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.rcsb.mmtf.decoder.StructureDecoderInter
-	 * face#setGroupBonds(int, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.rcsb.mmtf.decoder.StructureDecoderInter face#setGroupBonds(int, int,
+	 * int)
 	 */
 	@Override
-	public void setGroupBond(int indOne,
-			int indTwo, int bondOrder) {
+	public void setGroupBond(int indOne, int indTwo, int bondOrder) {
 		// Get the atom
 		Atom atomOne = atomsInGroup.get(indOne);
 		Atom atomTwo = atomsInGroup.get(indTwo);
@@ -337,13 +339,14 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		BondImpl bond = new BondImpl(atomOne, atomTwo, bondOrder);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.rcsb.mmtf.decoder.StructureDecoder
-	 * Interface#setInterGroupBonds(int, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.rcsb.mmtf.decoder.StructureDecoder Interface#setInterGroupBonds(int,
+	 * int, int)
 	 */
 	@Override
-	public void setInterGroupBond(int indOne,
-			int indTwo, int bondOrder) {
+	public void setInterGroupBond(int indOne, int indTwo, int bondOrder) {
 		// Get the atom
 		Atom atomOne = allAtoms[indOne];
 		Atom atomTwo = allAtoms[indTwo];
@@ -351,7 +354,6 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		@SuppressWarnings("unused")
 		BondImpl bond = new BondImpl(atomOne, atomTwo, bondOrder);
 	}
-
 
 	/**
 	 * Generates Alternate location groups.
@@ -367,7 +369,8 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 			// we are just adding atoms to the current group
 			// probably there is a second group following later...
 			if (a1.getAltLoc().equals(altLoc)) {
-				return group;	}
+				return group;
+			}
 		}
 
 		// Get the altLocGroup
@@ -377,7 +380,7 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		}
 		// If the group already exists (microheterogenity).
 		Group oldGroup = getGroupWithSameResNumButDiffPDBName();
-		if (oldGroup!= null){
+		if (oldGroup != null) {
 			Group altLocG = group;
 			group = oldGroup;
 			group.addAltLoc(altLocG);
@@ -392,15 +395,16 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		Group altLocG = (Group) group.clone();
 		// drop atoms from cloned group...
 		// https://redmine.open-bio.org/issues/3307
-		altLocG.setAtoms(new ArrayList<Atom>());
+		altLocG.setAtoms(new ArrayList<>());
 		altLocG.getAltLocs().clear();
 		group.addAltLoc(altLocG);
 		return altLocG;
 
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.rcsb.mmtf.decoder.StructureDecoderInterface#
 	 * setXtalInfo(java.lang.String, java.util.List)
 	 */
@@ -411,8 +415,8 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		SpaceGroup spaceGroup = SpaceGroup.parseSpaceGroup(spaceGroupString);
 		pci.setSpaceGroup(spaceGroup);
 		if (unitCell.length > 0) {
-			CrystalCell cell = new CrystalCell(unitCell[0], unitCell[1],
-					unitCell[2], unitCell[3], unitCell[4], unitCell[5]);
+			CrystalCell cell = new CrystalCell(unitCell[0], unitCell[1], unitCell[2], unitCell[3], unitCell[4],
+					unitCell[5]);
 			pci.setCrystalCell(cell);
 			structure.setCrystallographicInfo(pci);
 		}
@@ -420,28 +424,29 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		pci.setNcsOperators(MmtfUtils.getNcsAsMatrix4d(ncsOperMatrixList));
 	}
 
-
 	/**
-	 * Get the type of group (0,1 or 2) depending on whether it is an amino aicd (1), nucleic acid (2) or ligand (0)
+	 * Get the type of group (0,1 or 2) depending on whether it is an amino aicd
+	 * (1), nucleic acid (2) or ligand (0)
+	 * 
 	 * @param polymerType
-	 * @return The type of group. (0,1 or 2) depending on whether it is an amino aicd (1), nucleic acid (2) or ligand (0)
+	 * @return The type of group. (0,1 or 2) depending on whether it is an amino
+	 *         aicd (1), nucleic acid (2) or ligand (0)
 	 */
 	private int getGroupTypIndicator(PolymerType polymerType) {
-		if(PolymerType.PROTEIN_ONLY.contains(polymerType)){
+		if (PolymerType.PROTEIN_ONLY.contains(polymerType)) {
 			return 1;
 		}
-		if(PolymerType.POLYNUCLEOTIDE_ONLY.contains(polymerType)){
+		if (PolymerType.POLYNUCLEOTIDE_ONLY.contains(polymerType)) {
 			return 2;
 		}
 		return 0;
 	}
 
-
 	@Override
 	public void setBioAssemblyTrans(int bioAssemblyId, int[] inputChainIndices, double[] inputTransform, String name) {
 		// Biojava uses this as a one indexed id.
 		bioAssemblyId++;
-		if(bioassIndex!=bioAssemblyId){
+		if (bioassIndex != bioAssemblyId) {
 			transformList = new ArrayList<>();
 			bioassIndex = bioAssemblyId;
 		}
@@ -450,29 +455,28 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		Map<Integer, BioAssemblyInfo> bioAssemblies = pdbHeader.getBioAssemblies();
 		// Get the bioassembly itself (if it exists
 		BioAssemblyInfo bioAssInfo;
-		if (bioAssemblies.containsKey(bioAssemblyId)){
+		if (bioAssemblies.containsKey(bioAssemblyId)) {
 			bioAssInfo = bioAssemblies.get(bioAssemblyId);
-		}
-		else{
-			bioAssInfo = new  BioAssemblyInfo();
-			bioAssInfo.setTransforms(new ArrayList<BiologicalAssemblyTransformation>());
+		} else {
+			bioAssInfo = new BioAssemblyInfo();
+			bioAssInfo.setTransforms(new ArrayList<>());
 			bioAssemblies.put(bioAssemblyId, bioAssInfo);
 			bioAssInfo.setId(bioAssemblyId);
 		}
 
-		for(int currChainIndex : inputChainIndices){
+		for (int currChainIndex : inputChainIndices) {
 			BiologicalAssemblyTransformation bioAssTrans = new BiologicalAssemblyTransformation();
-			Integer transId = transformList.indexOf(inputTransform)+1;
-			if(transId==0){
+			Integer transId = transformList.indexOf(inputTransform) + 1;
+			if (transId == 0) {
 				transformList.add(inputTransform);
-				transId = transformList.indexOf(inputTransform)+1;
+				transId = transformList.indexOf(inputTransform) + 1;
 			}
 			bioAssTrans.setId(transId.toString());
-			// If it actually has an index - if it doesn't it is because the chain has no density.
-			if (currChainIndex!=-1){
+			// If it actually has an index - if it doesn't it is because the chain has no
+			// density.
+			if (currChainIndex != -1) {
 				bioAssTrans.setChainId(chainList.get(currChainIndex).getId());
-			}
-			else {
+			} else {
 				continue;
 			}
 			// Now set matrix
@@ -493,7 +497,7 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		entityInfo.setType(EntityType.entityTypeFromString(type));
 		List<Chain> chains = new ArrayList<>();
 		// Now loop through the chain ids and make a list of them
-		for( int index : chainIndices) {
+		for (int index : chainIndices) {
 			chains.add(chainList.get(index));
 			chainList.get(index).setEntityInfo(entityInfo);
 			chainSequenceMap.put(chainList.get(index).getId(), sequence);
@@ -513,32 +517,32 @@ public class MmtfStructureReader implements StructureAdapterInterface, Serializa
 		pdbHeader.setRfree(rFree);
 		pdbHeader.setRwork(rWork);
 		// Now loop through the techniques and add them in
-		if (experimentalMethods!=null) {
+		if (experimentalMethods != null) {
 			for (String techniqueStr : experimentalMethods) {
 				pdbHeader.setExperimentalTechnique(techniqueStr);
 			}
 		}
 		// Set the dates
-		if(depositionDate!=null){
+		if (depositionDate != null) {
 			try {
 				Date depDate = formatter.parse(depositionDate);
 				pdbHeader.setDepDate(depDate);
 			} catch (ParseException e) {
+				logger.error(e.getMessage(), e);
 				logger.warn("Could not parse date string '{}', depositon date will be unavailable", depositionDate);
 			}
-		}
-		else{
+		} else {
 			pdbHeader.setDepDate(new Date(0));
 		}
-		if(releaseDate!=null){
+		if (releaseDate != null) {
 			try {
 				Date relDate = formatter.parse(releaseDate);
 				pdbHeader.setRelDate(relDate);
 			} catch (ParseException e) {
+				logger.error(e.getMessage(), e);
 				logger.warn("Could not parse date string '{}', release date will be unavailable", releaseDate);
 			}
-		}
-		else{
+		} else {
 			pdbHeader.setRelDate(new Date(0));
 		}
 	}

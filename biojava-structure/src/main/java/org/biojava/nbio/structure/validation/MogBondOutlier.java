@@ -25,18 +25,19 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -80,9 +81,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the zscore property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getZscore() {
@@ -92,9 +91,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the zscore property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setZscore(BigDecimal value) {
@@ -104,9 +101,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the atoms property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAtoms() {
@@ -116,9 +111,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the atoms property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAtoms(String value) {
@@ -128,9 +121,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the mean property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getMean() {
@@ -140,9 +131,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the mean property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setMean(BigDecimal value) {
@@ -152,9 +141,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the mindiff property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getMindiff() {
@@ -164,9 +151,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the mindiff property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setMindiff(BigDecimal value) {
@@ -176,9 +161,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the numobs property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigInteger }
+	 * @return possible object is {@link BigInteger }
 	 *
 	 */
 	public BigInteger getNumobs() {
@@ -188,9 +171,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the numobs property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigInteger }
+	 * @param value allowed object is {@link BigInteger }
 	 *
 	 */
 	public void setNumobs(BigInteger value) {
@@ -200,9 +181,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the obsval property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getObsval() {
@@ -212,9 +191,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the obsval property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setObsval(BigDecimal value) {
@@ -224,9 +201,7 @@ public class MogBondOutlier {
 	/**
 	 * Gets the value of the stdev property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getStdev() {
@@ -236,9 +211,7 @@ public class MogBondOutlier {
 	/**
 	 * Sets the value of the stdev property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setStdev(BigDecimal value) {

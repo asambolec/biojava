@@ -25,8 +25,8 @@ import org.biojava.nbio.core.sequence.compound.NucleotideCompound;
 import org.biojava.nbio.core.sequence.template.Compound;
 
 /**
- * Attempts to wrap compounds so it is possible to view them
- * in a case insensitive manner
+ * Attempts to wrap compounds so it is possible to view them in a case
+ * insensitive manner
  */
 public class CaseInsensitiveCompound implements Compound {
 
@@ -37,7 +37,7 @@ public class CaseInsensitiveCompound implements Compound {
 	}
 
 	@Override
-public boolean equalsIgnoreCase(Compound compound) {
+	public boolean equalsIgnoreCase(Compound compound) {
 		if (compound == null) {
 			return false;
 		}
@@ -49,18 +49,18 @@ public boolean equalsIgnoreCase(Compound compound) {
 	}
 
 	@Override
-public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (!(obj instanceof CaseInsensitiveCompound)) {
 			return false;
 		}
-		return equalsIgnoreCase((Compound)obj);
+		return equalsIgnoreCase((Compound) obj);
 	}
 
 	@Override
-public int hashCode() {
+	public int hashCode() {
 		return toString().toUpperCase().hashCode();
 	}
 
@@ -69,47 +69,47 @@ public int hashCode() {
 	}
 
 	@Override
-public String getDescription() {
+	public String getDescription() {
 		return getUnderlyingCompound().getDescription();
 	}
 
 	@Override
-public String getLongName() {
+	public String getLongName() {
 		return getUnderlyingCompound().getLongName();
 	}
 
 	@Override
-public Float getMolecularWeight() {
+	public Float getMolecularWeight() {
 		return getUnderlyingCompound().getMolecularWeight();
 	}
 
 	@Override
-public String getShortName() {
+	public String getShortName() {
 		return getUnderlyingCompound().getShortName();
 	}
 
 	@Override
-public String toString() {
+	public String toString() {
 		return getUnderlyingCompound().toString();
 	}
 
 	@Override
-public void setDescription(String description) {
-		//Nothing
+	public void setDescription(String description) {
+		// Nothing
 	}
 
 	@Override
-public void setLongName(String longName) {
-		//Nothing
+	public void setLongName(String longName) {
+		// Nothing
 	}
 
 	@Override
-public void setMolecularWeight(Float molecularWeight) {
-		//Nothing
+	public void setMolecularWeight(Float molecularWeight) {
+		// Nothing
 	}
 
 	@Override
-public void setShortName(String shortName) {
-		//Nothing
+	public void setShortName(String shortName) {
+		// Nothing
 	}
 }

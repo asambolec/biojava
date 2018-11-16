@@ -32,45 +32,45 @@ class JTableMouseButtonListener implements MouseListener {
 
 	private JTable __table;
 
-	private void __forwardEventToButton(MouseEvent e) {
-		TableColumnModel columnModel = __table.getColumnModel();
-		int column = columnModel.getColumnIndexAtX(e.getX());
-		int row    = e.getY() / __table.getRowHeight();
-
-		Component component;
-
-
-		//System.out.println("row " + row + " col " + column);
-		if(row >= __table.getRowCount() || row < 0 ||
-				column >= __table.getColumnCount() || column < 0)
-			return;
-
-		Object value = __table.getValueAt(row, column);
-
-		if(!(value instanceof Component))
-			return;
-
-		//System.out.println("converting event");
-		component = (Component)value;
-
-		MouseEvent mevent = SwingUtilities.convertMouseEvent(__table, e, component);
-
-		//System.out.println(mevent);
-
-		component.dispatchEvent(mevent);
-		// This is necessary so that when a button is pressed and released
-		// it gets rendered properly.  Otherwise, the button may still appear
-		// pressed down when it has been released.
-		__table.repaint();
-	}
-
 	public JTableMouseButtonListener(JTable table) {
 		__table = table;
 	}
 
+	private void __forwardEventToButton(MouseEvent e) {
+		TableColumnModel columnModel = __table.getColumnModel();
+		int column = columnModel.getColumnIndexAtX(e.getX());
+		int row = e.getY() / __table.getRowHeight();
+
+		Component component;
+
+		// System.out.println("row " + row + " col " + column);
+		if (row >= __table.getRowCount() || row < 0 || column >= __table.getColumnCount() || column < 0) {
+			return;
+		}
+
+		Object value = __table.getValueAt(row, column);
+
+		if (!(value instanceof Component)) {
+			return;
+		}
+
+		// System.out.println("converting event");
+		component = (Component) value;
+
+		MouseEvent mevent = SwingUtilities.convertMouseEvent(__table, e, component);
+
+		// System.out.println(mevent);
+
+		component.dispatchEvent(mevent);
+		// This is necessary so that when a button is pressed and released
+		// it gets rendered properly. Otherwise, the button may still appear
+		// pressed down when it has been released.
+		__table.repaint();
+	}
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		//System.out.println("clicked!");
+		// System.out.println("clicked!");
 		__forwardEventToButton(e);
 	}
 

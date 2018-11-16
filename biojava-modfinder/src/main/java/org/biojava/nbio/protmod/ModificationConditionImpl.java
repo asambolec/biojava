@@ -38,33 +38,34 @@ public class ModificationConditionImpl implements ModificationCondition {
 	private final List<Component> components;
 	private final List<ModificationLinkage> linkages;
 
-	public ModificationConditionImpl(final List<Component> components,
-			final List<ModificationLinkage> linkages) {
+	public ModificationConditionImpl(final List<Component> components, final List<ModificationLinkage> linkages) {
 
-		if ( components == null)
+		if (components == null) {
 			throw new IllegalArgumentException("Can not create ModificationCondition, components == null!");
+		}
 
-		if ( components.isEmpty())
+		if (components.isEmpty()) {
 			throw new IllegalArgumentException("Can not create ModificationCondition, components is empty!");
-
+		}
 
 		if (components.size() > 1) {
-			Set<Integer> indices = new HashSet<Integer>();
-			for (ModificationLinkage linkage : linkages) {
+			Set<Integer> indices = new HashSet<>();
+			linkages.forEach(linkage -> {
 				indices.add(linkage.getIndexOfComponent1());
 				indices.add(linkage.getIndexOfComponent2());
-			}
+			});
 
 			// TODO: a more comprehensive check would be checking whether
 			// all components are connected
-			if (indices.size()!=components.size()) {
-				throw new IllegalStateException("All components " +
-						"have to be linked. indices.size:" + indices.size() + " components size:" + components.size()); // TODO: is this true?
+			if (indices.size() != components.size()) {
+				throw new IllegalStateException(new StringBuilder().append("All components ")
+						.append("have to be linked. indices.size:").append(indices.size()).append(" components size:")
+						.append(components.size()).toString()); // TODO: is this true?
 			}
 		}
 
 		this.components = Collections.unmodifiableList(components);
-		if (linkages==null) {
+		if (linkages == null) {
 			this.linkages = Collections.emptyList();
 		} else {
 			this.linkages = Collections.unmodifiableList(linkages);
@@ -96,17 +97,13 @@ public class ModificationConditionImpl implements ModificationCondition {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Components:");
-		for (Component comp : components) {
-			sb.append(comp).append(";");
-		}
-		sb.deleteCharAt(sb.length()-1);
+		components.forEach(comp -> sb.append(comp).append(";"));
+		sb.deleteCharAt(sb.length() - 1);
 
 		if (!linkages.isEmpty()) {
 			sb.append("\nLinkages:");
-			for (ModificationLinkage link : linkages) {
-				sb.append(link).append(";");
-			}
-			sb.deleteCharAt(sb.length()-1);
+			linkages.forEach(link -> sb.append(link).append(";"));
+			sb.deleteCharAt(sb.length() - 1);
 		}
 
 		return sb.toString();

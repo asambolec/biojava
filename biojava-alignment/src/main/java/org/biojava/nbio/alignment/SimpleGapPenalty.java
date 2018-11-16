@@ -28,7 +28,8 @@ import java.io.Serializable;
 import org.biojava.nbio.alignment.template.GapPenalty;
 
 /**
- * Implements a data structure for the gap penalties used during a sequence alignment routine.
+ * Implements a data structure for the gap penalties used during a sequence
+ * alignment routine.
  *
  * @author Mark Chapman
  */
@@ -36,28 +37,15 @@ public class SimpleGapPenalty implements GapPenalty, Serializable {
 
 	private static final long serialVersionUID = 3945671344135815456L;
 
-	private static int dgop = 10, dgep = 1;
+	private static int dgop = 10;
 
-	/**
-	 * Sets the default gap extension penalty.
-	 *
-	 * @param gep the default gap extension penalty
-	 */
-	public static void setDefaultExtensionPenalty(int gep) {
-		dgep = gep;
-	}
-
-	/**
-	 * Sets the default gap open penalty.
-	 *
-	 * @param gop the default gap open penalty
-	 */
-	public static void setDefaultOpenPenalty(int gop) {
-		dgop = gop;
-	}
+	private static int dgep = 1;
 
 	private GapPenalty.Type type;
-	private int gop, gep;
+
+	private int gop;
+
+	private int gep;
 
 	/**
 	 * Creates a new set of gap penalties using the defaults.
@@ -79,7 +67,26 @@ public class SimpleGapPenalty implements GapPenalty, Serializable {
 	}
 
 	/**
-	 * <strong>Returns the negative of the extension penalty passed to the constructor.</strong>
+	 * Sets the default gap extension penalty.
+	 *
+	 * @param gep the default gap extension penalty
+	 */
+	public static void setDefaultExtensionPenalty(int gep) {
+		dgep = gep;
+	}
+
+	/**
+	 * Sets the default gap open penalty.
+	 *
+	 * @param gop the default gap open penalty
+	 */
+	public static void setDefaultOpenPenalty(int gop) {
+		dgop = gop;
+	}
+
+	/**
+	 * <strong>Returns the negative of the extension penalty passed to the
+	 * constructor.</strong>
 	 */
 	@Override
 	public int getExtensionPenalty() {
@@ -87,7 +94,8 @@ public class SimpleGapPenalty implements GapPenalty, Serializable {
 	}
 
 	/**
-	 * <strong>Returns the negative of the opening penalty passed to the constructor.</strong>
+	 * <strong>Returns the negative of the opening penalty passed to the
+	 * constructor.</strong>
 	 */
 	@Override
 	public int getOpenPenalty() {

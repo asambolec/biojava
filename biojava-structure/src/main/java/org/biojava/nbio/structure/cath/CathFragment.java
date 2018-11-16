@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * @author Daniel Asarnow
  */
-public class CathFragment implements Serializable{
+public class CathFragment implements Serializable {
 
 	public static final long serialVersionUID = 1L;
 
@@ -38,14 +38,14 @@ public class CathFragment implements Serializable{
 	Integer fragmentId;
 
 	/**
-	 * The first residue in the segment.
-	 * Refers to the complete residue specification (sequence number AND insertion code).
+	 * The first residue in the segment. Refers to the complete residue
+	 * specification (sequence number AND insertion code).
 	 */
 	String start;
 
-	 /**
-	 * The last residue in the segment.
-	 * Refers to the complete residue specification (sequence number AND insertion code).
+	/**
+	 * The last residue in the segment. Refers to the complete residue specification
+	 * (sequence number AND insertion code).
 	 */
 	String stop;
 

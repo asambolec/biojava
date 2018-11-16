@@ -56,12 +56,16 @@ public class CoxMart {
 	 * @return
 	 */
 	static public double[] process(CoxMethod method, ArrayList<SurvivalInfo> survivalInfoList, boolean useStrata) {
-		int i, j;
+		int i;
+		int j;
 		int lastone;
 		int n = survivalInfoList.size();
-		double deaths, denom = 0, e_denom = 0;
+		double deaths;
+		double denom = 0;
+		double e_denom = 0;
 		double hazard;
-		double temp, wtsum;
+		double temp;
+		double wtsum;
 		double downwt;
 		double[] time = new double[n];
 		double[] status = new double[n];
@@ -84,21 +88,21 @@ public class CoxMart {
 			score[p] = si.getScore();
 		}
 
-		strata[n - 1] = 1;  /*failsafe */
+		strata[n - 1] = 1; /* failsafe */
 		/* Pass 1-- store the risk denominator in 'expect' */
-		for (i = n - 1; i >= 0; i--) {  // Error because of no bounds checking in C it is an error on the get i - 1
-		 //   SurvivalInfo si = survivalInfoList.get(i);
+		for (i = n - 1; i >= 0; i--) { // Error because of no bounds checking in C it is an error on the get i - 1
+			// SurvivalInfo si = survivalInfoList.get(i);
 
 			if (strata[i] == 1) {
-				denom = 0; //strata[i]
+				denom = 0; // strata[i]
 			}
-			denom += score[i] * wt[i];      //score[i]*wt[i];
-			if (i == 0 || strata[i - 1] == 1 || time[i - 1] != time[i]) //strata[i-1]==1 ||  time[i-1]!=time[i]
+			denom += score[i] * wt[i]; // score[i]*wt[i];
+			if (i == 0 || strata[i - 1] == 1 || time[i - 1] != time[i]) // strata[i-1]==1 || time[i-1]!=time[i]
 			{
-			 //   si.setResidual(denom);
+				// si.setResidual(denom);
 				expect[i] = denom;
 			} else {
-			 //   si.setResidual(0); //expect[i] =0;
+				// si.setResidual(0); //expect[i] =0;
 				expect[i] = 0;
 			}
 		}
@@ -110,31 +114,32 @@ public class CoxMart {
 		hazard = 0;
 		lastone = 0;
 		for (i = 0; i < n; i++) {
-	//         SurvivalInfo si = survivalInfoList.get(i);
-	//         SurvivalInfo sip1 = null;
-	//         if (i + 1 < n) {
-	//             sip1 = survivalInfoList.get(i + 1);
-	//         }
-	//         if (si.getResidual() != 0) {
-	//             denom = si.getResidual();
-	//         }
-			if(expect[i] != 0)
+			// SurvivalInfo si = survivalInfoList.get(i);
+			// SurvivalInfo sip1 = null;
+			// if (i + 1 < n) {
+			// sip1 = survivalInfoList.get(i + 1);
+			// }
+			// if (si.getResidual() != 0) {
+			// denom = si.getResidual();
+			// }
+			if (expect[i] != 0) {
 				denom = expect[i];
-	//         si.setResidual(status[i]);//expect[i] = status[i];
+			}
+			// si.setResidual(status[i]);//expect[i] = status[i];
 			expect[i] = status[i];
 
-			deaths += status[i]; //status[i];
+			deaths += status[i]; // status[i];
 			wtsum += status[i] * wt[i]; // status[i]*wt[i];
-			e_denom += score[i] * status[i] * wt[i];//score[i]*status[i] *wt[i];
-			if ( strata[i] == 1 || time[i + 1] != time[i]) { //strata[i]==1 ||  time[i+1]!=time[i]
-		/*last subject of a set of tied times */
-				if (deaths < 2 || method == CoxMethod.Breslow) { //*method==0
+			e_denom += score[i] * status[i] * wt[i];// score[i]*status[i] *wt[i];
+			if (strata[i] == 1 || time[i + 1] != time[i]) { // strata[i]==1 || time[i+1]!=time[i]
+				/* last subject of a set of tied times */
+				if (deaths < 2 || method == CoxMethod.Breslow) { // *method==0
 					hazard += wtsum / denom;
 					for (j = lastone; j <= i; j++) {
-					//     SurvivalInfo sj = survivalInfoList.get(j);
-					//     double res =  sj.getResidual() - score[j] * hazard;
+						// SurvivalInfo sj = survivalInfoList.get(j);
+						// double res = sj.getResidual() - score[j] * hazard;
 						expect[j] -= score[j] * hazard;
-					//     sj.setResidual(res); //expect[j] -= score[j]*hazard;
+						// sj.setResidual(res); //expect[j] -= score[j]*hazard;
 
 					}
 				} else {
@@ -146,16 +151,17 @@ public class CoxMart {
 						temp += wtsum * (1 - downwt) / (denom - e_denom * downwt);
 					}
 					for (j = lastone; j <= i; j++) {
-					 //   SurvivalInfo sj = survivalInfoList.get(j);
+						// SurvivalInfo sj = survivalInfoList.get(j);
 						if (status[j] == 0) {
-							//this appears to be an error for = - versus -=
-						 //   double res = -score[j] * hazard;
+							// this appears to be an error for = - versus -=
+							// double res = -score[j] * hazard;
 							expect[j] = -score[j] * hazard;
-						 //   sj.setResidual(res);//expect[j] = -score[j]*hazard; This appears to be an error of -score vs -=
+							// sj.setResidual(res);//expect[j] = -score[j]*hazard; This appears to be an
+							// error of -score vs -=
 						} else {
 							// double res = sj.getResidual() - score[j] * temp;
 							expect[j] -= score[j] * temp;
-							//expect[j] -=  score[j]* temp;
+							// expect[j] -= score[j]* temp;
 						}
 					}
 				}
@@ -168,7 +174,6 @@ public class CoxMart {
 				hazard = 0;
 			}
 		}
-
 
 		for (j = lastone; j < n; j++) {
 			expect[j] -= score[j] * hazard;

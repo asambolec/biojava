@@ -25,7 +25,6 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
@@ -33,11 +32,13 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigDecimal;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -86,9 +87,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the atom0 property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAtom0() {
@@ -98,9 +97,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the atom0 property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAtom0(String value) {
@@ -110,9 +107,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the atom1 property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAtom1() {
@@ -122,9 +117,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the atom1 property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAtom1(String value) {
@@ -134,9 +127,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the atom2 property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getAtom2() {
@@ -146,9 +137,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the atom2 property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setAtom2(String value) {
@@ -158,9 +147,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the mean property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getMean() {
@@ -170,9 +157,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the mean property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setMean(BigDecimal value) {
@@ -182,9 +167,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the obs property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getObs() {
@@ -194,9 +177,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the obs property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setObs(BigDecimal value) {
@@ -206,9 +187,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the stdev property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getStdev() {
@@ -218,9 +197,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the stdev property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setStdev(BigDecimal value) {
@@ -230,9 +207,7 @@ public class AngleOutlier {
 	/**
 	 * Gets the value of the z property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link BigDecimal }
+	 * @return possible object is {@link BigDecimal }
 	 *
 	 */
 	public BigDecimal getZ() {
@@ -242,9 +217,7 @@ public class AngleOutlier {
 	/**
 	 * Sets the value of the z property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link BigDecimal }
+	 * @param value allowed object is {@link BigDecimal }
 	 *
 	 */
 	public void setZ(BigDecimal value) {

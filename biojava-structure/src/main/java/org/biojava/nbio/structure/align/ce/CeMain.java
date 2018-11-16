@@ -24,7 +24,6 @@
 
 package org.biojava.nbio.structure.align.ce;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.StructureException;
@@ -33,10 +32,11 @@ import org.biojava.nbio.structure.align.StructureAlignment;
 import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.jama.Matrix;
 
-/** 
- * The main class of the Java implementation of the Combinatorial Extension Algorithm (CE),
- * as has been originally developed by I. Shindyalov and P.Bourne (1998).
- * The original CE paper is available from here: <a href="http://peds.oxfordjournals.org/cgi/content/short/11/9/739">http://peds.oxfordjournals.org/cgi/content/short/11/9/739</a>
+/**
+ * The main class of the Java implementation of the Combinatorial Extension
+ * Algorithm (CE), as has been originally developed by I. Shindyalov and
+ * P.Bourne (1998). The original CE paper is available from here: <a href=
+ * "http://peds.oxfordjournals.org/cgi/content/short/11/9/739">http://peds.oxfordjournals.org/cgi/content/short/11/9/739</a>
  *
  * For a demo of how to use this algorithm, visit the BioJava web site:
  * <a href="">CE usage example</a>.
@@ -46,15 +46,13 @@ import org.biojava.nbio.structure.jama.Matrix;
  * @author Andreas Prlic.
  *
  */
-public class CeMain extends AbstractStructureAlignment implements StructureAlignment {
+public class CeMain extends AbstractStructureAlignment {
 
 	public static final String algorithmName = "jCE";
 
 	/**
-	 *  version history:
-	 *  1.2 - Added more parameters to the command line, including -maxOptRMSD
-	 *  1.1 - Additional parameters
-	 *  1.0 - Initial port from C code
+	 * version history: 1.2 - Added more parameters to the command line, including
+	 * -maxOptRMSD 1.1 - Additional parameters 1.0 - Initial port from C code
 	 */
 	public static final String version = "1.2";
 
@@ -62,12 +60,10 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 	protected CECalculator calculator;
 	private Atom[] ca2clone;
 
-	public CeMain(){
-		super();
+	public CeMain() {
 		params = new CeParameters();
 		calculator = new CECalculator(params);
 	}
-
 
 	/**
 	 * Example Parameters:
@@ -76,7 +72,7 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 	 *
 	 */
 	public static void main(String[] args) throws Exception {
-		CeUserArgumentProcessor processor = new CeUserArgumentProcessor(); //Responsible for creating a CeMain instance
+		CeUserArgumentProcessor processor = new CeUserArgumentProcessor(); // Responsible for creating a CeMain instance
 		processor.process(args);
 	}
 
@@ -84,9 +80,10 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 	 * Align ca2 onto ca1.
 	 */
 	@Override
-	public AFPChain align(Atom[] ca1, Atom[] ca2, Object param) throws StructureException{
-		if ( ! (param instanceof CeParameters))
+	public AFPChain align(Atom[] ca1, Atom[] ca2, Object param) throws StructureException {
+		if (!(param instanceof CeParameters)) {
 			throw new IllegalArgumentException("CE algorithm needs an object of call CeParameters as argument.");
+		}
 
 		params = (CeParameters) param;
 
@@ -94,8 +91,8 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 		ca2clone = new Atom[ca2.length];
 
 		int pos = 0;
-		for (Atom a : ca2){
-			Group g = (Group)a.getGroup().clone(); // works because each group has only a CA atom
+		for (Atom a : ca2) {
+			Group g = (Group) a.getGroup().clone(); // works because each group has only a CA atom
 
 			ca2clone[pos] = g.getAtom(a.getName());
 
@@ -104,30 +101,35 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 
 		calculator = new CECalculator(params);
 
-		//Build alignment ca1 to ca2-ca2
+		// Build alignment ca1 to ca2-ca2
 		AFPChain afpChain = new AFPChain(algorithmName);
 		afpChain = calculator.extractFragments(afpChain, ca1, ca2clone);
-		calculator.traceFragmentMatrix( afpChain,ca1, ca2clone);
-		calculator.nextStep( afpChain,ca1, ca2clone);
+		calculator.traceFragmentMatrix(afpChain, ca1, ca2clone);
+		calculator.nextStep(afpChain, ca1, ca2clone);
 
 		afpChain.setAlgorithmName(getAlgorithmName());
 		afpChain.setVersion(version);
 
 		// Try to guess names
 
-		if (ca1.length!=0 && ca1[0].getGroup().getChain()!=null && ca1[0].getGroup().getChain().getStructure()!=null)
+		if (ca1.length != 0 && ca1[0].getGroup().getChain() != null
+				&& ca1[0].getGroup().getChain().getStructure() != null) {
 			afpChain.setName1(ca1[0].getGroup().getChain().getStructure().getName());
+		}
 
-		if (ca2.length!=0 && ca2[0].getGroup().getChain()!=null && ca2[0].getGroup().getChain().getStructure()!=null)
+		if (ca2.length != 0 && ca2[0].getGroup().getChain() != null
+				&& ca2[0].getGroup().getChain().getStructure() != null) {
 			afpChain.setName2(ca2[0].getGroup().getChain().getStructure().getName());
+		}
 
-		if ( afpChain.getNrEQR() == 0)
-		   return afpChain;
+		if (afpChain.getNrEQR() == 0) {
+			return afpChain;
+		}
 
 		// Set the distance matrix
 
 		int winSize = params.getWinSize();
-		int winSizeComb1 = (winSize-1)*(winSize-2)/2;
+		int winSizeComb1 = (winSize - 1) * (winSize - 2) / 2;
 		double[][] m = calculator.initSumOfDistances(ca1.length, ca2.length, winSize, winSizeComb1, ca1, ca2clone);
 		afpChain.setDistanceMatrix(new Matrix(m));
 		afpChain.setSequentialAlignment(true);
@@ -135,16 +137,14 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 		return afpChain;
 	}
 
-
-
-
 	@Override
 	public AFPChain align(Atom[] ca1, Atom[] ca2) throws StructureException {
 
-		if (params == null)
+		if (params == null) {
 			params = new CeParameters();
+		}
 
-		return align(ca1,ca2,params);
+		return align(ca1, ca2, params);
 	}
 
 	@Override
@@ -160,8 +160,8 @@ public class CeMain extends AbstractStructureAlignment implements StructureAlign
 	}
 
 	@Override
-	public void setParameters(ConfigStrucAligParams params){
-		if (! (params instanceof CeParameters )){
+	public void setParameters(ConfigStrucAligParams params) {
+		if (!(params instanceof CeParameters)) {
 			throw new IllegalArgumentException("provided parameter object is not of type CeParameter");
 		}
 		this.params = (CeParameters) params;

@@ -31,25 +31,34 @@ import org.biojava.nbio.structure.io.mmcif.ChemCompProvider;
 import org.biojava.nbio.structure.io.mmcif.DownloadChemCompProvider;
 
 import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *  This demo shows how to use an alternative ChemCompProvider. The default mechanism in BioJava is to access chemical components
- *  by using the {@link DownloadChemCompProvider}. It fetches and locally caches chemical component definitions as they are encountered during file parsing.
- *  It can be enabled by using the {@link FileParsingParameters#setLoadChemCompInfo(boolean)} method.
+ * This demo shows how to use an alternative ChemCompProvider. The default
+ * mechanism in BioJava is to access chemical components by using the
+ * {@link DownloadChemCompProvider}. It fetches and locally caches chemical
+ * component definitions as they are encountered during file parsing. It can be
+ * enabled by using the
+ * {@link FileParsingParameters#setLoadChemCompInfo(boolean)} method.
  *
- * The {@link AllChemCompProvider} downloads and unpacks all chemcomps. It is slower and requires more memory than the default {@link DownloadChemCompProvider},
- * but it avoids network access to the FTP site, if a new chemcomp is detected, that has not been downloaded yet.
+ * The {@link AllChemCompProvider} downloads and unpacks all chemcomps. It is
+ * slower and requires more memory than the default
+ * {@link DownloadChemCompProvider}, but it avoids network access to the FTP
+ * site, if a new chemcomp is detected, that has not been downloaded yet.
  *
- * Since all chemcomps will be kept in memory, the standard memory that is available to a JVM will not be sufficient
- * in order to run this demo. Please start with -Xmx200M
+ * Since all chemcomps will be kept in memory, the standard memory that is
+ * available to a JVM will not be sufficient in order to run this demo. Please
+ * start with -Xmx200M
  *
  * @author Andreas Prlic
  *
  */
 public class DemoChangeChemCompProvider {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoChangeChemCompProvider.class);
+
+	public static void main(String[] args) {
 		String pdbId = "1O1G";
 
 		boolean loadChemComp = true;
@@ -62,12 +71,12 @@ public class DemoChangeChemCompProvider {
 
 		// Set the system wide property where PDB and chemcomp files are being cached.
 		// you can set the path to the local PDB installation either like this
-//		reader.setPath(PDB_PATH);
+		// reader.setPath(PDB_PATH);
 		// or via
 		// by setting the PDB_PATH environmental variable or system property
 		// when running the demo (e.g. -DPDB_DIR=/path/to/pdb)
 
-		if ( loadChemComp) {
+		if (loadChemComp) {
 
 			// The AllChemCompProvider loads all chem comps at startup.
 			// This is slow (13 sec on my laptop) and requires more
@@ -81,19 +90,21 @@ public class DemoChangeChemCompProvider {
 		DemoChangeChemCompProvider demo = new DemoChangeChemCompProvider();
 
 		// run the demo
-		demo.basicLoad(reader,loadChemComp, pdbId);
+		demo.basicLoad(reader, loadChemComp, pdbId);
 
 	}
 
-	public void basicLoad(PDBFileReader reader, boolean loadChemComp, String pdbId){
+	public void basicLoad(PDBFileReader reader, boolean loadChemComp, String pdbId) {
 
 		try {
 			// configure the parameters of file parsing
 
 			FileParsingParameters params = new FileParsingParameters();
 
-			// should the ATOM and SEQRES residues be aligned when creating the internal data model?
-			// only do this if you need to work with SEQRES sequences. If all you need are ATOMs, then
+			// should the ATOM and SEQRES residues be aligned when creating the internal
+			// data model?
+			// only do this if you need to work with SEQRES sequences. If all you need are
+			// ATOMs, then
 			// set it to false to have quicker file loading.
 			params.setAlignSeqRes(true);
 
@@ -107,41 +118,41 @@ public class DemoChangeChemCompProvider {
 
 			printStructure(struc);
 
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
 
 	private void printStructure(Structure struc) {
 
-		System.out.println(struc);
+		logger.info(String.valueOf(struc));
 
-		//Chain c = struc.getChainByPDB("C");
+		// Chain c = struc.getChainByPDB("C");
 		String pdbid = struc.getPDBCode();
 		for (int i = 0; i < struc.nrModels(); i++) {
 
 			// loop chain
 			for (Chain ch : struc.getModel(i)) {
-				if (! ch.getName().equals("A") )
+				if (!"A".equals(ch.getName())) {
 					continue;
-				System.out.println(pdbid + ">>>" + ch.getName() + ">>>"
-						+ ch.getAtomSequence());
-				System.out.println(pdbid + ">>>" + ch.getName() + ">>>"
-						+ ch.getSeqResSequence());
+				}
+				logger.info(new StringBuilder().append(pdbid).append(">>>").append(ch.getName()).append(">>>")
+						.append(ch.getAtomSequence()).toString());
+				logger.info(new StringBuilder().append(pdbid).append(">>>").append(ch.getName()).append(">>>")
+						.append(ch.getSeqResSequence()).toString());
 				// Test the getAtomGroups() and getSeqResGroups() method
 
 				List<Group> group = ch.getSeqResGroups();
 				int seqPos = 0;
 				for (Group gp : group) {
-					System.out.println(ch.getName() + ":"+seqPos + ":" + gp.getResidueNumber() + ":"
-							+ gp.getPDBName() + " " + gp.getType());
+					logger.info(new StringBuilder().append(ch.getName()).append(":").append(seqPos).append(":")
+							.append(gp.getResidueNumber()).append(":").append(gp.getPDBName()).append(" ")
+							.append(gp.getType()).toString());
 					seqPos++;
 				}
 			}
 		}
-
 
 	}
 }

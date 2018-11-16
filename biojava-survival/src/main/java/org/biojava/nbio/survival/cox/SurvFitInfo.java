@@ -29,10 +29,9 @@ import java.util.LinkedHashMap;
  */
 public class SurvFitInfo {
 
-	private LinkedHashMap<String, StrataInfo> strataInfoHashMap = new LinkedHashMap<String, StrataInfo>();
-	private LinkedHashMap<String, StrataInfo> unweightedStrataInfoHashMap = new LinkedHashMap<String, StrataInfo>();
+	private LinkedHashMap<String, StrataInfo> strataInfoHashMap = new LinkedHashMap<>();
+	private LinkedHashMap<String, StrataInfo> unweightedStrataInfoHashMap = new LinkedHashMap<>();
 	private boolean weighted = false;
-
 
 	/**
 	 *
@@ -70,15 +69,15 @@ public class SurvFitInfo {
 	 * @param label
 	 */
 	public void addStrataInfoHashMap(LinkedHashMap<String, StrataInfo> siHashMap, String label) {
-		for (String key : siHashMap.keySet()) {
+		siHashMap.keySet().forEach(key -> {
 			StrataInfo si = siHashMap.get(key);
-			strataInfoHashMap.put(label + " " + key, si);
-		}
+			strataInfoHashMap.put(new StringBuilder().append(label).append(" ").append(key).toString(), si);
+		});
 	}
 
 	@Override
 	public String toString() {
-		return strataInfoHashMap.toString(); //To change body of generated methods, choose Tools | Templates.
+		return strataInfoHashMap.toString(); // To change body of generated methods, choose Tools | Templates.
 	}
 
 	/**

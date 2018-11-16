@@ -44,13 +44,12 @@ public class SecStrucTools {
 	 * Obtain the List of secondary structure information (SecStrucInfo) of a
 	 * Structure.
 	 *
-	 * @param s
-	 *            Structure with SS assignments
+	 * @param s Structure with SS assignments
 	 * @return List of SecStrucInfo objects
 	 */
 	public static List<SecStrucInfo> getSecStrucInfo(Structure s) {
 
-		List<SecStrucInfo> listSSI = new ArrayList<SecStrucInfo>();
+		List<SecStrucInfo> listSSI = new ArrayList<>();
 		GroupIterator iter = new GroupIterator(s);
 
 		while (iter.hasNext()) {
@@ -67,14 +66,9 @@ public class SecStrucTools {
 		return listSSI;
 	}
 
+	public static void assignSecStruc(Structure s, List<SecStrucInfo> listSSI) {
 
-	public static void assignSecStruc( Structure s,List<SecStrucInfo> listSSI){
-
-		for ( SecStrucInfo ssi : listSSI){
-
-			ssi.getGroup().setProperty(Group.SEC_STRUC,ssi);
-
-		}
+		listSSI.forEach(ssi -> ssi.getGroup().setProperty(Group.SEC_STRUC, ssi));
 
 	}
 
@@ -82,13 +76,12 @@ public class SecStrucTools {
 	 * Obtain the List of secondary structure elements (SecStrucElement) of a
 	 * Structure.
 	 *
-	 * @param s
-	 *            Structure with SS assignments
+	 * @param s Structure with SS assignments
 	 * @return List of SecStrucElement objects
 	 */
 	public static List<SecStrucElement> getSecStrucElements(Structure s) {
 
-		List<SecStrucElement> listSSE = new ArrayList<SecStrucElement>();
+		List<SecStrucElement> listSSE = new ArrayList<>();
 		GroupIterator iter = new GroupIterator(s);
 
 		// SecStruc information - initialize
@@ -99,29 +92,30 @@ public class SecStrucTools {
 		int count = 0; // counts the number of residues in SSE
 
 		// Create a map for the IDs of the SSE in the structure
-		Map<SecStrucType, Integer> ids = new TreeMap<SecStrucType, Integer>();
-		for (SecStrucType t : SecStrucType.values())
+		Map<SecStrucType, Integer> ids = new TreeMap<>();
+		for (SecStrucType t : SecStrucType.values()) {
 			ids.put(t, 1);
+		}
 
 		while (iter.hasNext()) {
 			Group g = iter.next();
 
 			if (g.hasAminoAtoms()) {
 				Object p = g.getProperty(Group.SEC_STRUC);
-				if (p == null)
+				if (p == null) {
 					continue;
+				}
 				SecStrucInfo ss = (SecStrucInfo) p;
 
 				if (count > 0) {
 					// If chain and type are equal increment counter
-					if (ss.type == type && chainId == g.getChainId()) {
+					if (ss.type == type && chainId.equals(g.getChainId())) {
 						previous = g.getResidueNumber();
 						count++;
 						continue;
 					} else {
 						// Save the current SSE if chain or type change
-						SecStrucElement sse = new SecStrucElement(type, start,
-								previous, count, ids.get(type), chainId);
+						SecStrucElement sse = new SecStrucElement(type, start, previous, count, ids.get(type), chainId);
 						listSSE.add(sse);
 						ids.put(type, ids.get(type) + 1);
 						count = 0;
@@ -151,17 +145,16 @@ public class SecStrucTools {
 	}
 
 	/**
-	 * Obtain the List of secondary structure elements (SecStrucElement) of a
-	 * List of Groups (assumed to be sequential, this is, connected in the
-	 * original Structure).
+	 * Obtain the List of secondary structure elements (SecStrucElement) of a List
+	 * of Groups (assumed to be sequential, this is, connected in the original
+	 * Structure).
 	 *
-	 * @param groups
-	 *            Structure with SS assignments
+	 * @param groups Structure with SS assignments
 	 * @return List of SecStrucElement objects
 	 */
 	public static List<SecStrucElement> getSecStrucElements(List<Group> groups) {
 
-		List<SecStrucElement> listSSE = new ArrayList<SecStrucElement>();
+		List<SecStrucElement> listSSE = new ArrayList<>();
 
 		// SecStruc information - initialize
 		SecStrucType type = SecStrucType.coil;
@@ -171,28 +164,29 @@ public class SecStrucTools {
 		int count = 0; // counts the number of residues in SSE
 
 		// Create a map for the IDs of the SSE in the structure
-		Map<SecStrucType, Integer> ids = new TreeMap<SecStrucType, Integer>();
-		for (SecStrucType t : SecStrucType.values())
+		Map<SecStrucType, Integer> ids = new TreeMap<>();
+		for (SecStrucType t : SecStrucType.values()) {
 			ids.put(t, 1);
+		}
 
 		for (Group g : groups) {
 
 			if (g.hasAminoAtoms()) {
 				Object p = g.getProperty(Group.SEC_STRUC);
-				if (p == null)
+				if (p == null) {
 					continue;
+				}
 				SecStrucInfo ss = (SecStrucInfo) p;
 
 				if (count > 0) {
 					// If chain and type are equal increment counter
-					if (ss.type == type && chainId == g.getChainId()) {
+					if (ss.type == type && chainId.equals(g.getChainId())) {
 						previous = g.getResidueNumber();
 						count++;
 						continue;
 					} else {
 						// Save the current SSE if chain or type change
-						SecStrucElement sse = new SecStrucElement(type, start,
-								previous, count, ids.get(type), chainId);
+						SecStrucElement sse = new SecStrucElement(type, start, previous, count, ids.get(type), chainId);
 						listSSE.add(sse);
 						ids.put(type, ids.get(type) + 1);
 						count = 0;

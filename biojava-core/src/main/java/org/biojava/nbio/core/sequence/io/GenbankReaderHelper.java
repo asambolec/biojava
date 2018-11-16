@@ -47,85 +47,79 @@ public class GenbankReaderHelper {
 	private final static Logger logger = LoggerFactory.getLogger(GenbankReaderHelper.class);
 
 	/**
-	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out the accessionid and offsets and return sequence objects
-	 * that can in the future read the sequence from the disk. This allows the loading of large Genbank files where you are only interested
-	 * in one sequence based on accession id.
+	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out
+	 * the accessionid and offsets and return sequence objects that can in the
+	 * future read the sequence from the disk. This allows the loading of large
+	 * Genbank files where you are only interested in one sequence based on
+	 * accession id.
+	 * 
 	 * @param file
 	 * @param lazySequenceLoad
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(File file, boolean lazySequenceLoad) throws Exception {
+	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(File file, boolean lazySequenceLoad)
+			throws Exception {
 		if (!lazySequenceLoad) {
 			return readGenbankDNASequence(file);
 		}
 
-		GenbankReader<DNASequence, NucleotideCompound> GenbankProxyReader =
-				new GenbankReader<DNASequence, NucleotideCompound>(
-						file,
-						new GenericGenbankHeaderParser<DNASequence, NucleotideCompound>(),
-						new FileProxyDNASequenceCreator(
-								file,
-								DNACompoundSet.getDNACompoundSet(),
-								new GenbankSequenceParser<AbstractSequence<NucleotideCompound>, NucleotideCompound>()
-							)
-					);
+		GenbankReader<DNASequence, NucleotideCompound> GenbankProxyReader = new GenbankReader<>(file,
+				new GenericGenbankHeaderParser<DNASequence, NucleotideCompound>(),
+				new FileProxyDNASequenceCreator(file, DNACompoundSet.getDNACompoundSet(),
+						new GenbankSequenceParser<AbstractSequence<NucleotideCompound>, NucleotideCompound>()));
 		return GenbankProxyReader.process();
 
 	}
 
 	/**
-	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out the accessionid and offsets and return sequence objects
-	 * that can in the future read the sequence from the disk. This allows the loading of large Genbank files where you are only interested
-	 * in one sequence based on accession id.
+	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out
+	 * the accessionid and offsets and return sequence objects that can in the
+	 * future read the sequence from the disk. This allows the loading of large
+	 * Genbank files where you are only interested in one sequence based on
+	 * accession id.
+	 * 
 	 * @param file
 	 * @param lazySequenceLoad
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(File file, boolean lazySequenceLoad) throws Exception {
+	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(File file, boolean lazySequenceLoad)
+			throws Exception {
 		if (!lazySequenceLoad) {
 			return readGenbankProteinSequence(file);
 		}
 
-		GenbankReader<ProteinSequence, AminoAcidCompound> GenbankProxyReader =
-				new GenbankReader<ProteinSequence, AminoAcidCompound>(
-						file,
-						new GenericGenbankHeaderParser<ProteinSequence, AminoAcidCompound>(),
-						new FileProxyProteinSequenceCreator(
-								file,
-								AminoAcidCompoundSet.getAminoAcidCompoundSet(),
-								new GenbankSequenceParser<AbstractSequence<AminoAcidCompound>, AminoAcidCompound>()
-							)
-					);
+		GenbankReader<ProteinSequence, AminoAcidCompound> GenbankProxyReader = new GenbankReader<>(file,
+				new GenericGenbankHeaderParser<ProteinSequence, AminoAcidCompound>(),
+				new FileProxyProteinSequenceCreator(file, AminoAcidCompoundSet.getAminoAcidCompoundSet(),
+						new GenbankSequenceParser<AbstractSequence<AminoAcidCompound>, AminoAcidCompound>()));
 		return GenbankProxyReader.process();
 
 	}
 
 	/**
-	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out the accessionid and offsets and return sequence objects
-	 * that can in the future read the sequence from the disk. This allows the loading of large Genbank files where you are only interested
-	 * in one sequence based on accession id.
+	 * Selecting lazySequenceLoad=true will parse the Genbank file and figure out
+	 * the accessionid and offsets and return sequence objects that can in the
+	 * future read the sequence from the disk. This allows the loading of large
+	 * Genbank files where you are only interested in one sequence based on
+	 * accession id.
+	 * 
 	 * @param file
 	 * @param lazySequenceLoad
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(File file, boolean lazySequenceLoad) throws Exception {
+	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(File file, boolean lazySequenceLoad)
+			throws Exception {
 		if (!lazySequenceLoad) {
 			return readGenbankRNASequence(file);
 		}
 
-		GenbankReader<RNASequence, NucleotideCompound> GenbankProxyReader =
-				new GenbankReader<RNASequence, NucleotideCompound>(
-						file,
-						new GenericGenbankHeaderParser<RNASequence, NucleotideCompound>(),
-						new FileProxyRNASequenceCreator(
-								file,
-								RNACompoundSet.getRNACompoundSet(),
-								new GenbankSequenceParser<AbstractSequence<NucleotideCompound>, NucleotideCompound>()
-							)
-					);
+		GenbankReader<RNASequence, NucleotideCompound> GenbankProxyReader = new GenbankReader<>(file,
+				new GenericGenbankHeaderParser<RNASequence, NucleotideCompound>(),
+				new FileProxyRNASequenceCreator(file, RNACompoundSet.getRNACompoundSet(),
+						new GenbankSequenceParser<AbstractSequence<NucleotideCompound>, NucleotideCompound>()));
 		return GenbankProxyReader.process();
 
 	}
@@ -138,8 +132,7 @@ public class GenbankReaderHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(
-			File file) throws Exception {
+	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(File file) throws Exception {
 		FileInputStream inStream = new FileInputStream(file);
 		LinkedHashMap<String, ProteinSequence> proteinSequences = readGenbankProteinSequence(inStream);
 		inStream.close();
@@ -154,10 +147,9 @@ public class GenbankReaderHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(
-			InputStream inStream) throws Exception {
-		GenbankReader<ProteinSequence, AminoAcidCompound> GenbankReader = new GenbankReader<ProteinSequence, AminoAcidCompound>(
-				inStream,
+	public static LinkedHashMap<String, ProteinSequence> readGenbankProteinSequence(InputStream inStream)
+			throws Exception {
+		GenbankReader<ProteinSequence, AminoAcidCompound> GenbankReader = new GenbankReader<>(inStream,
 				new GenericGenbankHeaderParser<ProteinSequence, AminoAcidCompound>(),
 				new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet()));
 		return GenbankReader.process();
@@ -165,14 +157,13 @@ public class GenbankReaderHelper {
 
 	/**
 	 * Read a Genbank DNA sequence
+	 * 
 	 * @param inStream
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(
-			InputStream inStream) throws Exception {
-		GenbankReader<DNASequence, NucleotideCompound> GenbankReader = new GenbankReader<DNASequence, NucleotideCompound>(
-				inStream,
+	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(InputStream inStream) throws Exception {
+		GenbankReader<DNASequence, NucleotideCompound> GenbankReader = new GenbankReader<>(inStream,
 				new GenericGenbankHeaderParser<DNASequence, NucleotideCompound>(),
 				new DNASequenceCreator(DNACompoundSet.getDNACompoundSet()));
 		return GenbankReader.process();
@@ -184,23 +175,22 @@ public class GenbankReaderHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(
-			File file) throws Exception {
+	public static LinkedHashMap<String, DNASequence> readGenbankDNASequence(File file) throws Exception {
 		FileInputStream inStream = new FileInputStream(file);
 		LinkedHashMap<String, DNASequence> dnaSequences = readGenbankDNASequence(inStream);
 		inStream.close();
 		return dnaSequences;
 	}
+
 	/**
 	 * Read a Genbank RNA sequence
+	 * 
 	 * @param inStream
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(
-			InputStream inStream) throws Exception {
-		GenbankReader<RNASequence, NucleotideCompound> GenbankReader = new GenbankReader<RNASequence, NucleotideCompound>(
-				inStream,
+	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(InputStream inStream) throws Exception {
+		GenbankReader<RNASequence, NucleotideCompound> GenbankReader = new GenbankReader<>(inStream,
 				new GenericGenbankHeaderParser<RNASequence, NucleotideCompound>(),
 				new RNASequenceCreator(RNACompoundSet.getRNACompoundSet()));
 		return GenbankReader.process();
@@ -212,8 +202,7 @@ public class GenbankReaderHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(
-			File file) throws Exception {
+	public static LinkedHashMap<String, RNASequence> readGenbankRNASequence(File file) throws Exception {
 		FileInputStream inStream = new FileInputStream(file);
 		LinkedHashMap<String, RNASequence> rnaSequences = readGenbankRNASequence(inStream);
 		inStream.close();
@@ -222,14 +211,14 @@ public class GenbankReaderHelper {
 
 	public static void main(String[] args) throws Exception {
 
-		LinkedHashMap<String, DNASequence> dnaSequences = GenbankReaderHelper.readGenbankDNASequence(new File("src/test/resources/NM_000266.gb"), true);
-		for (DNASequence sequence : dnaSequences.values()) {
-			logger.info("DNA Sequence: {}", sequence.getRNASequence().getProteinSequence().getSequenceAsString());
-		}
+		LinkedHashMap<String, DNASequence> dnaSequences = GenbankReaderHelper
+				.readGenbankDNASequence(new File("src/test/resources/NM_000266.gb"), true);
+		dnaSequences.values().forEach(sequence -> logger.info("DNA Sequence: {}",
+				sequence.getRNASequence().getProteinSequence().getSequenceAsString()));
 
-		LinkedHashMap<String, ProteinSequence> proteinSequences = GenbankReaderHelper.readGenbankProteinSequence(new File("src/test/resources/BondFeature.gb"), true);
-		for (ProteinSequence sequence : proteinSequences.values()) {
-			logger.info("Protein Sequence: {}", sequence.getSequenceAsString());
-		}
+		LinkedHashMap<String, ProteinSequence> proteinSequences = GenbankReaderHelper
+				.readGenbankProteinSequence(new File("src/test/resources/BondFeature.gb"), true);
+		proteinSequences.values()
+				.forEach(sequence -> logger.info("Protein Sequence: {}", sequence.getSequenceAsString()));
 	}
 }

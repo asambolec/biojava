@@ -37,24 +37,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This algorithm uses a divide-and-conquer approach to find optimal pairwise global sequence alignments (from the
- * first until the last {@link Compound} of each {@link Sequence}) with the restriction that any alignment produced
- * will connect the query sequence to the target sequence at the <em>anchors</em>.  This class performs such global
- * sequence comparisons efficiently by dynamic programming with a space requirement reduced from quadratic (a multiple
- * of query sequence length times target sequence length) to only linear (a multiple of query sequence length).  The
- * counterpoint to this reduction in space complexity is a modest (a multiple < 2) increase in time.
+ * This algorithm uses a divide-and-conquer approach to find optimal pairwise
+ * global sequence alignments (from the first until the last {@link Compound} of
+ * each {@link Sequence}) with the restriction that any alignment produced will
+ * connect the query sequence to the target sequence at the <em>anchors</em>.
+ * This class performs such global sequence comparisons efficiently by dynamic
+ * programming with a space requirement reduced from quadratic (a multiple of
+ * query sequence length times target sequence length) to only linear (a
+ * multiple of query sequence length). The counterpoint to this reduction in
+ * space complexity is a modest (a multiple < 2) increase in time.
  *
  * @author Mark Chapman
  * @author Daniel Cameron
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
-public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Compound> extends
-		AbstractPairwiseSequenceAligner<S, C> {
+public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Compound>
+		extends AbstractPairwiseSequenceAligner<S, C> {
 
 	/**
-	 * Before running a pairwise global sequence alignment, data must be sent in via calls to
-	 * {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)}, {@link #setGapPenalty(GapPenalty)}, and
+	 * Before running a pairwise global sequence alignment, data must be sent in via
+	 * calls to {@link #setQuery(Sequence)}, {@link #setTarget(Sequence)},
+	 * {@link #setGapPenalty(GapPenalty)}, and
 	 * {@link #setSubstitutionMatrix(SubstitutionMatrix)}.
 	 */
 	public AnchoredPairwiseSequenceAligner() {
@@ -63,11 +68,12 @@ public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Co
 	/**
 	 * Prepares for a pairwise global sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
-	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
-	 * @param cutsPerSection the number of cuts added to each section during each pass
+	 * @param query          the first {@link Sequence} of the pair to align
+	 * @param target         the second {@link Sequence} of the pair to align
+	 * @param gapPenalty     the gap penalties used during alignment
+	 * @param subMatrix      the set of substitution scores used during alignment
+	 * @param cutsPerSection the number of cuts added to each section during each
+	 *                       pass
 	 */
 	public AnchoredPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix) {
 		this(query, target, gapPenalty, subMatrix, null);
@@ -76,21 +82,23 @@ public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Co
 	/**
 	 * Prepares for a pairwise global sequence alignment.
 	 *
-	 * @param query the first {@link Sequence} of the pair to align
-	 * @param target the second {@link Sequence} of the pair to align
-	 * @param gapPenalty the gap penalties used during alignment
-	 * @param subMatrix the set of substitution scores used during alignment
-	 * @param cutsPerSection the number of cuts added to each section during each pass
-	 * @param anchors the initial list of anchors
+	 * @param query          the first {@link Sequence} of the pair to align
+	 * @param target         the second {@link Sequence} of the pair to align
+	 * @param gapPenalty     the gap penalties used during alignment
+	 * @param subMatrix      the set of substitution scores used during alignment
+	 * @param cutsPerSection the number of cuts added to each section during each
+	 *                       pass
+	 * @param anchors        the initial list of anchors
 	 */
-	public AnchoredPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix, int[] anchors) {
+	public AnchoredPairwiseSequenceAligner(S query, S target, GapPenalty gapPenalty, SubstitutionMatrix<C> subMatrix,
+			int[] anchors) {
 		super(query, target, gapPenalty, subMatrix);
 		setAnchors(anchors);
 	}
 
 	/**
-	 * Returns the list of anchors.  The populated elements correspond to query compounds with a connection established
-	 * to a target compound.
+	 * Returns the list of anchors. The populated elements correspond to query
+	 * compounds with a connection established to a target compound.
 	 *
 	 * @return the list of anchors
 	 */
@@ -99,19 +107,18 @@ public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Co
 		for (int i = 0; i < anchor.length; i++) {
 			anchor[i] = -1;
 		}
-		for (int i = 0; i < anchors.size(); i++) {
-			anchor[anchors.get(i).getQueryIndex()] = anchors.get(i).getTargetIndex();
-		}
+		anchors.forEach(anchor1 -> anchor[anchor1.getQueryIndex()] = anchor1.getTargetIndex());
 		return anchor;
 	}
 
 	/**
 	 * Sets the starting list of anchors before running the alignment routine.
 	 *
-	 * @param anchors list of points that are tied to the given indices in the target
+	 * @param anchors list of points that are tied to the given indices in the
+	 *                target
 	 */
 	public void setAnchors(int[] anchors) {
-		super.anchors = new ArrayList<Anchor>();
+		super.anchors = new ArrayList<>();
 		if (anchors != null) {
 			for (int i = 0; i < anchors.length; i++) {
 				if (anchors[i] >= 0) {
@@ -120,9 +127,11 @@ public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Co
 			}
 		}
 	}
+
 	/**
 	 * Adds an additional anchor to the set of anchored compounds
-	 * @param queryIndex 0-based index of query sequence compound
+	 * 
+	 * @param queryIndex  0-based index of query sequence compound
 	 * @param targetIndex 0-base index of target sequence compound to anchor to
 	 */
 	public void addAnchor(int queryIndex, int targetIndex) {
@@ -133,7 +142,7 @@ public class AnchoredPairwiseSequenceAligner<S extends Sequence<C>, C extends Co
 
 	@Override
 	protected void setProfile(List<Step> sx, List<Step> sy) {
-		profile = pair = new SimpleSequencePair<S, C>(getQuery(), getTarget(), sx, sy);
+		profile = pair = new SimpleSequencePair<>(getQuery(), getTarget(), sx, sy);
 	}
 
 }

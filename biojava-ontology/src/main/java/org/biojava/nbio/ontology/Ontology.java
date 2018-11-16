@@ -25,16 +25,14 @@ import org.biojava.nbio.ontology.utils.AssertionFailure;
 
 import java.util.*;
 
-
-
-
 /**
  * An ontology.
  *
- * <p>This is just a set of Term objects, and a set of
- * Triple objects describing relationships between these terms.
- * This class does not itself contain any reasoning functionality. Ontology is
- * a collection of facts, or axioms.</p>
+ * <p>
+ * This is just a set of Term objects, and a set of Triple objects describing
+ * relationships between these terms. This class does not itself contain any
+ * reasoning functionality. Ontology is a collection of facts, or axioms.
+ * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -43,17 +41,18 @@ import java.util.*;
  * @see org.biojavax.ontology.ComparableOntology
  */
 
-public interface Ontology  {
-
+public interface Ontology {
 
 	/**
 	 * Return the name of this ontology
+	 * 
 	 * @return the name of the ontology
 	 */
 
 	public String getName();
 
-	/** Set the name for this ontology
+	/**
+	 * Set the name for this ontology
 	 *
 	 * @param name - the name
 	 *
@@ -61,23 +60,24 @@ public interface Ontology  {
 	public void setName(String name);
 
 	/**
-	 * Return a human-readable description of this ontology, or the empty
-	 * string if none is available
+	 * Return a human-readable description of this ontology, or the empty string if
+	 * none is available
+	 * 
 	 * @return the description of the term
 	 */
 
 	public String getDescription();
 
-	/** set the description of this ontology
+	/**
+	 * set the description of this ontology
 	 *
 	 * @param description
 	 */
 	public void setDescription(String description);
 
-
-
 	/**
 	 * Return all the terms in this ontology
+	 * 
 	 * @return a Set of all Terms of the ontology.
 	 */
 
@@ -85,21 +85,22 @@ public interface Ontology  {
 
 	/**
 	 * Fetch the term with the specified name.
+	 * 
 	 * @param name the name of the term
 	 *
 	 * @return The term named <code>name</code>
 	 * @throws NoSuchElementException if no term exists with that name
 	 */
 
-	public Term getTerm(String name) throws NoSuchElementException;
+	public Term getTerm(String name);
 
 	/**
-	 * Return all triples from this ontology which match the supplied
-	 * pattern.  If any of the parameters of this method are <code>null</code>,
-	 * they are treated as wildcards.
+	 * Return all triples from this ontology which match the supplied pattern. If
+	 * any of the parameters of this method are <code>null</code>, they are treated
+	 * as wildcards.
 	 *
-	 * @param subject The subject to search for, or <code>null</code>
-	 * @param object The object to search for, or <code>null</code>
+	 * @param subject   The subject to search for, or <code>null</code>
+	 * @param object    The object to search for, or <code>null</code>
 	 * @param predicate The relationship to search for, or <code>null</code>.
 	 * @return a Set of triples
 	 */
@@ -109,11 +110,10 @@ public interface Ontology  {
 	/**
 	 * Return the associated OntologyOps.
 	 *
-	 * This method should be implemented by ontology
-	 * implementors to allow OntoTools
+	 * This method should be implemented by ontology implementors to allow OntoTools
 	 * to get optimized access to some usefull ontology operations. It is not
-	 * intended that users will ever invoke this. A sensible dumb implementation
-	 * of this would return a per-ontology instance of DefaultOps.
+	 * intended that users will ever invoke this. A sensible dumb implementation of
+	 * this would return a per-ontology instance of DefaultOps.
 	 *
 	 * @return the OntologyOps instance associated with this instance.
 	 */
@@ -125,121 +125,105 @@ public interface Ontology  {
 	 *
 	 * @param name The name of the term (must be unique))
 	 * @throws IllegalArgumentException if either <code>name</code> or
-	 *         <code>description</code> is <code>null</code>, or violates
-	 *         some other constraint of this implementation.
-	 * @throws AlreadyExistsException if a term of this name already exists
+	 *                                  <code>description</code> is
+	 *                                  <code>null</code>, or violates some other
+	 *                                  constraint of this implementation.
+	 * @throws AlreadyExistsException   if a term of this name already exists
 	 * @return The newly created term.
 	 * @throws ChangeVetoException
 	 */
 
-	public Term createTerm(String name)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException;
+	public Term createTerm(String name) throws AlreadyExistsException;
 
 	/**
 	 * Create a new term in this ontology.
 	 *
-	 * @param name The name of the term (must be unique)
+	 * @param name        The name of the term (must be unique)
 	 * @param description A human-readable description (may be empty)
 	 * @throws IllegalArgumentException if either <code>name</code> or
-	 *         <code>description</code> is <code>null</code>, or violates
-	 *         some other constraint of this implementation.
-	 * @throws AlreadyExistsException if a term of this name already exists
+	 *                                  <code>description</code> is
+	 *                                  <code>null</code>, or violates some other
+	 *                                  constraint of this implementation.
+	 * @throws AlreadyExistsException   if a term of this name already exists
 	 * @return The newly created term.
 	 * @throws ChangeVetoException
 	 */
 
-	public Term createTerm(String name, String description)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException;
+	public Term createTerm(String name, String description) throws AlreadyExistsException;
 
 	/**
 	 * Create a new term in this ontology.
 	 *
-	 * @param name The name of the term (must be unique)
+	 * @param name        The name of the term (must be unique)
 	 * @param description A human-readable description (may be empty)
-	 * @param synonyms Some synonyms for this term.
+	 * @param synonyms    Some synonyms for this term.
 	 * @throws IllegalArgumentException if either <code>name</code> or
-	 *         <code>description</code> is <code>null</code>, or violates
-	 *         some other constraint of this implementation.
-	 * @throws AlreadyExistsException if a term of this name already exists
+	 *                                  <code>description</code> is
+	 *                                  <code>null</code>, or violates some other
+	 *                                  constraint of this implementation.
+	 * @throws AlreadyExistsException   if a term of this name already exists
 	 * @return The newly created term.
 	 * @throws ChangeVetoException
 	 */
 
-	public Term createTerm(String name, String description, Object[] synonyms)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException;
+	public Term createTerm(String name, String description, Object[] synonyms) throws AlreadyExistsException;
 
 	/**
 	 * Create a new term in this ontology that is used as a variable.
 	 *
-	 * @param name The name of the term (must be unique)
+	 * @param name        The name of the term (must be unique)
 	 * @param description A human-readable description (may be empty)
 	 * @throws IllegalArgumentException if either <code>name</code> or
-	 *         <code>description</code> is <code>null</code>, or violates
-	 *         some other constraint of this implementation.
-	 * @throws AlreadyExistsException if a term of this name already exists
+	 *                                  <code>description</code> is
+	 *                                  <code>null</code>, or violates some other
+	 *                                  constraint of this implementation.
+	 * @throws AlreadyExistsException   if a term of this name already exists
 	 * @return The newly created term.
 	 * @throws ChangeVetoException
 	 */
 
-	public Variable createVariable(String name, String description)
-			throws
-			AlreadyExistsException,
-
-			IllegalArgumentException;
+	public Variable createVariable(String name, String description) throws AlreadyExistsException;
 
 	/**
-	 * Create a view of a term from another ontology.  If the requested term
-	 * has already been imported under that name, this method returns the existing
-	 * RemoteTerm object. If the term that is being imported is itself a
-	 * RemoteTerm instance then first unwrap the term back to the orriginal
-	 * term it represents and then produce a RemoteTerm from that. If the term
-	 * being imported orriginated from this ontology, then return that term
-	 * unaltered.
+	 * Create a view of a term from another ontology. If the requested term has
+	 * already been imported under that name, this method returns the existing
+	 * RemoteTerm object. If the term that is being imported is itself a RemoteTerm
+	 * instance then first unwrap the term back to the orriginal term it represents
+	 * and then produce a RemoteTerm from that. If the term being imported
+	 * orriginated from this ontology, then return that term unaltered.
 	 *
-	 * @param t  the Term to import
-	 * @param localName  the local name to import it under, optionally null
+	 * @param t         the Term to import
+	 * @param localName the local name to import it under, optionally null
 	 * @return a Term
 	 * @throws ChangeVetoException
 	 * @throws IllegalArgumentException
 	 */
 
-	public Term importTerm(Term t, String localName)
-			throws
-
-			IllegalArgumentException;
+	public Term importTerm(Term t, String localName);
 
 	/**
 	 * Creates a new Triple.
 	 *
 	 * @param subject     the subject Term
 	 * @param object      the object Term
-	 * @param predicate    the predicate Term
+	 * @param predicate   the predicate Term
 	 * @param name        the name of the triple, or null
 	 * @param description the description of the triple, or null
-	 * @return  a new Triple over these three terms
-	 * @throws AlreadyExistsException if a triple already exists with the same
-	 *      subject, object and predicate, regardless of the name and description
+	 * @return a new Triple over these three terms
+	 * @throws AlreadyExistsException   if a triple already exists with the same
+	 *                                  subject, object and predicate, regardless of
+	 *                                  the name and description
 	 * @throws ChangeVetoException
-	 * @throws NullPointerException if subject, object or predicate are null
+	 * @throws NullPointerException     if subject, object or predicate are null
 	 * @throws IllegalArgumentException if subject, object or predicate are not all
-	 *      from the same ontology
+	 *                                  from the same ontology
 	 */
 	public Triple createTriple(Term subject, Term object, Term predicate, String name, String description)
-			throws
-			AlreadyExistsException
-			;
+			throws AlreadyExistsException;
 
 	/**
 	 * See if a triple exists in this ontology
+	 * 
 	 * @param subject
 	 * @param object
 	 * @param predicate
@@ -250,14 +234,16 @@ public interface Ontology  {
 
 	/**
 	 * Remove a term from an ontology, together with all triples which refer to it.
+	 * 
 	 * @param t
 	 * @throws ChangeVetoException
 	 */
 
-	public void deleteTerm(Term t) ;
+	public void deleteTerm(Term t);
 
 	/**
 	 * Determines if this ontology currently contains a term named <code>name</code>
+	 * 
 	 * @param name
 	 * @return true is contained
 	 */
@@ -273,34 +259,35 @@ public interface Ontology  {
 	 */
 
 	// AP: I am setting name and description to public changeable fields
-	// e.g during parsing of an .obo file we don't know them when the ontology is instanciated
+	// e.g during parsing of an .obo file we don't know them when the ontology is
+	// instanciated
 	public final class Impl
 
-	implements Ontology, java.io.Serializable {
+			implements Ontology, java.io.Serializable {
 		/**
 		 *
 		 */
 		private static final long serialVersionUID = -8064461497813727957L;
-		private final Map<String,Term> terms;
+		private final Map<String, Term> terms;
 		private final Set<Triple> triples;
 		private final Map<Term, Set<Triple>> subjectTriples;
 		private final Map<Term, Set<Triple>> objectTriples;
 		private final Map<Term, Set<Triple>> relationTriples;
-		private final Map<Term,RemoteTerm> remoteTerms;
+		private final Map<Term, RemoteTerm> remoteTerms;
 		private final Set<Term> localRemoteTerms;
 
-		private /*final*/ String name;
-		private /*final*/ String description;
+		private /* final */ String name;
+		private /* final */ String description;
 		private final OntologyOps ops;
 
 		{
-			terms            = new HashMap<String, Term>();
-			triples          = new HashSet<Triple>();
-			subjectTriples   = new HashMap<Term, Set<Triple>>();
-			objectTriples    = new HashMap<Term, Set<Triple>>();
-			relationTriples  = new HashMap<Term, Set<Triple>>();
-			remoteTerms      = new HashMap<Term, RemoteTerm>();
-			localRemoteTerms = new HashSet<Term>();
+			terms = new HashMap<>();
+			triples = new HashSet<>();
+			subjectTriples = new HashMap<>();
+			objectTriples = new HashMap<>();
+			relationTriples = new HashMap<>();
+			remoteTerms = new HashMap<>();
+			localRemoteTerms = new HashSet<>();
 		}
 
 		public Impl(String name, String description) {
@@ -329,49 +316,50 @@ public interface Ontology  {
 			return description;
 		}
 
-
 		@Override
-		public void setDescription(String description){
+		public void setDescription(String description) {
 			this.description = description;
 		}
 
 		@Override
 		public Set<Term> getTerms() {
-			return new HashSet<Term>(terms.values());
+			return new HashSet<>(terms.values());
 		}
 
 		@Override
-		public Term getTerm(String name)
-				throws NoSuchElementException
-				{
+		public Term getTerm(String name) {
 			Term t = terms.get(name);
 			if (t == null) {
-				throw new NoSuchElementException("No term named '" + name + "'");
+				throw new NoSuchElementException(
+						new StringBuilder().append("No term named '").append(name).append("'").toString());
 			} else {
 				return terms.get(name);
 			}
-				}
+		}
 
 		@Override
 		public Set<Triple> getTriples(Term subject, Term object, Term predicate) {
-			if(subject != null && subject.getOntology() != this) {
-				throw new IllegalArgumentException("Subject is not in this ontology: " + subject + " " + this);
+			if (subject != null && subject.getOntology() != this) {
+				throw new IllegalArgumentException(new StringBuilder().append("Subject is not in this ontology: ")
+						.append(subject).append(" ").append(this).toString());
 			}
 
-			if(object != null && object.getOntology() != this) {
-				throw new IllegalArgumentException("Object is not in this ontology: " + object + " " + this);
+			if (object != null && object.getOntology() != this) {
+				throw new IllegalArgumentException(new StringBuilder().append("Object is not in this ontology: ")
+						.append(object).append(" ").append(this).toString());
 			}
 
-			if(predicate != null && predicate.getOntology() != this) {
-				throw new IllegalArgumentException("Predicate is not in this ontology: " + predicate + " " + this);
+			if (predicate != null && predicate.getOntology() != this) {
+				throw new IllegalArgumentException(new StringBuilder().append("Predicate is not in this ontology: ")
+						.append(predicate).append(" ").append(this).toString());
 			}
 
 			if (subject != null) {
-				return filterTriples( subjectTriples.get(subject), null, object, predicate);
+				return filterTriples(subjectTriples.get(subject), null, object, predicate);
 			} else if (object != null) {
-				return filterTriples( objectTriples.get(object), subject, null, predicate);
+				return filterTriples(objectTriples.get(object), subject, null, predicate);
 			} else if (predicate != null) {
-				return filterTriples( relationTriples.get(predicate), subject, object, null);
+				return filterTriples(relationTriples.get(predicate), subject, object, null);
 			} else {
 				return filterTriples(triples, subject, object, predicate);
 			}
@@ -384,9 +372,8 @@ public interface Ontology  {
 				return Collections.unmodifiableSet(new HashSet<Triple>(base));
 			}
 
-			Set<Triple> retval = new HashSet<Triple>();
-			for (Iterator<Triple> i = base.iterator(); i.hasNext(); ) {
-				Triple t = i.next();
+			Set<Triple> retval = new HashSet<>();
+			for (Triple t : base) {
 				if (subject != null && t.getSubject() != subject) {
 					continue;
 				}
@@ -401,75 +388,58 @@ public interface Ontology  {
 			return retval;
 		}
 
-		private void addTerm(Term t)
-				throws AlreadyExistsException, IllegalArgumentException
-				{
+		private void addTerm(Term t) throws AlreadyExistsException {
 			if (terms.containsKey(t.getName())) {
-				throw new AlreadyExistsException("Ontology " + getName() + " already contains " + t.toString());
+				throw new AlreadyExistsException(new StringBuilder().append("Ontology ").append(getName())
+						.append(" already contains ").append(t.toString()).toString());
 			}
-
 
 			terms.put(t.getName(), t);
 
-				}
+		}
 
 		@Override
-		public Term createTerm(String name)
-				throws AlreadyExistsException, IllegalArgumentException
-				{
+		public Term createTerm(String name) throws AlreadyExistsException {
 			Term t = new Term.Impl(this, name);
 			addTerm(t);
 			return t;
-				}
+		}
 
 		@Override
-		public Term createTerm(String name, String description)
-				throws AlreadyExistsException, IllegalArgumentException
-				{
+		public Term createTerm(String name, String description) throws AlreadyExistsException {
 			Term t = new Term.Impl(this, name, description);
 			addTerm(t);
 			return t;
-				}
+		}
 
 		@Override
-		public Term createTerm(String name, String description, Object[] synonyms)
-				throws AlreadyExistsException, IllegalArgumentException
-				{
+		public Term createTerm(String name, String description, Object[] synonyms) throws AlreadyExistsException {
 			Term t = new Term.Impl(this, name, description, synonyms);
 			addTerm(t);
 			return t;
-				}
+		}
 
 		@Override
-		public Variable createVariable(String name, String description)
-				throws
-				AlreadyExistsException,
-
-				IllegalArgumentException {
+		public Variable createVariable(String name, String description) throws AlreadyExistsException {
 			Variable var = new Variable.Impl(this, name, description);
 			addTerm(var);
 			return var;
 		}
 
-		public OntologyTerm createOntologyTerm(Ontology o)
-				throws AlreadyExistsException
-				{
+		public OntologyTerm createOntologyTerm(Ontology o) throws AlreadyExistsException {
 			OntologyTerm ot = new OntologyTerm.Impl(this, o);
 			addTerm(ot);
 			return ot;
-				}
-
+		}
 
 		@Override
-		public Term importTerm(Term t, String name)
-				throws IllegalArgumentException
-				{
+		public Term importTerm(Term t, String name) {
 			// unpack any potential indirection - belt & braces
-			while(t instanceof RemoteTerm) {
+			while (t instanceof RemoteTerm) {
 				t = ((RemoteTerm) t).getRemoteTerm();
 			}
 
-			if(t.getOntology() == this) {
+			if (t.getOntology() == this) {
 				return t;
 			}
 
@@ -481,13 +451,13 @@ public interface Ontology  {
 				} catch (AlreadyExistsException e) {
 					throw new AssertionFailure("This term can not exist", e);
 				}
-				if(name == null) {
+				if (name == null) {
 					remoteTerms.put(t, rt);
 				}
 				localRemoteTerms.add(rt);
 			}
 			return rt;
-				}
+		}
 
 		@Override
 		public void deleteTerm(Term t)
@@ -499,7 +469,7 @@ public interface Ontology  {
 			}
 
 			terms.remove(name);
-			if(t instanceof Triple) {
+			if (t instanceof Triple) {
 				removeTriple((Triple) t);
 			}
 
@@ -516,45 +486,45 @@ public interface Ontology  {
 
 		@Override
 		public boolean containsTriple(Term subject, Term object, Term predicate) {
-			if(!(subject.getOntology() == this)) return false;
-			if(!(object.getOntology() == this)) return false;
-			if(!(predicate.getOntology() == this)) return false;
+			if (!(subject.getOntology() == this)) {
+				return false;
+			}
+			if (!(object.getOntology() == this)) {
+				return false;
+			}
+			if (!(predicate.getOntology() == this)) {
+				return false;
+			}
 
 			return triples.contains(new Triple.Impl(subject, object, predicate));
 		}
 
 		@Override
-		public Triple createTriple(Term subject,
-				Term object,
-				Term predicate,
-				String name,
-				String description)
-						throws
-						AlreadyExistsException,
-						IllegalArgumentException,
-						NullPointerException,
-						IllegalArgumentException
-						{
+		public Triple createTriple(Term subject, Term object, Term predicate, String name, String description)
+				throws AlreadyExistsException {
 			Triple t = new Triple.Impl(subject, object, predicate, name, description);
 			if (!containsTerm(subject)) {
-				throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + subject);
+				throw new IllegalArgumentException(new StringBuilder().append("Ontology ").append(getName())
+						.append(" doesn't contain ").append(subject).toString());
 			}
 			if (!containsTerm(predicate)) {
-				throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + predicate);
+				throw new IllegalArgumentException(new StringBuilder().append("Ontology ").append(getName())
+						.append(" doesn't contain ").append(predicate).toString());
 			}
 			if (!containsTerm(object)) {
-				throw new IllegalArgumentException("Ontology " + getName() + " doesn't contain " + object);
+				throw new IllegalArgumentException(new StringBuilder().append("Ontology ").append(getName())
+						.append(" doesn't contain ").append(object).toString());
 			}
 			if (triples.contains(t)) {
-				throw new AlreadyExistsException("Ontology " + getName() + " already contains " + t.toString());
+				throw new AlreadyExistsException(new StringBuilder().append("Ontology ").append(getName())
+						.append(" already contains ").append(t.toString()).toString());
 			}
-
 
 			addTerm(t);
 			addTriple(t);
 
 			return t;
-						}
+		}
 
 		private void addTriple(Triple t) {
 			triples.add(t);
@@ -563,10 +533,10 @@ public interface Ontology  {
 			pushTriple(relationTriples, t.getPredicate(), t);
 		}
 
-		private void pushTriple(Map<Term,Set<Triple>> m, Term key, Triple t) {
+		private void pushTriple(Map<Term, Set<Triple>> m, Term key, Triple t) {
 			Set<Triple> s = m.get(key);
 			if (s == null) {
-				s = new HashSet<Triple>();
+				s = new HashSet<>();
 				m.put(key, s);
 			}
 			s.add(t);
@@ -598,9 +568,8 @@ public interface Ontology  {
 
 		@Override
 		public void setName(String name) {
-			this.name=name;
+			this.name = name;
 
 		}
 	}
 }
-

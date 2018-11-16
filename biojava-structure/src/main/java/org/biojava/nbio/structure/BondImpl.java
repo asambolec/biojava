@@ -41,14 +41,14 @@ public class BondImpl implements Bond {
 	 * Constructs a new bond from a pair of atoms and the bond order of the bond
 	 * between them.
 	 * <p>
-	 * Note that by forming a bond between atoms 'A' and 'B' with this
-	 * constructor, atoms 'A' and 'B' will be updated to have this bond in their
-	 * list of bonds. If you do not want this automatic updating, instead use
-	 * {@link #Bond(Atom, Atom, int, boolean)} with the
-	 * <code>addSelfToAtoms</code> flag set to <code>false</code>.
+	 * Note that by forming a bond between atoms 'A' and 'B' with this constructor,
+	 * atoms 'A' and 'B' will be updated to have this bond in their list of bonds.
+	 * If you do not want this automatic updating, instead use
+	 * {@link #Bond(Atom, Atom, int, boolean)} with the <code>addSelfToAtoms</code>
+	 * flag set to <code>false</code>.
 	 *
-	 * @param atomA one of the atoms in this bond
-	 * @param atomB the other atom in this bond
+	 * @param atomA     one of the atoms in this bond
+	 * @param atomB     the other atom in this bond
 	 * @param bondOrder the bond order of this bond
 	 */
 	public BondImpl(Atom atomA, Atom atomB, int bondOrder) {
@@ -59,13 +59,14 @@ public class BondImpl implements Bond {
 	 * Constructs a new bond from a pair of atoms and the bond order of the bond
 	 * between them.
 	 *
-	 * @param atomA one of the atoms in this bond
-	 * @param atomB the other atom in this bond
-	 * @param bondOrder the bond order of this bond
+	 * @param atomA          one of the atoms in this bond
+	 * @param atomB          the other atom in this bond
+	 * @param bondOrder      the bond order of this bond
 	 * @param addSelfToAtoms if set to true, this bond, once created, will
-	 * automatically add itself to atomA and atomB's bond lists. (If this
-	 * argument is set to false, the list returned from {@link Atom#getBonds()}
-	 * will not contain this bond.)
+	 *                       automatically add itself to atomA and atomB's bond
+	 *                       lists. (If this argument is set to false, the list
+	 *                       returned from {@link Atom#getBonds()} will not contain
+	 *                       this bond.)
 	 */
 	public BondImpl(Atom atomA, Atom atomB, int bondOrder, boolean addSelfToAtoms) {
 		this.atomA = atomA;
@@ -78,19 +79,18 @@ public class BondImpl implements Bond {
 	}
 
 	/**
-	 * Adds this Bond to its atoms bond lists. If this method is not called,
-	 * then the list returned from calling {@link Atom#getBonds()} will not
-	 * include this bond.
+	 * Adds this Bond to its atoms bond lists. If this method is not called, then
+	 * the list returned from calling {@link Atom#getBonds()} will not include this
+	 * bond.
 	 * <p>
-	 * If you created your Bond with the constructor
-	 * {@link #Bond(Atom, Atom, int)}, this method has already been called for
-	 * you and should not be called again.
+	 * If you created your Bond with the constructor {@link #Bond(Atom, Atom, int)},
+	 * this method has already been called for you and should not be called again.
 	 */
 	// TODO first check if those bonds haven't been made already
 	private void addSelfToAtoms() {
 		List<Bond> bonds = atomA.getBonds();
-		if (bonds==null) {
-			bonds = new ArrayList<Bond>(AtomImpl.BONDS_INITIAL_CAPACITY);
+		if (bonds == null) {
+			bonds = new ArrayList<>(AtomImpl.BONDS_INITIAL_CAPACITY);
 			atomA.setBonds(bonds);
 		}
 
@@ -102,16 +102,17 @@ public class BondImpl implements Bond {
 				break;
 			}
 		}
-		if (!exists) {
-			atomA.addBond(this);
-			atomB.addBond(this);
+		if (exists) {
+			return;
 		}
+		atomA.addBond(this);
+		atomB.addBond(this);
 	}
 
 	/**
 	 * Gets atom 'A' of this bond. There is no meaning to which atom is 'A' and
-	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in
-	 * which they are passed to this class's constructor.
+	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in which
+	 * they are passed to this class's constructor.
 	 *
 	 * @see #getAtomB()
 	 * @return one of the two atoms in this bond
@@ -123,8 +124,8 @@ public class BondImpl implements Bond {
 
 	/**
 	 * Gets atom 'B' of this bond. There is no meaning to which atom is 'A' and
-	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in
-	 * which they are passed to this class's constructor.
+	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in which
+	 * they are passed to this class's constructor.
 	 *
 	 * @see #getAtomA()
 	 * @return one of the two atoms in this bond
@@ -135,13 +136,13 @@ public class BondImpl implements Bond {
 	}
 
 	/**
-	 * A utility method to get the other atom in a bond, given one of its atoms.
-	 * If the atom passed is one of the atoms in this bond, then this method is
+	 * A utility method to get the other atom in a bond, given one of its atoms. If
+	 * the atom passed is one of the atoms in this bond, then this method is
 	 * essentially equivalent to saying
 	 * <code>atom == bond.getAtomA() ? bond.getAtomB() : bond.getAtomA()</code>.
 	 * <p>
-	 * <i>Note:</i> Comparison of atoms in this method is done with
-	 * <code>==</code>, not <code>equals</code>.
+	 * <i>Note:</i> Comparison of atoms in this method is done with <code>==</code>,
+	 * not <code>equals</code>.
 	 *
 	 * @param exclude the atom of the bond to not return
 	 * @throws IllegalArgumentException if the passed atom is not in this bond
@@ -150,8 +151,7 @@ public class BondImpl implements Bond {
 	@Override
 	public Atom getOther(Atom exclude) {
 		if (exclude != atomA && exclude != atomB) {
-			throw new IllegalArgumentException(
-					"Atom to exclude is not in bond.");
+			throw new IllegalArgumentException("Atom to exclude is not in bond.");
 		}
 
 		if (exclude == atomA) {
@@ -175,9 +175,9 @@ public class BondImpl implements Bond {
 	/**
 	 * Gets the distance between the two atoms of this bond.
 	 * <p>
-	 * This distance is calculated by {@link Calc#getDistance(Atom, Atom)}, but
-	 * this method will suppress the empty threat of a
-	 * {@link StructureException} that method makes.
+	 * This distance is calculated by {@link Calc#getDistance(Atom, Atom)}, but this
+	 * method will suppress the empty threat of a {@link StructureException} that
+	 * method makes.
 	 *
 	 * @return the distance between the two atoms of this bond.
 	 */
@@ -190,10 +190,8 @@ public class BondImpl implements Bond {
 
 	@Override
 	public String toString() {
-		return "Bond [atomA=" + atomA + ", atomB=" + atomB + ", bondOrder="
-				+ bondOrder + "]";
+		return new StringBuilder().append("Bond [atomA=").append(atomA).append(", atomB=").append(atomB)
+				.append(", bondOrder=").append(bondOrder).append("]").toString();
 	}
-
-
 
 }

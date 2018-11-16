@@ -21,7 +21,8 @@
  */
 package org.biojava.nbio.structure.io.mmcif.model;
 
-/** a bean to contain the data of the _struct lines
+/**
+ * a bean to contain the data of the _struct lines
  *
  * @author Andreas Prlic
  *
@@ -35,31 +36,40 @@ public class Struct {
 	String pdbx_CASP_flag;
 
 	@Override
-	public String toString(){
-		return "entry_id:" +entry_id + " title:" + title + " pdbx_descriptor:" +pdbx_descriptor + " pdbx_model_details:"+pdbx_model_details;
+	public String toString() {
+		return new StringBuilder().append("entry_id:").append(entry_id).append(" title:").append(title)
+				.append(" pdbx_descriptor:").append(pdbx_descriptor).append(" pdbx_model_details:")
+				.append(pdbx_model_details).toString();
 	}
 
 	public String getEntry_id() {
 		return entry_id;
 	}
+
 	public void setEntry_id(String entry_id) {
 		this.entry_id = entry_id;
 	}
+
 	public String getTitle() {
 		return title;
 	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public String getPdbx_descriptor() {
 		return pdbx_descriptor;
 	}
+
 	public void setPdbx_descriptor(String pdbx_descriptor) {
 		this.pdbx_descriptor = pdbx_descriptor;
 	}
+
 	public String getPdbx_model_details() {
 		return pdbx_model_details;
 	}
+
 	public void setPdbx_model_details(String pdbx_model_details) {
 		this.pdbx_model_details = pdbx_model_details;
 	}
@@ -79,8 +89,5 @@ public class Struct {
 	public void setPdbx_CASP_flag(String pdbx_CASP_flag) {
 		this.pdbx_CASP_flag = pdbx_CASP_flag;
 	}
-
-
-
 
 }

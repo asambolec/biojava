@@ -36,14 +36,16 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This class is a good example of using the SequenceCreatorInterface where during parsing of the stream
- * the sequence and the offset index are passed to create a Protein sequence that will be loaded in lazily.
- * This way you can load very large fasta files and store accession id and delay loading the sequence to save
- * memory. The index is the file stream offset so when a ProteinSequence has a call to getSequence() the
- * SequenceFileProxyLoader will open the file and offset to the index and retrieve the sequence.
+ * This class is a good example of using the SequenceCreatorInterface where
+ * during parsing of the stream the sequence and the offset index are passed to
+ * create a Protein sequence that will be loaded in lazily. This way you can
+ * load very large fasta files and store accession id and delay loading the
+ * sequence to save memory. The index is the file stream offset so when a
+ * ProteinSequence has a call to getSequence() the SequenceFileProxyLoader will
+ * open the file and offset to the index and retrieve the sequence.
  *
- * Same approach can be used for genome sequence data stored in a local fasta file, in a database or via http
- * interface to a remote server
+ * Same approach can be used for genome sequence data stored in a local fasta
+ * file, in a database or via http interface to a remote server
  *
  * @author Scooter Willis &lt;willishf at gmail dot com&gt;
  */
@@ -54,19 +56,23 @@ public class FileProxyProteinSequenceCreator implements SequenceCreatorInterface
 	SequenceParserInterface sequenceParser;
 
 	/**
-	 * Need File so that we can store full path name in SequenceFileProxyLoader for Random File access as a quick read
+	 * Need File so that we can store full path name in SequenceFileProxyLoader for
+	 * Random File access as a quick read
+	 * 
 	 * @param fastaFile
 	 * @param compoundSet
 	 */
-	public FileProxyProteinSequenceCreator(File file, CompoundSet<AminoAcidCompound> compoundSet, SequenceParserInterface sequenceParser ) {
+	public FileProxyProteinSequenceCreator(File file, CompoundSet<AminoAcidCompound> compoundSet,
+			SequenceParserInterface sequenceParser) {
 		this.compoundSet = compoundSet;
 		this.file = file;
 		this.sequenceParser = sequenceParser;
 	}
 
 	/**
-	 * Even though we are passing in the sequence we really only care about the length of the sequence and the offset
-	 * index in the fasta file.
+	 * Even though we are passing in the sequence we really only care about the
+	 * length of the sequence and the offset index in the fasta file.
+	 * 
 	 * @param sequence
 	 * @param index
 	 * @return
@@ -74,38 +80,35 @@ public class FileProxyProteinSequenceCreator implements SequenceCreatorInterface
 	 * @throws IOException
 	 */
 	@Override
-	public AbstractSequence<AminoAcidCompound> getSequence(String sequence, long index) throws CompoundNotFoundException, IOException {
-		SequenceFileProxyLoader<AminoAcidCompound> sequenceFileProxyLoader =
-				new SequenceFileProxyLoader<AminoAcidCompound>(
-						file,
-						sequenceParser,
-						index,
-						sequence.length(),
-						compoundSet
-						);
+	public AbstractSequence<AminoAcidCompound> getSequence(String sequence, long index)
+			throws CompoundNotFoundException, IOException {
+		SequenceFileProxyLoader<AminoAcidCompound> sequenceFileProxyLoader = new SequenceFileProxyLoader<>(file,
+				sequenceParser, index, sequence.length(), compoundSet);
 		return new ProteinSequence(sequenceFileProxyLoader, compoundSet);
 	}
 
 	/**
-	 * Should be able to extend the same concept to a remote URL call or database connection. Not supported yet
+	 * Should be able to extend the same concept to a remote URL call or database
+	 * connection. Not supported yet
+	 * 
 	 * @param proxyLoader
 	 * @param index
 	 * @return
 	 */
 	@Override
-	public AbstractSequence<AminoAcidCompound> getSequence(
-			ProxySequenceReader<AminoAcidCompound> proxyLoader, long index) {
+	public AbstractSequence<AminoAcidCompound> getSequence(ProxySequenceReader<AminoAcidCompound> proxyLoader,
+			long index) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	/**
 	 * Not sure of use case and currently not supported
+	 * 
 	 * @param list
 	 * @return
 	 */
 	@Override
-	public AbstractSequence<AminoAcidCompound> getSequence(
-			List<AminoAcidCompound> list) {
+	public AbstractSequence<AminoAcidCompound> getSequence(List<AminoAcidCompound> list) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

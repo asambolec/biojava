@@ -33,9 +33,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A Gene sequence has a Positive or Negative Strand where we want to write out to a stream the 5 to 3 prime version.
- * It is also an option to write out the gene sequence where the exon regions are upper case
- * 6/22/2010 FastaWriter needs to be sequence aware to handle writing out a GeneSequence which is negative Strand with the proper sequence
+ * A Gene sequence has a Positive or Negative Strand where we want to write out
+ * to a stream the 5 to 3 prime version. It is also an option to write out the
+ * gene sequence where the exon regions are upper case 6/22/2010 FastaWriter
+ * needs to be sequence aware to handle writing out a GeneSequence which is
+ * negative Strand with the proper sequence
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class FastaGeneWriter {
@@ -47,35 +50,41 @@ public class FastaGeneWriter {
 	Collection<GeneSequence> sequences;
 	FastaHeaderFormatInterface<GeneSequence, NucleotideCompound> headerFormat;
 	private int lineLength = 60;
-/**
- *
- * @param os
- * @param sequences
- * @param headerFormat
- * @param showExonUppercase
- */
-	public FastaGeneWriter(OutputStream os, Collection<GeneSequence> sequences, FastaHeaderFormatInterface<GeneSequence, NucleotideCompound> headerFormat, boolean showExonUppercase) {
+
+	/**
+	 *
+	 * @param os
+	 * @param sequences
+	 * @param headerFormat
+	 * @param showExonUppercase
+	 */
+	public FastaGeneWriter(OutputStream os, Collection<GeneSequence> sequences,
+			FastaHeaderFormatInterface<GeneSequence, NucleotideCompound> headerFormat, boolean showExonUppercase) {
 		this(os, sequences, headerFormat, showExonUppercase, 60);
 	}
-/**
- *
- * @param os
- * @param sequences
- * @param headerFormat
- * @param showExonUppercase
- * @param lineLength
- */
-	public FastaGeneWriter(OutputStream os, Collection<GeneSequence> sequences, FastaHeaderFormatInterface<GeneSequence, NucleotideCompound> headerFormat, boolean showExonUppercase, int lineLength) {
+
+	/**
+	 *
+	 * @param os
+	 * @param sequences
+	 * @param headerFormat
+	 * @param showExonUppercase
+	 * @param lineLength
+	 */
+	public FastaGeneWriter(OutputStream os, Collection<GeneSequence> sequences,
+			FastaHeaderFormatInterface<GeneSequence, NucleotideCompound> headerFormat, boolean showExonUppercase,
+			int lineLength) {
 		this.os = os;
 		this.sequences = sequences;
 		this.headerFormat = headerFormat;
 		this.lineLength = lineLength;
 		this.showExonUppercase = showExonUppercase;
 	}
-/**
- *
- * @throws Exception
- */
+
+	/**
+	 *
+	 * @throws Exception
+	 */
 	public void process() throws Exception {
 		byte[] lineSep = System.getProperty("line.separator").getBytes();
 
@@ -87,14 +96,14 @@ public class FastaGeneWriter {
 
 			int compoundCount = 0;
 			String seq = "";
-			//GeneSequence currently has a strand attribute to indicate direction
+			// GeneSequence currently has a strand attribute to indicate direction
 
 			seq = sequence.getSequence5PrimeTo3Prime().getSequenceAsString();
 			if (showExonUppercase) {
 				StringBuilder sb = new StringBuilder(seq.toLowerCase());
 				int geneBioBegin = sequence.getBioBegin();
 				int geneBioEnd = sequence.getBioEnd();
-				for (ExonSequence exonSequence : sequence.getExonSequences()) {
+				sequence.getExonSequences().forEach(exonSequence -> {
 					int featureBioBegin = 0;
 					int featureBioEnd = 0;
 					if (sequence.getStrand() != Strand.NEGATIVE) {
@@ -104,18 +113,22 @@ public class FastaGeneWriter {
 						featureBioBegin = geneBioEnd - exonSequence.getBioEnd();
 						featureBioEnd = geneBioEnd - exonSequence.getBioBegin();
 					}
-					if (featureBioBegin < 0 || featureBioEnd < 0 || featureBioEnd > sb.length() || featureBioBegin > sb.length()) {
-						logger.warn("Bad Feature, Accession: {}, Sequence Strand: {}, Gene Begin: {}, Gene End: {}, Exon Begin: {}, Exon End: {}", sequence.getAccession().toString(), sequence.getStrand(), geneBioBegin, geneBioEnd, exonSequence.getBioBegin(), exonSequence.getBioEnd());
+					if (featureBioBegin < 0 || featureBioEnd < 0 || featureBioEnd > sb.length()
+							|| featureBioBegin > sb.length()) {
+						logger.warn(
+								"Bad Feature, Accession: {}, Sequence Strand: {}, Gene Begin: {}, Gene End: {}, Exon Begin: {}, Exon End: {}",
+								sequence.getAccession().toString(), sequence.getStrand(), geneBioBegin, geneBioEnd,
+								exonSequence.getBioBegin(), exonSequence.getBioEnd());
 					} else {
 						for (int i = featureBioBegin; i <= featureBioEnd; i++) {
 							char ch = sb.charAt(i);
-							//probably not the fastest but the safest way if language is not standard ASCII
+							// probably not the fastest but the safest way if language is not standard ASCII
 							String temp = String.valueOf(ch);
 							ch = temp.toUpperCase().charAt(0);
 							sb.setCharAt(i, ch);
 						}
 					}
-				}
+				});
 				seq = sb.toString();
 			}
 
@@ -129,10 +142,9 @@ public class FastaGeneWriter {
 
 			}
 
-
-			//If we had sequence which was a reciprocal of line length
-			//then don't write the line terminator as this has already written
-			//it
+			// If we had sequence which was a reciprocal of line length
+			// then don't write the line terminator as this has already written
+			// it
 			if ((sequence.getLength() % getLineLength()) != 0) {
 				os.write(lineSep);
 			}
@@ -156,8 +168,9 @@ public class FastaGeneWriter {
 	public static void main(String[] args) {
 
 		try {
-			ArrayList<GeneSequence> sequences = new ArrayList<GeneSequence>();
-			ChromosomeSequence seq1 = new ChromosomeSequence("ATATATATATATATATATATATATATATATATACGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCATATATATATATATATATATATACGCGCGCGCGCGCGCGCATATATATATATATATATATATATATATATATACGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCATATATATATATATATATATATACGCGCGCGCGCGCGCGC");
+			ArrayList<GeneSequence> sequences = new ArrayList<>();
+			ChromosomeSequence seq1 = new ChromosomeSequence(
+					"ATATATATATATATATATATATATATATATATACGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCATATATATATATATATATATATACGCGCGCGCGCGCGCGCATATATATATATATATATATATATATATATATACGCGCGCGCGCGCGCGCGCGCGCGCGCGCGCATATATATATATATATATATATACGCGCGCGCGCGCGCGC");
 			GeneSequence gene1 = seq1.addGene(new AccessionID("gene1"), 1, 20, Strand.POSITIVE);
 
 			gene1.addExon(new AccessionID("t1_1_10"), 1, 10);
@@ -169,10 +182,9 @@ public class FastaGeneWriter {
 			sequences.add(gene1);
 			sequences.add(gene2);
 
-
-			FastaGeneWriter fastaWriter = new FastaGeneWriter(System.out, sequences, new GenericFastaHeaderFormat<GeneSequence, NucleotideCompound>(), true);
+			FastaGeneWriter fastaWriter = new FastaGeneWriter(System.out, sequences,
+					new GenericFastaHeaderFormat<GeneSequence, NucleotideCompound>(), true);
 			fastaWriter.process();
-
 
 		} catch (Exception e) {
 			logger.warn("Exception: ", e);

@@ -25,45 +25,43 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 public class BrowserOpener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BrowserOpener.class);
 
-	/** open a URL in the browser that was used to launch SPICE
+	/**
+	 * open a URL in the browser that was used to launch SPICE
 	 *
 	 * @param url URL to be opened
 	 * @return true if this was successfull
 	 */
-	public static boolean showDocument(URL url)
-	{
-		if ( url != null ){
-			boolean success = JNLPProxy.showDocument(url);
-			if ( ! success)
-				logger.info("could not open URL "+url+" in browser. check your config or browser version.");
-		return success;
-
-		}
-		else
+	public static boolean showDocument(URL url) {
+		if (url == null) {
 			return false;
+		}
+		boolean success = JNLPProxy.showDocument(url);
+		if (!success) {
+			logger.info(new StringBuilder().append("could not open URL ").append(url)
+					.append(" in browser. check your config or browser version.").toString());
+		}
+		return success;
 	}
 
-
-	/** open a URL in the browser that was used to launch SPICE
+	/**
+	 * open a URL in the browser that was used to launch SPICE
 	 *
 	 * @param urlstring string represntation of URL to be opened
 	 * @return true if this was successfull
 	 */
-	public static boolean showDocument(String urlstring){
-		try{
+	public static boolean showDocument(String urlstring) {
+		try {
 			URL url = new URL(urlstring);
 
 			return showDocument(url);
-		} catch (MalformedURLException e){
+		} catch (MalformedURLException e) {
 			logger.warn("malformed URL {}", urlstring, e);
 			return false;
 		}
 	}
 
 }
-

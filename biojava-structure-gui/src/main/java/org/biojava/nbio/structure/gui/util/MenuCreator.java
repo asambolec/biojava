@@ -32,56 +32,57 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *  Create the menu for BiojavaJmol
+ * Create the menu for BiojavaJmol
+ * 
  * @author Andreas Prlic
  * @since 1.7
  */
 public class MenuCreator {
 
-	/** provide a JMenuBar that can be added to a JFrame
+	private static final Logger logger = LoggerFactory.getLogger(MenuCreator.class);
+
+	/**
+	 * provide a JMenuBar that can be added to a JFrame
 	 *
 	 * @return a JMenuBar
 	 */
-	public static JMenuBar initMenu(){
+	public static JMenuBar initMenu() {
 
 		// show a menu
 
 		JMenuBar menu = new JMenuBar();
 
-		JMenu file= new JMenu("File");
+		JMenu file = new JMenu("File");
 		file.getAccessibleContext().setAccessibleDescription("File Menu");
 
 		JMenuItem openI = new JMenuItem("Open");
 		openI.setMnemonic(KeyEvent.VK_O);
-		openI.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String cmd = e.getActionCommand();
-				if ( cmd.equals("Open")){
-					final JFileChooser fc = new JFileChooser();
+		openI.addActionListener((ActionEvent e) -> {
+			String cmd = e.getActionCommand();
+			if ("Open".equals(cmd)) {
+				final JFileChooser fc = new JFileChooser();
 
-//					In response to a button click:
-					int returnVal = fc.showOpenDialog(null);
-					if ( returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
+				// In response to a button click:
+				int returnVal = fc.showOpenDialog(null);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file1 = fc.getSelectedFile();
 
-						PDBFileReader reader = new PDBFileReader();
-						try {
-							Structure s = reader.getStructure(file);
-							BiojavaJmol jmol = new BiojavaJmol();
-							jmol.setStructure(s);
-							jmol.evalString("select * ; color chain;");
-							jmol.evalString("select *; spacefill off; wireframe off; backbone 0.4;  ");
+					PDBFileReader reader = new PDBFileReader();
+					try {
+						Structure s = reader.getStructure(file1);
+						BiojavaJmol jmol = new BiojavaJmol();
+						jmol.setStructure(s);
+						jmol.evalString("select * ; color chain;");
+						jmol.evalString("select *; spacefill off; wireframe off; backbone 0.4;  ");
 
-						} catch (Exception ex){
-							ex.printStackTrace();
-						}
-
-
+					} catch (Exception ex) {
+						logger.error(ex.getMessage(), ex);
 					}
+
 				}
 			}
 		});
@@ -89,15 +90,11 @@ public class MenuCreator {
 
 		JMenuItem exitI = new JMenuItem("Exit");
 		exitI.setMnemonic(KeyEvent.VK_X);
-		exitI.addActionListener(new ActionListener(){
+		exitI.addActionListener((ActionEvent e) -> {
+			String cmd = e.getActionCommand();
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String cmd = e.getActionCommand();
-
-				if ( cmd.equals("Exit")){
-					System.exit(0);
-				}
+			if ("Exit".equals(cmd)) {
+				System.exit(0);
 			}
 		});
 
@@ -106,14 +103,11 @@ public class MenuCreator {
 
 		JMenu align = new JMenu("Align");
 		JMenuItem pairI = new JMenuItem("2 protein structures");
-		pairI.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String cmd = e.getActionCommand();
+		pairI.addActionListener((ActionEvent e) -> {
+			String cmd = e.getActionCommand();
 
-				if ( cmd.equals("2 protein structures")){
-					MenuCreator.showPairDialog();
-				}
+			if ("2 protein structures".equals(cmd)) {
+				MenuCreator.showPairDialog();
 			}
 		});
 
@@ -123,15 +117,11 @@ public class MenuCreator {
 
 		JMenu about = new JMenu("About");
 		JMenuItem aboutI = new JMenuItem("PDBview");
-		aboutI.addActionListener(new ActionListener(){
+		aboutI.addActionListener((ActionEvent e) -> {
+			String cmd = e.getActionCommand();
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String cmd = e.getActionCommand();
-
-				if ( cmd.equals("PDBview")){
-					MenuCreator.showAboutDialog();
-				}
+			if ("PDBview".equals(cmd)) {
+				MenuCreator.showAboutDialog();
 			}
 		});
 
@@ -144,31 +134,30 @@ public class MenuCreator {
 
 	}
 
-
-	/** provide a display for the pairwise structure alignment
+	/**
+	 * provide a display for the pairwise structure alignment
 	 *
 	 */
-	private static void showPairDialog(){
+	private static void showPairDialog() {
 		AlignmentGui gui = AlignmentGui.getInstance();
 		gui.setVisible(true);
 	}
 
-	/** show some info about this gui
+	/**
+	 * show some info about this gui
 	 *
 	 */
-	private static void showAboutDialog(){
+	private static void showAboutDialog() {
 
 		JDialog dialog = new JDialog();
 
-		dialog.setSize(new Dimension(300,300));
+		dialog.setSize(new Dimension(300, 300));
 
 		String msg = "This viewer is based on <b>BioJava</b> and <b>Jmol</>. <br>Author: Andreas Prlic <br> ";
 		msg += "Structure Alignment algorithm based on a variation of the PSC++ algorithm by Peter Lackner.";
 
-
 		JEditorPane txt = new JEditorPane("text/html", msg);
 		txt.setEditable(false);
-
 
 		JScrollPane scroll = new JScrollPane(txt);
 
@@ -177,30 +166,25 @@ public class MenuCreator {
 
 		JButton close = new JButton("Close");
 
-		close.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				Object source = event.getSource();
+		close.addActionListener((ActionEvent event) -> {
+			Object source = event.getSource();
 
-				JButton but = (JButton)source;
-				Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent() ;
+			JButton but = (JButton) source;
+			Container parent = but.getParent().getParent().getParent().getParent().getParent().getParent();
 
-				JDialog dia = (JDialog) parent;
-				dia.dispose();
-			}
+			JDialog dia = (JDialog) parent;
+			dia.dispose();
 		});
 
 		Box hBoxb = Box.createHorizontalBox();
 		hBoxb.add(Box.createGlue());
-		hBoxb.add(close,BorderLayout.EAST);
+		hBoxb.add(close, BorderLayout.EAST);
 
 		vBox.add(hBoxb);
 
 		dialog.getContentPane().add(vBox);
 		dialog.setVisible(true);
 
-
 	}
-
 
 }

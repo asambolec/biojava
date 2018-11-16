@@ -22,22 +22,24 @@ package org.biojava.nbio.structure.align.client;
 
 import org.biojava.nbio.structure.StructureException;
 
-/** A pair for structure alignment
+/**
+ * A pair for structure alignment
  *
  * @author Andreas Prlic
  *
- * name1 is always < name2
+ *         name1 is always < name2
  *
  */
 public class PdbPair implements Comparable<PdbPair> {
 
 	StructureName name1;
 	StructureName name2;
+
 	public PdbPair(String name1, String name2) {
-		this(new StructureName(name1),new StructureName(name2));
+		this(new StructureName(name1), new StructureName(name2));
 	}
+
 	public PdbPair(StructureName name1, StructureName name2) {
-		super();
 		this.name1 = name1;
 		this.name2 = name2;
 	}
@@ -45,19 +47,23 @@ public class PdbPair implements Comparable<PdbPair> {
 	public String getName1() {
 		return name1.getIdentifier();
 	}
+
 	public void setName1(String name1) {
 		this.name1 = new StructureName(name1);
 	}
+
 	public String getName2() {
 		return name2.getIdentifier();
 	}
+
 	public void setName2(String name2) {
 		this.name2 = new StructureName(name2);
 	}
 
 	@Override
 	public String toString() {
-		return "PdbPair [name1=" + name1 + ", name2=" + name2 + "]";
+		return new StringBuilder().append("PdbPair [name1=").append(name1).append(", name2=").append(name2).append("]")
+				.toString();
 	}
 
 	@Override
@@ -71,48 +77,59 @@ public class PdbPair implements Comparable<PdbPair> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PdbPair other = (PdbPair) obj;
 		if (name1 == null) {
-			if (other.name1 != null)
+			if (other.name1 != null) {
 				return false;
-		} else if (!name1.equals(other.name1))
+			}
+		} else if (!name1.equals(other.name1)) {
 			return false;
+		}
 		if (name2 == null) {
-			if (other.name2 != null)
+			if (other.name2 != null) {
 				return false;
-		} else if (!name2.equals(other.name2))
+			}
+		} else if (!name2.equals(other.name2)) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public int compareTo(PdbPair o) {
-		if ( this.equals(o))
+		if (this.equals(o)) {
 			return 0;
+		}
 		// Use StructureName's compareTo method
 		int c = name1.compareTo(o.name1);
-		if ( c != 0 )
+		if (c != 0) {
 			return c;
+		}
 		return name2.compareTo(o.name2);
 	}
 
 	public String getPDBCode1() throws StructureException {
 		return name1.getPdbId();
 	}
-	public String getPDBCode2() throws StructureException{
+
+	public String getPDBCode2() throws StructureException {
 		return name2.getPdbId();
 	}
 
-	public String getChainId1(){
-		return  name1.getChainId();
+	public String getChainId1() {
+		return name1.getChainId();
 	}
-	public String getChainId2(){
+
+	public String getChainId2() {
 		return name2.getChainId();
 	}
 

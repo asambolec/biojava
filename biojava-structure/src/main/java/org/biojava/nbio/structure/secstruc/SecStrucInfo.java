@@ -74,28 +74,28 @@ public class SecStrucInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return assignment + ": " + type;
+		return new StringBuilder().append(assignment).append(": ").append(type).toString();
 	}
 
 	@Override
 	public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result
-		    + ((assignment == null) ? 0 : type.hashCode());
-	    return result;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((assignment == null) ? 0 : type.hashCode());
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof SecStrucInfo))
+		if (!(o instanceof SecStrucInfo)) {
 			return false;
-		else {
+		} else {
 			SecStrucInfo ss = (SecStrucInfo) o;
-			if (type == ss.type)
+			if (type == ss.type) {
 				return true;
-			else
+			} else {
 				return false;
+			}
 		}
 	}
 

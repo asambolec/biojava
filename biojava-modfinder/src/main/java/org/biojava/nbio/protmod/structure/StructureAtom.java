@@ -26,6 +26,7 @@ package org.biojava.nbio.protmod.structure;
 
 /**
  * Everything that is needed to uniquely describe a atom.
+ * 
  * @author Jianjiong Gao
  * @since 3.0
  */
@@ -35,7 +36,7 @@ public class StructureAtom {
 	private final String atomName;
 
 	public StructureAtom(final StructureGroup group, final String atomName) {
-		if (group==null || atomName==null) {
+		if (group == null || atomName == null) {
 			throw new IllegalArgumentException("Null argument(s).");
 		}
 		this.group = group;
@@ -52,19 +53,23 @@ public class StructureAtom {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == this)
+		if (obj == this) {
 			return true;
+		}
 
-		if (!(obj instanceof StructureAtom))
+		if (!(obj instanceof StructureAtom)) {
 			return false;
+		}
 
-		StructureAtom anAtom = (StructureAtom)obj;
+		StructureAtom anAtom = (StructureAtom) obj;
 
-		if (!anAtom.getGroup().equals(group))
+		if (!anAtom.getGroup().equals(group)) {
 			return false;
+		}
 
-		if (!anAtom.getAtomName().equals(atomName))
+		if (!anAtom.getAtomName().equals(atomName)) {
 			return false;
+		}
 
 		return true;
 	}
@@ -79,6 +84,6 @@ public class StructureAtom {
 
 	@Override
 	public String toString() {
-		return group.toString() + '\t' + atomName;
+		return new StringBuilder().append(group.toString()).append('\t').append(atomName).toString();
 	}
 }

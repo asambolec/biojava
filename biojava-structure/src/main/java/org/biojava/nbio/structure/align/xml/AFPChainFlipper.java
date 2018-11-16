@@ -29,18 +29,22 @@ import org.biojava.nbio.structure.Calc;
 import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.jama.Matrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AFPChainFlipper {
 
+	private static final Logger logger = LoggerFactory.getLogger(AFPChainFlipper.class);
 
-	/** Flip the position of name1 and name2 (as well as all underlying data) in an AFPChain.
-	 * This is a utility function for AFPChainXMLParser.
-	 * You will have to call AFPCHainXMLParser.rebuildAFPChain in order to get twisted groups...
+	/**
+	 * Flip the position of name1 and name2 (as well as all underlying data) in an
+	 * AFPChain. This is a utility function for AFPChainXMLParser. You will have to
+	 * call AFPCHainXMLParser.rebuildAFPChain in order to get twisted groups...
 	 *
 	 * @param o ... the original AFPCHain that should be flipped
 	 * @return a cloned AFPCHain which the positions of name1 and name2 flipped.
 	 */
-	public static AFPChain flipChain(AFPChain o) throws StructureException{
+	public static AFPChain flipChain(AFPChain o) throws StructureException {
 
 		AFPChain n = new AFPChain(o.getAlgorithmName());
 		n.setVersion(o.getVersion());
@@ -61,28 +65,26 @@ public class AFPChainFlipper {
 		n.setBlockRmsd(o.getBlockRmsd());
 		n.setBlockGap(o.getBlockGap());
 
-		int minLength = Math.min(n.getCa1Length(),n.getCa2Length());
-		int[][][] optAlnN 			= new int[blockNum][2][minLength];
-		int[][][] optAlnO           = o.getOptAln();
+		int minLength = Math.min(n.getCa1Length(), n.getCa2Length());
+		int[][][] optAlnN = new int[blockNum][2][minLength];
+		int[][][] optAlnO = o.getOptAln();
 
+		String[][][] pdbAlnN = new String[blockNum][2][minLength];
+		String[][][] pdbAlnO = o.getPdbAln();
 
-		String[][][] pdbAlnN         = new String[blockNum][2][minLength];
-		String[][][] pdbAlnO         = o.getPdbAln();
-
-		if ( ( optAlnO == null) && ( pdbAlnO == null) ){
-			System.err.println("Can't get either optAln or pdbAln data from original AFPChain. Not enough information to recreate alignment!");
+		if ((optAlnO == null) && (pdbAlnO == null)) {
+			logger.error(
+					"Can't get either optAln or pdbAln data from original AFPChain. Not enough information to recreate alignment!");
 		}
 
+		for (int blockNr = 0; blockNr < blockNum; blockNr++) {
+			for (int eqrNr = 0; eqrNr < optLen[blockNr]; eqrNr++) {
 
-
-		for (int blockNr = 0 ; blockNr < blockNum ; blockNr++) {
-			for ( int eqrNr = 0 ; eqrNr < optLen[blockNr] ; eqrNr++ ) {
-
-				if ( optAlnO != null ){
+				if (optAlnO != null) {
 					optAlnN[blockNr][0][eqrNr] = optAlnO[blockNr][1][eqrNr];
 					optAlnN[blockNr][1][eqrNr] = optAlnO[blockNr][0][eqrNr];
 				}
-				if ( pdbAlnO != null) {
+				if (pdbAlnO != null) {
 					pdbAlnN[blockNr][0][eqrNr] = pdbAlnO[blockNr][1][eqrNr];
 					pdbAlnN[blockNr][1][eqrNr] = pdbAlnO[blockNr][0][eqrNr];
 				}
@@ -91,11 +93,9 @@ public class AFPChainFlipper {
 
 		n.setOptAln(optAlnN);
 
-		if ( pdbAlnO != null) {
+		if (pdbAlnO != null) {
 			n.setPdbAln(pdbAlnN);
 		}
-
-
 
 		n.setAlnLength(o.getAlnLength());
 		n.setAlignScore(o.getAlignScore());
@@ -116,10 +116,9 @@ public class AFPChainFlipper {
 		n.setTotalRmsdOpt(o.getTotalRmsdOpt());
 		n.setTMScore(o.getTMScore());
 
-
 		// change direction of the Matrix and shift!
 		//
-		Matrix[] maxO  = o.getBlockRotationMatrix();
+		Matrix[] maxO = o.getBlockRotationMatrix();
 		Matrix[] maxN = new Matrix[maxO.length];
 
 		int i = -1;
@@ -127,22 +126,21 @@ public class AFPChainFlipper {
 		Atom[] shiftO = o.getBlockShiftVector();
 		Atom[] shiftN = new Atom[shiftO.length];
 
-		for (Matrix m : maxO){
+		for (Matrix m : maxO) {
 			i++;
-			if ( m == null) {
+			if (m == null) {
 				// alignment too short probably
 				continue;
 			}
 
-			Matrix mnew = m ;
+			Matrix mnew = m;
 			Atom a = shiftO[i];
 
 			maxN[i] = mnew.transpose();
 
-			shiftN[i] =  Calc.invert(a);
+			shiftN[i] = Calc.invert(a);
 
-			Calc.rotate(shiftN[i],maxN[i]);
-
+			Calc.rotate(shiftN[i], maxN[i]);
 
 		}
 

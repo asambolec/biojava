@@ -31,6 +31,7 @@ public class CoxVariablesVariableComparator implements CoxComparatorInterface {
 
 	String variables = "";
 	String variable = "";
+	String description = "Signatures ranked by p-value ";
 
 	/**
 	 *
@@ -40,41 +41,46 @@ public class CoxVariablesVariableComparator implements CoxComparatorInterface {
 	public CoxVariablesVariableComparator(String variables, String variable) {
 		this.variables = variables;
 		this.variable = variable;
-		description = "Signatures ranked by model " + variables + " and variable " + variable + " p-value";
+		description = new StringBuilder().append("Signatures ranked by model ").append(variables)
+				.append(" and variable ").append(variable).append(" p-value").toString();
 	}
 
 	@Override
 	public int compare(CoxVariables coxVariables1, CoxVariables coxVariables2) {
-		if(coxVariables1.equals(coxVariables2))
+		if (coxVariables1.equals(coxVariables2)) {
 			return 0;
+		}
 		CoxInfo ci1 = coxVariables1.getCoxInfo(variables);
 		CoxInfo ci2 = coxVariables2.getCoxInfo(variables);
-		if(ci1 == null && ci2 == null)
+		if (ci1 == null && ci2 == null) {
 			return 0;
-		if(ci1 == null && ci2 != null)
+		}
+		if (ci1 == null && ci2 != null) {
 			return 1;
-		if(ci2 == null && ci1 != null)
+		}
+		if (ci2 == null && ci1 != null) {
 			return -1;
+		}
 		if (ci1.getCoefficientsList().get(variable).getPvalue() < ci2.getCoefficientsList().get(variable).getPvalue()) {
 			return -1;
-		} else if (ci1.getCoefficientsList().get(variable).getPvalue() > ci2.getCoefficientsList().get(variable).getPvalue()) {
+		} else if (ci1.getCoefficientsList().get(variable).getPvalue() > ci2.getCoefficientsList().get(variable)
+				.getPvalue()) {
 			return 1;
 		} else {
 			return 0;
 		}
-		//ascending order
+		// ascending order
 		// return coxVariables1.compareTo(coxVariables2);
 	}
 
 	@Override
 	public String getDescription() {
-	   return description;
+		return description;
 	}
-	String description = "Signatures ranked by p-value ";
 
 	@Override
 	public void setDescription(String description) {
-	   this.description = description;
+		this.description = description;
 	}
 
 	@Override
@@ -86,7 +92,5 @@ public class CoxVariablesVariableComparator implements CoxComparatorInterface {
 	public String getSortVariable() {
 		return variable;
 	}
-
-
 
 }

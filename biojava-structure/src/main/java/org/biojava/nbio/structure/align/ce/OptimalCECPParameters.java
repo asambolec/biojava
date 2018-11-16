@@ -26,7 +26,8 @@ package org.biojava.nbio.structure.align.ce;
 
 import java.util.List;
 
-/** Contains the parameters that can be sent to CE
+/**
+ * Contains the parameters that can be sent to CE
  *
  * @author Andreas Prlic
  *
@@ -39,33 +40,27 @@ public class OptimalCECPParameters extends CeParameters {
 	/**
 	 * The CP point, specified as a residue index
 	 *
-	 * <p>TODO make this a ResidueNumber
+	 * <p>
+	 * TODO make this a ResidueNumber
 	 */
 	protected Integer cpPoint;
 
 	@Override
 	public String toString() {
-		return "OptimalCECPParameters [scoringStrategy=" + scoringStrategy
-		+ ", maxGapSize=" + maxGapSize
-		+ ", rmsdThr=" + rmsdThr
-		+ ", rmsdThrJoin="+ rmsdThrJoin
-		+ ", winSize=" + winSize
-		+ ", showAFPRanges=" + showAFPRanges
-		+ ", maxOptRMSD=" + maxOptRMSD
-		+ ", seqWeight=" + seqWeight
-		+ ", tryAllCPs" + tryAllCPs
-		+ ", cpPoint" + cpPoint
-		+ "]";
+		return new StringBuilder().append("OptimalCECPParameters [scoringStrategy=").append(scoringStrategy)
+				.append(", maxGapSize=").append(maxGapSize).append(", rmsdThr=").append(rmsdThr)
+				.append(", rmsdThrJoin=").append(rmsdThrJoin).append(", winSize=").append(winSize)
+				.append(", showAFPRanges=").append(showAFPRanges).append(", maxOptRMSD=").append(maxOptRMSD)
+				.append(", seqWeight=").append(seqWeight).append(", tryAllCPs").append(tryAllCPs).append(", cpPoint")
+				.append(cpPoint).append("]").toString();
 	}
 
-
 	@Override
-	public void reset(){
+	public void reset() {
 		super.reset();
 		tryAllCPs = true;
 		cpPoint = 0;
 	}
-
 
 	@Override
 	public List<String> getUserConfigHelp() {
@@ -84,7 +79,7 @@ public class OptimalCECPParameters extends CeParameters {
 	}
 
 	@Override
-	public List<String> getUserConfigParameterNames(){
+	public List<String> getUserConfigParameterNames() {
 		List<String> params = super.getUserConfigParameterNames();
 
 		params.add("Try all CPs");
@@ -101,7 +96,6 @@ public class OptimalCECPParameters extends CeParameters {
 		return params;
 	}
 
-
 	/**
 	 * @return Whether we should try all CP sites
 	 */
@@ -109,14 +103,12 @@ public class OptimalCECPParameters extends CeParameters {
 		return tryAllCPs;
 	}
 
-
 	/**
 	 * @param tryAllCPs Set whether we should try all CP sites
 	 */
 	public void setTryAllCPs(Boolean tryAllCPs) {
 		this.tryAllCPs = tryAllCPs;
 	}
-
 
 	/**
 	 * @return the cpPoint
@@ -131,7 +123,5 @@ public class OptimalCECPParameters extends CeParameters {
 	public void setCPPoint(Integer cpPoint) {
 		this.cpPoint = cpPoint;
 	}
-
-
 
 }

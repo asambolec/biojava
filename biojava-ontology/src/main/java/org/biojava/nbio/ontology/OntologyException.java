@@ -21,7 +21,6 @@
 
 package org.biojava.nbio.ontology;
 
-
 /**
  * Thrown to indicate an error in an Ontology object
  *
@@ -29,13 +28,11 @@ package org.biojava.nbio.ontology;
  * @since 1.4
  */
 
-public class OntologyException
-extends Exception {
+public class OntologyException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-public OntologyException() {
-		super();
+	public OntologyException() {
 	}
 
 	public OntologyException(String message) {

@@ -35,8 +35,7 @@ import org.biojava.nbio.structure.StructureIdentifier;
  * @since 4.1.0
  *
  */
-public class MultipleAlignmentImpl extends AbstractScoresCache implements
-		Serializable, MultipleAlignment, Cloneable {
+public class MultipleAlignmentImpl extends AbstractScoresCache implements Serializable, MultipleAlignment, Cloneable {
 
 	private static final long serialVersionUID = 3432043794125805139L;
 
@@ -62,16 +61,15 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 	 * Constructor linking to an existing ensemble. Automatically adds this
 	 * alignment to the parent ensemble.
 	 *
-	 * @param ensemble
-	 *            parent MultipleAlignmentEnsemble.
+	 * @param ensemble parent MultipleAlignmentEnsemble.
 	 * @return MultipleAlignment an alignment instance part of an ensemble.
 	 */
 	public MultipleAlignmentImpl(MultipleAlignmentEnsemble ensemble) {
 
-		super();
 		parent = ensemble;
-		if (parent != null)
+		if (parent != null) {
 			parent.getMultipleAlignments().add(this);
+		}
 
 		blockSets = null;
 
@@ -84,8 +82,7 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 	/**
 	 * Copy constructor. Recursively copies member BlockSets.
 	 *
-	 * @param ma
-	 *            MultipleAlignmentImpl to copy.
+	 * @param ma MultipleAlignmentImpl to copy.
 	 * @return MultipleAlignmentImpl identical copy of the alignment.
 	 */
 	public MultipleAlignmentImpl(MultipleAlignmentImpl ma) {
@@ -99,12 +96,11 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 		blockSets = null;
 		if (ma.blockSets != null) {
 			// Make a deep copy of everything
-			this.blockSets = new ArrayList<BlockSet>();
-			for (BlockSet bs : ma.blockSets) {
-				BlockSet newBS = bs.clone();
+			this.blockSets = new ArrayList<>();
+			ma.blockSets.stream().map(BlockSet::clone).forEach(newBS -> {
 				newBS.setMultipleAlignment(this);
 				this.blockSets.add(newBS);
-			}
+			});
 		}
 	}
 
@@ -114,9 +110,7 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 		length = -1;
 		coreLength = -1;
 		alignResCounts = null;
-		for (BlockSet a : getBlockSets()) {
-			a.clear();
-		}
+		getBlockSets().forEach(BlockSet::clear);
 	}
 
 	@Override
@@ -126,18 +120,14 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 
 	@Override
 	public String toString() {
-		List<String> ids = new ArrayList<String>(parent
-				.getStructureIdentifiers().size());
-		for (StructureIdentifier i : parent.getStructureIdentifiers()) {
-			ids.add(i.getIdentifier());
-		}
-		String resume = "Structures:" + ids + " \nAlgorithm:"
-				+ parent.getAlgorithmName() + "_" + parent.getVersion()
-				+ " \nBlockSets: " + getBlockSets().size() + " \nBlocks: "
-				+ getBlocks().size() + " \nLength: " + length()
-				+ " \nCore Length: " + getCoreLength();
+		List<String> ids = new ArrayList<>(parent.getStructureIdentifiers().size());
+		parent.getStructureIdentifiers().forEach(i -> ids.add(i.getIdentifier()));
+		String resume = new StringBuilder().append("Structures:").append(ids).append(" \nAlgorithm:")
+				.append(parent.getAlgorithmName()).append("_").append(parent.getVersion()).append(" \nBlockSets: ")
+				.append(getBlockSets().size()).append(" \nBlocks: ").append(getBlocks().size()).append(" \nLength: ")
+				.append(length()).append(" \nCore Length: ").append(getCoreLength()).toString();
 		for (String score : getScores()) {
-			resume += " \n" + score + ": ";
+			resume += new StringBuilder().append(" \n").append(score).append(": ").toString();
 			resume += String.format("%.2f", getScore(score));
 		}
 		return resume;
@@ -145,17 +135,16 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 
 	@Override
 	public List<BlockSet> getBlockSets() {
-		if (blockSets == null)
-			blockSets = new ArrayList<BlockSet>();
+		if (blockSets == null) {
+			blockSets = new ArrayList<>();
+		}
 		return blockSets;
 	}
 
 	@Override
 	public List<Block> getBlocks() {
-		List<Block> blocks = new ArrayList<Block>();
-		for (BlockSet bs : getBlockSets()) {
-			blocks.addAll(bs.getBlocks());
-		}
+		List<Block> blocks = new ArrayList<>();
+		getBlockSets().forEach(bs -> blocks.addAll(bs.getBlocks()));
 		return blocks;
 	}
 
@@ -192,15 +181,17 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 
 	@Override
 	public int length() {
-		if (length < 0)
+		if (length < 0) {
 			updateLength();
+		}
 		return length;
 	}
 
 	@Override
 	public int getCoreLength() {
-		if (coreLength < 0)
+		if (coreLength < 0) {
 			updateCoreLength();
+		}
 		return coreLength;
 	}
 
@@ -210,13 +201,11 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 	 */
 	protected void updateLength() {
 		if (getBlockSets().size() == 0) {
-			throw new IndexOutOfBoundsException(
-					"Empty MultipleAlignment: blockSets size == 0.");
+			throw new IndexOutOfBoundsException("Empty MultipleAlignment: blockSets size == 0.");
 		} // Otherwise try to calculate it from the BlockSet information
 		else {
 			length = 0;
-			for (BlockSet blockSet : blockSets)
-				length += blockSet.length();
+			blockSets.forEach(blockSet -> length += blockSet.length());
 		}
 	}
 
@@ -226,13 +215,11 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 	 */
 	protected void updateCoreLength() {
 		if (getBlockSets().size() == 0) {
-			throw new IndexOutOfBoundsException(
-					"Empty MultipleAlignment: blockSets size == 0.");
+			throw new IndexOutOfBoundsException("Empty MultipleAlignment: blockSets size == 0.");
 		} // Otherwise try to calculate it from the BlockSet information
 		else {
 			coreLength = 0;
-			for (BlockSet blockSet : blockSets)
-				coreLength += blockSet.getCoreLength();
+			blockSets.forEach(blockSet -> coreLength += blockSet.getCoreLength());
 		}
 	}
 
@@ -259,32 +246,35 @@ public class MultipleAlignmentImpl extends AbstractScoresCache implements
 	@Override
 	public List<Integer> getAlignResCounts() {
 
-		if (alignResCounts != null)
+		if (alignResCounts != null) {
 			return alignResCounts;
-
-		alignResCounts = new ArrayList<Integer>(size());
-		for (int s = 0; s < size(); s++)
-			alignResCounts.add(0);
-
-		for (BlockSet bs : blockSets) {
-			List<Integer> bscounts = bs.getAlignResCounts();
-			for (int s = 0; s < size(); s++)
-				alignResCounts.set(s, alignResCounts.get(s) + bscounts.get(s));
 		}
+
+		alignResCounts = new ArrayList<>(size());
+		for (int s = 0; s < size(); s++) {
+			alignResCounts.add(0);
+		}
+
+		blockSets.stream().map(BlockSet::getAlignResCounts).forEach(bscounts -> {
+			for (int s = 0; s < size(); s++) {
+				alignResCounts.set(s, alignResCounts.get(s) + bscounts.get(s));
+			}
+		});
 		return alignResCounts;
 	}
 
 	@Override
 	public List<Double> getCoverages() {
-		
-		if (coverages != null)
+
+		if (coverages != null) {
 			return coverages;
-		
+		}
+
 		List<Integer> counts = getAlignResCounts();
-		coverages = new ArrayList<Double>(size());
-		for (int s = 0; s < size(); s++)
-			coverages.add(counts.get(s)
-					/ (double) getAtomArrays().get(s).length);
+		coverages = new ArrayList<>(size());
+		for (int s = 0; s < size(); s++) {
+			coverages.add(counts.get(s) / (double) getAtomArrays().get(s).length);
+		}
 		return coverages;
 	}
 

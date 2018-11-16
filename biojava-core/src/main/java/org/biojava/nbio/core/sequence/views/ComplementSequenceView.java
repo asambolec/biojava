@@ -27,13 +27,13 @@ import org.biojava.nbio.core.sequence.template.SequenceMixin;
 import org.biojava.nbio.core.sequence.template.SequenceProxyView;
 
 /**
- * For a given sequence this class will create a view over the top of it
- * and for every request the code will return the complement of the underlying
- * base e.g. base A will become base T
+ * For a given sequence this class will create a view over the top of it and for
+ * every request the code will return the complement of the underlying base e.g.
+ * base A will become base T
  *
  * @author Andy Yates
- * @param <C> Must be a subtype of @{link ComplementCompound} since
- * only those support complements
+ * @param <C> Must be a subtype of @{link ComplementCompound} since only those
+ *        support complements
  */
 public class ComplementSequenceView<C extends ComplementCompound> extends SequenceProxyView<C> {
 

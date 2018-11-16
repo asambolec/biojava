@@ -19,24 +19,27 @@
  *
  */
 package demo;
+
 import org.biojava.nbio.aaproperties.IPeptideProperties;
 import org.biojava.nbio.aaproperties.PeptidePropertiesImpl;
 import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.ProteinSequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by andreas on 8/9/14.
  */
 
-
 public class BioJavaAADemo {
 
+	private static final Logger logger = LoggerFactory.getLogger(BioJavaAADemo.class);
 
 	public static void main(String[] args) throws CompoundNotFoundException {
 		ProteinSequence pSequence = new ProteinSequence("VLSPADKTNVKAAWGKVGAHAG");
 
 		IPeptideProperties pp = new PeptidePropertiesImpl();
 
-		System.out.println("Peptide Properties: " + pp.getIsoelectricPoint(pSequence));
+		logger.info("Peptide Properties: " + pp.getIsoelectricPoint(pSequence));
 	}
 }

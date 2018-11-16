@@ -26,7 +26,6 @@ package org.biojava.nbio.structure.symmetry.jmolScript;
 import org.biojava.nbio.structure.symmetry.axis.RotationAxisAligner;
 import org.biojava.nbio.structure.symmetry.geometry.RectangularPrism;
 
-
 /**
  * @author Peter
  *
@@ -35,7 +34,8 @@ public class JmolSymmetryScriptGeneratorC1 extends JmolSymmetryScriptGeneratorPo
 
 	public JmolSymmetryScriptGeneratorC1(RotationAxisAligner axisTransformation, String name) {
 		super(axisTransformation, name);
-		setPolyhedron(new RectangularPrism(axisTransformation.getDimension().z*2, axisTransformation.getDimension().x*2, axisTransformation.getDimension().y*2));
+		setPolyhedron(new RectangularPrism(axisTransformation.getDimension().z * 2,
+				axisTransformation.getDimension().x * 2, axisTransformation.getDimension().y * 2));
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class JmolSymmetryScriptGeneratorC1 extends JmolSymmetryScriptGeneratorPo
 		double polyhedronExtension = Math.max(at.getDimension().x, at.getDimension().y);
 
 		polyhedronExtension = Math.max(at.getDimension().z, polyhedronExtension);
-		int zoom = Math.round((float)(maxExtension/polyhedronExtension * 110));
+		int zoom = Math.round((float) (maxExtension / polyhedronExtension * 110));
 		if (zoom > 100) {
 			zoom = 100;
 		}
@@ -57,7 +57,7 @@ public class JmolSymmetryScriptGeneratorC1 extends JmolSymmetryScriptGeneratorPo
 	@Override
 	public int getOrientationCount() {
 		// the last two views (top, bottom) are not that interesting.
-		return getPolyhedron().getViewCount()-2;
+		return getPolyhedron().getViewCount() - 2;
 	}
 
 }

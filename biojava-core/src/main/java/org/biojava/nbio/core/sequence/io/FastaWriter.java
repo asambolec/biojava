@@ -39,10 +39,11 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 /**
- * The FastaWriter writes a collection of sequences to an outputStream. FastaWriterHelper should be
- * used to write out sequences. Each sequence loaded from a fasta file retains the original Fasta header
- * and that is used when writing to the stream. This behavior can be overwritten by implementing
- * a custom FastaHeaderFormatInterface.
+ * The FastaWriter writes a collection of sequences to an outputStream.
+ * FastaWriterHelper should be used to write out sequences. Each sequence loaded
+ * from a fasta file retains the original Fasta header and that is used when
+ * writing to the stream. This behavior can be overwritten by implementing a
+ * custom FastaHeaderFormatInterface.
  *
  * @author Scooter Willis <willishf at gmail dot com>
  */
@@ -55,12 +56,14 @@ public class FastaWriter<S extends Sequence<?>, C extends Compound> {
 	FastaHeaderFormatInterface<S, C> headerFormat;
 	private int lineLength = 60;
 	byte[] lineSep = System.getProperty("line.separator").getBytes();
-/**
- * Use default line length of 60
- * @param os
- * @param sequences
- * @param headerFormat
- */
+
+	/**
+	 * Use default line length of 60
+	 * 
+	 * @param os
+	 * @param sequences
+	 * @param headerFormat
+	 */
 	public FastaWriter(OutputStream os, Collection<S> sequences, FastaHeaderFormatInterface<S, C> headerFormat) {
 
 		this.os = os;
@@ -68,15 +71,17 @@ public class FastaWriter<S extends Sequence<?>, C extends Compound> {
 		this.headerFormat = headerFormat;
 	}
 
-/**
- * Set custom lineLength
- * @param os
- * @param sequences
- * @param headerFormat
- * @param lineLength
- */
+	/**
+	 * Set custom lineLength
+	 * 
+	 * @param os
+	 * @param sequences
+	 * @param headerFormat
+	 * @param lineLength
+	 */
 
-	public FastaWriter(OutputStream os, Collection<S> sequences, FastaHeaderFormatInterface<S, C> headerFormat, int lineLength) {
+	public FastaWriter(OutputStream os, Collection<S> sequences, FastaHeaderFormatInterface<S, C> headerFormat,
+			int lineLength) {
 		this.os = os;
 		this.sequences = sequences;
 		this.headerFormat = headerFormat;
@@ -84,17 +89,17 @@ public class FastaWriter<S extends Sequence<?>, C extends Compound> {
 	}
 
 	/**
-	 * Allow an override of operating system line separator for programs that needs a specific CRLF or CR or LF option
+	 * Allow an override of operating system line separator for programs that needs
+	 * a specific CRLF or CR or LF option
+	 * 
 	 * @param lineSeparator
 	 */
-	public void setLineSeparator(String lineSeparator){
+	public void setLineSeparator(String lineSeparator) {
 		lineSep = lineSeparator.getBytes();
 	}
 
 	public void process() throws IOException {
-	   // boolean closeit = false;
-
-
+		// boolean closeit = false;
 
 		for (S sequence : sequences) {
 			String header = headerFormat.getHeader(sequence);
@@ -117,10 +122,9 @@ public class FastaWriter<S extends Sequence<?>, C extends Compound> {
 
 			}
 
-
-			//If we had sequence which was a reciprocal of line length
-			//then don't write the line terminator as this has already written
-			//it
+			// If we had sequence which was a reciprocal of line length
+			// then don't write the line terminator as this has already written
+			// it
 			if ((sequence.getLength() % getLineLength()) != 0) {
 				os.write(lineSep);
 			}
@@ -129,29 +133,27 @@ public class FastaWriter<S extends Sequence<?>, C extends Compound> {
 	}
 
 	public static void main(String[] args) {
-		try {
-			FileInputStream is = new FileInputStream("/Users/Scooter/scripps/dyadic/c1-454Scaffolds.faa");
-
-
-			FastaReader<ProteinSequence, AminoAcidCompound> fastaReader = new FastaReader<ProteinSequence, AminoAcidCompound>(is, new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>(), new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet()));
+		try (FileInputStream is = new FileInputStream("/Users/Scooter/scripps/dyadic/c1-454Scaffolds.faa")) {
+			FastaReader<ProteinSequence, AminoAcidCompound> fastaReader = new FastaReader<>(is,
+					new GenericFastaHeaderParser<ProteinSequence, AminoAcidCompound>(),
+					new ProteinSequenceCreator(AminoAcidCompoundSet.getAminoAcidCompoundSet()));
 			LinkedHashMap<String, ProteinSequence> proteinSequences = fastaReader.process();
-			is.close();
 
+			// logger.debug(proteinSequences);
 
-		  //  logger.debug(proteinSequences);
-
-			FileOutputStream fileOutputStream = new FileOutputStream("/Users/Scooter/scripps/dyadic/c1-454Scaffolds_temp.faa");
+			FileOutputStream fileOutputStream = new FileOutputStream(
+					"/Users/Scooter/scripps/dyadic/c1-454Scaffolds_temp.faa");
 
 			BufferedOutputStream bo = new BufferedOutputStream(fileOutputStream);
 			long start = System.currentTimeMillis();
-			FastaWriter<ProteinSequence, AminoAcidCompound> fastaWriter = new FastaWriter<ProteinSequence, AminoAcidCompound>(bo, proteinSequences.values(), new GenericFastaHeaderFormat<ProteinSequence, AminoAcidCompound>());
+			FastaWriter<ProteinSequence, AminoAcidCompound> fastaWriter = new FastaWriter<>(bo,
+					proteinSequences.values(), new GenericFastaHeaderFormat<ProteinSequence, AminoAcidCompound>());
 			fastaWriter.process();
 			bo.close();
 			long end = System.currentTimeMillis();
 			logger.info("Took {} seconds", (end - start));
 
 			fileOutputStream.close();
-
 
 		} catch (IOException e) {
 			logger.warn("Exception: ", e);

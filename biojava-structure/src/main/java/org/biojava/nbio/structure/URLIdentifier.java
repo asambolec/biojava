@@ -53,12 +53,14 @@ import org.slf4j.LoggerFactory;
  *
  * <ul>
  * <li><tt>format=[pdb|cif]</tt> Specify the file format (will otherwise be
- *     guessed from the extension)
- * <li><tt>pdbId=[String]</tt> Specify the PDB ID (also guessed from the filename)
+ * guessed from the extension)
+ * <li><tt>pdbId=[String]</tt> Specify the PDB ID (also guessed from the
+ * filename)
  * <li><tt>chainID=[String]</tt> A single chain from the structure
  * <li><tt>residues=[String]</tt> Residue ranges, in a form understood by
- *     {@link SubstructureIdentifier}
+ * {@link SubstructureIdentifier}
  * </ul>
+ * 
  * @author Spencer Bliven
  *
  */
@@ -69,22 +71,29 @@ public class URLIdentifier implements StructureIdentifier {
 	private static final Logger logger = LoggerFactory.getLogger(URLIdentifier.class);
 
 	// Used for guessing the PDB ID from the filename
-	private static final Pattern PDBID_REGEX = Pattern.compile("^([0-9][a-z0-9]{3})([._-]|\\s).*",Pattern.CASE_INSENSITIVE);
+	private static final Pattern PDBID_REGEX = Pattern.compile("^([0-9][a-z0-9]{3})([._-]|\\s).*",
+			Pattern.CASE_INSENSITIVE);
 
 	/** URL parameter specifying the file format (PDB or CIF) */
 	public static final String FORMAT_PARAM = "format";
 	/** URL parameter specifying the PDB ID */
 	public static final String PDBID_PARAM = "pdbid";
-	/** URL parameter specifying a single chain to include; overridden by residues */
+	/**
+	 * URL parameter specifying a single chain to include; overridden by residues
+	 */
 
-	//TODO: should this get renamed to chainname or asymid?
+	// TODO: should this get renamed to chainname or asymid?
 	public static final String CHAINID_PARAM = "chainid";
-	/** URL parameter specifying residue ranges to include, e.g. <tt>residues=A:1-70</tt>
+	/**
+	 * URL parameter specifying residue ranges to include, e.g.
+	 * <tt>residues=A:1-70</tt>
+	 * 
 	 * @see SubstructureIdentifier
 	 */
 	public static final String RESIDUES_PARAM = "residues";
 
 	final private URL url;
+
 	public URLIdentifier(URL url) {
 		this.url = url;
 	}
@@ -96,6 +105,7 @@ public class URLIdentifier implements StructureIdentifier {
 	public URL getURL() {
 		return url;
 	}
+
 	@Override
 	public String getIdentifier() {
 		return url.toString();
@@ -110,20 +120,21 @@ public class URLIdentifier implements StructureIdentifier {
 		List<ResidueRange> ranges = Collections.emptyList();
 		try {
 			Map<String, String> params = parseQuery(url);
-			if(params.containsKey(PDBID_PARAM)) {
+			if (params.containsKey(PDBID_PARAM)) {
 				pdbId = params.get(PDBID_PARAM);
 			}
-			if(params.containsKey(RESIDUES_PARAM)) {
+			if (params.containsKey(RESIDUES_PARAM)) {
 				ranges = ResidueRange.parseMultiple(params.get(RESIDUES_PARAM));
-			} else if(params.containsKey(CHAINID_PARAM)) {
-				ranges = Arrays.asList(new ResidueRange(params.get(CHAINID_PARAM),(ResidueNumber)null,(ResidueNumber)null));
+			} else if (params.containsKey(CHAINID_PARAM)) {
+				ranges = Arrays.asList(
+						new ResidueRange(params.get(CHAINID_PARAM), (ResidueNumber) null, (ResidueNumber) null));
 			}
 		} catch (UnsupportedEncodingException e) {
-			logger.error("Unable to decode URL "+url,e);
+			logger.error("Unable to decode URL " + url, e);
 		}
-		if(pdbId == null) {
+		if (pdbId == null) {
 			String path = url.getPath();
-			pdbId = guessPDBID(path.substring(path.lastIndexOf("/")+1));
+			pdbId = guessPDBID(path.substring(path.lastIndexOf("/") + 1));
 		}
 		return new SubstructureIdentifier(pdbId, ranges);
 	}
@@ -132,50 +143,50 @@ public class URLIdentifier implements StructureIdentifier {
 	public Structure reduce(Structure input) throws StructureException {
 		return toCanonical().reduce(input);
 	}
+
 	/**
 	 * Load the structure from the URL
+	 * 
 	 * @return null
 	 */
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-			IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		StructureFiletype format = StructureFiletype.UNKNOWN;
 
 		// Use user-specified format
 		try {
 			Map<String, String> params = parseQuery(url);
-			if(params.containsKey(FORMAT_PARAM)) {
+			if (params.containsKey(FORMAT_PARAM)) {
 				String formatStr = params.get(FORMAT_PARAM);
-				format = StructureIO.guessFiletype("."+formatStr);
+				format = StructureIO.guessFiletype("." + formatStr);
 			}
 		} catch (UnsupportedEncodingException e) {
-			logger.error("Unable to decode URL "+url,e);
+			logger.error("Unable to decode URL " + url, e);
 		}
 
 		// Guess format from extension
-		if(format == StructureFiletype.UNKNOWN) {
+		if (format == StructureFiletype.UNKNOWN) {
 			format = StructureIO.guessFiletype(url.getPath());
 		}
 
-		switch(format) {
+		switch (format) {
 		case CIF:
 			// need to do mmcif parsing!
 
 			InputStreamProvider prov = new InputStreamProvider();
-			InputStream inStream =  prov.getInputStream(url);
+			InputStream inStream = prov.getInputStream(url);
 
 			MMcifParser parser = new SimpleMMcifParser();
 
 			SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
 			consumer.setFileParsingParameters(cache.getFileParsingParams());
 
-
 			parser.addMMcifConsumer(consumer);
 
 			try {
 				parser.parse(new BufferedReader(new InputStreamReader(inStream)));
-			} catch (IOException e){
-				e.printStackTrace();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
 			}
 
 			// now get the protein structure.
@@ -192,16 +203,16 @@ public class URLIdentifier implements StructureIdentifier {
 		}
 	}
 
-
 	/**
 	 * Recognizes PDB IDs that occur at the beginning of name followed by some
 	 * delimiter.
+	 * 
 	 * @param name Input filename
 	 * @return A 4-character id-like string, or null if none is found
 	 */
 	public static String guessPDBID(String name) {
 		Matcher match = PDBID_REGEX.matcher(name);
-		if(match.matches()) {
+		if (match.matches()) {
 			return match.group(1).toUpperCase();
 		} else {
 			// Give up if doesn't match
@@ -216,25 +227,26 @@ public class URLIdentifier implements StructureIdentifier {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private static Map<String,String> parseQuery(URL url) throws UnsupportedEncodingException {
-		Map<String,String> params = new LinkedHashMap<String, String>();
+	private static Map<String, String> parseQuery(URL url) throws UnsupportedEncodingException {
+		Map<String, String> params = new LinkedHashMap<>();
 		String query = url.getQuery();
-		if( query == null || query.isEmpty()) {
+		if (query == null || query.isEmpty()) {
 			// empty query
 			return params;
 		}
 		String[] pairs = url.getQuery().split("&");
-		for(String pair: pairs) {
+		for (String pair : pairs) {
 			int i = pair.indexOf("=");
 			String key = pair;
-			if(i > 0) {
+			if (i > 0) {
 				key = URLDecoder.decode(pair.substring(0, i), "UTF-8");
 			}
 			String value = null;
-			if(i > 0 && pair.length() > i+1) {
-				value = URLDecoder.decode(pair.substring(i+1), "UTF-8");
+			if (i > 0 && pair.length() > i + 1) {
+				value = URLDecoder.decode(pair.substring(i + 1), "UTF-8");
 			}
-			// note that this uses the last instance if a parameter is specified multiple times
+			// note that this uses the last instance if a parameter is specified multiple
+			// times
 			params.put(key.toLowerCase(), value);
 		}
 		return params;

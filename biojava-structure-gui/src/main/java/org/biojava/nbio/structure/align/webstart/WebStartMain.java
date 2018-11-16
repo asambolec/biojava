@@ -43,57 +43,47 @@ import org.biojava.nbio.structure.align.util.UserConfiguration;
 import javax.swing.*;
 
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class WebStartMain
-{
+public class WebStartMain {
 
+	private static final Logger logger = LoggerFactory.getLogger(WebStartMain.class);
 	static UserConfiguration userConfig;
 
 	/**
-	 *  If no arguments, shows AlignmentGui for pairwise alignments.
-	 *  if 1 argument: dbmenu shows the DBSearchGUI, otherwise the AlignentGUI is shown.
+	 * If no arguments, shows AlignmentGui for pairwise alignments. if 1 argument:
+	 * dbmenu shows the DBSearchGUI, otherwise the AlignentGUI is shown.
 	 *
-	 * if more than 3 arguments takes the following arguments
-	 * arg0 : fatcat or biojava .
-	 * arg1 : pdb1.X
-	 * arg2 ; pdb2.X
+	 * if more than 3 arguments takes the following arguments arg0 : fatcat or
+	 * biojava . arg1 : pdb1.X arg2 ; pdb2.X
 	 *
-	 * The 4th argument is optional and it could be the serverLocation which the client should talk to.
+	 * The 4th argument is optional and it could be the serverLocation which the
+	 * client should talk to.
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		AligUIManager.setLookAndFeel();
 
-		if ( args.length == 0){
+		if (args.length == 0) {
 
-			//JOptionPane.showMessageDialog(null,
-			//		"Not enough arguments. Need at least 3, but only got " + args.length);
+			// JOptionPane.showMessageDialog(null,
+			// "Not enough arguments. Need at least 3, but only got " + args.length);
 
 			// we did not get enough arguments, show the general user interface...
 
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-
-					AlignmentGui.getInstance();
-				}
-			});
+			javax.swing.SwingUtilities.invokeLater(AlignmentGui::getInstance);
 
 			return;
 
 		}
 
-		else if ( args.length < 3){
-			//String arg0 = args[0];
+		else if (args.length < 3) {
+			// String arg0 = args[0];
 
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					AlignmentGui.getInstance();
-				}
-			});
+			javax.swing.SwingUtilities.invokeLater(AlignmentGui::getInstance);
 
 			return;
 
@@ -101,21 +91,17 @@ public class WebStartMain
 
 		String arg0 = args[0];
 
-		if (! (arg0.equals("fatcat") ||
-				arg0.equals("biojava") ||
-				arg0.equals("fatcat_flexible") ||
-				arg0.equals("ce") ||
-				arg0.equals("ce_cp") ||
-				arg0.equals("sw")
-		)){
+		if (!("fatcat".equals(arg0) || "biojava".equals(arg0) || "fatcat_flexible".equals(arg0) || "ce".equals(arg0)
+				|| "ce_cp".equals(arg0) || "sw".equals(arg0))) {
 			JOptionPane.showMessageDialog(null,
-					"Wrong arguments. First argument has to be \"fatcat\", \"ce\", \"ce_cp\", \"sw\", \"fatcat_flexible\", or \"biojava\", but got " + arg0);
+					"Wrong arguments. First argument has to be \"fatcat\", \"ce\", \"ce_cp\", \"sw\", \"fatcat_flexible\", or \"biojava\", but got "
+							+ arg0);
 			return;
 		}
 
 		String serverLocation = FarmJobParameters.DEFAULT_SERVER_URL;
 
-		if ( args.length  > 3 ) {
+		if (args.length > 3) {
 			// we have 4 arguments.
 			// in this case the 4th has to be the server URL
 			serverLocation = args[3];
@@ -127,78 +113,70 @@ public class WebStartMain
 			String name2 = args[2];
 
 			PdbPair pair = new PdbPair(name1, name2);
-			System.out.println("### user provided: " + pair);
+			logger.info("### user provided: " + pair);
 
 			UserConfiguration config = getWebStartConfig();
 
-			System.setProperty(UserConfiguration.PDB_DIR,config.getPdbFilePath());
-			System.out.println("using PDB file path: " + config.getPdbFilePath());
+			System.setProperty(UserConfiguration.PDB_DIR, config.getPdbFilePath());
+			logger.info("using PDB file path: " + config.getPdbFilePath());
 
 			AtomCache cache = new AtomCache(config);
 
 			JFrame frame = new JFrame();
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-			showProgressBar(frame,"Loading PDB files...", "Loading files from local directory or via FTP.");
+			showProgressBar(frame, "Loading PDB files...", "Loading files from local directory or via FTP.");
 
 			Atom[] ca1 = cache.getAtoms(pair.getName1());
 			Atom[] ca2 = cache.getAtoms(pair.getName2());
 
 			frame.dispose();
 
-			System.out.println("done reading structures");
+			logger.info("done reading structures");
 
-
-			if (arg0.equalsIgnoreCase("ce") ||
-					arg0.equalsIgnoreCase("ce_cp") ||
-					arg0.equalsIgnoreCase("sw") ||
-					arg0.equalsIgnoreCase("fatcat") ||
-					arg0.equalsIgnoreCase("fatcat_flexible")){
+			if ("ce".equalsIgnoreCase(arg0) || "ce_cp".equalsIgnoreCase(arg0) || "sw".equalsIgnoreCase(arg0)
+					|| "fatcat".equalsIgnoreCase(arg0) || "fatcat_flexible".equalsIgnoreCase(arg0)) {
 				try {
 
-					StructureAlignment algorithm ;
-					if ( arg0.equalsIgnoreCase("ce"))
+					StructureAlignment algorithm;
+					if ("ce".equalsIgnoreCase(arg0)) {
 						algorithm = StructureAlignmentFactory.getAlgorithm(CeMain.algorithmName);
-					else if ( arg0.equalsIgnoreCase("ce_cp"))
+					} else if ("ce_cp".equalsIgnoreCase(arg0)) {
 						algorithm = StructureAlignmentFactory.getAlgorithm(CeCPMain.algorithmName);
-					else if ( arg0.equalsIgnoreCase("fatcat"))
+					} else if ("fatcat".equalsIgnoreCase(arg0)) {
 						algorithm = StructureAlignmentFactory.getAlgorithm(FatCatRigid.algorithmName);
-					else if ( arg0.equalsIgnoreCase("fatcat_flexible"))
+					} else if ("fatcat_flexible".equalsIgnoreCase(arg0)) {
 						algorithm = StructureAlignmentFactory.getAlgorithm(FatCatFlexible.algorithmName);
-					else
+					} else {
 						algorithm = new SmithWaterman3Daligner();
+					}
 
-					showStructureAlignment(serverLocation,algorithm ,ca1,ca2,pair.getName1(),pair.getName2());
+					showStructureAlignment(serverLocation, algorithm, ca1, ca2, pair.getName1(), pair.getName2());
 
-				} catch (Exception e){
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null,
-							"Something went wrong! : " + e.getMessage());
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					JOptionPane.showMessageDialog(null, "Something went wrong! : " + e.getMessage());
 				}
 
-
-			} else if ( arg0.equalsIgnoreCase("biojava")){
+			} else if ("biojava".equalsIgnoreCase(arg0)) {
 				try {
-					//showBiojava(ca1,ca2);
-				} catch (Exception e){
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null,
-							"Something went wrong! : " + e.getMessage());
+					// showBiojava(ca1,ca2);
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					JOptionPane.showMessageDialog(null, "Something went wrong! : " + e.getMessage());
 					System.exit(0);
 				}
 			}
 
-
 		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null,
-					"Error: " + e.getMessage());
+			logger.error(e.getMessage(), e);
+			JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
 			System.exit(0);
 			return;
 		}
 	}
 
-	private static JProgressBar showProgressBar(JFrame frame, String title, String displayTxt){
+	private static JProgressBar showProgressBar(JFrame frame, String title, String displayTxt) {
 
 		frame.setTitle(title);
 		JProgressBar progressBar;
@@ -206,7 +184,7 @@ public class WebStartMain
 		JPanel content = new JPanel();
 		content.setOpaque(true);
 
-		//Where the GUI is constructed:
+		// Where the GUI is constructed:
 		progressBar = new JProgressBar();
 		progressBar.setToolTipText(title);
 		progressBar.setValue(0);
@@ -225,11 +203,10 @@ public class WebStartMain
 		return progressBar;
 	}
 
-
-	public static UserConfiguration getWebStartConfig(){
+	public static UserConfiguration getWebStartConfig() {
 
 		// check if we could load it (i.e. we are running in web start mode)
-		if ( userConfig == null ) {
+		if (userConfig == null) {
 			userConfig = WebStartMain.getDefaultConfig();
 
 		}
@@ -237,12 +214,11 @@ public class WebStartMain
 		return userConfig;
 	}
 
-
-	public static UserConfiguration getDefaultConfig(){
+	public static UserConfiguration getDefaultConfig() {
 		userConfig = new UserConfiguration();
 
 		String pdbDir = System.getProperty(UserConfiguration.PDB_DIR);
-		if ( pdbDir != null) {
+		if (pdbDir != null) {
 			userConfig.setPdbFilePath(pdbDir);
 
 		}
@@ -250,16 +226,15 @@ public class WebStartMain
 		return userConfig;
 	}
 
+	public static UserConfiguration requestUserConfig() {
 
-	public static UserConfiguration requestUserConfig(){
+		if (userConfig == null) {
 
-		if ( userConfig == null) {
-
-			//UserConfiguration config = new UserConfiguration();
+			// UserConfiguration config = new UserConfiguration();
 			userConfig = new UserConfiguration();
 
 			String pdbDir = System.getProperty(UserConfiguration.PDB_DIR);
-			if ( pdbDir != null) {
+			if (pdbDir != null) {
 				userConfig.setPdbFilePath(pdbDir);
 				return userConfig;
 			}
@@ -268,7 +243,7 @@ public class WebStartMain
 		JTextField textField = new JTextField();
 		ChooseDirAction action = new ChooseDirAction(textField, userConfig);
 		action.actionPerformed(null);
-		if ( textField.getText() == null) {
+		if (textField.getText() == null) {
 
 			// accessing temp. OS directory:
 			String property = "java.io.tmpdir";
@@ -276,17 +251,18 @@ public class WebStartMain
 
 			String tempdir = System.getProperty(property);
 
-			if ( !(tempdir.endsWith(lineSplit ) ) )
+			if (!(tempdir.endsWith(lineSplit))) {
 				tempdir = tempdir + lineSplit;
+			}
 
 			userConfig.setPdbFilePath(tempdir);
 			return userConfig;
 		}
 
 		File file = new File(textField.getText());
-		if ( ! file.isDirectory() ){
+		if (!file.isDirectory()) {
 			// should not happen
-			System.err.println("did not provide directory, going on level higher! " + file.getAbsolutePath());
+			logger.error("did not provide directory, going on level higher! " + file.getAbsolutePath());
 			file = file.getParentFile();
 		}
 		System.setProperty(UserConfiguration.PDB_DIR, file.getAbsolutePath());
@@ -295,29 +271,29 @@ public class WebStartMain
 		return userConfig;
 	}
 
-
-
-	private static void showStructureAlignment(String serverLocation, StructureAlignment algorithm, Atom[] ca1, Atom[] ca2, String name1, String name2) throws StructureException{
+	private static void showStructureAlignment(String serverLocation, StructureAlignment algorithm, Atom[] ca1,
+			Atom[] ca2, String name1, String name2) throws StructureException {
 		JFrame tmpFrame = new JFrame();
 		tmpFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		String title = "Calculating " + algorithm.getAlgorithmName() + " V." + algorithm.getVersion()+" alignment... ";
+		String title = new StringBuilder().append("Calculating ").append(algorithm.getAlgorithmName()).append(" V.")
+				.append(algorithm.getVersion()).append(" alignment... ").toString();
 
+		showProgressBar(tmpFrame, title, "Calculating the structure alignment.");
 
-		showProgressBar(tmpFrame,title, "Calculating the structure alignment.");
-
-
-		//do the actual alignment
+		// do the actual alignment
 		AFPChain afpChain = null;
 
 		try {
-			// using 10 sec as timeout on server now, since we expect the server to be able to complete the calculation within that time...
-			afpChain =  JFatCatClient.getAFPChainFromServer(serverLocation,algorithm.getAlgorithmName(), name1, name2, ca1, ca2, 10000);
-		} catch (Exception e){
-			e.printStackTrace();
+			// using 10 sec as timeout on server now, since we expect the server to be able
+			// to complete the calculation within that time...
+			afpChain = JFatCatClient.getAFPChainFromServer(serverLocation, algorithm.getAlgorithmName(), name1, name2,
+					ca1, ca2, 10000);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
-		if ( afpChain == null )  {
+		if (afpChain == null) {
 			afpChain = algorithm.align(ca1, ca2);
 		}
 
@@ -326,83 +302,83 @@ public class WebStartMain
 
 		tmpFrame.dispose();
 
-
 		// show results
-		StructureAlignmentJmol jmol =  StructureAlignmentDisplay.display(afpChain,ca1,ca2);
+		StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
-		System.out.println(afpChain.toCE(ca1, ca2));
+		logger.info(afpChain.toCE(ca1, ca2));
 
-		DisplayAFP.showAlignmentPanel(afpChain,ca1,ca2,jmol);
+		DisplayAFP.showAlignmentPanel(afpChain, ca1, ca2, jmol);
 
 	}
 
-
-//	private static void showBiojava(Atom[] ca1, Atom[] ca2) throws StructureException{
-//
-//		StructurePairAligner aligner = new StructurePairAligner();
-//
-//		StrucAligParameters params = StrucAligParameters.getDefaultParameters();
-//		//params.setJoinFast(true);
-//		//params.setMaxIter(1);
-//		try {
-//			// align the full 2 structures with default parameters.
-//			// see StructurePairAligner for more options and how to align
-//			// any set of Atoms
-//			long start = System.currentTimeMillis();
-//
-//
-//			aligner.align(ca1,ca2,params);
-//			long end = System.currentTimeMillis();
-//			System.out.println("calculation time:" + (end-start));
-//
-//			AlternativeAlignment[] aligs = aligner.getAlignments();
-//			AlternativeAlignment a = aligs[0];
-//			System.out.println(a);
-//
-//			if (! BiojavaJmol.jmolInClassPath()){
-//				System.err.println("Could not find Jmol in classpath, please install first!");
-//				return;
-//			}
-//			// display the alignment in Jmol
-//
-//
-//
-//			// first get an artificial structure for the alignment
-//			Structure artificial = a.getAlignedStructure(structure1, structure2);
-//
-//			// and then send it to Jmol (only will work if Jmol is in the Classpath)
-//			BiojavaJmol jmol = new BiojavaJmol();
-//			jmol.setTitle(artificial.getName());
-//			jmol.setStructure(artificial);
-//
-//			// color the two structures
-//
-//
-//			jmol.evalString("select *; backbone 0.4; wireframe off; spacefill off; " +
-//			"select not protein and not solvent; spacefill on;");
-//			jmol.evalString("select */1 ; color red; model 1; ");
-//
-//
-//			// now color the equivalent residues ...
-//
-//			String[] pdb1 = a.getPDBresnum1();
-//			for (String res : pdb1 ){
-//				jmol.evalString("select " + res + "/1 ; backbone 0.6; color orange;");
-//			}
-//
-//			jmol.evalString("select */2; color blue; model 2;");
-//			String[] pdb2 = a.getPDBresnum2();
-//			for (String res :pdb2 ){
-//				jmol.evalString("select " + res + "/2 ; backbone 0.6; color cyan;");
-//			}
-//
-//
-//			// now show both models again.
-//			jmol.evalString("model 0;");
-//
-//		} catch (StructureException e){
-//			e.printStackTrace();
-//		}
-//
-//	}
+	// private static void showBiojava(Atom[] ca1, Atom[] ca2) throws
+	// StructureException{
+	//
+	// StructurePairAligner aligner = new StructurePairAligner();
+	//
+	// StrucAligParameters params = StrucAligParameters.getDefaultParameters();
+	// //params.setJoinFast(true);
+	// //params.setMaxIter(1);
+	// try {
+	// // align the full 2 structures with default parameters.
+	// // see StructurePairAligner for more options and how to align
+	// // any set of Atoms
+	// long start = System.currentTimeMillis();
+	//
+	//
+	// aligner.align(ca1,ca2,params);
+	// long end = System.currentTimeMillis();
+	// System.out.println("calculation time:" + (end-start));
+	//
+	// AlternativeAlignment[] aligs = aligner.getAlignments();
+	// AlternativeAlignment a = aligs[0];
+	// System.out.println(a);
+	//
+	// if (! BiojavaJmol.jmolInClassPath()){
+	// System.err.println("Could not find Jmol in classpath, please install
+	// first!");
+	// return;
+	// }
+	// // display the alignment in Jmol
+	//
+	//
+	//
+	// // first get an artificial structure for the alignment
+	// Structure artificial = a.getAlignedStructure(structure1, structure2);
+	//
+	// // and then send it to Jmol (only will work if Jmol is in the Classpath)
+	// BiojavaJmol jmol = new BiojavaJmol();
+	// jmol.setTitle(artificial.getName());
+	// jmol.setStructure(artificial);
+	//
+	// // color the two structures
+	//
+	//
+	// jmol.evalString("select *; backbone 0.4; wireframe off; spacefill off; " +
+	// "select not protein and not solvent; spacefill on;");
+	// jmol.evalString("select */1 ; color red; model 1; ");
+	//
+	//
+	// // now color the equivalent residues ...
+	//
+	// String[] pdb1 = a.getPDBresnum1();
+	// for (String res : pdb1 ){
+	// jmol.evalString("select " + res + "/1 ; backbone 0.6; color orange;");
+	// }
+	//
+	// jmol.evalString("select */2; color blue; model 2;");
+	// String[] pdb2 = a.getPDBresnum2();
+	// for (String res :pdb2 ){
+	// jmol.evalString("select " + res + "/2 ; backbone 0.6; color cyan;");
+	// }
+	//
+	//
+	// // now show both models again.
+	// jmol.evalString("model 0;");
+	//
+	// } catch (StructureException e){
+	// e.printStackTrace();
+	// }
+	//
+	// }
 }

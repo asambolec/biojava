@@ -28,8 +28,9 @@ import java.util.Set;
  * methods for setting and getting Alignment properties.
  *
  * Ideally, one would extend this class if creating a service by creating
- * wrapper methods that actually call either getAlignementOption or setAlignementOption
- * with specific values for parameter names and checking values for options.
+ * wrapper methods that actually call either getAlignementOption or
+ * setAlignementOption with specific values for parameter names and checking
+ * values for options.
  *
  * For an example, go see NCBIQBlastProperties
  *
@@ -37,7 +38,7 @@ import java.util.Set;
  * @since Biojava 3
  *
  */
-public interface RemotePairwiseAlignmentProperties extends Serializable{
+public interface RemotePairwiseAlignmentProperties extends Serializable {
 
 	public static final long serialVersionUID = 1L;
 
@@ -51,12 +52,13 @@ public interface RemotePairwiseAlignmentProperties extends Serializable{
 	public String getAlignmentOption(String key) throws Exception;
 
 	/**
-	 * Method to set the value for a specific alignment parameter using a key to store in a map.
+	 * Method to set the value for a specific alignment parameter using a key to
+	 * store in a map.
 	 *
 	 * @param key :the key use to designate the value to be stored
 	 * @param val :the actual value matched to key
 	 */
-	public void setAlignementOption(String key,String val);
+	public void setAlignementOption(String key, String val);
 
 	/**
 	 * Method to get all keys to the information stored in this object.

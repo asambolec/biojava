@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
-public class PdbxStructAssemblyGen implements Serializable{
+public class PdbxStructAssemblyGen implements Serializable {
 	/**
 	 *
 	 */
@@ -34,34 +34,35 @@ public class PdbxStructAssemblyGen implements Serializable{
 	String oper_expression;
 	String asym_id_list;
 
-
 	public String getAssembly_id() {
 		return assembly_id;
 	}
+
 	public void setAssembly_id(String assembly_id) {
 		this.assembly_id = assembly_id;
 	}
+
 	public String getOper_expression() {
 		return oper_expression;
 	}
+
 	public void setOper_expression(String oper_expression) {
 		this.oper_expression = oper_expression;
 	}
+
 	public String getAsym_id_list() {
 		return asym_id_list;
 	}
+
 	public void setAsym_id_list(String asym_id_list) {
 		this.asym_id_list = asym_id_list;
 	}
+
 	@Override
 	public String toString() {
-		return "PdbxStructAssemblyGen [assembly_id=" + assembly_id
-				+ ", oper_expression=" + oper_expression + ", asym_id_list="
-				+ asym_id_list + "]";
+		return new StringBuilder().append("PdbxStructAssemblyGen [assembly_id=").append(assembly_id)
+				.append(", oper_expression=").append(oper_expression).append(", asym_id_list=").append(asym_id_list)
+				.append("]").toString();
 	}
-
-
-
-
 
 }

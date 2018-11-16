@@ -26,7 +26,6 @@ package org.biojava.nbio.structure.symmetry.jmolScript;
 import org.biojava.nbio.structure.symmetry.axis.RotationAxisAligner;
 import org.biojava.nbio.structure.symmetry.geometry.Prism;
 
-
 /**
  * @author Peter
  *
@@ -39,12 +38,12 @@ public class JmolSymmetryScriptGeneratorDn extends JmolSymmetryScriptGeneratorPo
 
 		// special case for D2. Since there is no 2-fold prism, draw a 4-fold
 		// prism that encases the D2 structure
-		if (axisTransformation.getRotationGroup().getPointGroup().equals("D2")) {
+		if ("D2".equals(axisTransformation.getRotationGroup().getPointGroup())) {
 			fold = 4;
 		}
 
 		Prism p = new Prism(fold);
-		p.setHeight(axisTransformation.getDimension().z*2);
+		p.setHeight(axisTransformation.getDimension().z * 2);
 		p.setInscribedRadius(axisTransformation.getRadius());
 		setPolyhedron(p);
 	}
@@ -54,9 +53,10 @@ public class JmolSymmetryScriptGeneratorDn extends JmolSymmetryScriptGeneratorPo
 		// find maximum extension of structure
 		double maxExtension = getMaxExtension();
 		// find maximum extension of polyhedron
-		double polyhedronExtension = Math.max(getPolyhedron().getCirumscribedRadius(), getAxisTransformation().getDimension().z);
+		double polyhedronExtension = Math.max(getPolyhedron().getCirumscribedRadius(),
+				getAxisTransformation().getDimension().z);
 
-		int zoom = Math.round((float)(maxExtension/polyhedronExtension * 110));
+		int zoom = Math.round((float) (maxExtension / polyhedronExtension * 110));
 		if (zoom > 100) {
 			zoom = 100;
 		}
@@ -66,17 +66,18 @@ public class JmolSymmetryScriptGeneratorDn extends JmolSymmetryScriptGeneratorPo
 	@Override
 	public int getOrientationCount() {
 		// for Dn point groups the last view is redundant due to symmetry.
-		return getPolyhedron().getViewCount()-1;
+		return getPolyhedron().getViewCount() - 1;
 	}
 
 	/**
 	 * Returns the name of a specific orientation
+	 * 
 	 * @param index orientation index
 	 * @return name of orientation
 	 */
 	@Override
 	public String getOrientationName(int index) {
-		if (index == 0 && getAxisTransformation().getRotationGroup().getPointGroup().equals("D2")) {
+		if (index == 0 && "D2".equals(getAxisTransformation().getRotationGroup().getPointGroup())) {
 			return "Front C2 axis";
 		} else {
 			return getPolyhedron().getViewName(index);

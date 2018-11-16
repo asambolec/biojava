@@ -33,12 +33,14 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  *
  * @author Mark Chapman
  * @author Paolo Pavan
- * @param <C> each element of the {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of the {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public interface MutableAlignedSequence<S extends Sequence<C>, C extends Compound> extends AlignedSequence<S, C> {
 
 	/**
-	 * Sets the position of the {@link AlignedSequence} to the given {@link Location} (start, gaps, end).
+	 * Sets the position of the {@link AlignedSequence} to the given
+	 * {@link Location} (start, gaps, end).
 	 *
 	 * @param location new location for this sequence
 	 * @throws IllegalArgumentException if location is invalid
@@ -49,8 +51,9 @@ public interface MutableAlignedSequence<S extends Sequence<C>, C extends Compoun
 	 * Slides a part of the {@link AlignedSequence}.
 	 *
 	 * @param location portion of sequence moved in alignment coordinates
-	 * @param shift amount the alignment index changes for each contained element
-	 * @throws IllegalArgumentException if location is invalid or the shift causes a collision with stationary elements
+	 * @param shift    amount the alignment index changes for each contained element
+	 * @throws IllegalArgumentException if location is invalid or the shift causes a
+	 *                                  collision with stationary elements
 	 */
 	void shiftAtAlignmentLocation(Location location, int shift);
 
@@ -58,8 +61,9 @@ public interface MutableAlignedSequence<S extends Sequence<C>, C extends Compoun
 	 * Slides a part of the {@link AlignedSequence}.
 	 *
 	 * @param location portion of sequence moved in sequence coordinates
-	 * @param shift amount the alignment index changes for each contained element
-	 * @throws IllegalArgumentException if location is invalid or the shift causes a collision with stationary elements
+	 * @param shift    amount the alignment index changes for each contained element
+	 * @throws IllegalArgumentException if location is invalid or the shift causes a
+	 *                                  collision with stationary elements
 	 */
 	void shiftAtSequenceLocation(Location location, int shift);
 

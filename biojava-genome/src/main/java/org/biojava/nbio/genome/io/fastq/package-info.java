@@ -24,6 +24,7 @@
  *
  * <p>
  * To read from an Illumina variant FASTQ sequence file:
+ * 
  * <pre>
  * FastqReader reader = new IlluminaFastqReader();
  * for (Fastq fastq : reader.read(new File("illumina.fastq"))
@@ -33,24 +34,25 @@
  * </pre>
  *
  * To write to a Sanger variant FASTQ sequence file:
+ * 
  * <pre>
  * Collection&lt;Fastq&gt; fastq = ...;
  * SangerFastqWriter writer = new SangerFastqWriter();
  * writer.write(new File("sanger.fastq"), fastq);
  * </pre>
  *
- * For further documentation on the FASTQ sequence format,
- * its variants, and how they are handled in O|B|F projects,
- * see:
+ * For further documentation on the FASTQ sequence format, its variants, and how
+ * they are handled in O|B|F projects, see:
  *
  * <p>
  * 
- * <a href="http://dx.doi.org/10.1093/nar/gkp1137">The Sanger FASTQ file format for sequences
- * with quality scores, and the Solexa/Illumina FASTQ variants</a>
+ * <a href="http://dx.doi.org/10.1093/nar/gkp1137">The Sanger FASTQ file format
+ * for sequences with quality scores, and the Solexa/Illumina FASTQ variants</a>
  * <p>
- * Peter J. A. Cock (Biopython), Christopher J. Fields (BioPerl), Naohisa Goto (BioRuby),
- * Michael L. Heuer (BioJava) and Peter M. Rice (EMBOSS).<br>
- * Nucleic Acids Research, <a href="http://dx.doi.org/10.1093/nar/gkp1137">doi:10.1093/nar/gkp1137</a>
+ * Peter J. A. Cock (Biopython), Christopher J. Fields (BioPerl), Naohisa Goto
+ * (BioRuby), Michael L. Heuer (BioJava) and Peter M. Rice (EMBOSS).<br>
+ * Nucleic Acids Research,
+ * <a href="http://dx.doi.org/10.1093/nar/gkp1137">doi:10.1093/nar/gkp1137</a>
  *
  * <p>
  * Moved from org.biojava.nbio.sequencing (biojava-sequencing module) in 5.0.0

@@ -32,7 +32,8 @@ import javax.vecmath.Matrix4d;
 import javax.vecmath.Vector3d;
 
 /**
- * A class to contain the BoundingBoxes of all polymeric molecules in a full unit cell.
+ * A class to contain the BoundingBoxes of all polymeric molecules in a full
+ * unit cell.
  *
  * @author Jose Duarte
  *
@@ -41,14 +42,14 @@ public class UnitCellBoundingBox {
 
 	/**
 	 * An array with dimensions numOperatorsSg x numPolyChainsAu to contain all
-	 * bounding boxes of all chains of all AUs in unit cell
-	 * e.g. chainBbs[0] would be the bounding boxes for all chains in the original AU
+	 * bounding boxes of all chains of all AUs in unit cell e.g. chainBbs[0] would
+	 * be the bounding boxes for all chains in the original AU
 	 */
 	private BoundingBox[][] chainBbs;
 
 	/**
-	 * An array with dimensions numOperatorsSg to contain all bounding boxes of
-	 * all AUs in unit cell
+	 * An array with dimensions numOperatorsSg to contain all bounding boxes of all
+	 * AUs in unit cell
 	 */
 	private BoundingBox[] auBbs;
 
@@ -65,7 +66,7 @@ public class UnitCellBoundingBox {
 	public void setBbs(Structure structure, Matrix4d[] ops, boolean includeHetAtoms) {
 
 		setBb(structure, includeHetAtoms, 0);
-		for (int i=1;i<ops.length;i++) {
+		for (int i = 1; i < ops.length; i++) {
 			Structure sym = structure.clone();
 			Calc.transform(sym, ops[i]);
 			setBb(sym, includeHetAtoms, i);
@@ -85,8 +86,9 @@ public class UnitCellBoundingBox {
 	}
 
 	/**
-	 * Get the chain BoundingBox for the given cell index (cellIdx=0 would be original AU)
-	 * and chain index
+	 * Get the chain BoundingBox for the given cell index (cellIdx=0 would be
+	 * original AU) and chain index
+	 * 
 	 * @param cellIdx
 	 * @param chainIdx
 	 * @return
@@ -96,8 +98,10 @@ public class UnitCellBoundingBox {
 	}
 
 	/**
-	 * Get the AU BoundingBox for the given cell index (cellIdx=0 would be original AU)
-	 * The AU BoundingBox is the BoundingBox that bounds all chains belonging to the AU
+	 * Get the AU BoundingBox for the given cell index (cellIdx=0 would be original
+	 * AU) The AU BoundingBox is the BoundingBox that bounds all chains belonging to
+	 * the AU
+	 * 
 	 * @param cellIdx
 	 * @return
 	 */
@@ -108,14 +112,15 @@ public class UnitCellBoundingBox {
 	/**
 	 * Returns a new BoundingBoxes object containing the same bounds as this
 	 * BoundingBoxes object translated by the given translation
+	 * 
 	 * @param translation
 	 * @return
 	 */
 	public UnitCellBoundingBox getTranslatedBbs(Vector3d translation) {
 		UnitCellBoundingBox translatedBbs = new UnitCellBoundingBox(numOperatorsSg, numPolyChainsAu);
 
-		for (int i=0; i<numOperatorsSg; i++) {
-			for (int j = 0;j<numPolyChainsAu; j++) {
+		for (int i = 0; i < numOperatorsSg; i++) {
+			for (int j = 0; j < numPolyChainsAu; j++) {
 				translatedBbs.chainBbs[i][j] = new BoundingBox(this.chainBbs[i][j]);
 				translatedBbs.chainBbs[i][j].translate(translation);
 			}

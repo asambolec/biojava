@@ -22,7 +22,6 @@
  */
 package org.biojava.nbio.structure.align.gui;
 
-
 import org.biojava.nbio.structure.Atom;
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.StructureException;
@@ -34,10 +33,10 @@ import org.biojava.nbio.structure.align.model.AFPChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/** A class that obtains two structures via DAS and aligns them
- *  This is done in a separate thread.
- *  It is possible to register Event listeners to get notification of when the download has finished.
+/**
+ * A class that obtains two structures via DAS and aligns them This is done in a
+ * separate thread. It is possible to register Event listeners to get
+ * notification of when the download has finished.
  *
  * @author Andreas Prlic
  * @since 1.7
@@ -60,16 +59,17 @@ public class AlignmentCalc implements AlignmentCalculationRunnable {
 
 	AlignmentGui parent;
 
-	/** requests an alignment of pdb1 vs pdb 2.
-	 * Chain 1 and chain2 are optional.
-	 * If they are empty strings, they are ignored
+	/**
+	 * requests an alignment of pdb1 vs pdb 2. Chain 1 and chain2 are optional. If
+	 * they are empty strings, they are ignored
+	 * 
 	 * @param parent the alignment gui frame that interacts with this class
-	 * @param s1 structure 1
-	 * @param s2 structure 2
+	 * @param s1     structure 1
+	 * @param s2     structure 2
 	 */
-	public AlignmentCalc(AlignmentGui parent, Structure s1, Structure s2 , String name1, String name2) {
+	public AlignmentCalc(AlignmentGui parent, Structure s1, Structure s2, String name1, String name2) {
 
-		this.parent= parent;
+		this.parent = parent;
 
 		structure1 = s1;
 		structure2 = s2;
@@ -85,48 +85,45 @@ public class AlignmentCalc implements AlignmentCalculationRunnable {
 		// both structure have been downloaded, now calculate the alignment ...
 
 		StructureAlignment algorithm = parent.getStructureAlignment();
-		//StructurePairAligner aligner = new StructurePairAligner();
-		//aligner.setDebug(true);
+		// StructurePairAligner aligner = new StructurePairAligner();
+		// aligner.setDebug(true);
 		try {
 
 			Atom[] ca1 = StructureTools.getRepresentativeAtomArray(structure1);
 			Atom[] ca2 = StructureTools.getRepresentativeAtomArray(structure2);
 
-			//System.out.println("ca1 size:" + ca1.length + " ca2 size: " + ca2.length);
+			// System.out.println("ca1 size:" + ca1.length + " ca2 size: " + ca2.length);
 			AFPChain afpChain = algorithm.align(ca1, ca2);
 
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
-			StructureAlignmentJmol jmol =   StructureAlignmentDisplay.display(afpChain, ca1, ca2);
+			StructureAlignmentJmol jmol = StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
 			String title = jmol.getTitle();
 			ConfigStrucAligParams params = algorithm.getParameters();
-			if ( params != null)
+			if (params != null) {
 				title += " " + algorithm.getParameters().toString();
+			}
 			jmol.setTitle(title);
 
-			DisplayAFP.showAlignmentPanel(afpChain,ca1,ca2,jmol);
+			DisplayAFP.showAlignmentPanel(afpChain, ca1, ca2, jmol);
 
-			System.out.println(afpChain.toCE(ca1,ca2));
+			logger.info(afpChain.toCE(ca1, ca2));
 
-		} catch (StructureException e){
-			e.printStackTrace();
+		} catch (StructureException e) {
+			logger.error(e.getMessage(), e);
 			logger.warn(e.getMessage());
 		}
 
-
-
-		//logger.info("done!");
+		// logger.info("done!");
 
 		parent.notifyCalcFinished();
 
 	}
 
-
-
-
-	/** stops what is currently happening and does not continue
+	/**
+	 * stops what is currently happening and does not continue
 	 *
 	 *
 	 */
@@ -140,7 +137,7 @@ public class AlignmentCalc implements AlignmentCalculationRunnable {
 
 		parent.notifyCalcFinished();
 
-		parent=null;
+		parent = null;
 		// cleanup...
 
 		structure1 = null;
@@ -148,7 +145,8 @@ public class AlignmentCalc implements AlignmentCalculationRunnable {
 
 	}
 
-	/** does not do anything here...
+	/**
+	 * does not do anything here...
 	 *
 	 */
 	@Override
@@ -157,10 +155,4 @@ public class AlignmentCalc implements AlignmentCalculationRunnable {
 		//
 	}
 
-
-
 }
-
-
-
-

@@ -26,49 +26,43 @@ package org.biojava.nbio.core.sequence.template;
 import java.util.List;
 
 /**
- * Defines a minimal data structure for reading and writing a sequence alignment.  The full {@code Profile} data
- * structure in the alignment module provides additional functionality.
+ * Defines a minimal data structure for reading and writing a sequence
+ * alignment. The full {@code Profile} data structure in the alignment module
+ * provides additional functionality.
  *
  * @author Mark Chapman
  * @param <S> each element of the alignment profile is of type S
- * @param <C> each element of an {@link Sequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link Sequence} is a {@link Compound} of type
+ *        C
  */
 public interface LightweightProfile<S extends Sequence<C>, C extends Compound> {
-
-	/**
-	 * List of output formats.
-	 */
-	enum StringFormat {
-		ALN,
-		CLUSTALW,
-		FASTA,
-		GCG,
-		MSF,
-		PDBWEB
-	}
 
 	/**
 	 * Returns {@link Sequence} at given index.
 	 *
 	 * @param listIndex index of sequence in profile
 	 * @return desired sequence
-	 * @throws IndexOutOfBoundsException if listIndex < 1 or listIndex > number of sequences
+	 * @throws IndexOutOfBoundsException if listIndex < 1 or listIndex > number of
+	 *                                   sequences
 	 */
 	S getAlignedSequence(int listIndex);
 
 	/**
-	 * Returns a {@link List} containing the individual {@link Sequence}s of this alignment.
+	 * Returns a {@link List} containing the individual {@link Sequence}s of this
+	 * alignment.
 	 *
 	 * @return list of aligned sequences
 	 */
 	List<S> getAlignedSequences();
 
 	/**
-	 * Returns the {@link Compound} elements of the original {@link Sequence}s at the given column.
+	 * Returns the {@link Compound} elements of the original {@link Sequence}s at
+	 * the given column.
 	 *
 	 * @param alignmentIndex column index within an alignment
 	 * @return the sequence elements
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	List<C> getCompoundsAt(int alignmentIndex);
 
@@ -87,16 +81,18 @@ public interface LightweightProfile<S extends Sequence<C>, C extends Compound> {
 	int getLength();
 
 	/**
-	 * Returns the number of rows in this profile.  If any {@link Sequence}s are circular and overlap within the
-	 * alignment, the returned size will be greater than the number of sequences, otherwise the numbers will be equal.
+	 * Returns the number of rows in this profile. If any {@link Sequence}s are
+	 * circular and overlap within the alignment, the returned size will be greater
+	 * than the number of sequences, otherwise the numbers will be equal.
 	 *
 	 * @return number of rows
 	 */
 	int getSize();
 
 	/**
-	 * Returns a simple view of the alignment profile.  This shows each sequence on a separate line (or multiple lines,
-	 * if circular) and nothing more.  This should result in {@link #getSize()} lines with {@link #getLength()}
+	 * Returns a simple view of the alignment profile. This shows each sequence on a
+	 * separate line (or multiple lines, if circular) and nothing more. This should
+	 * result in {@link #getSize()} lines with {@link #getLength()}
 	 * {@link Compound}s per line.
 	 *
 	 * @return a simple view of the alignment profile
@@ -105,8 +101,9 @@ public interface LightweightProfile<S extends Sequence<C>, C extends Compound> {
 	String toString();
 
 	/**
-	 * Returns a formatted view of the alignment profile.  This shows the start and end indices of the profile for each
-	 * group of lines of the given width.  Each line may also be labeled.
+	 * Returns a formatted view of the alignment profile. This shows the start and
+	 * end indices of the profile for each group of lines of the given width. Each
+	 * line may also be labeled.
 	 *
 	 * @param width limit on the line length
 	 * @return a formatted view of the alignment profile
@@ -114,11 +111,19 @@ public interface LightweightProfile<S extends Sequence<C>, C extends Compound> {
 	String toString(int width);
 
 	/**
-	 * Returns a formatted view of the alignment profile.  Details depend on the format given.
+	 * Returns a formatted view of the alignment profile. Details depend on the
+	 * format given.
 	 *
 	 * @param format output format
 	 * @return a formatted view of the alignment profile
 	 */
 	String toString(StringFormat format);
+
+	/**
+	 * List of output formats.
+	 */
+	enum StringFormat {
+		ALN, CLUSTALW, FASTA, GCG, MSF, PDBWEB
+	}
 
 }

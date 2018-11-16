@@ -30,10 +30,10 @@ import java.util.List;
 
 import javax.vecmath.Point3d;
 
-
 /**
- * Implementation of an Atom of a PDB file.
- * currently the coordinates of an atom are represented by a double[3] array.
+ * Implementation of an Atom of a PDB file. currently the coordinates of an atom
+ * are represented by a double[3] array.
+ * 
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
@@ -43,79 +43,88 @@ public class AtomImpl implements Atom {
 	private static final long serialVersionUID = -2258364127420562883L;
 
 	/**
-	 * The inital capacity of the bonds list.
-	 * Most atoms have a maximum of 3 heavy atom neighbors.
+	 * The inital capacity of the bonds list. Most atoms have a maximum of 3 heavy
+	 * atom neighbors.
 	 */
 	public static final int BONDS_INITIAL_CAPACITY = 3;
 
 	private String name;
-	private Element element;	
+	private Element element;
 	private Point3d coords;
 	private int pdbserial;
 	private short charge;
 
-	private float occupancy ;
+	private float occupancy;
 	private float tempfactor;
 
-	private char altLoc ;
+	private char altLoc;
 	private Group parent;
 
 	private List<Bond> bonds;
 
-	public AtomImpl () {
-		name       = null;
-		element    = Element.R;
-		coords	   = new Point3d();
-		occupancy  = 0.0f;
+	public AtomImpl() {
+		name = null;
+		element = Element.R;
+		coords = new Point3d();
+		occupancy = 0.0f;
 		tempfactor = 0.0f;
-		altLoc 	   = 0;
-		parent     = null;
-		bonds      = null; // let's save some memory and let's not initialise this until it's needed - JD 2016-03-02
-		charge     = 0;
+		altLoc = 0;
+		parent = null;
+		bonds = null; // let's save some memory and let's not initialise this until it's needed - JD
+						// 2016-03-02
+		charge = 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void   setName(String s) { name = s ;}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getName()         { return name ;}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setPDBserial(int i) { pdbserial = i    ; }
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int  getPDBserial()      { return pdbserial ; }
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void     setCoords( double[] c ) { 
-		coords = new Point3d(c); 
+	public void setName(String s) {
+		name = s;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double[] getCoords() { 
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setPDBserial(int i) {
+		pdbserial = i;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getPDBserial() {
+		return pdbserial;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setCoords(double[] c) {
+		coords = new Point3d(c);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double[] getCoords() {
 		double[] c = new double[3];
 		coords.get(c);
-		return c;		
+		return c;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -126,80 +135,94 @@ public class AtomImpl implements Atom {
 
 	@Override
 	public void setX(double x) {
-		coords.x = x ;
+		coords.x = x;
 	}
-	
+
 	@Override
 	public void setY(double y) {
-		coords.y = y ;
+		coords.y = y;
 	}
-	
+
 	@Override
 	public void setZ(double z) {
-		coords.z = z ;
+		coords.z = z;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getX() { return coords.x; }
+	public double getX() {
+		return coords.x;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getY() { return coords.y; }
+	public double getY() {
+		return coords.y;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double getZ() { return coords.z; }
+	public double getZ() {
+		return coords.z;
+	}
 
 	/**
 	 * Set alternate Location.
+	 * 
 	 * @see #getAltLoc
 	 */
 	@Override
 	public void setAltLoc(Character c) {
-		// after changing altLoc from Character to char, we do this to keep the interface the same as it used to be - JD 2016-01-27
-		if (c==null)
+		// after changing altLoc from Character to char, we do this to keep the
+		// interface the same as it used to be - JD 2016-01-27
+		if (c == null) {
 			altLoc = 0;
-		else
-			altLoc = c ;
+		} else {
+			altLoc = c;
+		}
 	}
 
 	/**
 	 * Get alternate Location.
+	 * 
 	 * @return a Character object representing the alt loc value
 	 * @see #setAltLoc
 	 */
 	@Override
 	public Character getAltLoc() {
-		// after changing altLoc from Character to char, we do this to keep the interface the same as it used to be - JD 2016-01-27
-		if (altLoc==0 ) return null;
-		return altLoc ;
+		// after changing altLoc from Character to char, we do this to keep the
+		// interface the same as it used to be - JD 2016-01-27
+		if (altLoc == 0) {
+			return null;
+		}
+		return altLoc;
 	}
 
 	@Override
 	public String toString() {
-		return name + " " + element + " " + pdbserial + " " + coords.x + " " + coords.y + " " + coords.z;
+		return new StringBuilder().append(name).append(" ").append(element).append(" ").append(pdbserial).append(" ")
+				.append(coords.x).append(" ").append(coords.y).append(" ").append(coords.z).toString();
 	}
 
 	@Override
-	public void   setOccupancy(float occu){
-		occupancy = occu ;
+	public void setOccupancy(float occu) {
+		occupancy = occu;
 	}
 
 	@Override
-	public float getOccupancy(){
+	public float getOccupancy() {
 		return occupancy;
 	}
 
 	@Override
-	public void   setTempFactor(float temp) {
-		tempfactor = temp ;
+	public void setTempFactor(float temp) {
+		tempfactor = temp;
 	}
 
 	@Override
@@ -207,15 +230,18 @@ public class AtomImpl implements Atom {
 		return tempfactor;
 	}
 
-	/** returns and identical copy of this  object .
-	 * @return  and identical copy of this  object
+	/**
+	 * returns and identical copy of this object .
+	 * 
+	 * @return and identical copy of this object
 	 */
 	@Override
 	public Object clone() {
 		AtomImpl n = new AtomImpl();
 		n.setOccupancy(getOccupancy());
 		n.setTempFactor(getTempFactor());
-		n.altLoc = altLoc; // since char is a primitive we can do this (to avoid going through getter/setter that check for nulls)
+		n.altLoc = altLoc; // since char is a primitive we can do this (to avoid going through
+							// getter/setter that check for nulls)
 		n.setCharge(getCharge());
 		double[] coords = getCoords();
 		n.setX(coords[0]);
@@ -225,16 +251,17 @@ public class AtomImpl implements Atom {
 		n.setName(getName());
 		n.setElement(getElement());
 		// NOTE bonds can't be cloned here, they would need to be cloned at the
-		//      chain or group level (depending if they are intra or inter group bonds) -- JD 2016-03-02
+		// chain or group level (depending if they are intra or inter group bonds) -- JD
+		// 2016-03-02
 
-		return n ;
+		return n;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setGroup(Group parent){
+	public void setGroup(Group parent) {
 		this.parent = parent;
 	}
 
@@ -242,7 +269,7 @@ public class AtomImpl implements Atom {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Group getGroup(){
+	public Group getGroup() {
 		return parent;
 	}
 
@@ -271,7 +298,7 @@ public class AtomImpl implements Atom {
 
 	@Override
 	public void toPDB(StringBuffer buf) {
-		FileConvert.toPDB(this,buf);
+		FileConvert.toPDB(this, buf);
 
 	}
 
@@ -287,15 +314,12 @@ public class AtomImpl implements Atom {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasBond(Atom other){
-		if ( bonds == null)
+	public boolean hasBond(Atom other) {
+		if (bonds == null) {
 			return false;
-
-		for (Bond b : bonds){
-			if ( b.getAtomA().equals(other) || b.getAtomB().equals(other))
-				return true;
 		}
-		return false;
+
+		return bonds.stream().anyMatch(b -> b.getAtomA().equals(other) || b.getAtomB().equals(other));
 	}
 
 	/**
@@ -308,8 +332,8 @@ public class AtomImpl implements Atom {
 
 	@Override
 	public void addBond(Bond bond) {
-		if (bonds==null) {
-			bonds = new ArrayList<Bond>(BONDS_INITIAL_CAPACITY);
+		if (bonds == null) {
+			bonds = new ArrayList<>(BONDS_INITIAL_CAPACITY);
 		}
 		bonds.add(bond);
 	}

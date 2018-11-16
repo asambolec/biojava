@@ -30,13 +30,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name = "Domain", namespace ="http://www.biojava.org")
+@XmlRootElement(name = "Domain", namespace = "http://www.biojava.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 
-/** represents a Domain
+/**
+ * represents a Domain
+ * 
  * @since 3.0.2
  */
-public class Domain implements Comparable<Domain>, Serializable{
+public class Domain implements Comparable<Domain>, Serializable {
 
 	/**
 	 *
@@ -48,9 +50,9 @@ public class Domain implements Comparable<Domain>, Serializable{
 	int nseg;
 	double score;
 
-	List<Segment>segments = new ArrayList<Segment>();
+	List<Segment> segments = new ArrayList<>();
 
-	public Domain(){
+	public Domain() {
 
 	}
 
@@ -58,19 +60,14 @@ public class Domain implements Comparable<Domain>, Serializable{
 		return id;
 	}
 
-
-
 	public void setId(String id) {
 		this.id = id;
 	}
 
-
-
 	@Override
 	public String toString() {
-		return "Domain [size=" + size + ", nseg=" + nseg + ", score=" + score
-
-				+ "]";
+		return new StringBuilder().append("Domain [size=").append(size).append(", nseg=").append(nseg)
+				.append(", score=").append(score).append("]").toString();
 	}
 
 	public List<Segment> getSegments() {
@@ -78,9 +75,9 @@ public class Domain implements Comparable<Domain>, Serializable{
 		return segments;
 	}
 
-	public Segment getSegmentAtPos(int pos){
+	public Segment getSegmentAtPos(int pos) {
 		int size = segments.size();
-		while ( pos >= size){
+		while (pos >= size) {
 			segments.add(new Segment());
 			size++;
 
@@ -88,13 +85,14 @@ public class Domain implements Comparable<Domain>, Serializable{
 		return segments.get(pos);
 	}
 
-
 	@Override
 	public int compareTo(Domain other) {
-		if ( this.getId() == null)
+		if (this.getId() == null) {
 			return 1;
-		if ( other.getId() == null)
+		}
+		if (other.getId() == null) {
 			return -1;
+		}
 		return this.getId().compareTo(other.getId());
 	}
 
@@ -126,8 +124,4 @@ public class Domain implements Comparable<Domain>, Serializable{
 		this.segments = segments;
 	}
 
-
-
 }
-
-

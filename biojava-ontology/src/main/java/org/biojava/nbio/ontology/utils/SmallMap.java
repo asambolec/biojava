@@ -24,13 +24,13 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Lightweight implementation of Map which uses little memory to store a
- * small number of mappings, at the expense of scalability.  Not recommended
- * for more than 20-30 mappings.
+ * Lightweight implementation of Map which uses little memory to store a small
+ * number of mappings, at the expense of scalability. Not recommended for more
+ * than 20-30 mappings.
  *
  * <p>
- * This implementation has the useful property that the iteration order is
- * the same as the order in which mappings are added.
+ * This implementation has the useful property that the iteration order is the
+ * same as the order in which mappings are added.
  * </p>
  *
  * @author Thomas Down
@@ -42,17 +42,15 @@ public class SmallMap extends AbstractMap implements Serializable {
 	private int numMappings = 0;
 
 	public SmallMap() {
-		super();
 	}
 
 	public SmallMap(int size) {
-		super();
 		mappings = new Object[size * 2];
 	}
 
 	public SmallMap(Map m) {
 		this(m.size());
-		for (Iterator i = m.entrySet().iterator(); i.hasNext(); ) {
+		for (Iterator i = m.entrySet().iterator(); i.hasNext();) {
 			Map.Entry me = (Map.Entry) i.next();
 			put(me.getKey(), me.getValue());
 		}
@@ -84,8 +82,8 @@ public class SmallMap extends AbstractMap implements Serializable {
 
 		for (int i = 0; i < numMappings * 2; i += 2) {
 			if (keyHash == mappings[i].hashCode() && key.equals(mappings[i])) {
-				Object oldValue = mappings[i+1];
-				mappings[i+1] = value;
+				Object oldValue = mappings[i + 1];
+				mappings[i + 1] = value;
 				return oldValue;
 			}
 		}
@@ -135,7 +133,6 @@ public class SmallMap extends AbstractMap implements Serializable {
 		}
 		return false;
 	}
-
 
 	// num ranges from 1 to numMappings
 	private void removeMapping(int num) {
@@ -247,13 +244,13 @@ public class SmallMap extends AbstractMap implements Serializable {
 
 		@Override
 		public boolean equals(Object o) {
-			if (! (o instanceof Map.Entry)) {
+			if (!(o instanceof Map.Entry)) {
 				return false;
 			}
 
 			Map.Entry mo = (Map.Entry) o;
-			return ((getKey() == null ? mo.getKey() == null : getKey().equals(mo.getKey())) &&
-			(getValue() == null ? mo.getValue() == null : getValue().equals(mo.getValue())));
+			return ((getKey() == null ? mo.getKey() == null : getKey().equals(mo.getKey()))
+					&& (getValue() == null ? mo.getValue() == null : getValue().equals(mo.getValue())));
 		}
 
 		@Override

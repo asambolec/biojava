@@ -33,7 +33,7 @@ import java.io.StringWriter;
 
 public class StructureAtomXMLConverter {
 
-	public static String toXML(StructureAtom atom) throws IOException{
+	public static String toXML(StructureAtom atom) throws IOException {
 
 		StringWriter out = new StringWriter();
 
@@ -43,34 +43,36 @@ public class StructureAtomXMLConverter {
 		return out.toString();
 	}
 
-	public static void toXML(StructureAtom atom, PrettyXMLWriter xml) throws IOException{
+	public static void toXML(StructureAtom atom, PrettyXMLWriter xml) throws IOException {
 		String name = atom.getAtomName();
 		xml.openTag("structureAtom");
 		xml.attribute("name", name);
 		StructureGroup group = atom.getGroup();
-		StructureGroupXMLConverter.toXML(group,xml);
+		StructureGroupXMLConverter.toXML(group, xml);
 		xml.closeTag("structureAtom");
 	}
 
-	public static StructureAtom fromXML(Node structureAtomElement){
+	public static StructureAtom fromXML(Node structureAtomElement) {
 
 		String name = structureAtomElement.getNodeName();
-		if ( ! name.equals("structureAtom"))
-			throw new RuntimeException("Node is not a structureAtom, but " +name);
+		if (!"structureAtom".equals(name)) {
+			throw new RuntimeException("Node is not a structureAtom, but " + name);
+		}
 
-		String atomName = getAttribute( structureAtomElement,"name");
+		String atomName = getAttribute(structureAtomElement, "name");
 		StructureGroup group = null;
 
 		NodeList valList = structureAtomElement.getChildNodes();
-		int numChildren  = valList.getLength();
+		int numChildren = valList.getLength();
 
-		for ( int e =0; e< numChildren ; e++){
-			Node  nodes = valList.item(e);
+		for (int e = 0; e < numChildren; e++) {
+			Node nodes = valList.item(e);
 
-			if(!nodes.hasAttributes()) continue;
+			if (!nodes.hasAttributes()) {
+				continue;
+			}
 
-
-			if ( nodes.getNodeName().equals("structureGroup")) {
+			if ("structureGroup".equals(nodes.getNodeName())) {
 				group = StructureGroupXMLConverter.fromXML(nodes);
 			}
 		}
@@ -78,18 +80,21 @@ public class StructureAtomXMLConverter {
 		return atom;
 	}
 
-	private static String getAttribute(Node node, String attr){
-		if( ! node.hasAttributes())
+	private static String getAttribute(Node node, String attr) {
+		if (!node.hasAttributes()) {
 			return null;
+		}
 
 		NamedNodeMap atts = node.getAttributes();
 
-		if ( atts == null)
+		if (atts == null) {
 			return null;
+		}
 
 		Node att = atts.getNamedItem(attr);
-		if ( att == null)
+		if (att == null) {
 			return null;
+		}
 
 		String value = att.getTextContent();
 

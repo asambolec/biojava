@@ -43,22 +43,22 @@ import java.awt.event.WindowEvent;
 import java.text.MessageFormat;
 import java.util.List;
 
-
-/** a frame showing the alternative alignments, which are the result of a structure superimposition
+/**
+ * a frame showing the alternative alignments, which are the result of a
+ * structure superimposition
  *
  * @author Andreas Prlic
  * @since 1.7
  * @version %I% %G%
  */
-public class AlternativeAlignmentFrame
-extends JFrame{
+public class AlternativeAlignmentFrame extends JFrame {
 
-	private static final long serialVersionUID=0l;
-
+	private static final long serialVersionUID = 0l;
 
 	private static final Logger logger = LoggerFactory.getLogger(AlternativeAlignmentFrame.class);
 
-	private static String[] columnNames = new String[]{"#","eqr","score", "rms", "gaps","cluster", "show distance matrix","show alignment"};
+	private static String[] columnNames = new String[] { "#", "eqr", "score", "rms", "gaps", "cluster",
+			"show distance matrix", "show alignment" };
 
 	AlternativeAlignment[] aligs;
 	JPanel panel;
@@ -68,25 +68,23 @@ extends JFrame{
 	StructurePairAligner structurePairAligner;
 
 	public AlternativeAlignmentFrame(Structure s1, Structure s2) {
-		super();
 		panel = new JPanel();
-		panel.setPreferredSize(new Dimension(800,400));
+		panel.setPreferredSize(new Dimension(800, 400));
 		this.getContentPane().add(panel);
 
-
-		structure1  = s1;
-		structure2  = s2;
+		structure1 = s1;
+		structure2 = s2;
 		String pdb1 = s1.getPDBCode();
 		String pdb2 = s2.getPDBCode();
 
 		String t = "Alternative Alignments";
-		Object[] args = {pdb1,pdb2};
+		Object[] args = { pdb1, pdb2 };
 
-		String title =  MessageFormat.format(t,args);
+		String title = MessageFormat.format(t, args);
 		this.setTitle(title);
 	}
 
-	public void setStructurePairAligner(StructurePairAligner aligner){
+	public void setStructurePairAligner(StructurePairAligner aligner) {
 		this.structurePairAligner = aligner;
 	}
 
@@ -94,13 +92,12 @@ extends JFrame{
 		this.aligs = aligs;
 		panel.removeAll();
 
-		//Box vBox = Box.createVerticalBox();
-		//panel.add(vBox);
+		// Box vBox = Box.createVerticalBox();
+		// panel.add(vBox);
 
 		Object[][] data = getDataFromAligs(aligs);
 		JTableDataButtonModel model = new JTableDataButtonModel(data, columnNames);
 		JTable table = new JTable(model);
-
 
 		TableCellRenderer defaultRenderer = table.getDefaultRenderer(JButton.class);
 
@@ -111,68 +108,63 @@ extends JFrame{
 		table.addMouseListener(new JTableMouseButtonListener(table));
 
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setPreferredSize(new Dimension(800,400));
-		//vBox.add(e);
+		scrollPane.setPreferredSize(new Dimension(800, 400));
+		// vBox.add(e);
 		panel.add(scrollPane);
-
 
 	}
 
-	private Object[][] getDataFromAligs(AlternativeAlignment[] aligs){
-
+	private Object[][] getDataFromAligs(AlternativeAlignment[] aligs) {
 
 		Object[][] data = new Object[aligs.length][columnNames.length];
 
-		for ( int i=0;i< aligs.length;i++){
+		for (int i = 0; i < aligs.length; i++) {
 			AlternativeAlignment alig = aligs[i];
 
-			data[i][0] = new Integer(i+1);
-			data[i][1] = new Integer(alig.getEqr());
-			data[i][2] = new Double(alig.getScore());
-			data[i][3] = new Double(alig.getRmsd());
-			data[i][4] = new Integer(alig.getGaps());
-			data[i][5] = new Integer(alig.getCluster());
+			data[i][0] = Integer.valueOf(i + 1);
+			data[i][1] = Integer.valueOf(alig.getEqr());
+			data[i][2] = Double.valueOf(alig.getScore());
+			data[i][3] = Double.valueOf(alig.getRmsd());
+			data[i][4] = Integer.valueOf(alig.getGaps());
+			data[i][5] = Integer.valueOf(alig.getCluster());
 			JButton maxb = new JButton("Distance Matrix");
-			maxb.addMouseListener(new MatrixMouseListener(this,i));
+			maxb.addMouseListener(new MatrixMouseListener(this, i));
 
 			data[i][6] = maxb;
 
-
-			//Action action1 = new MyButtonAction(t,this,i);
+			// Action action1 = new MyButtonAction(t,this,i);
 			JButton but = new JButton("Show in Jmol");
-			but.addMouseListener(new MyButtonMouseListener(this,i));
+			but.addMouseListener(new MyButtonMouseListener(this, i));
 			data[i][7] = but;
-
 
 		}
 		return data;
 	}
 
-	public void showDistanceMatrix(int position){
-		if ( position > aligs.length){
+	public void showDistanceMatrix(int position) {
+		if (position > aligs.length) {
 			return;
 		}
 		AlternativeAlignment alig = aligs[position];
-		logger.info("display distance matrix for alternative alignment " + (position +1));
+		logger.info("display distance matrix for alternative alignment " + (position + 1));
 
 		ScaleableMatrixPanel smp = new ScaleableMatrixPanel();
 		JFrame frame = new JFrame();
-		frame.setTitle("Alt. Alig [" + position+"] - Distance Matrix & path");
+		frame.setTitle(new StringBuilder().append("Alt. Alig [").append(position).append("] - Distance Matrix & path")
+				.toString());
 
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e){
+			public void windowClosing(WindowEvent e) {
 				JFrame f = (JFrame) e.getSource();
 				f.setVisible(false);
 				f.dispose();
 			}
 
-
-
 		});
 
 		smp.setMatrix(alig.getDistanceMatrix());
-		smp.setAlternativeAligs(new AlternativeAlignment[]{alig});
+		smp.setAlternativeAligs(new AlternativeAlignment[] { alig });
 
 		frame.getContentPane().add(smp);
 
@@ -181,34 +173,32 @@ extends JFrame{
 
 	}
 
-	public void showAlternative(int position){
-		if ( position > aligs.length){
+	public void showAlternative(int position) {
+		if (position > aligs.length) {
 			return;
 		}
 		AlternativeAlignment alig = aligs[position];
-		logger.info("display alternative alignment " + (position +1));
+		logger.info("display alternative alignment " + (position + 1));
 
 		// create the structure alignment object and tell the listeners ...
 
-
-//		Matrix m1 = Matrix.identity(3,3);
+		// Matrix m1 = Matrix.identity(3,3);
 		Matrix m2 = alig.getRotationMatrix();
 
 		String pdb1 = structure1.getPDBCode();
 		String pdb2 = structure2.getPDBCode();
 
-
 		Atom shift1 = new AtomImpl();
-		shift1.setCoords(new double[]{0,0,1});
+		shift1.setCoords(new double[] { 0, 0, 1 });
 		Atom shift2 = alig.getShift();
 
 		Structure s3 = structure2.clone();
 
-		Calc.rotate(s3,m2);
-		Calc.shift(s3,shift2);
+		Calc.rotate(s3, m2);
+		Calc.shift(s3, shift2);
 
 		BiojavaJmol jmol = new BiojavaJmol();
-		jmol.setTitle(pdb1 + " vs. " + pdb2);
+		jmol.setTitle(new StringBuilder().append(pdb1).append(" vs. ").append(pdb2).toString());
 
 		Structure n = new StructureImpl();
 
@@ -225,10 +215,11 @@ extends JFrame{
 		jmol.evalString(cmds[0]);
 		jmol.evalString(cmds[1]);
 
-		JFrame frame = new JFrame("Sequences for AlternativeAlignment ["+position+"]");
+		JFrame frame = new JFrame(new StringBuilder().append("Sequences for AlternativeAlignment [").append(position)
+				.append("]").toString());
 
 		SequenceDisplay seqdisp;
-		seqdisp =  new SequenceDisplay(structurePairAligner);
+		seqdisp = new SequenceDisplay(structurePairAligner);
 		seqdisp.setStructure1(structure1);
 		seqdisp.setStructure2(structure2);
 
@@ -238,21 +229,19 @@ extends JFrame{
 
 		frame.pack();
 		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e){
+			public void windowClosing(WindowEvent e) {
 				JFrame f = (JFrame) e.getSource();
 				f.setVisible(false);
 				f.dispose();
 			}
 
-
-
 		});
 
 		seqdisp.updateDisplay();
 
-		JmolAlignedPositionListener jmolBridge = new JmolAlignedPositionListener(jmol,structurePairAligner);
+		JmolAlignedPositionListener jmolBridge = new JmolAlignedPositionListener(jmol, structurePairAligner);
 		jmolBridge.setStructure1(structure1);
 		jmolBridge.setStructure2(s3);
 
@@ -260,27 +249,25 @@ extends JFrame{
 
 	}
 
-
-
-	private String[] createRasmolScripts(AlternativeAlignment alig){
+	private String[] createRasmolScripts(AlternativeAlignment alig) {
 		String[] scripts = new String[2];
 
 		Color col1 = Color.red;
 		Color col2 = Color.blue;
 
-		Color chaincol1 = new Color(col1.getRed()/2,col1.getGreen()/2,col1.getBlue()/2);
-		Color chaincol2 = new Color(col2.getRed()/2,col2.getGreen()/2,col2.getBlue()/2);
-
-
+		Color chaincol1 = new Color(col1.getRed() / 2, col1.getGreen() / 2, col1.getBlue() / 2);
+		Color chaincol2 = new Color(col2.getRed() / 2, col2.getGreen() / 2, col2.getBlue() / 2);
 
 		String cmd1 = "";
 		String cmd2 = "";
 
-		cmd1 += "select */"+1+"; ";
-		cmd1 += " color [" +chaincol1.getRed()+","+chaincol1.getGreen() +","+chaincol1.getBlue() +"];";
+		cmd1 += new StringBuilder().append("select */").append(1).append("; ").toString();
+		cmd1 += new StringBuilder().append(" color [").append(chaincol1.getRed()).append(",")
+				.append(chaincol1.getGreen()).append(",").append(chaincol1.getBlue()).append("];").toString();
 
-		cmd2 += "select */"+2+"; ";
-		cmd2 += " color [" +chaincol2.getRed()+","+chaincol2.getGreen() +","+chaincol2.getBlue() +"];";
+		cmd2 += new StringBuilder().append("select */").append(2).append("; ").toString();
+		cmd2 += new StringBuilder().append(" color [").append(chaincol2.getRed()).append(",")
+				.append(chaincol2.getGreen()).append(",").append(chaincol2.getBlue()).append("];").toString();
 
 		cmd1 += "select ";
 		cmd2 += "select ";
@@ -288,53 +275,49 @@ extends JFrame{
 		String[] pdb1s = alig.getPDBresnum1();
 		String[] pdb2s = alig.getPDBresnum2();
 
-
-		for ( int i =0 ; i< pdb1s.length;i++){
+		for (int i = 0; i < pdb1s.length; i++) {
 
 			String p1 = pdb1s[i];
 			String p2 = pdb2s[i];
 
-			cmd1 += p1 +"/1";
-			cmd2 += p2 +"/2";
+			cmd1 += p1 + "/1";
+			cmd2 += p2 + "/2";
 
-			if ( i <= pdb1s.length -2){
+			if (i <= pdb1s.length - 2) {
 				cmd1 += ",";
 				cmd2 += ",";
 			}
 		}
 
-		cmd1 += "; color [" +col1.getRed()+","+col1.getGreen() +","+col1.getBlue() +"];";
+		cmd1 += new StringBuilder().append("; color [").append(col1.getRed()).append(",").append(col1.getGreen())
+				.append(",").append(col1.getBlue()).append("];").toString();
 		cmd1 += " backbone 0.6;";
 
-		cmd2 += "; color [" +col2.getRed()+","+col2.getGreen() +","+col2.getBlue() +"];";
+		cmd2 += new StringBuilder().append("; color [").append(col2.getRed()).append(",").append(col2.getGreen())
+				.append(",").append(col2.getBlue()).append("];").toString();
 		cmd2 += " backbone 0.6;";
 
-		//System.out.println(cmd1);
+		// System.out.println(cmd1);
 		scripts[0] = cmd1;
 		scripts[1] = cmd2;
 
 		return scripts;
 	}
 
-
-
-
 }
 
-class MyButtonMouseListener implements MouseListener{
+class MyButtonMouseListener implements MouseListener {
 	AlternativeAlignmentFrame parent;
 	int pos;
-	public MyButtonMouseListener(AlternativeAlignmentFrame parent, int position){
+
+	public MyButtonMouseListener(AlternativeAlignmentFrame parent, int position) {
 
 		this.parent = parent;
 		this.pos = position;
 	}
 
-
-
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-
 
 	}
 
@@ -361,19 +344,23 @@ class MyButtonMouseListener implements MouseListener{
 
 }
 
-class MatrixMouseListener implements MouseListener{
+class MatrixMouseListener implements MouseListener {
 	AlternativeAlignmentFrame parent;
 	int pos;
-	public MatrixMouseListener( AlternativeAlignmentFrame parent, int position){
+
+	public MatrixMouseListener(AlternativeAlignmentFrame parent, int position) {
 
 		this.parent = parent;
 		this.pos = position;
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {}
+	public void mouseClicked(MouseEvent arg0) {
+	}
+
 	@Override
-	public void mousePressed(MouseEvent arg0) {}
+	public void mousePressed(MouseEvent arg0) {
+	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
@@ -381,12 +368,12 @@ class MatrixMouseListener implements MouseListener{
 
 	}
 
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) { }
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {}
+	public void mouseExited(MouseEvent arg0) {
+	}
 
 }
-

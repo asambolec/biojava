@@ -20,37 +20,39 @@
  */
 package demo;
 
-
 import org.biojava.nbio.structure.Structure;
 import org.biojava.nbio.structure.align.util.AtomCache;
 import org.biojava.nbio.structure.io.FileParsingParameters;
 import org.biojava.nbio.structure.StructureIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/** Example of how to load PDB files using the AtomCache class.
+/**
+ * Example of how to load PDB files using the AtomCache class.
  *
  * @author Andreas Prlic
  *
  */
 public class DemoAtomCache {
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoAtomCache.class);
+
+	public static void main(String[] args) {
 		demoAtomCache();
 		demoStructureIO();
 
 	}
 
 	@SuppressWarnings("unused")
-	private static void demoStructureIO()  {
-
+	private static void demoStructureIO() {
 
 		try {
 			Structure s1 = StructureIO.getStructure("4hhb");
 
-			Structure bioAssembly = StructureIO.getBiologicalAssembly("1stp",1);
+			Structure bioAssembly = StructureIO.getBiologicalAssembly("1stp", 1);
 
 			// do something with them...
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 	}
@@ -65,23 +67,24 @@ public class DemoAtomCache {
 		params.setParseCAOnly(false);
 		params.setParseSecStruc(false);
 
-		String[] pdbIDs = new String[]{"4hhb", "1cdg","5pti","1gav", "WRONGID" };
+		String[] pdbIDs = new String[] { "4hhb", "1cdg", "5pti", "1gav", "WRONGID" };
 
-		for (String pdbID : pdbIDs){
+		for (String pdbID : pdbIDs) {
 
 			try {
 				Structure s = cache.getStructure(pdbID);
-				if ( s == null) {
-					System.out.println("could not find structure " + pdbID);
+				if (s == null) {
+					logger.info("could not find structure " + pdbID);
 					continue;
 				}
 				// do something with the structure
-				System.out.println(s);
+				logger.info(String.valueOf(s));
 
-			} catch (Exception e){
+			} catch (Exception e) {
 				// something crazy happened...
-				System.err.println("Can't load structure " + pdbID + " reason: " + e.getMessage());
-				//e.printStackTrace();
+				logger.error(new StringBuilder().append("Can't load structure ").append(pdbID).append(" reason: ")
+						.append(e.getMessage()).toString(), e);
+				// e.printStackTrace();
 			}
 		}
 

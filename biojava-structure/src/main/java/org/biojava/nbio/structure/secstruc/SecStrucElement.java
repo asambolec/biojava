@@ -33,10 +33,10 @@ import org.biojava.nbio.structure.ResidueRangeAndLength;
  * @since 4.1.1
  *
  */
-public class SecStrucElement implements Serializable  {
+public class SecStrucElement implements Serializable {
 
 	private static final long serialVersionUID = -8485685793171396131L;
-	
+
 	private SecStrucType type;
 	private ResidueRangeAndLength range;
 	private int index;
@@ -45,20 +45,15 @@ public class SecStrucElement implements Serializable  {
 	 * Create a new SSE object. The start and end residue numbers cannot be the
 	 * same.
 	 *
-	 * @param type
-	 *            object describing the type of SS
-	 * @param start
-	 *            first residue of the SSE
-	 * @param end
-	 *            final residue of the SSE
-	 * @param length
-	 *            number of residues included in the SSE
+	 * @param type    object describing the type of SS
+	 * @param start   first residue of the SSE
+	 * @param end     final residue of the SSE
+	 * @param length  number of residues included in the SSE
 	 * @param index
-	 * @param chainID
-	 *            the chain ID
+	 * @param chainID the chain ID
 	 */
-	public SecStrucElement(SecStrucType type, ResidueNumber start,
-			ResidueNumber end, int length, int index, String chainID) {
+	public SecStrucElement(SecStrucType type, ResidueNumber start, ResidueNumber end, int length, int index,
+			String chainID) {
 
 		this.type = type;
 		this.index = index;
@@ -75,8 +70,8 @@ public class SecStrucElement implements Serializable  {
 	}
 
 	/**
-	 * Returns the index of the SSE for its type. This is, the sequential
-	 * position of this SSE relative to the other SSE of the same type.
+	 * Returns the index of the SSE for its type. This is, the sequential position
+	 * of this SSE relative to the other SSE of the same type.
 	 *
 	 * @return
 	 */
@@ -100,7 +95,7 @@ public class SecStrucElement implements Serializable  {
 	 * @return
 	 */
 	public String getId() {
-		return type.toString() + index + "";
+		return new StringBuilder().append(type.toString()).append(index).append("").toString();
 	}
 
 	/**
@@ -114,7 +109,7 @@ public class SecStrucElement implements Serializable  {
 
 	@Override
 	public String toString() {
-		return getId() + ": " + range.toString();
+		return new StringBuilder().append(getId()).append(": ").append(range.toString()).toString();
 	}
 
 }

@@ -56,25 +56,26 @@ public class XMLHelper {
 		return childElement;
 	}
 
-	static public Document getNewDocument() throws ParserConfigurationException  {
+	static public Document getNewDocument() throws ParserConfigurationException {
 
-		//Create instance of DocumentBuilderFactory
+		// Create instance of DocumentBuilderFactory
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		//Get the DocumentBuilder
+		// Get the DocumentBuilder
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
-		//Create blank DOM Document
+		// Create blank DOM Document
 		Document doc = docBuilder.newDocument();
 		return doc;
 	}
 
-	static public Document loadXML(String fileName) throws SAXException, IOException, ParserConfigurationException  {
+	static public Document loadXML(String fileName) throws SAXException, IOException, ParserConfigurationException {
 		InputStream is = openFile(new File(fileName));
 		Document doc = inputStreamToDocument(new BufferedInputStream(is));
 		close(is);
 		return doc;
 	}
 
-	static public Document inputStreamToDocument(InputStream inputStream) throws SAXException, IOException, ParserConfigurationException  {
+	static public Document inputStreamToDocument(InputStream inputStream)
+			throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -89,27 +90,26 @@ public class XMLHelper {
 		// Use a Transformer for output
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		Transformer transformer = tFactory.newTransformer();
-		//    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		// transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
 		DOMSource source = new DOMSource(document);
 		StreamResult result = new StreamResult(outputStream);
 		transformer.transform(source, result);
 
-
 	}
 
-	static public void outputToStream(Element document, OutputStream outputStream) throws TransformerException  {
+	static public void outputToStream(Element document, OutputStream outputStream) throws TransformerException {
 		// Use a Transformer for output
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		Transformer transformer = tFactory.newTransformer();
-		//     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		// transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
 		DOMSource source = new DOMSource(document);
 		StreamResult result = new StreamResult(outputStream);
 		transformer.transform(source, result);
 
 	}
-	//static XPath xpath = XPathFactory.newInstance().newXPath();
+	// static XPath xpath = XPathFactory.newInstance().newXPath();
 
 	static public Element selectParentElement(Element element, String parentName) {
 		Element parentElement = (Element) element.getParentNode();
@@ -123,7 +123,7 @@ public class XMLHelper {
 	}
 
 	static public Element selectSingleElement(Element element, String xpathExpression) throws XPathExpressionException {
-		if (xpathExpression.indexOf("/") == -1) {
+		if (!xpathExpression.contains("/")) {
 			NodeList nodeList = element.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
@@ -131,12 +131,12 @@ public class XMLHelper {
 					return (Element) node;
 				}
 			}
-			//  NodeList nodes = element.getElementsByTagName(xpathExpression);
-			//  if (nodes.getLength() > 0) {
-			//      return (Element) nodes.item(0);
-			//  } else {
+			// NodeList nodes = element.getElementsByTagName(xpathExpression);
+			// if (nodes.getLength() > 0) {
+			// return (Element) nodes.item(0);
+			// } else {
 			return null;
-			//  }
+			// }
 		} else {
 			XPath xpath = XPathFactory.newInstance().newXPath();
 			Element node = (Element) xpath.evaluate(xpathExpression, element, XPathConstants.NODE);
@@ -144,12 +144,13 @@ public class XMLHelper {
 		}
 	}
 
-	static public ArrayList<Element> selectElements(Element element, String xpathExpression) throws XPathExpressionException {
-		ArrayList<Element> resultVector = new ArrayList<Element>();
+	static public ArrayList<Element> selectElements(Element element, String xpathExpression)
+			throws XPathExpressionException {
+		ArrayList<Element> resultVector = new ArrayList<>();
 		if (element == null) {
 			return resultVector;
 		}
-		if (xpathExpression.indexOf("/") == -1) {
+		if (!xpathExpression.contains("/")) {
 			NodeList nodeList = element.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
@@ -160,7 +161,6 @@ public class XMLHelper {
 		} else {
 			XPath xpath = XPathFactory.newInstance().newXPath();
 			NodeList nodes = (NodeList) xpath.evaluate(xpathExpression, element, XPathConstants.NODESET);
-
 
 			for (int i = 0; i < nodes.getLength(); i++) {
 				Node node = nodes.item(i);

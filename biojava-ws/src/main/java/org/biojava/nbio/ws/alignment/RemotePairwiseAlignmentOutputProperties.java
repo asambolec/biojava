@@ -25,15 +25,16 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * RemotePairwiseAlignmentOutputProperties: the simplest representation of an object capable of holding
- * output formatting informations to be fed to a RemotePairwiseAlignmentService-implemented object.
+ * RemotePairwiseAlignmentOutputProperties: the simplest representation of an
+ * object capable of holding output formatting informations to be fed to a
+ * RemotePairwiseAlignmentService-implemented object.
  *
  * @author Sylvain Foisy, Diploide BioIT
  * @since Biojava 3
  *
  *
  */
-public interface RemotePairwiseAlignmentOutputProperties extends Serializable{
+public interface RemotePairwiseAlignmentOutputProperties extends Serializable {
 	/**
 	 *
 	 */
@@ -48,14 +49,14 @@ public interface RemotePairwiseAlignmentOutputProperties extends Serializable{
 	 */
 	public String getOutputOption(String key) throws Exception;
 
-
 	/**
-	 * Method to set the value for a specific output parameter using a key to store in a map.
+	 * Method to set the value for a specific output parameter using a key to store
+	 * in a map.
 	 *
 	 * @param key :the key use to designate the value to be stored
 	 * @param val :the actual value matched to key
 	 */
-	public void setOutputOption(String key,String val);
+	public void setOutputOption(String key, String val);
 
 	/**
 	 * Method to get all keys to the information stored in this object.

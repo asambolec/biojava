@@ -42,8 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SymmetryCalc implements AlignmentCalculationRunnable {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SymmetryCalc.class);
+	private static final Logger logger = LoggerFactory.getLogger(SymmetryCalc.class);
 
 	boolean interrupted = false;
 

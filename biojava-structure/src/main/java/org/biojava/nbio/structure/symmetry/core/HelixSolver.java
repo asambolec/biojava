@@ -41,8 +41,7 @@ import java.util.Map.Entry;
  */
 public class HelixSolver {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(HelixSolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(HelixSolver.class);
 
 	private QuatSymmetrySubunits subunits = null;
 	private int fold = 1;
@@ -50,8 +49,7 @@ public class HelixSolver {
 	private QuatSymmetryParameters parameters = null;
 	boolean modified = true;
 
-	public HelixSolver(QuatSymmetrySubunits subunits, int fold,
-			QuatSymmetryParameters parameters) {
+	public HelixSolver(QuatSymmetrySubunits subunits, int fold, QuatSymmetryParameters parameters) {
 		this.subunits = subunits;
 		this.fold = fold;
 		this.parameters = parameters;
@@ -73,22 +71,21 @@ public class HelixSolver {
 		HelicalRepeatUnit unit = new HelicalRepeatUnit(subunits);
 		List<Point3d> repeatUnitCenters = unit.getRepeatUnitCenters();
 		List<Point3d[]> repeatUnits = unit.getRepeatUnits();
-		Set<List<Integer>> permutations = new HashSet<List<Integer>>();
+		Set<List<Integer>> permutations = new HashSet<>();
 
 		double minRise = parameters.getMinimumHelixRise() * fold; // for n-start
 																	// helix,
 																	// the rise
 																	// must be
 																	// steeper
-		Map<Integer[], Integer> interactionMap = unit
-				.getInteractingRepeatUnits();
+		Map<Integer[], Integer> interactionMap = unit.getInteractingRepeatUnits();
 
 		int maxLayerLineLength = 0;
 
 		for (Entry<Integer[], Integer> entry : interactionMap.entrySet()) {
 			Integer[] pair = entry.getKey();
 			logger.debug("HelixSolver: pair: " + Arrays.toString(pair));
-			
+
 			int contacts = entry.getValue();
 			Point3d[] h1 = CalcPoint.clonePoint3dArray(repeatUnits.get(pair[0]));
 			Point3d[] h2 = CalcPoint.clonePoint3dArray(repeatUnits.get(pair[1]));
@@ -98,14 +95,10 @@ public class HelixSolver {
 			Matrix4d transformation = SuperPositions.superposeAndTransform(h2, h1);
 
 			double rmsd = CalcPoint.rmsd(h1, h2);
-			double rise = getRise(transformation,
-					repeatUnitCenters.get(pair[0]),
-					repeatUnitCenters.get(pair[1]));
+			double rise = getRise(transformation, repeatUnitCenters.get(pair[0]), repeatUnitCenters.get(pair[1]));
 			double angle = getAngle(transformation);
 
-			logger.debug(
-					"Original rmsd: {}, Original rise {}, Original angle: {}",
-					rmsd, rise, Math.toDegrees(angle));
+			logger.debug("Original rmsd: {}, Original rise {}, Original angle: {}", rmsd, rise, Math.toDegrees(angle));
 
 			if (rmsd > parameters.getRmsdThreshold()) {
 				continue;
@@ -126,10 +119,9 @@ public class HelixSolver {
 			}
 			permutations.add(permutation);
 			logger.debug("Permutation: " + permutation);
-			
 
 			// keep track of which subunits are permuted
-			Set<Integer> permSet = new HashSet<Integer>();
+			Set<Integer> permSet = new HashSet<>();
 			int count = 0;
 			boolean valid = true;
 			for (int i = 0; i < permutation.size(); i++) {
@@ -164,8 +156,8 @@ public class HelixSolver {
 			}
 
 			// superpose all permuted subunits
-			List<Point3d> point1 = new ArrayList<Point3d>();
-			List<Point3d> point2 = new ArrayList<Point3d>();
+			List<Point3d> point1 = new ArrayList<>();
+			List<Point3d> point2 = new ArrayList<>();
 			List<Point3d> centers = subunits.getOriginalCenters();
 			for (int j = 0; j < permutation.size(); j++) {
 				if (permutation.get(j) != -1) {
@@ -185,11 +177,11 @@ public class HelixSolver {
 				transformation = SuperPositions.superposeAndTransform(h2, h1);
 
 				subunitRmsd = CalcPoint.rmsd(h1, h2);
-				rise = getRise(transformation, repeatUnitCenters.get(pair[0]),
-						repeatUnitCenters.get(pair[1]));
+				rise = getRise(transformation, repeatUnitCenters.get(pair[0]), repeatUnitCenters.get(pair[1]));
 				angle = getAngle(transformation);
 
-				logger.debug("Subunit rmsd: {}, Subunit rise: {}, Subunit angle: {}", subunitRmsd, rise, Math.toDegrees(angle));
+				logger.debug("Subunit rmsd: {}, Subunit rise: {}, Subunit angle: {}", subunitRmsd, rise,
+						Math.toDegrees(angle));
 
 				if (subunitRmsd > parameters.getRmsdThreshold()) {
 					continue;
@@ -199,8 +191,7 @@ public class HelixSolver {
 					continue;
 				}
 
-				if (subunitRmsd > parameters.getHelixRmsdToRiseRatio()
-						* Math.abs(rise)) {
+				if (subunitRmsd > parameters.getHelixRmsdToRiseRatio() * Math.abs(rise)) {
 					continue;
 				}
 			}
@@ -234,8 +225,7 @@ public class HelixSolver {
 
 			double traceRmsd = CalcPoint.rmsd(h1, h2);
 
-			rise = getRise(transformation, repeatUnitCenters.get(pair[0]),
-					repeatUnitCenters.get(pair[1]));
+			rise = getRise(transformation, repeatUnitCenters.get(pair[0]), repeatUnitCenters.get(pair[1]));
 			angle = getAngle(transformation);
 
 			logger.debug("Trace rmsd: " + traceRmsd);
@@ -256,8 +246,7 @@ public class HelixSolver {
 				continue;
 			}
 
-			if (traceRmsd > parameters.getHelixRmsdToRiseRatio()
-					* Math.abs(rise)) {
+			if (traceRmsd > parameters.getHelixRmsdToRiseRatio() * Math.abs(rise)) {
 				continue;
 			}
 
@@ -273,15 +262,14 @@ public class HelixSolver {
 			// Here we make sure it's 1.
 			transformation.setElement(3, 3, 1.0);
 			transformation.invert();
-			QuatSymmetryScores scores = QuatSuperpositionScorer.calcScores(
-					subunits, transformation, permutation);
+			QuatSymmetryScores scores = QuatSuperpositionScorer.calcScores(subunits, transformation, permutation);
 			scores.setRmsdCenters(subunitRmsd);
 			helix.setScores(scores);
 			helix.setFold(fold);
 			helix.setContacts(contacts);
 			helix.setRepeatUnits(unit.getRepeatUnitIndices());
 			logger.debug("Layerlines: " + helix.getLayerLines());
-			
+
 			for (List<Integer> line : helix.getLayerLines()) {
 				maxLayerLineLength = Math.max(maxLayerLineLength, line.size());
 			}
@@ -328,7 +316,8 @@ public class HelixSolver {
 				}
 			}
 		}
-		System.out.println("SelfLimiting helix: " + overlap1 + ", " + overlap2);
+		logger.info(new StringBuilder().append("SelfLimiting helix: ").append(overlap1).append(", ").append(overlap2)
+				.toString());
 	}
 
 	private boolean preCheck() {
@@ -341,21 +330,20 @@ public class HelixSolver {
 	}
 
 	/**
-	 * Returns a permutation of subunit indices for the given helix
-	 * transformation. An index of -1 is used to indicate subunits that do not
-	 * superpose onto any other subunit.
+	 * Returns a permutation of subunit indices for the given helix transformation.
+	 * An index of -1 is used to indicate subunits that do not superpose onto any
+	 * other subunit.
 	 * 
 	 * @param transformation
 	 * @return
 	 */
 	private List<Integer> getPermutation(Matrix4d transformation) {
-		double rmsdThresholdSq = Math
-				.pow(this.parameters.getRmsdThreshold(), 2);
+		double rmsdThresholdSq = Math.pow(this.parameters.getRmsdThreshold(), 2);
 
 		List<Point3d> centers = subunits.getOriginalCenters();
 		List<Integer> seqClusterId = subunits.getClusterIds();
 
-		List<Integer> permutations = new ArrayList<Integer>(centers.size());
+		List<Integer> permutations = new ArrayList<>(centers.size());
 		double[] dSqs = new double[centers.size()];
 		boolean[] used = new boolean[centers.size()];
 		Arrays.fill(used, false);
@@ -366,7 +354,7 @@ public class HelixSolver {
 			int permutation = -1;
 			double minDistSq = Double.MAX_VALUE;
 			for (int j = 0; j < centers.size(); j++) {
-				if (seqClusterId.get(i) == seqClusterId.get(j)) {
+				if (seqClusterId.get(i).equals(seqClusterId.get(j))) {
 					if (!used[j]) {
 						double dSq = tCenter.distanceSquared(centers.get(j));
 						if (dSq < minDistSq && dSq <= rmsdThresholdSq) {
@@ -396,16 +384,12 @@ public class HelixSolver {
 	 * Returns the rise of a helix given the subunit centers of two adjacent
 	 * subunits and the helix transformation
 	 * 
-	 * @param transformation
-	 *            helix transformation
-	 * @param p1
-	 *            center of one subunit
-	 * @param p2
-	 *            center of an adjacent subunit
+	 * @param transformation helix transformation
+	 * @param p1             center of one subunit
+	 * @param p2             center of an adjacent subunit
 	 * @return
 	 */
-	private static double getRise(Matrix4d transformation, Point3d p1,
-			Point3d p2) {
+	private static double getRise(Matrix4d transformation, Point3d p1, Point3d p2) {
 		AxisAngle4d axis = getAxisAngle(transformation);
 		Vector3d h = new Vector3d(axis.x, axis.y, axis.z);
 		Vector3d p = new Vector3d();
@@ -416,8 +400,7 @@ public class HelixSolver {
 	/**
 	 * Returns the pitch angle of the helix
 	 * 
-	 * @param transformation
-	 *            helix transformation
+	 * @param transformation helix transformation
 	 * @return
 	 */
 	private static double getAngle(Matrix4d transformation) {
@@ -427,8 +410,7 @@ public class HelixSolver {
 	/**
 	 * Returns the AxisAngle of the helix transformation
 	 * 
-	 * @param transformation
-	 *            helix transformation
+	 * @param transformation helix transformation
 	 * @return
 	 */
 	private static AxisAngle4d getAxisAngle(Matrix4d transformation) {

@@ -50,28 +50,20 @@ public class ForesterWrapper {
 
 	/**
 	 * Convert a BioJava {@link MultipleSequenceAlignment} to a forester
-	 * {@link Msa}. The easiest way to convert them is writting the msa as a
-	 * FASTA file and then parsing it with the forester {@link FastaParser}.
+	 * {@link Msa}. The easiest way to convert them is writting the msa as a FASTA
+	 * file and then parsing it with the forester {@link FastaParser}.
 	 *
-	 * @param msa
-	 *            BioJava MultipleSequenceAlignment
+	 * @param msa BioJava MultipleSequenceAlignment
 	 * @return forester Msa object
-	 * @throws IOException
-	 *             if the conversion was not possible
+	 * @throws IOException if the conversion was not possible
 	 */
-	public static <C extends Sequence<D>, D extends Compound> Msa convert(
-			MultipleSequenceAlignment<C, D> msa) throws IOException {
+	public static <C extends Sequence<D>, D extends Compound> Msa convert(MultipleSequenceAlignment<C, D> msa)
+			throws IOException {
 
 		// Convert the biojava MSA to a FASTA String
 		OutputStream os = new ByteArrayOutputStream();
-		FastaWriter<C, D> fastaW = new FastaWriter<C, D>(os,
-				msa.getAlignedSequences(),
-				new FastaHeaderFormatInterface<C, D>() {
-					@Override
-					public String getHeader(C sequence) {
-						return sequence.getAccession().toString();
-					};
-				});
+		FastaWriter<C, D> fastaW = new FastaWriter<>(os, msa.getAlignedSequences(),
+				(C sequence) -> sequence.getAccession().toString());
 
 		fastaW.process();
 		String fastaMSA = os.toString();
@@ -81,18 +73,15 @@ public class ForesterWrapper {
 	}
 
 	/**
-	 * Convert a Phylogenetic tree to its Newick representation, so that it can
-	 * be exported to an external application.
+	 * Convert a Phylogenetic tree to its Newick representation, so that it can be
+	 * exported to an external application.
 	 *
-	 * @param phylo
-	 *            Phylogeny phylogenetic tree
-	 * @param writeDistances
-	 *            write the branch lengths if true
+	 * @param phylo          Phylogeny phylogenetic tree
+	 * @param writeDistances write the branch lengths if true
 	 * @return
 	 * @throws IOException
 	 */
-	public static String getNewickString(Phylogeny phylo,
-			boolean writeDistances) throws IOException {
+	public static String getNewickString(Phylogeny phylo, boolean writeDistances) throws IOException {
 
 		PhylogenyWriter w = new PhylogenyWriter();
 		StringBuffer newickString = w.toNewHampshire(phylo, writeDistances);
@@ -102,16 +91,13 @@ public class ForesterWrapper {
 	/**
 	 * Helper function to clone a forester symmetrical DistanceMatrix.
 	 *
-	 * @param distM
-	 *            forester symmetrical DistanceMatrix
+	 * @param distM forester symmetrical DistanceMatrix
 	 * @return identical copy of the forester symmetrical DistanceMatrix
 	 */
-	public static BasicSymmetricalDistanceMatrix cloneDM(
-			BasicSymmetricalDistanceMatrix distM) {
+	public static BasicSymmetricalDistanceMatrix cloneDM(BasicSymmetricalDistanceMatrix distM) {
 
 		int n = distM.getSize();
-		BasicSymmetricalDistanceMatrix cloneDM =
-				new BasicSymmetricalDistanceMatrix(n);
+		BasicSymmetricalDistanceMatrix cloneDM = new BasicSymmetricalDistanceMatrix(n);
 
 		for (int i = 0; i < n; i++) {
 			cloneDM.setIdentifier(i, distM.getIdentifier(i));

@@ -32,8 +32,6 @@ package org.biojava.nbio.ws.alignment.qblast;
  */
 public enum BlastOutputFormatEnum {
 
-	Text,
-	XML,
-	HTML
+	Text, XML, HTML
 
 }

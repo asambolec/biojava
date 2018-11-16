@@ -28,9 +28,8 @@ import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.util.AlignmentTools;
 
 /**
- * Calls Spencer's method for determining order.
- * This method uses the sequence alignment information
- * to guess the order of symmetry.
+ * Calls Spencer's method for determining order. This method uses the sequence
+ * alignment information to guess the order of symmetry.
  *
  * @author dmyersturnbull
  * @since 4.2.0
@@ -41,7 +40,8 @@ public class SequenceFunctionOrderDetector implements OrderDetector {
 	private int maxSymmetry = 8;
 	private float minimumMetricChange = 0.4f;
 
-	public SequenceFunctionOrderDetector() {}
+	public SequenceFunctionOrderDetector() {
+	}
 
 	public SequenceFunctionOrderDetector(int maxSymmetry, float minimumMetricChange) {
 		this.maxSymmetry = maxSymmetry;
@@ -49,15 +49,12 @@ public class SequenceFunctionOrderDetector implements OrderDetector {
 	}
 
 	@Override
-	public int calculateOrder(AFPChain afpChain, Atom[] ca)
-			throws RefinerFailedException {
+	public int calculateOrder(AFPChain afpChain, Atom[] ca) throws RefinerFailedException {
 		try {
-			Map<Integer,Integer> alignment =
-					AlignmentTools.alignmentAsMap(afpChain);
+			Map<Integer, Integer> alignment = AlignmentTools.alignmentAsMap(afpChain);
 
-			return AlignmentTools.getSymmetryOrder(alignment,
-					new AlignmentTools.IdentityMap<Integer>(),
-					maxSymmetry, minimumMetricChange);
+			return AlignmentTools.getSymmetryOrder(alignment, new AlignmentTools.IdentityMap<Integer>(), maxSymmetry,
+					minimumMetricChange);
 
 		} catch (StructureException e) {
 			throw new RefinerFailedException(e);
@@ -66,7 +63,7 @@ public class SequenceFunctionOrderDetector implements OrderDetector {
 
 	@Override
 	public String toString() {
-		return "SequenceFunctionOrderDetector [maxSymmetry=" + maxSymmetry
-				+ ", minimumMetricChange=" + minimumMetricChange + "]";
+		return new StringBuilder().append("SequenceFunctionOrderDetector [maxSymmetry=").append(maxSymmetry)
+				.append(", minimumMetricChange=").append(minimumMetricChange).append("]").toString();
 	}
 }

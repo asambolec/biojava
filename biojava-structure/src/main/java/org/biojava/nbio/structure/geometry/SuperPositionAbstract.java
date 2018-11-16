@@ -53,15 +53,14 @@ public abstract class SuperPositionAbstract implements SuperPosition {
 	 * @param moved
 	 */
 	protected void checkInput(Point3d[] fixed, Point3d[] moved) {
-		if (fixed.length != moved.length)
-			throw new IllegalArgumentException(
-					"Point arrays to superpose are of different lengths.");
+		if (fixed.length != moved.length) {
+			throw new IllegalArgumentException("Point arrays to superpose are of different lengths.");
+		}
 	}
 
 	/**
-	 * @param centered
-	 *            true if the point arrays are centered at the origin (faster),
-	 *            false otherwise
+	 * @param centered true if the point arrays are centered at the origin (faster),
+	 *                 false otherwise
 	 */
 	public void setCentered(boolean centered) {
 		this.centered = centered;

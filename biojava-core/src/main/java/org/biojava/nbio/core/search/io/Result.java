@@ -29,24 +29,23 @@ import java.util.NoSuchElementException;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * This class models a search result.
- * You will find one of this for every query sequence specified in the run.
+ * This class models a search result. You will find one of this for every query
+ * sequence specified in the run.
  *
- * Designed by Paolo Pavan.
- * You may want to find my contacts on Github and LinkedIn for code info
- * or discuss major changes.
+ * Designed by Paolo Pavan. You may want to find my contacts on Github and
+ * LinkedIn for code info or discuss major changes.
  * https://github.com/paolopavan
  *
  * @author Paolo Pavan
  */
 
-public abstract class Result implements Iterable<Hit>{
+public abstract class Result implements Iterable<Hit> {
 	private String program;
 	private String version;
 	private String reference;
 	private String dbFile;
 
-	private HashMap<String,String> programSpecificParameters;
+	private HashMap<String, String> programSpecificParameters;
 
 	private int iterationNumber;
 	private String queryID;
@@ -56,7 +55,9 @@ public abstract class Result implements Iterable<Hit>{
 	private List<Hit> hits;
 	private int hitCounter = -1;
 
-	public Result(String program, String version, String reference, String dbFile, HashMap<String, String> programSpecificParameters, int iterationNumber, String queryID, String queryDef, int queryLength, List<Hit> hits, Sequence querySequence) {
+	public Result(String program, String version, String reference, String dbFile,
+			HashMap<String, String> programSpecificParameters, int iterationNumber, String queryID, String queryDef,
+			int queryLength, List<Hit> hits, Sequence querySequence) {
 		this.program = program;
 		this.version = version;
 		this.reference = reference;
@@ -78,11 +79,12 @@ public abstract class Result implements Iterable<Hit>{
 		hash = 29 * hash + (this.hits != null ? this.hits.hashCode() : 0);
 		return hash;
 	}
+
 	/**
-	 * Experimental.
-	 * Wants to return an hashcode designed to allow conceptual comparisons of search results.
-	 * Wants to implement conceptual comparisons of search results.
-	 * Fields unrelated to search are deliberately not considered.
+	 * Experimental. Wants to return an hashcode designed to allow conceptual
+	 * comparisons of search results. Wants to implement conceptual comparisons of
+	 * search results. Fields unrelated to search are deliberately not considered.
+	 * 
 	 * @return
 	 */
 	@Override
@@ -149,10 +151,12 @@ public abstract class Result implements Iterable<Hit>{
 	public String getProgramSpecificParameter(String key) {
 		return programSpecificParameters.get(key);
 	}
+
 	/**
-	 * returns the reference to the original and whole sequence used to query the database.
-	 * Available only if the ResultFactory implements setQueryReferences and
-	 * it was used before the parsing with SearchIO
+	 * returns the reference to the original and whole sequence used to query the
+	 * database. Available only if the ResultFactory implements setQueryReferences
+	 * and it was used before the parsing with SearchIO
+	 * 
 	 * @return Sequence object
 	 */
 	public Sequence getQuerySequence() {
@@ -163,6 +167,7 @@ public abstract class Result implements Iterable<Hit>{
 	public Iterator<Hit> iterator() {
 		return new Iterator<Hit>() {
 			int currentResult = 0;
+
 			@Override
 			public boolean hasNext() {
 				return currentResult < hits.size();
@@ -170,10 +175,10 @@ public abstract class Result implements Iterable<Hit>{
 
 			@Override
 			public Hit next() {
-                if(!hasNext()){
-                    throw new NoSuchElementException();
-                }
-                return hits.get(currentResult++);
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				return hits.get(currentResult++);
 			}
 
 			@Override

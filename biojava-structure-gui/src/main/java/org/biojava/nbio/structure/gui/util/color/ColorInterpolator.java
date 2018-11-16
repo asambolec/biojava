@@ -30,8 +30,9 @@ import java.awt.*;
 public interface ColorInterpolator {
 	/**
 	 * Interpolates to a color between a and b
-	 * @param a First color
-	 * @param b Second color
+	 * 
+	 * @param a      First color
+	 * @param b      Second color
 	 * @param mixing Mixing coefficient; the fraction of a in the result.
 	 * @return The color between a and b
 	 * @throws IllegalArgumentException if mixing is not between 0 and 1

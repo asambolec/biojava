@@ -27,17 +27,15 @@ import java.util.NoSuchElementException;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * This class models a search Hit.
- * You will retrieve a list of this using iterator of a Result
- * Designed by Paolo Pavan.
- * You may want to find my contacts on Github and LinkedIn for code info
- * or discuss major changes.
+ * This class models a search Hit. You will retrieve a list of this using
+ * iterator of a Result Designed by Paolo Pavan. You may want to find my
+ * contacts on Github and LinkedIn for code info or discuss major changes.
  * https://github.com/paolopavan
  *
  * @author Paolo Pavan
  */
 
-public abstract class Hit implements Iterable<Hsp>{
+public abstract class Hit implements Iterable<Hsp> {
 	private final int hitNum;
 	private final String hitId;
 	private final String hitDef;
@@ -49,9 +47,8 @@ public abstract class Hit implements Iterable<Hsp>{
 	private final List<Hsp> hsps;
 	private Sequence hitSequence;
 
-
-
-	public Hit(int hitNum, String hitId, String hitDef, String hitAccession, int hitLen, List<Hsp> hsps, Sequence hitSequence) {
+	public Hit(int hitNum, String hitId, String hitDef, String hitAccession, int hitLen, List<Hsp> hsps,
+			Sequence hitSequence) {
 		this.hitNum = hitNum;
 		this.hitId = hitId;
 		this.hitDef = hitDef;
@@ -68,9 +65,11 @@ public abstract class Hit implements Iterable<Hsp>{
 		hash = 89 * hash + (this.hsps != null ? this.hsps.hashCode() : 0);
 		return hash;
 	}
-	 /**
-	 * Implements conceptual comparisons of search results.
-	 * Fields unrelated to search are deliberately not considered.
+
+	/**
+	 * Implements conceptual comparisons of search results. Fields unrelated to
+	 * search are deliberately not considered.
+	 * 
 	 * @return
 	 */
 	@Override
@@ -113,8 +112,9 @@ public abstract class Hit implements Iterable<Hsp>{
 
 	/**
 	 * returns the reference to the original and whole sequence hit in the database.
-	 * Available only if the ResultFactory implements setHitReferences and
-	 * it was used before the parsing with SearchIO
+	 * Available only if the ResultFactory implements setHitReferences and it was
+	 * used before the parsing with SearchIO
+	 * 
 	 * @return Sequence object
 	 */
 	public Sequence getHitSequence() {
@@ -125,6 +125,7 @@ public abstract class Hit implements Iterable<Hsp>{
 	public Iterator<Hsp> iterator() {
 		return new Iterator<Hsp>() {
 			int current = 0;
+
 			@Override
 			public boolean hasNext() {
 				return current < hsps.size();
@@ -132,10 +133,10 @@ public abstract class Hit implements Iterable<Hsp>{
 
 			@Override
 			public Hsp next() {
-                if(!hasNext()){
-                    throw new NoSuchElementException();
-                }
-                return hsps.get(current++);
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				return hsps.get(current++);
 			}
 
 			@Override

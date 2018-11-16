@@ -38,10 +38,8 @@ public class Comparison {
 	/**
 	 * this is a gapped PID calculation
 	 *
-	 * @param s1
-	 *            SequenceI
-	 * @param s2
-	 *            SequenceI
+	 * @param s1 SequenceI
+	 * @param s2 SequenceI
 	 * @return float
 	 */
 	public final static float PID(String seq1, String seq2) {
@@ -95,8 +93,7 @@ public class Comparison {
 	/**
 	 * Method that determines if a character means a gap in the alignment.
 	 *
-	 * @param c
-	 *            gap character is one of the symbols in {' ','-','.'}
+	 * @param c gap character is one of the symbols in {' ','-','.'}
 	 *
 	 * @return true if it is a gap, false otherwise
 	 */

@@ -27,10 +27,12 @@ import org.biojava.nbio.structure.contact.AtomContactSet;
 import org.biojava.nbio.structure.contact.GroupContactSet;
 
 import java.io.IOException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoContacts {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoContacts.class);
 
 	public static void main(String[] args) throws IOException, StructureException {
 
@@ -50,66 +52,56 @@ public class DemoContacts {
 
 		Chain chain = structure.getPolyChainByPDB("A");
 
-		String[] atoms = {"CA"};
+		String[] atoms = { "CA" };
 		AtomContactSet contacts = StructureTools.getAtomsInContact(chain, atoms, 8.0);
 
-		System.out.println("Contacting residues (on CA atoms)");
+		logger.info("Contacting residues (on CA atoms)");
 
-		for (AtomContact contact:contacts) {
+		for (AtomContact contact : contacts) {
 			Atom atom1 = contact.getPair().getFirst();
 			Atom atom2 = contact.getPair().getSecond();
 
-			System.out.printf(" %3s-%3s %3s-%3s : %5.2f\n",
-					atom1.getGroup().getResidueNumber(),
-					atom1.getGroup().getPDBName(),
-					atom2.getGroup().getResidueNumber(),
-					atom2.getGroup().getPDBName(),
+			logger.info(" %3s-%3s %3s-%3s : %5.2f\n", atom1.getGroup().getResidueNumber(),
+					atom1.getGroup().getPDBName(), atom2.getGroup().getResidueNumber(), atom2.getGroup().getPDBName(),
 					contact.getDistance());
 		}
 
-		System.out.println("Total number of atom contacts: "+contacts.size());
+		logger.info("Total number of atom contacts: " + contacts.size());
 
 		GroupContactSet groupContacts = new GroupContactSet(contacts);
-//		for (GroupContact groupContact:groupContacts) {
-//			Group g1 = groupContact.getPair().getFirst();
-//			Group g2 = groupContact.getPair().getSecond();
-//
-//			System.out.printf(" %3s-%3s %3s-%3s : %5.2f\n",
-//					g1.getResidueNumber(),
-//					g1.getPDBName(),
-//					g2.getResidueNumber(),
-//					g2.getPDBName(),
-//					groupContact.getMinDistance());
-//		}
-		System.out.println("Total number of residue contacts: "+groupContacts.size());
+		// for (GroupContact groupContact:groupContacts) {
+		// Group g1 = groupContact.getPair().getFirst();
+		// Group g2 = groupContact.getPair().getSecond();
+		//
+		// System.out.printf(" %3s-%3s %3s-%3s : %5.2f\n",
+		// g1.getResidueNumber(),
+		// g1.getPDBName(),
+		// g2.getResidueNumber(),
+		// g2.getPDBName(),
+		// groupContact.getMinDistance());
+		// }
+		logger.info("Total number of residue contacts: " + groupContacts.size());
 
+		contacts = StructureTools.getAtomsInContact(structure.getChainByIndex(0), structure.getChainByIndex(1), 5.5,
+				false);
 
-		contacts = StructureTools.getAtomsInContact(structure.getChainByIndex(0),structure.getChainByIndex(1),5.5, false);
+		logger.info("Contacting residues between 2 first chains (all non-H non-hetatoms)");
 
-		System.out.println("Contacting residues between 2 first chains (all non-H non-hetatoms)");
-
-		for (AtomContact contact:contacts) {
+		for (AtomContact contact : contacts) {
 			Atom atom1 = contact.getPair().getFirst();
 			Atom atom2 = contact.getPair().getSecond();
 
-			System.out.printf(" %3s:%1s-%3s-%3s || %3s:%1s-%3s-%3s : %5.2f\n",
-					atom1.getGroup().getResidueNumber(),
-					atom1.getGroup().getChainId(),
-					atom1.getGroup().getPDBName(),
-					atom1.getName(),
-					atom2.getGroup().getResidueNumber(),
-					atom2.getGroup().getChainId(),
-					atom2.getGroup().getPDBName(),
-					atom2.getName(),
-					contact.getDistance());
+			logger.info(" %3s:%1s-%3s-%3s || %3s:%1s-%3s-%3s : %5.2f\n", atom1.getGroup().getResidueNumber(),
+					atom1.getGroup().getChainId(), atom1.getGroup().getPDBName(), atom1.getName(),
+					atom2.getGroup().getResidueNumber(), atom2.getGroup().getChainId(), atom2.getGroup().getPDBName(),
+					atom2.getName(), contact.getDistance());
 		}
 
-		System.out.println("Total number of atom contacts: "+contacts.size());
+		logger.info("Total number of atom contacts: " + contacts.size());
 
 		groupContacts = new GroupContactSet(contacts);
-		System.out.println("Total number of residue contacts: "+groupContacts.size());
+		logger.info("Total number of residue contacts: " + groupContacts.size());
 
 	}
-
 
 }

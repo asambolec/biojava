@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
-/** 
- * Provides a cache for storing multiple small files in memory. Can be used to e.g cache gzip compressed PDB files 
- * for avoiding disk IO bottlenecks.
- * Note this is just a wrapper for the singleton cache.
+/**
+ * Provides a cache for storing multiple small files in memory. Can be used to
+ * e.g cache gzip compressed PDB files for avoiding disk IO bottlenecks. Note
+ * this is just a wrapper for the singleton cache.
  * 
  * @author Andreas Prlic.
  *
@@ -44,17 +44,16 @@ public class FlatFileCache {
 	/**
 	 * The cache singleton.
 	 */
-	private static SoftHashMap<String, byte[]> cache = new SoftHashMap<String, byte[]>(0);
-
+	private static SoftHashMap<String, byte[]> cache = new SoftHashMap<>(0);
 
 	// no public constructor;
-	private FlatFileCache(){
+	private FlatFileCache() {
 
 	}
 
-
-	public  static void addToCache(String key, File fileToCache){
-		//logger.debug("storing " + key + " on file cache (cache size: " + cache.size() + ")");
+	public static void addToCache(String key, File fileToCache) {
+		// logger.debug("storing " + key + " on file cache (cache size: " + cache.size()
+		// + ")");
 		try {
 			InputStream is = new FileInputStream(fileToCache);
 			// Get the size of the file
@@ -69,53 +68,53 @@ public class FlatFileCache {
 			}
 
 			// Create the byte array to hold the data
-			byte[] bytes = new byte[(int)length];
+			byte[] bytes = new byte[(int) length];
 
 			// Read in the bytes
 			int offset = 0;
 			int numRead = 0;
-			while (offset < bytes.length
-					&& (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+			while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
 				offset += numRead;
 			}
 
 			// Ensure all the bytes have been read in
 			if (offset < bytes.length) {
 				is.close();
-				throw new IOException("Could not completely read file "+fileToCache.getName());
+				throw new IOException("Could not completely read file " + fileToCache.getName());
 			}
 
 			// Close the input stream and return bytes
 			is.close();
 
-			cache.put(key,bytes);
+			cache.put(key, bytes);
 
-		} catch (Exception e){
+		} catch (Exception e) {
 			logger.error("Error adding to cache! " + e.getMessage(), e);
 		}
 	}
 
-	public  static InputStream getInputStream(String key){
-		//logger.debug("returning " + key + " from file cache (cache size: " + cache.size() + ")");
+	public static InputStream getInputStream(String key) {
+		// logger.debug("returning " + key + " from file cache (cache size: " +
+		// cache.size() + ")");
 		byte[] bytes = cache.get(key);
-		if ( bytes == null)
+		if (bytes == null) {
 			return null;
+		}
 
 		return new ByteArrayInputStream(bytes);
 
 	}
 
 	public static int size() {
-		if ( cache != null)
+		if (cache != null) {
 			return cache.size();
-		else
+		} else {
 			return -1;
+		}
 	}
 
-	public static void clear(){
-	   cache.clear();
+	public static void clear() {
+		cache.clear();
 	}
-
-	
 
 }

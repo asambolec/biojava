@@ -32,6 +32,8 @@ import org.biojava.nbio.structure.cluster.SubunitClustererParameters;
 import org.biojava.nbio.structure.symmetry.core.QuatSymmetryDetector;
 import org.biojava.nbio.structure.symmetry.core.QuatSymmetryParameters;
 import org.biojava.nbio.structure.symmetry.core.QuatSymmetryResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A demo on how to use the quaternary symmetry detection algorithms.
@@ -41,79 +43,80 @@ import org.biojava.nbio.structure.symmetry.core.QuatSymmetryResults;
  */
 public class DemoSymmetry {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoSymmetry.class);
+
 	public static void main(String[] args) throws Exception {
-		
-		System.out.println("Getting all bioassemblies");
+
+		logger.info("Getting all bioassemblies");
 		List<Structure> bioAssemblies = StructureIO.getBiologicalAssemblies("4hhb");
-		
-		for (Structure bioAssembly : bioAssemblies) {			
-			findQuatSym(bioAssembly);			
+
+		for (Structure bioAssembly : bioAssemblies) {
+			findQuatSym(bioAssembly);
 		}
-		
 
 	}
 
 	private static void findQuatSym(Structure bioAssembly) throws StructureException {
 
-		QuatSymmetryParameters symmParams = new QuatSymmetryParameters();		
-		
-		System.out.println("GLOBAL SYMMETRY, NO CLUSTERING");
+		QuatSymmetryParameters symmParams = new QuatSymmetryParameters();
+
+		logger.info("GLOBAL SYMMETRY, NO CLUSTERING");
 		SubunitClustererParameters clusterParams = new SubunitClustererParameters();
 		clusterParams.setSequenceIdentityThreshold(0.95);
 		clusterParams.setRMSDThreshold(0.0);
 		clusterParams.setClustererMethod(SubunitClustererMethod.SEQUENCE);
 
-		QuatSymmetryResults globalResults = QuatSymmetryDetector.calcGlobalSymmetry(bioAssembly, symmParams, clusterParams);	
-		
-		
-		
-		System.out.println(globalResults.getSymmetry() + (globalResults.isPseudoStoichiometric()?"(pseudo)":""));
-		
-		System.out.println("There are "+globalResults.getSubunitClusters().size()+" subunit clusters");
+		QuatSymmetryResults globalResults = QuatSymmetryDetector.calcGlobalSymmetry(bioAssembly, symmParams,
+				clusterParams);
+
+		logger.info(globalResults.getSymmetry() + (globalResults.isPseudoStoichiometric() ? "(pseudo)" : ""));
+
+		logger.info(new StringBuilder().append("There are ").append(globalResults.getSubunitClusters().size())
+				.append(" subunit clusters").toString());
 		int i = 1;
 		for (SubunitCluster suc : globalResults.getSubunitClusters()) {
-			//System.out.println(suc.getClustererMethod());
+			// System.out.println(suc.getClustererMethod());
 			MultipleAlignment ma = suc.getMultipleAlignment();
-						
-			System.out.printf("Cluster %d (clustered by %s), RMSD = %4.2f\n", i, suc.getClustererMethod(), ma.getScore("RMSD"));
-			
+
+			logger.info("Cluster %d (clustered by %s), RMSD = %4.2f\n", i, suc.getClustererMethod(),
+					ma.getScore("RMSD"));
+
 			i++;
 		}
 
-		System.out.println("\nGLOBAL SYMMETRY, WITH CLUSTERING (PSEUDO-SYMMETRY)");
+		logger.info("\nGLOBAL SYMMETRY, WITH CLUSTERING (PSEUDO-SYMMETRY)");
 		clusterParams = new SubunitClustererParameters();
-		// we can either set sequence identity to 40% or rmsd to 2, both would have the same effect of clustering the alpha/beta subunits together
+		// we can either set sequence identity to 40% or rmsd to 2, both would have the
+		// same effect of clustering the alpha/beta subunits together
 		clusterParams.setSequenceIdentityThreshold(0.4);
 		clusterParams.setClustererMethod(SubunitClustererMethod.STRUCTURE);
 		clusterParams.setRMSDThreshold(3.0);
 
 		globalResults = QuatSymmetryDetector.calcGlobalSymmetry(bioAssembly, symmParams, clusterParams);
 
+		logger.info(globalResults.getSymmetry() + (globalResults.isPseudoStoichiometric() ? "(pseudo)" : ""));
 
-
-		System.out.println(globalResults.getSymmetry() + (globalResults.isPseudoStoichiometric()?"(pseudo)":""));
-
-		System.out.println("There are "+globalResults.getSubunitClusters().size()+" subunit clusters");
+		logger.info(new StringBuilder().append("There are ").append(globalResults.getSubunitClusters().size())
+				.append(" subunit clusters").toString());
 		i = 1;
 		for (SubunitCluster suc : globalResults.getSubunitClusters()) {
-			//System.out.println(suc.getClustererMethod());
+			// System.out.println(suc.getClustererMethod());
 			MultipleAlignment ma = suc.getMultipleAlignment();
 
-			System.out.printf("Cluster %d (clustered by %s), RMSD = %4.2f\n", i, suc.getClustererMethod(), ma.getScore("RMSD"));
+			logger.info("Cluster %d (clustered by %s), RMSD = %4.2f\n", i, suc.getClustererMethod(),
+					ma.getScore("RMSD"));
 
 			i++;
 		}
 
+		logger.info("\n\nLOCAL SYMMETRIES");
+		List<QuatSymmetryResults> localResults = QuatSymmetryDetector.calcLocalSymmetries(bioAssembly, symmParams,
+				clusterParams);
 
-		System.out.println("\n\nLOCAL SYMMETRIES");
-		List<QuatSymmetryResults> localResults = QuatSymmetryDetector.calcLocalSymmetries(bioAssembly, symmParams, clusterParams);
+		logger.info("Number of local symmetries: " + localResults.size());
 
-		System.out.println("Number of local symmetries: "+localResults.size());
-
-		for (QuatSymmetryResults results : localResults) {
-			System.out.println(results.getSymmetry()+" "+results.getStoichiometry());
-		}
-
+		localResults.forEach(results -> logger.info(new StringBuilder().append(results.getSymmetry()).append(" ")
+				.append(results.getStoichiometry()).toString()));
 
 	}
 }

@@ -25,18 +25,19 @@
 // Generated on: 2013.12.17 at 03:04:15 PM PST
 //
 
-
 package org.biojava.nbio.structure.validation;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
 /**
- * <p>Java class for anonymous complex type.
+ * <p>
+ * Java class for anonymous complex type.
  *
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  *
  * <pre>
  * &lt;complexType>
@@ -71,9 +72,7 @@ public class Program {
 	/**
 	 * Gets the value of the name property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getName() {
@@ -83,9 +82,7 @@ public class Program {
 	/**
 	 * Sets the value of the name property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setName(String value) {
@@ -95,9 +92,7 @@ public class Program {
 	/**
 	 * Gets the value of the properties property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getProperties() {
@@ -107,9 +102,7 @@ public class Program {
 	/**
 	 * Sets the value of the properties property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setProperties(String value) {
@@ -119,9 +112,7 @@ public class Program {
 	/**
 	 * Gets the value of the version property.
 	 *
-	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * @return possible object is {@link String }
 	 *
 	 */
 	public String getVersion() {
@@ -131,9 +122,7 @@ public class Program {
 	/**
 	 * Sets the value of the version property.
 	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 * @param value allowed object is {@link String }
 	 *
 	 */
 	public void setVersion(String value) {

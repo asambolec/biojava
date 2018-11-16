@@ -36,13 +36,14 @@ import java.util.Map;
  * Sequence view over what is actually carried out in the {@link BitArrayWorker}
  * instances. These are the objects that carry out array storage as well as
  * indexing into those arrays. New bit encodings can be written by extending
- * this class and a worker class. There are a number of issues with this
- * type of storage engine:
+ * this class and a worker class. There are a number of issues with this type of
+ * storage engine:
  *
  * <ul>
- * <li>We can only support a finite number of {@link Compound}s; 2 bit allows no N compounds</li>
- * <li>For real savings you must read the sequence in using your own
- * Reader and a {@link BitArrayWorker} instance</li>
+ * <li>We can only support a finite number of {@link Compound}s; 2 bit allows no
+ * N compounds</li>
+ * <li>For real savings you must read the sequence in using your own Reader and
+ * a {@link BitArrayWorker} instance</li>
  * </ul>
  *
  * @author ayates
@@ -55,8 +56,7 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	private final BitArrayWorker<C> worker;
 
 	/**
-	 * Instance which allows you to supply a different @{BitArrayWorker}
-	 * object.
+	 * Instance which allows you to supply a different @{BitArrayWorker} object.
 	 */
 	public BitSequenceReader(BitArrayWorker<C> worker, AccessionID accession) {
 		this.accession = accession;
@@ -76,7 +76,8 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	 */
 	@Override
 	public void setContents(String sequence) throws CompoundNotFoundException {
-		throw new UnsupportedOperationException(getClass().getSimpleName() + " is an immutable data structure; cannot reset contents");
+		throw new UnsupportedOperationException(
+				getClass().getSimpleName() + " is an immutable data structure; cannot reset contents");
 	}
 
 	/**
@@ -86,7 +87,6 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	public int countCompounds(C... compounds) {
 		return SequenceMixin.countCompounds(this, compounds);
 	}
-
 
 	@Override
 	public AccessionID getAccession() {
@@ -118,8 +118,8 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	}
 
 	/**
-	 * Returns the first occurrence of the given compound in this store; performs
-	 * a linear search
+	 * Returns the first occurrence of the given compound in this store; performs a
+	 * linear search
 	 */
 
 	@Override
@@ -128,8 +128,8 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	}
 
 	/**
-	 * Returns the last occurrence of the given compound in this store; performs
-	 * a linear search
+	 * Returns the last occurrence of the given compound in this store; performs a
+	 * linear search
 	 */
 
 	@Override
@@ -190,20 +190,19 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 
 	@Override
 	public boolean equals(Object o) {
-		if(Equals.classEqual(this, o)) {
-			@SuppressWarnings("unchecked")
-			BitSequenceReader<C> that = (BitSequenceReader<C>)o;
-			return  Equals.equal(this.accession, that.accession) &&
-					Equals.equal(this.worker, that.worker);
+		if (!Equals.classEqual(this, o)) {
+			return false;
 		}
-		return false;
+		@SuppressWarnings("unchecked")
+		BitSequenceReader<C> that = (BitSequenceReader<C>) o;
+		return Equals.equal(this.accession, that.accession) && Equals.equal(this.worker, that.worker);
 	}
 
 	/**
-	 * The logic of working with a bit has been separated out into this class
-	 * to help developers create the bit data structures without having to
-	 * put the code into an intermediate format and to also use the format
-	 * without the need to copy this code.
+	 * The logic of working with a bit has been separated out into this class to
+	 * help developers create the bit data structures without having to put the code
+	 * into an intermediate format and to also use the format without the need to
+	 * copy this code.
 	 *
 	 * This class behaves just like a {@link Sequence} without the interface
 	 *
@@ -213,13 +212,12 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 	 */
 	public static abstract class BitArrayWorker<C extends Compound> {
 
+		public static final int BYTES_PER_INT = 32;
 		private final CompoundSet<C> compoundSet;
 		private final int length;
 		private final int[] sequence;
 		private transient List<C> indexToCompoundsLookup = null;
 		private transient Map<C, Integer> compoundsToIndexLookup = null;
-		public static final int BYTES_PER_INT = 32;
-
 		private volatile Integer hashcode = null;
 
 		public BitArrayWorker(Sequence<C> sequence) {
@@ -245,9 +243,9 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 		}
 
 		/**
-		 * This method should return the bit mask to be used to extract the
-		 * bytes you are interested in working with. See solid implementations
-		 * on how to create these
+		 * This method should return the bit mask to be used to extract the bytes you
+		 * are interested in working with. See solid implementations on how to create
+		 * these
 		 */
 		protected abstract byte bitMask();
 
@@ -257,21 +255,21 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 		protected abstract int compoundsPerDatatype();
 
 		/**
-		 * Should return the inverse information that {@link #generateCompoundsToIndex() }
-		 * returns i.e. if the Compound C returns 1 from compoundsToIndex then we
-		 * should find that compound here in position 1
+		 * Should return the inverse information that
+		 * {@link #generateCompoundsToIndex() } returns i.e. if the Compound C returns 1
+		 * from compoundsToIndex then we should find that compound here in position 1
 		 */
 		protected abstract List<C> generateIndexToCompounds();
 
 		/**
-		 * Returns what the value of a compound is in the backing bit storage i.e.
-		 * in 2bit storage the value 0 is encoded as 00 (in binary).
+		 * Returns what the value of a compound is in the backing bit storage i.e. in
+		 * 2bit storage the value 0 is encoded as 00 (in binary).
 		 */
 		protected abstract Map<C, Integer> generateCompoundsToIndex();
 
 		/**
-		 * Returns how many bits are used to represent a compound e.g. 2 if using
-		 * 2bit encoding.
+		 * Returns how many bits are used to represent a compound e.g. 2 if using 2bit
+		 * encoding.
 		 */
 		protected int bitsPerCompound() {
 			return BYTES_PER_INT / compoundsPerDatatype();
@@ -320,7 +318,7 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 			int shiftBy = shiftBy(position);
 			Integer integerValue = getCompoundsToIndexLookup().get(compound);
 
-			//If we got nothing then throw an error as it's wrong
+			// If we got nothing then throw an error as it's wrong
 			if (integerValue == null) {
 				processUnknownCompound(compound, position);
 			}
@@ -334,13 +332,14 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 		 * Returns the compound at the specified biological index
 		 */
 		public C getCompoundAt(int position) {
-			//Avoids asking for something which is not encoded by a bit-pair
+			// Avoids asking for something which is not encoded by a bit-pair
 			if (position > getLength()) {
 				throw new IllegalArgumentException(position + " is greater than length. Cannot access this position");
 			}
-			//Just stops us from using 0 indexing
+			// Just stops us from using 0 indexing
 			if (position < 1) {
-				throw new IllegalArgumentException(position + " is less than 1; you must use biological indexing (indexing from 1)");
+				throw new IllegalArgumentException(
+						position + " is less than 1; you must use biological indexing (indexing from 1)");
 			}
 
 			int arrayIndex = biologicalIndexToArrayIndex(position);
@@ -349,32 +348,35 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 			int shifted = currentByte >>> shiftBy;
 			int masked = shifted & bitMask();
 
-			//If we could encode 4 compounds then our max masked value is 3
+			// If we could encode 4 compounds then our max masked value is 3
 			if (masked > (compoundsPerDatatype() - 1)) {
-				throw new IllegalStateException("Got a masked value of " + masked + "; do not understand values greater than " + (compoundsPerDatatype() - 1));
+				throw new IllegalStateException(new StringBuilder().append("Got a masked value of ").append(masked)
+						.append("; do not understand values greater than ").append(compoundsPerDatatype() - 1)
+						.toString());
 			}
 			return getIndexToCompoundsLookup().get(masked);
 		}
 
 		/**
-		 * Since bit encoding only supports a finite number of bases
-		 * it is more than likely when processing sequence you will encounter a
-		 * compound which is not covered by the encoding e.g. N in a 2bit sequence.
-		 * You can override this to convert the unknown base into one you can
-		 * process or store locations of unknown bases for a level of post processing
-		 * in your subclass.
+		 * Since bit encoding only supports a finite number of bases it is more than
+		 * likely when processing sequence you will encounter a compound which is not
+		 * covered by the encoding e.g. N in a 2bit sequence. You can override this to
+		 * convert the unknown base into one you can process or store locations of
+		 * unknown bases for a level of post processing in your subclass.
 		 *
 		 * @param compound Compound process
 		 * @return Byte representation of the compound
 		 * @throws IllegalStateException Done whenever this method is invoked
 		 */
-		protected byte processUnknownCompound(C compound, int position) throws IllegalStateException {
-			throw new IllegalStateException("Do not know how to translate the compound " + compound + " to a " + bitsPerCompound() + "bit representation");
+		protected byte processUnknownCompound(C compound, int position) {
+			throw new IllegalStateException(
+					new StringBuilder().append("Do not know how to translate the compound ").append(compound)
+							.append(" to a ").append(bitsPerCompound()).append("bit representation").toString());
 		}
 
 		/**
-		 * Returns a list of compounds the index position of which is used
-		 * to translate from the byte representation into a compound.
+		 * Returns a list of compounds the index position of which is used to translate
+		 * from the byte representation into a compound.
 		 */
 		protected List<C> getIndexToCompoundsLookup() {
 			if (indexToCompoundsLookup == null) {
@@ -445,7 +447,7 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 
 		@Override
 		public int hashCode() {
-			if(hashcode == null) {
+			if (hashcode == null) {
 				int s = Hashcoder.SEED;
 				s = Hashcoder.hash(s, sequence);
 				s = Hashcoder.hash(s, indexToCompoundsLookup);
@@ -458,13 +460,13 @@ public class BitSequenceReader<C extends Compound> implements ProxySequenceReade
 		@Override
 		@SuppressWarnings("unchecked")
 		public boolean equals(Object o) {
-			if(Equals.classEqual(this, o)) {
-				BitArrayWorker<C> that = (BitArrayWorker<C>)o;
-				return  Equals.equal(compoundSet, that.compoundSet) &&
-						Equals.equal(indexToCompoundsLookup, that.indexToCompoundsLookup) &&
-						Equals.equal(sequence, that.sequence);
+			if (!Equals.classEqual(this, o)) {
+				return false;
 			}
-			return false;
+			BitArrayWorker<C> that = (BitArrayWorker<C>) o;
+			return Equals.equal(compoundSet, that.compoundSet)
+					&& Equals.equal(indexToCompoundsLookup, that.indexToCompoundsLookup)
+					&& Equals.equal(sequence, that.sequence);
 		}
 	}
 }

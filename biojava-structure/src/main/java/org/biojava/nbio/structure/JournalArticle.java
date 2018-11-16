@@ -26,14 +26,15 @@ import java.util.List;
 
 /**
  * PDB-specific
+ * 
  * @author Jules Jacobsen
  * @since 1.7
  */
 public class JournalArticle implements Serializable {
 
 	private static final long serialVersionUID = 5062668226159515468L;
-	private List<Author> authorList = new ArrayList<Author>();
-	private List<Author> editorList = new ArrayList<Author>();
+	private List<Author> authorList = new ArrayList<>();
+	private List<Author> editorList = new ArrayList<>();
 	private String title = "";
 	private String ref = "";
 	private String journalName = "";
@@ -73,8 +74,7 @@ public class JournalArticle implements Serializable {
 	}
 
 	/**
-	 * Get the value of DOI field.
-	 * For example: 10.1016/S0969-2126(02)00720-7
+	 * Get the value of DOI field. For example: 10.1016/S0969-2126(02)00720-7
 	 *
 	 * @return the value of doi
 	 */
@@ -93,14 +93,15 @@ public class JournalArticle implements Serializable {
 
 	/**
 	 * Sets the publication state of a JournalArticle - TO BE PUBLISHED == false
+	 * 
 	 * @param state
 	 */
 	public void setIsPublished(Boolean state) {
 		this.published = state;
 	}
+
 	/**
-	 * Get the value of PMID field.
-	 * For example: 12005435
+	 * Get the value of PMID field. For example: 12005435
 	 *
 	 * @return the value of pmid
 	 */
@@ -118,8 +119,7 @@ public class JournalArticle implements Serializable {
 	}
 
 	/**
-	 * Get the value of REF field.
-	 * For example: TO BE PUBLISHED
+	 * Get the value of REF field. For example: TO BE PUBLISHED
 	 *
 	 * @return the value of ref
 	 */
@@ -137,8 +137,7 @@ public class JournalArticle implements Serializable {
 	}
 
 	/**
-	 * Get the value of REFN field.
-	 * For example: ISSN 0969-2126
+	 * Get the value of REFN field. For example: ISSN 0969-2126
 	 *
 	 * @return the value of ref
 	 */
@@ -223,14 +222,14 @@ public class JournalArticle implements Serializable {
 
 	@Override
 	public String toString() {
-//        JRNL        AUTH   M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
-//        JRNL        AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
-//        JRNL        TITL   A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
-//        JRNL        TITL 2 STAPHYLOCOCCUS AUREUS.
-//        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
-//        JRNL        REFN                   ISSN 1529-2908
-//        JRNL        PMID   17351618
-//        JRNL        DOI    10.1038/NI1450
+		// JRNL AUTH M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
+		// JRNL AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
+		// JRNL TITL A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
+		// JRNL TITL 2 STAPHYLOCOCCUS AUREUS.
+		// JRNL REF NAT.IMMUNOL. V. 8 430 2007
+		// JRNL REFN ISSN 1529-2908
+		// JRNL PMID 17351618
+		// JRNL DOI 10.1038/NI1450
 		String eol = System.getProperty("line.separator");
 
 		StringBuilder jrnlString = new StringBuilder();
@@ -244,33 +243,29 @@ public class JournalArticle implements Serializable {
 		StringBuilder pmidString = new StringBuilder("JRNL        PMID   ");
 		StringBuilder doiString = new StringBuilder("JRNL        DOI    ");
 
-		for (Author author : authorList) {
-			authString.append(author).append(",");
-		}
+		authorList.forEach(author -> authString.append(author).append(","));
 		jrnlString.append(authString).append(eol);
 		titlString.append(title);
 		jrnlString.append(titlString).append(eol);
 		if (!editorList.isEmpty()) {
-			for (Author editor : editorList) {
-				editString.append(editor).append(",");
-			}
+			editorList.forEach(editor -> editString.append(editor).append(","));
 			jrnlString.append(editString).append(eol);
 		}
 		refString.append(ref);
 		jrnlString.append(refString).append(eol);
-		if (!publisher.equals("")) {
+		if (!"".equals(publisher)) {
 			publString.append(publisher);
 			jrnlString.append(publString).append(eol);
 		}
-		if (!refn.equals("")) {
+		if (!"".equals(refn)) {
 			refnString.append(refn);
 			jrnlString.append(refnString).append(eol);
 		}
-		if (!pmid.equals("")) {
+		if (!"".equals(pmid)) {
 			pmidString.append(pmid);
 			jrnlString.append(pmidString).append(eol);
 		}
-		if (!doi.equals("")) {
+		if (!"".equals(doi)) {
 			doiString.append(doi);
 			jrnlString.append(doiString).append(eol);
 		}

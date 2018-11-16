@@ -34,16 +34,11 @@ import org.biojava.nbio.core.util.Hashcoder;
  */
 public class SimplePoint implements Serializable, Point {
 
-
 	private static final long serialVersionUID = 1L;
 
 	private int position;
 	private boolean unknown;
 	private boolean uncertain;
-
-	protected SimplePoint() {
-		super();
-	}
 
 	public SimplePoint(int position) {
 		this.position = position;
@@ -53,6 +48,9 @@ public class SimplePoint implements Serializable, Point {
 		this.position = position;
 		this.unknown = unknown;
 		this.uncertain = uncertain;
+	}
+
+	protected SimplePoint() {
 	}
 
 	@Override
@@ -103,8 +101,7 @@ public class SimplePoint implements Serializable, Point {
 		boolean equals = false;
 		if (Equals.classEqual(this, obj)) {
 			SimplePoint p = (SimplePoint) obj;
-			equals = (Equals.equal(getPosition(), p.getPosition())
-					&& Equals.equal(isUncertain(), p.isUncertain())
+			equals = (Equals.equal(getPosition(), p.getPosition()) && Equals.equal(isUncertain(), p.isUncertain())
 					&& Equals.equal(isUnknown(), p.isUnknown()));
 		}
 		return equals;

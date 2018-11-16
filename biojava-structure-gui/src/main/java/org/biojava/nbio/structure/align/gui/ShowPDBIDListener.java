@@ -30,45 +30,38 @@ import org.biojava.nbio.structure.align.webstart.WebStartMain;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class ShowPDBIDListener implements ActionListener {
+	private static final Logger logger = LoggerFactory.getLogger(ShowPDBIDListener.class);
 
-public class ShowPDBIDListener
-implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-		if ( cmd.equals("Show By ID")){
+		if (!"Show By ID".equals(cmd)) {
+			return;
+		}
+		JCheckBox useBioAssembly = new JCheckBox("Show Biological Assembly");
+		String msg = "Which ID to display?";
+		Object[] params = { msg, useBioAssembly };
+		String pdbId = JOptionPane.showInputDialog(null, params, "Enter PDB ID, PDB.chainName, or SCOP domain ID",
+				JOptionPane.QUESTION_MESSAGE);
+		if (pdbId != null) {
+			try {
+				pdbId = pdbId.trim();
+				UserConfiguration config = WebStartMain.getWebStartConfig();
 
-			JCheckBox useBioAssembly = new JCheckBox("Show Biological Assembly");
+				StructureLoaderThread r = new StructureLoaderThread(config, pdbId, useBioAssembly.isSelected());
 
-			String msg = "Which ID to display?";
-			Object[] params = {msg, useBioAssembly};
+				StructureLoaderThread.showProgressBar();
 
-			String pdbId = JOptionPane.showInputDialog(null,
-					params,
-					"Enter PDB ID, PDB.chainName, or SCOP domain ID",
-					JOptionPane.QUESTION_MESSAGE);
+				r.execute();
 
-			if ( pdbId != null) {
-				try {
-					pdbId = pdbId.trim();
-					UserConfiguration config = WebStartMain.getWebStartConfig();
-
-					StructureLoaderThread r = new StructureLoaderThread(config,pdbId, useBioAssembly.isSelected());
-
-					StructureLoaderThread.showProgressBar();
-
-					r.execute();
-
-
-				} catch (Exception ex){
-					ex.printStackTrace();
-				}
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
 			}
 		}
 	}
-
-
-
 
 }

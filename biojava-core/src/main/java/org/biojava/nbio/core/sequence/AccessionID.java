@@ -26,10 +26,10 @@ import org.biojava.nbio.core.util.Equals;
 import org.biojava.nbio.core.util.Hashcoder;
 
 /**
- * Used in Sequences as the unique indentifier. If possible, set the {@link DataSource} to know the
- * source of the id. This allows a SequenceProxy to gather features or related sequences
- * Protein->Gene as an example. When parsing a Blast file it is also possible
- * to identify the type of ID
+ * Used in Sequences as the unique indentifier. If possible, set the
+ * {@link DataSource} to know the source of the id. This allows a SequenceProxy
+ * to gather features or related sequences Protein->Gene as an example. When
+ * parsing a Blast file it is also possible to identify the type of ID
  *
  * @author Scooter Willis
  * @author Jacek Grzebyta
@@ -45,7 +45,7 @@ public class AccessionID {
 	 *
 	 */
 
-	public AccessionID(){
+	public AccessionID() {
 		id = "";
 
 	}
@@ -58,7 +58,6 @@ public class AccessionID {
 		this.id = id.trim();
 		this.source = DataSource.LOCAL;
 	}
-
 
 	/**
 	 *
@@ -96,11 +95,9 @@ public class AccessionID {
 		boolean equals = false;
 		if (Equals.classEqual(this, o)) {
 			AccessionID l = (AccessionID) o;
-			equals = (Equals.equal(getID(), l.getID())
-					&& Equals.equal(getDataSource(), l.getDataSource())
-					&& Equals.equal(getIdentifier(), l.getIdentifier())
-					&& Equals.equal(getVersion(), l.getVersion()));
-	}
+			equals = (Equals.equal(getID(), l.getID()) && Equals.equal(getDataSource(), l.getDataSource())
+					&& Equals.equal(getIdentifier(), l.getIdentifier()) && Equals.equal(getVersion(), l.getVersion()));
+		}
 		return equals;
 	}
 
@@ -114,13 +111,13 @@ public class AccessionID {
 		return r;
 	}
 
-//   public void setDataSource(DataSource dataSource){
-//       source = dataSource;
-//   }
-
+	// public void setDataSource(DataSource dataSource){
+	// source = dataSource;
+	// }
 
 	/**
 	 * In case if the {@link #getID() } is not unique keeps the id version.
+	 * 
 	 * @return the version
 	 */
 	public Integer getVersion() {
@@ -132,7 +129,8 @@ public class AccessionID {
 	}
 
 	/**
-	 * In case if {@link #getID() } in not unique keeps the alternative id, eg. NCBI GI number.
+	 * In case if {@link #getID() } in not unique keeps the alternative id, eg. NCBI
+	 * GI number.
 	 * 
 	 * This may null.
 	 *
@@ -145,7 +143,6 @@ public class AccessionID {
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
-
 
 	@Override
 	public String toString() {

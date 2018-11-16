@@ -33,14 +33,8 @@ package org.biojava.nbio.structure.secstruc;
  */
 public enum SecStrucType {
 
-	helix4("alpha Helix", 'H'),
-	extended("Extended", 'E'),
-	bridge("Bridge", 'B'),
-	helix3("3-10 Helix", 'G'),
-	helix5("pi Helix", 'I'),
-	turn("Turn", 'T'),
-	bend("Bend", 'S'),
-	coil("Coil", ' ');
+	helix4("alpha Helix", 'H'), extended("Extended", 'E'), bridge("Bridge", 'B'), helix3("3-10 Helix", 'G'),
+	helix5("pi Helix", 'I'), turn("Turn", 'T'), bend("Bend", 'S'), coil("Coil", ' ');
 
 	public final Character type;
 	public final String name;
@@ -54,8 +48,7 @@ public enum SecStrucType {
 	 * Converts a Character representing a Secondary Structure type into the
 	 * corresponding enum object.
 	 *
-	 * @param stype
-	 *            the character representing the SS type
+	 * @param stype the character representing the SS type
 	 * @return SecStrucType or null if the character is invalid
 	 */
 	public static SecStrucType fromCharacter(Character stype) {
@@ -79,24 +72,25 @@ public enum SecStrucType {
 	 * @return true if the type is any of the helix types, false otherwise
 	 */
 	public boolean isHelixType() {
-		if (type.equals(helix4.type) || type.equals(helix3.type)
-				|| type.equals(helix5.type))
+		if (type.equals(helix4.type) || type.equals(helix3.type) || type.equals(helix5.type)) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	/**
-	 * A Beta-Strand is an extended set of sequential Bridges that, together
-	 * with other Beta-Strands, is part of a Beta-Sheet.
+	 * A Beta-Strand is an extended set of sequential Bridges that, together with
+	 * other Beta-Strands, is part of a Beta-Sheet.
 	 *
 	 * @return true if the type is a Beta-Strand
 	 */
 	public boolean isBetaStrand() {
-		if (type.equals(extended.type))
+		if (type.equals(extended.type)) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 }

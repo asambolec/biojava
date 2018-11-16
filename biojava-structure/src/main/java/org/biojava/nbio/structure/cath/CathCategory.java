@@ -23,47 +23,40 @@
 
 package org.biojava.nbio.structure.cath;
 
-/** The categories found within CATH.
+/**
+ * The categories found within CATH.
  *
- * The CATH node types are:
- * 'C' (class), 'A' (architecture), 'T' (topology), 'H' (homologous superfamily),
- * 'S' (sequence family, S35), 'O' (orthologous sequence family, S60),
- * 'L' ("like" sequence family, S95), 'I' (identical, S100) and
- * 'D' (domain, S100 count).
+ * The CATH node types are: 'C' (class), 'A' (architecture), 'T' (topology), 'H'
+ * (homologous superfamily), 'S' (sequence family, S35), 'O' (orthologous
+ * sequence family, S60), 'L' ("like" sequence family, S95), 'I' (identical,
+ * S100) and 'D' (domain, S100 count).
  *
  * @author Daniel Asarnow
  */
 public enum CathCategory {
-	Class,
-	Architecture,
-	Topolgy,
-	Homology,
-	SequenceFamily,
-	OrthologousSequenceFamily,
-	LikeSequenceFamily,
-	IdenticalSequenceFamily,
-	DomainCounter;
+	Class, Architecture, Topolgy, Homology, SequenceFamily, OrthologousSequenceFamily, LikeSequenceFamily,
+	IdenticalSequenceFamily, DomainCounter;
 
 	static final String lut = "CATHSOLID";
 
 	public static CathCategory fromString(String type) {
-		if ( type.equals("C") ) {
+		if ("C".equals(type)) {
 			return Class;
-		} else if ( type.equals("A") ) {
+		} else if ("A".equals(type)) {
 			return Architecture;
-		} else if ( type.equals("T") ) {
+		} else if ("T".equals(type)) {
 			return Topolgy;
-		} else if ( type.equals("H") ) {
+		} else if ("H".equals(type)) {
 			return Homology;
-		} else if ( type.equals("S") ) {
+		} else if ("S".equals(type)) {
 			return SequenceFamily;
-		} else if ( type.equals("O") ) {
+		} else if ("O".equals(type)) {
 			return OrthologousSequenceFamily;
-		} else if ( type.equals("L") ) {
+		} else if ("L".equals(type)) {
 			return LikeSequenceFamily;
-		} else if ( type.equals("I") ) {
+		} else if ("I".equals(type)) {
 			return IdenticalSequenceFamily;
-//        } else if ( type.equals("D") ) {
+			// } else if ( type.equals("D") ) {
 		} else {
 			return DomainCounter;
 		}
@@ -72,36 +65,36 @@ public enum CathCategory {
 	@Override
 	public String toString() {
 		switch (this) {
-			case Class:
-				return "C";
-			case Architecture:
-				return "A";
-			case Topolgy:
-				return "T";
-			case Homology:
-				return "H";
-			case SequenceFamily:
-				return "S";
-			case OrthologousSequenceFamily:
-				return "O";
-			case LikeSequenceFamily:
-				return "L";
-			case IdenticalSequenceFamily:
-				return "I";
-//            case DomainCounter:
-			default:
-				return "D";
+		case Class:
+			return "C";
+		case Architecture:
+			return "A";
+		case Topolgy:
+			return "T";
+		case Homology:
+			return "H";
+		case SequenceFamily:
+			return "S";
+		case OrthologousSequenceFamily:
+			return "O";
+		case LikeSequenceFamily:
+			return "L";
+		case IdenticalSequenceFamily:
+			return "I";
+		// case DomainCounter:
+		default:
+			return "D";
 		}
 	}
 
 	public static CathCategory fromCathCode(String code) {
 		int count = 0;
 		int idx = 0;
-		while ((idx = code.indexOf(".",idx)) != -1) {
+		while ((idx = code.indexOf(".", idx)) != -1) {
 			count++;
 			idx++;
 		}
-		return fromString(lut.substring(count,count+1));
+		return fromString(lut.substring(count, count + 1));
 	}
 
 }

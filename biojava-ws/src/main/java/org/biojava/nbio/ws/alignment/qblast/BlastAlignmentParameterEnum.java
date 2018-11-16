@@ -25,57 +25,23 @@ package org.biojava.nbio.ws.alignment.qblast;
 
 /**
  * Alignment request parameters accepted by QBlast service.<br/>
- * Not all are mandatory. Certain parameters only work with a subset of other parameters in the list.
+ * Not all are mandatory. Certain parameters only work with a subset of other
+ * parameters in the list.
  * <p/>
- * Taken from <a href=https://www.ncbi.nlm.nih.gov/staff/tao/URLAPI/new/node9.html>Blast URL API</a>
+ * Taken from <a
+ * href=https://www.ncbi.nlm.nih.gov/staff/tao/URLAPI/new/node9.html>Blast URL
+ * API</a>
  *
  * @author Gediminas Rimsa
  */
 public enum BlastAlignmentParameterEnum {
 
-	CMD,
-	TOOL,
-	EMAIL,
+	CMD, TOOL, EMAIL,
 
-	ALIGNMENTS,
-	BLAST_PROGRAM,
-	CDD_SEARCH,
-	COMPOSITION_BASED_STATISTICS,
-	DATABASE_PREFIX,
-	DATABASE,
-	DB_GENETIC_CODE,
-	DESCRIPTIONS,
-	ENTREZ_QUERY,
-	EXPECT,
-	FILTER,
-	FIRST_QUERY_NUM,
-	GAPCOSTS,
-	GENETIC_CODE,
-	HITLIST_SIZE,
-	I_THRESH,
-	LCASE_MASK,
-	MATCH_SCORES,
-	MATRIX_NAME,
-	MAX_NUM_SEQ,
-	MEGABLAST,
-	NUM_OVERVIEW,
-	OTHER_ADVANCED,
-	PERC_IDENT,
-	PHI_PATTERN,
-	PROGRAM,
-	PSSM,
-	QUERY,
-	QUERY_BELIEVE_DEFLINE,
-	QUERY_FROM,
-	QUERY_TO,
-	REPEATS,
-	SHORT_QUERY_ADJUST,
-	SEARCHSP_EFF,
-	TEMPLATE_LENTH,
-	TEMPLATE_TYPE,
-	THRESHOLD,
-	TWO_HITS,
-	WORD_SIZE,
-	WWW_BLAST_TYPE
+	ALIGNMENTS, BLAST_PROGRAM, CDD_SEARCH, COMPOSITION_BASED_STATISTICS, DATABASE_PREFIX, DATABASE, DB_GENETIC_CODE,
+	DESCRIPTIONS, ENTREZ_QUERY, EXPECT, FILTER, FIRST_QUERY_NUM, GAPCOSTS, GENETIC_CODE, HITLIST_SIZE, I_THRESH,
+	LCASE_MASK, MATCH_SCORES, MATRIX_NAME, MAX_NUM_SEQ, MEGABLAST, NUM_OVERVIEW, OTHER_ADVANCED, PERC_IDENT,
+	PHI_PATTERN, PROGRAM, PSSM, QUERY, QUERY_BELIEVE_DEFLINE, QUERY_FROM, QUERY_TO, REPEATS, SHORT_QUERY_ADJUST,
+	SEARCHSP_EFF, TEMPLATE_LENTH, TEMPLATE_TYPE, THRESHOLD, TWO_HITS, WORD_SIZE, WWW_BLAST_TYPE
 
 }

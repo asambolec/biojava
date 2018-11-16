@@ -32,34 +32,36 @@ import java.util.TreeSet;
 
 public class PdbPairsMessage {
 
-	String method ;
+	String method;
 
 	SortedSet<PdbPair> pairs;
 
-	public PdbPairsMessage(){
+	public PdbPairsMessage() {
 
 		method = PdbPairXMLConverter.DEFAULT_METHOD_NAME;
 
-		pairs = new TreeSet<PdbPair>();
+		pairs = new TreeSet<>();
 
 	}
 
 	public String getMethod() {
 		return method;
 	}
+
 	public void setMethod(String method) {
 		this.method = method;
 	}
+
 	public SortedSet<PdbPair> getPairs() {
 		return pairs;
 	}
+
 	public void setPairs(SortedSet<PdbPair> pairs) {
 		this.pairs = pairs;
 	}
 
-
 	@Override
-	public String toString(){
+	public String toString() {
 
 		StringWriter w = new StringWriter();
 
@@ -69,11 +71,8 @@ public class PdbPairsMessage {
 		w.append(" pairs: ");
 		w.append(pairs.toString());
 
-
 		return w.toString();
 
 	}
-
-
 
 }

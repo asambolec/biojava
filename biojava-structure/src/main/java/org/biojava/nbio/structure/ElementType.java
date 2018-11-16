@@ -24,8 +24,9 @@
 package org.biojava.nbio.structure;
 
 /**
- * ElementType is an enumeration of the types of elements found in the periodic table.
- * Each element type is further classified into Metal, Metalloid, and Non-Metal.
+ * ElementType is an enumeration of the types of elements found in the periodic
+ * table. Each element type is further classified into Metal, Metalloid, and
+ * Non-Metal.
  *
  * Element types based on definition at http://www.ptable.com/
  *
@@ -36,16 +37,8 @@ package org.biojava.nbio.structure;
 
 public enum ElementType {
 
-	METALLOID(false),
-	OTHER_NONMETAL(false),
-	HALOGEN(false),
-	NOBLE_GAS(false),
-	ALKALI_METAL(true),
-	ALKALINE_EARTH_METAL(true),
-	LANTHANOID(true),
-	ACTINOID(true),
-	TRANSITION_METAL(true),
-	POST_TRANSITION_METAL(true),
+	METALLOID(false), OTHER_NONMETAL(false), HALOGEN(false), NOBLE_GAS(false), ALKALI_METAL(true),
+	ALKALINE_EARTH_METAL(true), LANTHANOID(true), ACTINOID(true), TRANSITION_METAL(true), POST_TRANSITION_METAL(true),
 	UNKNOWN(false);
 
 	private boolean metal;
@@ -56,6 +49,7 @@ public enum ElementType {
 
 	/**
 	 * Returns <CODE>true</CODE> if ElementType is a metal.
+	 * 
 	 * @return <CODE>true</CODE> if ElementType is a metal.
 	 */
 	public boolean isMetal() {
@@ -64,17 +58,19 @@ public enum ElementType {
 
 	/**
 	 * Returns <CODE>true</CODE> if ElementType is a metalloid.
+	 * 
 	 * @return <CODE>true</CODE> if ElementType is a metalloid.
 	 */
 	public boolean isMetalloid() {
-		return this.equals(METALLOID);
+		return this == METALLOID;
 	}
 
 	/**
 	 * Returns <CODE>true</CODE> if ElementType is a non-metal.
+	 * 
 	 * @return <CODE>true</CODE> if ElementType is a non-metal.
 	 */
 	public boolean isNonMetal() {
-		return this.equals(OTHER_NONMETAL) || this.equals(HALOGEN) || this.equals(NOBLE_GAS);
+		return this == OTHER_NONMETAL || this == HALOGEN || this == NOBLE_GAS;
 	}
 }

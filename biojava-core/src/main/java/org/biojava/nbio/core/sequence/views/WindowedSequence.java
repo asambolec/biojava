@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * A sliding window view of a sequence which does not implement any
- * interfaces like {@link Sequence} because they do not fit how this works.
- * For each index requested we return a SequenceView or List of compounds back.
+ * A sliding window view of a sequence which does not implement any interfaces
+ * like {@link Sequence} because they do not fit how this works. For each index
+ * requested we return a SequenceView or List of compounds back.
  *
  * If you perform a view on a Sequence whose length is not a multiple of the
  * window the final window will be omitted i.e. if we have the sequence AGCGG
@@ -39,8 +39,8 @@ import java.util.NoSuchElementException;
  * length of this sequence.
  *
  * Because this does not implement a Sequence interface we do not recommend
- * passing this class around. If you need to represent a windowed sequence
- * as a real Sequence then translate it into a new Compound
+ * passing this class around. If you need to represent a windowed sequence as a
+ * real Sequence then translate it into a new Compound
  *
  * @author ayates
  *
@@ -79,17 +79,17 @@ public class WindowedSequence<C extends Compound> implements Iterable<SequenceVi
 	}
 
 	/**
-	 * Returns the size of the windowed sequence which is the length by the
-	 * window size. Trailing Compounds are omitted.
+	 * Returns the size of the windowed sequence which is the length by the window
+	 * size. Trailing Compounds are omitted.
 	 */
 	public int getLength() {
 		return getBackingSequence().getLength() / getWindowSize();
 	}
 
 	/**
-	 * For a given position into the windowed view this will return those
-	 * compounds we can see in the window. i.e. in the sequence AGGCCT requesting
-	 * index 1 returns AGG and requesting index 2 return CCT.
+	 * For a given position into the windowed view this will return those compounds
+	 * we can see in the window. i.e. in the sequence AGGCCT requesting index 1
+	 * returns AGG and requesting index 2 return CCT.
 	 *
 	 * @param index Windowed index position
 	 * @return The List of compounds
@@ -99,19 +99,19 @@ public class WindowedSequence<C extends Compound> implements Iterable<SequenceVi
 	}
 
 	/**
-	 * Returns the window specified at the given index in offsets i.e. asking
-	 * for position 2 in a moving window sequence of size 3 will get you
-	 * the window starting at position 4.
+	 * Returns the window specified at the given index in offsets i.e. asking for
+	 * position 2 in a moving window sequence of size 3 will get you the window
+	 * starting at position 4.
 	 */
 	public SequenceView<C> get(int index) {
 		int start = toStartIndex(index);
-		int end  = index + (getWindowSize() - 1);
+		int end = index + (getWindowSize() - 1);
 		return getBackingSequence().getSubSequence(start, end);
 	}
 
 	/**
-	 * Returns an iterator which will return the windows in a sequence in
-	 * sequential order.
+	 * Returns an iterator which will return the windows in a sequence in sequential
+	 * order.
 	 */
 	@Override
 	public Iterator<SequenceView<C>> iterator() {
@@ -138,16 +138,16 @@ public class WindowedSequence<C extends Compound> implements Iterable<SequenceVi
 
 		@Override
 		public boolean hasNext() {
-			return (currentIndex+offset) <= end;
+			return (currentIndex + offset) <= end;
 		}
 
 		@Override
 		public SequenceView<C> next() {
-            if(!hasNext()){
-                throw new NoSuchElementException();
-            }
-            SequenceView<C> v = seq.getSubSequence(currentIndex, currentIndex + offset);
-			currentIndex = currentIndex + window;
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			SequenceView<C> v = seq.getSubSequence(currentIndex, currentIndex + offset);
+			currentIndex += window;
 			return v;
 		}
 

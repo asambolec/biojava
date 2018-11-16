@@ -43,8 +43,7 @@ import java.util.*;
  *
  * @author ayates
  */
-public class RNAToAminoAcidTranslator extends
-		AbstractCompoundTranslator<NucleotideCompound, AminoAcidCompound> {
+public class RNAToAminoAcidTranslator extends AbstractCompoundTranslator<NucleotideCompound, AminoAcidCompound> {
 
 	private final boolean trimStops;
 	private final boolean initMetOnly;
@@ -67,37 +66,32 @@ public class RNAToAminoAcidTranslator extends
 	// first residue in the resulting ProteinSequence
 	private final boolean waitForStartCodon;
 
-
-	public RNAToAminoAcidTranslator(
-			SequenceCreatorInterface<AminoAcidCompound> creator,
-			CompoundSet<NucleotideCompound> nucleotides,
-			CompoundSet<Codon> codons,
-			CompoundSet<AminoAcidCompound> aminoAcids, Table table,
-			boolean trimStops, boolean initMetOnly, boolean translateNCodons,
-			boolean stopAtStopCodons, boolean waitForStartCodon) {
+	public RNAToAminoAcidTranslator(SequenceCreatorInterface<AminoAcidCompound> creator,
+			CompoundSet<NucleotideCompound> nucleotides, CompoundSet<Codon> codons,
+			CompoundSet<AminoAcidCompound> aminoAcids, Table table, boolean trimStops, boolean initMetOnly,
+			boolean translateNCodons, boolean stopAtStopCodons, boolean waitForStartCodon) {
 
 		super(creator, nucleotides, aminoAcids);
 		this.trimStops = trimStops;
 		this.initMetOnly = initMetOnly;
 		this.translateNCodons = translateNCodons;
 
-		quickLookup = new HashMap<Table.CaseInsensitiveTriplet, Codon>(codons
-				.getAllCompounds().size());
-		aminoAcidToCodon = new HashMap<AminoAcidCompound, List<Codon>>();
+		quickLookup = new HashMap<>(codons.getAllCompounds().size());
+		aminoAcidToCodon = new HashMap<>();
 
 		List<Codon> codonList = table.getCodons(nucleotides, aminoAcids);
-		for (Codon codon : codonList) {
+		codonList.forEach(codon -> {
 			quickLookup.put(codon.getTriplet(), codon);
 			codonArray[codon.getTriplet().intValue()] = codon;
 
 			List<Codon> codonL = aminoAcidToCodon.get(codon.getAminoAcid());
 			if (codonL == null) {
-				codonL = new ArrayList<Codon>();
+				codonL = new ArrayList<>();
 				aminoAcidToCodon.put(codon.getAminoAcid(), codonL);
 			}
 			codonL.add(codon);
 
-		}
+		});
 		unknownAminoAcidCompound = aminoAcids.getCompoundForString("X");
 		methionineAminoAcidCompound = aminoAcids.getCompoundForString("M");
 		this.stopAtStopCodons = stopAtStopCodons;
@@ -111,13 +105,11 @@ public class RNAToAminoAcidTranslator extends
 	 */
 
 	@Override
-	public List<Sequence<AminoAcidCompound>> createSequences(
-			Sequence<NucleotideCompound> originalSequence) {
+	public List<Sequence<AminoAcidCompound>> createSequences(Sequence<NucleotideCompound> originalSequence) {
 
-		List<List<AminoAcidCompound>> workingList = new ArrayList<List<AminoAcidCompound>>();
+		List<List<AminoAcidCompound>> workingList = new ArrayList<>();
 
-		Iterable<SequenceView<NucleotideCompound>> iter = new WindowedSequence<NucleotideCompound>(
-				originalSequence, 3);
+		Iterable<SequenceView<NucleotideCompound>> iter = new WindowedSequence<NucleotideCompound>(originalSequence, 3);
 
 		boolean first = true;
 
@@ -128,9 +120,8 @@ public class RNAToAminoAcidTranslator extends
 			AminoAcidCompound aminoAcid = null;
 
 			int i = 1;
-			Table.CaseInsensitiveTriplet triplet = new Table.CaseInsensitiveTriplet(
-					element.getCompoundAt(i++), element.getCompoundAt(i++),
-					element.getCompoundAt(i++));
+			Table.CaseInsensitiveTriplet triplet = new Table.CaseInsensitiveTriplet(element.getCompoundAt(i++),
+					element.getCompoundAt(i++), element.getCompoundAt(i++));
 
 			Codon target = null;
 
@@ -142,8 +133,9 @@ public class RNAToAminoAcidTranslator extends
 			}
 
 			if (doTranslate) {
-				if (target != null)
+				if (target != null) {
 					aminoAcid = target.getAminoAcid();
+				}
 				if (aminoAcid == null && translateNCodons()) {
 					aminoAcid = unknownAminoAcidCompound;
 				} else {
@@ -172,13 +164,12 @@ public class RNAToAminoAcidTranslator extends
 	 * amino acid to M
 	 */
 	@Override
-	protected void postProcessCompoundLists(
-			List<List<AminoAcidCompound>> compoundLists) {
-		for (List<AminoAcidCompound> compounds : compoundLists) {
+	protected void postProcessCompoundLists(List<List<AminoAcidCompound>> compoundLists) {
+		compoundLists.forEach(compounds -> {
 			if (trimStops) {
 				trimStop(compounds);
 			}
-		}
+		});
 	}
 
 	/**
@@ -204,8 +195,8 @@ public class RNAToAminoAcidTranslator extends
 
 	/**
 	 * Indicates if we want to force exact translation of compounds or not i.e.
-	 * those with internal N RNA bases. This will cause a translation to an X
-	 * amino acid
+	 * those with internal N RNA bases. This will cause a translation to an X amino
+	 * acid
 	 */
 	public boolean translateNCodons() {
 		return translateNCodons;

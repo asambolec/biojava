@@ -24,9 +24,11 @@ package org.biojava.nbio.core.sequence.features;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 /**
  * If a SequenceProxyReader implements this interface then that external source
  * has a list features
+ * 
  * @author @author Paolo Pavan
  */
 public interface FeatureRetriever {

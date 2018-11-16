@@ -35,13 +35,14 @@ import java.util.Scanner;
  * Stockholm file parser.<br>
  * for more information about the format refer to
  * <ul>
- * <li><a
- * href="ftp://ftp.sanger.ac.uk/pub/databases/Pfam/current_release/userman.txt">ftp://ftp.sanger.ac.uk/pub/databases
+ * <li><a href=
+ * "ftp://ftp.sanger.ac.uk/pub/databases/Pfam/current_release/userman.txt">ftp://ftp.sanger.ac.uk/pub/databases
  * /Pfam/current_release/userman.txt</a>.</li>
- * <li><a
- * href="ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/USERMAN">ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT
+ * <li><a href=
+ * "ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/USERMAN">ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT
  * /USERMAN</a>.</li>
- * <li><a href="http://sonnhammer.sbc.su.se/Stockholm.html">http://sonnhammer.sbc.su.se/Stockholm.html</a>.</li>
+ * <li><a href=
+ * "http://sonnhammer.sbc.su.se/Stockholm.html">http://sonnhammer.sbc.su.se/Stockholm.html</a>.</li>
  * </ul>
  *
  * <pre>
@@ -100,11 +101,20 @@ public class StockholmFileParser {
 	public static final int INFINITY = -1;
 	/** #=GF &lt;feature&gt; &lt;Generic per-File annotation, free text&gt; */
 	private static final String GENERIC_PER_FILE_ANNOTATION = "GF";
-	/** #=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char per column&gt; */
+	/**
+	 * #=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char per
+	 * column&gt;
+	 */
 	private static final String GENERIC_PER_CONSENSUS_ANNOTATION = "GC";
-	/** #=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation, free text&gt; */
+	/**
+	 * #=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation,
+	 * free text&gt;
+	 */
 	private static final String GENERIC_PER_SEQUENCE_ANNOTATION = "GS";
-	/** #=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation, exactly 1 char per residue&gt; */
+	/**
+	 * #=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation,
+	 * exactly 1 char per residue&gt;
+	 */
 	private static final String GENERIC_PER_RESIDUE_ANNOTATION = "GR";
 
 	// COMPULSORY FIELDS
@@ -117,8 +127,8 @@ public class StockholmFileParser {
 	/** Authors of the entry. */
 	private static final String GF_AUTHOR = "AU";
 	/**
-	 * Indicates the order that ls and fs matches are aligned to the model to give the full alignment. (OBSOLETE IN
-	 * HMMER3)
+	 * Indicates the order that ls and fs matches are aligned to the model to give
+	 * the full alignment. (OBSOLETE IN HMMER3)
 	 */
 	private static final String GF_ALIGNMENT_METHOD = "AM";
 	/** Command line used to generate the model */
@@ -127,17 +137,26 @@ public class StockholmFileParser {
 	private static final String GF_SEARCH_METHOD = "SM";
 	/** The source suggesting the seed members belong to one family. */
 	private static final String GF_SOURCE_SEED = "SE";
-	/** The source (prediction or publication) of the consensus RNA secondary structure used by Rfam. */
+	/**
+	 * The source (prediction or publication) of the consensus RNA secondary
+	 * structure used by Rfam.
+	 */
 	private static final String GF_SOURCE_STRUCTURE = "SS";
 	/** Search threshold to build the full alignment. */
 	private static final String GF_GATHERING_THRESHOLD = "GA";
-	/** Lowest sequence score (and domain score for Pfam) of match in the full alignment. */
+	/**
+	 * Lowest sequence score (and domain score for Pfam) of match in the full
+	 * alignment.
+	 */
 	private static final String GF_TRUSTED_CUTOFF = "TC";
-	/** Highest sequence score (and domain score for Pfam) of match not in full alignment. */
+	/**
+	 * Highest sequence score (and domain score for Pfam) of match not in full
+	 * alignment.
+	 */
 	private static final String GF_NOISE_CUTOFF = "NC";
 	/**
-	 * Type of family -- presently Family, Domain, Motif or Repeat for Pfam. -- a tree with roots Gene, Intron or
-	 * Cis-reg for Rfam.
+	 * Type of family -- presently Family, Domain, Motif or Repeat for Pfam. -- a
+	 * tree with roots Gene, Intron or Cis-reg for Rfam.
 	 */
 	private static final String GF_TYPE_FIELD = "TP";
 	/** Number of sequences in alignment, and start of MSA. */
@@ -188,8 +207,8 @@ public class StockholmFileParser {
 	// OTHER
 
 	/**
-	 * A method used to set the bit score threshold based on the ratio of expected false positives to true positives.
-	 * Floating point number between 0 and 1.
+	 * A method used to set the bit score threshold based on the ratio of expected
+	 * false positives to true positives. Floating point number between 0 and 1.
 	 */
 	private static final String GF_FALSE_DISCOVERY_RATE = "FR";
 
@@ -202,7 +221,8 @@ public class StockholmFileParser {
 	private static final String GS_ORGANISM_CLASSIFICATION = "OC";
 	private static final String GS_LOOK = "LO";
 
-	// #=GR <seqname> <feature> <Generic per-Residue annotation, exactly 1 char per residue>
+	// #=GR <seqname> <feature> <Generic per-Residue annotation, exactly 1 char per
+	// residue>
 
 	/**
 	 * For RNA [.,;<>(){}[]AaBb...],<br>
@@ -246,14 +266,17 @@ public class StockholmFileParser {
 	private static final String GC_AS_SWISSPROT = "sAS_cons";
 	private static final String GC_INTRON = "IN_cons";
 	/**
-	 * Often the consensus RNA or protein sequence is used as a reference Any non-gap character (eg. x's) can indicate
-	 * consensus/conserved/match columns .'s or -'s indicate insert columns ~'s indicate unaligned insertions Upper and
-	 * lower case can be used to discriminate strong and weakly conserved residues respectively
+	 * Often the consensus RNA or protein sequence is used as a reference Any
+	 * non-gap character (eg. x's) can indicate consensus/conserved/match columns
+	 * .'s or -'s indicate insert columns ~'s indicate unaligned insertions Upper
+	 * and lower case can be used to discriminate strong and weakly conserved
+	 * residues respectively
 	 */
 	private static final String GC_REFERENCE_ANNOTATION = "RF";
 	/**
-	 * Indicates which columns in an alignment should be masked, such that the emission probabilities for match states
-	 * corresponding to those columns will be the background distribution.
+	 * Indicates which columns in an alignment should be masked, such that the
+	 * emission probabilities for match states corresponding to those columns will
+	 * be the background distribution.
 	 */
 	private static final String GC_MODEL_MASK = "MM";
 
@@ -270,20 +293,20 @@ public class StockholmFileParser {
 	private InputStream cashedInputStream;
 
 	/**
-	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with its content.<br>
-	 * This function is meant to be used for single access to specific file and it closes the file after doing its
-	 * assigned job. Any subsequent call to {@link #parseNext(int)} will throw an exception or will function with
+	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with
+	 * its content.<br>
+	 * This function is meant to be used for single access to specific file and it
+	 * closes the file after doing its assigned job. Any subsequent call to
+	 * {@link #parseNext(int)} will throw an exception or will function with
 	 * unpredicted behavior.
 	 *
-	 * @param filename
-	 *            complete(?) path to the file from where to read the content
+	 * @param filename complete(?) path to the file from where to read the content
 	 * @return stockholm file content
-	 * @throws IOException
-	 *             when an exception occurred while opening/reading/closing the file+
-	 * @throws ParserException
-	 *             if unexpected format is encountered
+	 * @throws IOException     when an exception occurred while
+	 *                         opening/reading/closing the file+
+	 * @throws ParserException if unexpected format is encountered
 	 */
-	public StockholmStructure parse(String filename) throws IOException, ParserException {
+	public StockholmStructure parse(String filename) throws IOException {
 		InputStream inStream = new InputStreamProvider().getInputStream(filename);
 		StockholmStructure structure = parse(inStream);
 		inStream.close();
@@ -291,58 +314,57 @@ public class StockholmFileParser {
 	}
 
 	/**
-	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with its content.<br>
-	 * This function doesn't close the file after doing its assigned job; to allow for further calls of
-	 * {@link #parseNext(int)}.
+	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with
+	 * its content.<br>
+	 * This function doesn't close the file after doing its assigned job; to allow
+	 * for further calls of {@link #parseNext(int)}.
 	 *
 	 * @see #parseNext(int)
 	 *
-	 * @param filename
-	 *            file from where to read the content. see {@link InputStreamProvider} for more details.
-	 * @param max
-	 *            maximum number of files to read, {@link #INFINITY} for all.
+	 * @param filename file from where to read the content. see
+	 *                 {@link InputStreamProvider} for more details.
+	 * @param max      maximum number of files to read, {@link #INFINITY} for all.
 	 * @return a vector of {@link StockholmStructure} containing parsed structures.
-	 * @throws IOException
-	 *             when an exception occurred while opening/reading/closing the file.
-	 * @throws ParserException
-	 *             if unexpected format is encountered
+	 * @throws IOException     when an exception occurred while
+	 *                         opening/reading/closing the file.
+	 * @throws ParserException if unexpected format is encountered
 	 */
-	public List<StockholmStructure> parse(String filename, int max) throws IOException, ParserException {
+	public List<StockholmStructure> parse(String filename, int max) throws IOException {
 		InputStreamProvider isp = new InputStreamProvider();
 		InputStream inStream = isp.getInputStream(filename);
 		return parse(inStream, max);
 	}
 
 	/**
-	 * parses {@link InputStream} and returns a the first contained alignment in a {@link StockholmStructure} object.
-	 * Used mainly for multiple files within the same input stream, (e.g. when reading from Pfam flat files. <br>
-	 * This method leaves the stream open for further calls of {@link #parseNext(int)}.
+	 * parses {@link InputStream} and returns a the first contained alignment in a
+	 * {@link StockholmStructure} object. Used mainly for multiple files within the
+	 * same input stream, (e.g. when reading from Pfam flat files. <br>
+	 * This method leaves the stream open for further calls of
+	 * {@link #parseNext(int)}.
 	 *
 	 * @see #parseNext(int)
-	 * @param inStream
-	 *            the {@link InputStream} containing the file to read.
+	 * @param inStream the {@link InputStream} containing the file to read.
 	 * @return a {@link StockholmStructure} object representing file contents.
 	 * @throws IOException
 	 * @throws ParserException
 	 */
-	public StockholmStructure parse(InputStream inStream) throws ParserException, IOException {
+	public StockholmStructure parse(InputStream inStream) throws IOException {
 		return parse(inStream, 1).get(0);
 	}
 
 	/**
-	 * parses an {@link InputStream} and returns at maximum <code>max</code> objects contained in that file.<br>
-	 * This method leaves the stream open for further calls of {@link #parse(InputStream, int)} (same function) or
-	 * {@link #parseNext(int)}.
+	 * parses an {@link InputStream} and returns at maximum <code>max</code> objects
+	 * contained in that file.<br>
+	 * This method leaves the stream open for further calls of
+	 * {@link #parse(InputStream, int)} (same function) or {@link #parseNext(int)}.
 	 *
 	 * @see #parseNext(int)
-	 * @param inStream
-	 *            the stream to parse
-	 * @param max
-	 *            maximum number of structures to try to parse, {@link #INFINITY} to try to obtain as much as possible.
-	 * @return a {@link List} of {@link StockholmStructure} objects. If there are no more structures, an empty list is
-	 *         returned.
-	 * @throws IOException
-	 *             in case an I/O Exception occurred.
+	 * @param inStream the stream to parse
+	 * @param max      maximum number of structures to try to parse,
+	 *                 {@link #INFINITY} to try to obtain as much as possible.
+	 * @return a {@link List} of {@link StockholmStructure} objects. If there are no
+	 *         more structures, an empty list is returned.
+	 * @throws IOException in case an I/O Exception occurred.
 	 */
 	public List<StockholmStructure> parse(InputStream inStream, int max) throws IOException {
 		if (max < INFINITY) {
@@ -356,7 +378,7 @@ public class StockholmFileParser {
 		if (internalScanner == null) {
 			internalScanner = new Scanner(inStream);
 		}
-		ArrayList<StockholmStructure> structures = new ArrayList<StockholmStructure>();
+		ArrayList<StockholmStructure> structures = new ArrayList<>();
 		while (max != INFINITY && max-- > 0) {
 			StockholmStructure structure = parse(internalScanner);
 			if (structure != null) {
@@ -369,9 +391,11 @@ public class StockholmFileParser {
 	}
 
 	/**
-	 * Tries to parse and return as maximum as <code>max</code> structures in the last used file or input stream.<br>
-	 * Please consider calling either {@link #parse(InputStream)}, {@link #parse(InputStream, int)}, or
-	 * {@link #parse(String, int)} before calling this function.
+	 * Tries to parse and return as maximum as <code>max</code> structures in the
+	 * last used file or input stream.<br>
+	 * Please consider calling either {@link #parse(InputStream)},
+	 * {@link #parse(InputStream, int)}, or {@link #parse(String, int)} before
+	 * calling this function.
 	 *
 	 * @param max
 	 * @return
@@ -382,16 +406,17 @@ public class StockholmFileParser {
 	}
 
 	/**
-	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with its content. This method returns
-	 * just after reaching the end of structure delimiter line ("//"), leaving any remaining empty lines unconsumed.
+	 * Parses a Stockholm file and returns a {@link StockholmStructure} object with
+	 * its content. This method returns just after reaching the end of structure
+	 * delimiter line ("//"), leaving any remaining empty lines unconsumed.
 	 *
-	 * @param scanner
-	 *            from where to read the file content
-	 * @return Stockholm file content, <code>null</code> if couldn't or no more structures.
+	 * @param scanner from where to read the file content
+	 * @return Stockholm file content, <code>null</code> if couldn't or no more
+	 *         structures.
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	StockholmStructure parse(Scanner scanner) throws ParserException, IOException {
+	StockholmStructure parse(Scanner scanner) throws IOException {
 		if (scanner == null) {
 			if (internalScanner != null) {
 				scanner = internalScanner;
@@ -405,14 +430,15 @@ public class StockholmFileParser {
 			while (scanner.hasNextLine()) {
 				line = scanner.nextLine();
 				// if the file is empty
-				// this condition will not happen, just left in case we decided to go for buffereedReader again for
+				// this condition will not happen, just left in case we decided to go for
+				// buffereedReader again for
 				// performance purpose.
 				if (linesCount == 0 && line == null) {
 					throw new IOException("Could not parse Stockholm file, BufferedReader returns null!");
 				}
 
 				// ignore empty lines
-				if ((/* status==STATUS_INSIDE_FILE && */line == null) || line.trim().length() == 0) {
+				if ((/* status==STATUS_INSIDE_FILE && */line == null) || line.trim().isEmpty()) {
 					continue;
 				}
 
@@ -438,20 +464,23 @@ public class StockholmFileParser {
 						// #=GS <seqname> <featurename> <generic per-sequence annotation, free text>
 						int index1 = line.indexOf(' ', 5);
 						String seqName = line.substring(5, index1);
-						while (line.charAt(++index1) <= ' ')
+						while (line.charAt(++index1) <= ' ') {
 							// i.e. white space
-							;// keep advancing
+							// keep advancing
+						}
 						int index2 = line.indexOf(' ', index1);
 						String featureName = line.substring(index1, index2);
 						String value = line.substring(index2).trim();
 						handleSequenceAnnotation(seqName, featureName, value);
 					} else if (line.startsWith(GENERIC_PER_RESIDUE_ANNOTATION, 2)) {
-						// #=GR <seqname> <featurename> <generic per-sequence AND per-column mark-up, exactly 1
+						// #=GR <seqname> <featurename> <generic per-sequence AND per-column mark-up,
+						// exactly 1
 						// character per column>
 						int index1 = line.indexOf(' ', 5);
 						String seqName = line.substring(5, index1);
-						while (line.charAt(++index1) == ' ')
-							;// keep advancing
+						while (line.charAt(++index1) == ' ') {
+							// keep advancing
+						}
 						int index2 = line.indexOf(' ', index1);
 						String featureName = line.substring(index1, index2);
 						String value = line.substring(index2).trim();
@@ -471,10 +500,10 @@ public class StockholmFileParser {
 					this.stockholmStructure = new StockholmStructure();
 					this.stockholmStructure.getFileAnnotation().setFormat(header[1]);
 					this.stockholmStructure.getFileAnnotation().setVersion(header[2]);
-				} else if (line.trim().equals("//")) {
+				} else if ("//".equals(line.trim())) {
 					// status = STATUS_OUTSIDE_FILE;
 					break;// should we just break immediately or jump next empty lines?
-				} else /* if (!line.startsWith("#")) */{
+				} else /* if (!line.startsWith("#")) */ {
 					// most probably This line corresponds to a sequence. Something like:
 					// O83071/192-246 MTCRAQLIAVPRASSLAEAIACAQKMRVSRVPVYERS
 					// N.B. as long as we don't check the status now, it is somehow error prone
@@ -487,11 +516,13 @@ public class StockholmFileParser {
 					// // }else if (status==STATUS_OUTSIDE_FILE) {
 					// // throw new
 					// //
-					// ParserException("The end of file character was allready reached but there are still sequence lines");
+					// ParserException("The end of file character was allready reached but there are
+					// still sequence lines");
 					// } else {
 					// System.err.println("Error: Unknown or unexpected line [" + line
 					// + "].\nPlease contact the Biojava team.");
-					// throw new ParserException("Error: Unknown or unexpected line [" + line + "].");
+					// throw new ParserException("Error: Unknown or unexpected line [" + line +
+					// "].");
 					// }
 					// //============removed status==========================
 				}
@@ -521,14 +552,14 @@ public class StockholmFileParser {
 
 	/**
 	 * Handles a line that corresponds to a sequence. <br>
-	 * e.g.: COATB_BPIKE/30-81 AEPNAATNYATEAMDSLKTQAIDLISQTWPVVTTVVVAGLVIRLFKKFSSKA<br>
+	 * e.g.: COATB_BPIKE/30-81
+	 * AEPNAATNYATEAMDSLKTQAIDLISQTWPVVTTVVVAGLVIRLFKKFSSKA<br>
 	 * N.B.: This function can't tolerate sequences with intrinsic white space.
 	 *
-	 * @param line
-	 *            the line to be parsed
+	 * @param line the line to be parsed
 	 * @throws Exception
 	 */
-	private void handleSequenceLine(String line) throws ParserException {
+	private void handleSequenceLine(String line) {
 		String[] lineContent = line.split("\\s+");
 		if (lineContent.length != 2) {
 			throw new ParserException("Could not split sequence line into sequence name and sequence:\n" + line);
@@ -540,8 +571,7 @@ public class StockholmFileParser {
 	 * #=GF &lt;feature&gt; &lt;Generic per-File annotation, free text&gt;
 	 *
 	 * @param featureName
-	 * @param value
-	 *            the line to be parsed
+	 * @param value       the line to be parsed
 	 */
 	private void handleFileAnnotation(String featureName, String value) {
 		if (featureName.equals(GF_ACCESSION_NUMBER)) {
@@ -622,12 +652,11 @@ public class StockholmFileParser {
 
 	/**
 	 * usually a single line of:<br>
-	 * #=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char per column&gt;
+	 * #=GC &lt;feature&gt; &lt;Generic per-Column annotation, exactly 1 char per
+	 * column&gt;
 	 *
-	 * @param featureName
-	 *            the feature name :)
-	 * @param value
-	 *            the line to be parsed.
+	 * @param featureName the feature name :)
+	 * @param value       the line to be parsed.
 	 */
 	private void handleConsensusAnnotation(String featureName, String value) {
 		if (featureName.equals(GC_SECONDARY_STRUCTURE)) {
@@ -661,10 +690,10 @@ public class StockholmFileParser {
 	}
 
 	/**
-	 * #=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation, free text&gt;
+	 * #=GS &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Sequence annotation,
+	 * free text&gt;
 	 *
-	 * @param line
-	 *            the line to be parsed
+	 * @param line the line to be parsed
 	 */
 	private void handleSequenceAnnotation(String seqName, String featureName, String value) {
 		if (featureName.equals(GS_ACCESSION_NUMBER)) {
@@ -686,10 +715,10 @@ public class StockholmFileParser {
 	}
 
 	/**
-	 * #=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation, exactly 1 char per residue&gt;
+	 * #=GR &lt;seqname&gt; &lt;feature&gt; &lt;Generic per-Residue annotation,
+	 * exactly 1 char per residue&gt;
 	 *
-	 * @param line
-	 *            the line to be parsed
+	 * @param line the line to be parsed
 	 */
 	private void handleResidueAnnotation(String seqName, String featureName, String value) {
 

@@ -22,7 +22,8 @@ package org.biojava.nbio.structure.io.mmcif.model;
  * Created by andreas on 9/11/15.
  */
 
-/** A class to store sequence mismatch annotations
+/**
+ * A class to store sequence mismatch annotations
  *
  */
 public class StructRefSeqDif {

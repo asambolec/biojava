@@ -27,30 +27,34 @@ import org.biojava.nbio.core.sequence.loader.UniprotProxySequenceReader;
 import org.biojava.nbio.ronn.Jronn;
 
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PredictDisorder {
 
-	public static void main(String[] args) throws Exception{
+	private static final Logger logger = LoggerFactory.getLogger(PredictDisorder.class);
+
+	public static void main(String[] args) throws Exception {
 
 		String uniprotID = "O30642";
 
 		ProteinSequence seq = getUniprot(uniprotID);
-		System.out.println("Protein Sequence: "+ seq.toString());
+		logger.info("Protein Sequence: " + seq.toString());
 		AminoAcidCompoundSet compoundSet = AminoAcidCompoundSet.getAminoAcidCompoundSet();
 
-		if (!compoundSet.isValidSequence(seq) ) {
-			System.err.println("Invalid sequence, exiting");
+		if (!compoundSet.isValidSequence(seq)) {
+			logger.error("Invalid sequence, exiting");
 			System.exit(1);
 		}
 
 		float[] values = Jronn.getDisorderScores(seq);
 
-		System.out.println("Disorder Scores: "+ Arrays.toString(values));
-
+		logger.info("Disorder Scores: " + Arrays.toString(values));
 
 	}
 
-	/** Fetch a protein sequence from the UniProt web site
+	/**
+	 * Fetch a protein sequence from the UniProt web site
 	 *
 	 * @param uniProtID
 	 * @return a Protein Sequence
@@ -59,7 +63,8 @@ public class PredictDisorder {
 	private static ProteinSequence getUniprot(String uniProtID) throws Exception {
 
 		AminoAcidCompoundSet set = AminoAcidCompoundSet.getAminoAcidCompoundSet();
-		UniprotProxySequenceReader<AminoAcidCompound> uniprotSequence = new UniprotProxySequenceReader<AminoAcidCompound>(uniProtID,set);
+		UniprotProxySequenceReader<AminoAcidCompound> uniprotSequence = new UniprotProxySequenceReader<>(uniProtID,
+				set);
 
 		ProteinSequence seq = new ProteinSequence(uniprotSequence);
 

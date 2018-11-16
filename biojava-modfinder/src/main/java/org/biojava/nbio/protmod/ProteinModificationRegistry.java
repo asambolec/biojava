@@ -32,11 +32,10 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * This class serves as a instance registry by maintaining
- * a pool of ProteinModification instances.
+ * This class serves as a instance registry by maintaining a pool of
+ * ProteinModification instances.
  *
- * A list of common protein modifications were preloaded
- * from an XML file.
+ * A list of common protein modifications were preloaded from an XML file.
  *
  * @author Jianjiong Gao
  * @since 3.0
@@ -55,9 +54,7 @@ public class ProteinModificationRegistry {
 	private static Map<ModificationCategory, Set<ProteinModification>> byCategory = null;
 	private static Map<ModificationOccurrenceType, Set<ProteinModification>> byOccurrenceType = null;
 
-	private static String DIR_XML_PTM_LIST = "ptm_list.xml";
-
-
+	private static String dirXmlPtmList = "ptm_list.xml";
 
 	/**
 	 * register common protein modifications from XML file.
@@ -79,68 +76,70 @@ public class ProteinModificationRegistry {
 
 	}
 
-	/** Initialization the static variables and register common modifications.
-	 * Allows external user to provide alternative ptm_list.xml file instead of the one contained in this jar file.
+	/**
+	 * Initialization the static variables and register common modifications. Allows
+	 * external user to provide alternative ptm_list.xml file instead of the one
+	 * contained in this jar file.
 	 *
-	 * @param inStream InputStream to a XML file containing the list of PTMs (as in ptm_list.xml)
+	 * @param inStream InputStream to a XML file containing the list of PTMs (as in
+	 *                 ptm_list.xml)
 	 */
 
 	public static void init(InputStream inStream) {
 		lazyInit(inStream);
 	}
 
-
-
 	/**
 	 * Lazy Initialization the static variables and register common modifications.
-	 * just opens the stream to ptm_list.xml and delegates to lazyInit(InputStream) for parsing.
+	 * just opens the stream to ptm_list.xml and delegates to lazyInit(InputStream)
+	 * for parsing.
 	 */
 	private static synchronized void lazyInit() {
-		if (registry==null) {
-			InputStream isXml = ProteinModification.class.getResourceAsStream(DIR_XML_PTM_LIST);
-			lazyInit(isXml);
+		if (registry != null) {
+			return;
 		}
+		InputStream isXml = ProteinModification.class.getResourceAsStream(dirXmlPtmList);
+		lazyInit(isXml);
 	}
-
 
 	/**
 	 * Lazy Initialization the static variables and register common modifications.
 	 */
 	private static synchronized void lazyInit(InputStream inStream) {
-		if (registry==null) {
-
-			registry = 	new HashSet<ProteinModification>();
-			byId = new HashMap<String, ProteinModification>();
-			byResidId = new HashMap<String, Set<ProteinModification>>();
-			byPsimodId = new HashMap<String, Set<ProteinModification>>();
-			byPdbccId = new HashMap<String, Set<ProteinModification>>();
-			byKeyword = new HashMap<String, Set<ProteinModification>>();
-			byComponent = new HashMap<Component, Set<ProteinModification>>();
-			byCategory = new EnumMap<ModificationCategory, Set<ProteinModification>>(
-					ModificationCategory.class);
-			for (ModificationCategory cat:ModificationCategory.values()) {
-				byCategory.put(cat, new HashSet<ProteinModification>());
-			}
-			byOccurrenceType = new EnumMap<ModificationOccurrenceType, Set<ProteinModification>>(
-					ModificationOccurrenceType.class);
-			for (ModificationOccurrenceType occ:ModificationOccurrenceType.values()) {
-				byOccurrenceType.put(occ, new HashSet<ProteinModification>());
-			}
-			registerCommonProteinModifications(inStream);
+		if (registry != null) {
+			return;
 		}
+		registry = new HashSet<>();
+		byId = new HashMap<>();
+		byResidId = new HashMap<>();
+		byPsimodId = new HashMap<>();
+		byPdbccId = new HashMap<>();
+		byKeyword = new HashMap<>();
+		byComponent = new HashMap<>();
+		byCategory = new EnumMap<>(ModificationCategory.class);
+		for (ModificationCategory cat : ModificationCategory.values()) {
+			byCategory.put(cat, new HashSet<>());
+		}
+		byOccurrenceType = new EnumMap<>(ModificationOccurrenceType.class);
+		for (ModificationOccurrenceType occ : ModificationOccurrenceType.values()) {
+			byOccurrenceType.put(occ, new HashSet<>());
+		}
+		registerCommonProteinModifications(inStream);
 	}
 
 	/**
 	 * Register a new ProteinModification.
 	 */
 	public static void register(final ProteinModification modification) {
-		if (modification==null) throw new IllegalArgumentException("modification == null!");
+		if (modification == null) {
+			throw new IllegalArgumentException("modification == null!");
+		}
 
 		lazyInit();
 
 		String id = modification.getId();
 		if (byId.containsKey(id)) {
-			throw new IllegalArgumentException(id+" has already been registered.");
+			throw new IllegalArgumentException(id + " has already been registered.");
 		}
 
 		registry.add(modification);
@@ -152,64 +151,66 @@ public class ProteinModificationRegistry {
 		ModificationOccurrenceType occType = modification.getOccurrenceType();
 		byOccurrenceType.get(occType).add(modification);
 
-
 		ModificationCondition condition = modification.getCondition();
 		List<Component> comps = condition.getComponents();
-		for (Component comp:comps) {
+		comps.forEach(comp -> {
 			Set<ProteinModification> mods = byComponent.get(comp);
-			if (mods==null) {
-				mods = new HashSet<ProteinModification>();
+			if (mods == null) {
+				mods = new HashSet<>();
 				byComponent.put(comp, mods);
 			}
 			mods.add(modification);
-		}
+		});
 
 		String pdbccId = modification.getPdbccId();
-		if (pdbccId!=null) {
+		if (pdbccId != null) {
 			Set<ProteinModification> mods = byPdbccId.get(pdbccId);
-			if (mods==null) {
-				mods = new HashSet<ProteinModification>();
+			if (mods == null) {
+				mods = new HashSet<>();
 				byPdbccId.put(pdbccId, mods);
 			}
 			mods.add(modification);
 		}
 
 		String residId = modification.getResidId();
-		if (residId!=null) {
+		if (residId != null) {
 			Set<ProteinModification> mods = byResidId.get(residId);
-			if (mods==null) {
-				mods = new HashSet<ProteinModification>();
+			if (mods == null) {
+				mods = new HashSet<>();
 				byResidId.put(residId, mods);
 			}
 			mods.add(modification);
 		}
 
 		String psimodId = modification.getPsimodId();
-		if (psimodId!=null) {
+		if (psimodId != null) {
 			Set<ProteinModification> mods = byPsimodId.get(psimodId);
-			if (mods==null) {
-				mods = new HashSet<ProteinModification>();
+			if (mods == null) {
+				mods = new HashSet<>();
 				byPsimodId.put(psimodId, mods);
 			}
 			mods.add(modification);
 		}
 
-		for (String keyword : modification.getKeywords()) {
+		modification.getKeywords().forEach(keyword -> {
 			Set<ProteinModification> mods = byKeyword.get(keyword);
-			if (mods==null) {
-				mods = new HashSet<ProteinModification>();
+			if (mods == null) {
+				mods = new HashSet<>();
 				byKeyword.put(keyword, mods);
 			}
 			mods.add(modification);
-		}
+		});
 	}
 
 	/**
 	 * Remove a modification from registry.
+	 * 
 	 * @param mod
 	 */
 	public static void unregister(ProteinModification modification) {
-		if (modification==null) throw new IllegalArgumentException("modification == null!");
+		if (modification == null) {
+			throw new IllegalArgumentException("modification == null!");
+		}
 
 		registry.remove(modification);
 
@@ -218,24 +219,34 @@ public class ProteinModificationRegistry {
 		Set<ProteinModification> mods;
 
 		mods = byResidId.get(modification.getResidId());
-		if (mods!=null) mods.remove(modification);
+		if (mods != null) {
+			mods.remove(modification);
+		}
 
 		mods = byPsimodId.get(modification.getPsimodId());
-		if (mods!=null) mods.remove(modification);
+		if (mods != null) {
+			mods.remove(modification);
+		}
 
 		mods = byPdbccId.get(modification.getPdbccId());
-		if (mods!=null) mods.remove(modification);
+		if (mods != null) {
+			mods.remove(modification);
+		}
 
 		for (String keyword : modification.getKeywords()) {
 			mods = byKeyword.get(keyword);
-			if (mods!=null) mods.remove(modification);
+			if (mods != null) {
+				mods.remove(modification);
+			}
 		}
 
 		ModificationCondition condition = modification.getCondition();
 		List<Component> comps = condition.getComponents();
 		for (Component comp : comps) {
 			mods = byComponent.get(comp);
-			if (mods!=null) mods.remove(modification);
+			if (mods != null) {
+				mods.remove(modification);
+			}
 		}
 
 		byCategory.get(modification.getCategory()).remove(modification);
@@ -261,6 +272,7 @@ public class ProteinModificationRegistry {
 		lazyInit();
 		return byResidId.get(residId);
 	}
+
 	/**
 	 *
 	 * @param psimodId PSI-MOD ID.
@@ -293,25 +305,25 @@ public class ProteinModificationRegistry {
 
 	/**
 	 * Get ProteinModifications that involves one or more components.
+	 * 
 	 * @param comp1 a {@link Component}.
 	 * @param comps other {@link Component}s.
 	 * @return a set of ProteinModifications that involves all the components.
 	 */
-	public static Set<ProteinModification> getByComponent(final Component comp1,
-			final Component... comps) {
+	public static Set<ProteinModification> getByComponent(final Component comp1, final Component... comps) {
 		lazyInit();
 		Set<ProteinModification> mods = byComponent.get(comp1);
-		if (mods==null) {
+		if (mods == null) {
 			return Collections.emptySet();
 		}
 
-		if (comps.length==0) {
+		if (comps.length == 0) {
 			return Collections.unmodifiableSet(mods);
 		} else {
-			Set<ProteinModification> ret = new HashSet<ProteinModification>(mods);
-			for (Component comp:comps) {
+			Set<ProteinModification> ret = new HashSet<>(mods);
+			for (Component comp : comps) {
 				mods = byComponent.get(comp);
-				if (mods==null) {
+				if (mods == null) {
 					return Collections.emptySet();
 				} else {
 					ret.retainAll(mods);
@@ -345,7 +357,8 @@ public class ProteinModificationRegistry {
 	/**
 	 *
 	 * @param occ {@link ModificationOccurrenceType}.
-	 * @return set of registered ProteinModifications of a particular occurrence type.
+	 * @return set of registered ProteinModifications of a particular occurrence
+	 *         type.
 	 */
 	public static Set<ProteinModification> getByOccurrenceType(final ModificationOccurrenceType occ) {
 		lazyInit();
@@ -412,6 +425,5 @@ public class ProteinModificationRegistry {
 		Set<String> ret = byKeyword.keySet();
 		return Collections.unmodifiableSet(ret);
 	}
-
 
 }

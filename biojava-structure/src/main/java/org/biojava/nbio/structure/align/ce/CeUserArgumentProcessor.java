@@ -24,16 +24,59 @@
 
 package org.biojava.nbio.structure.align.ce;
 
-
 import org.biojava.nbio.structure.align.StructureAlignment;
 import org.biojava.nbio.structure.align.ce.CeParameters.ScoringStrategy;
 
-/** process the arguments from command line
+/**
+ * process the arguments from command line
  *
  * @author Andreas Prlic
  *
  */
 public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
+
+	@Override
+	protected StartupParameters getStartupParametersInstance() {
+		return new CeStartupParams();
+	}
+
+	@Override
+	public StructureAlignment getAlgorithm() {
+		return new CeMain();
+	}
+
+	@Override
+	public Object getParameters() {
+
+		StructureAlignment alignment = getAlgorithm();
+
+		CeParameters aligParams = (CeParameters) alignment.getParameters();
+		CeStartupParams startParams = (CeStartupParams) params;
+
+		if (aligParams == null) {
+			aligParams = new CECPParameters();
+		}
+
+		// Copy relevant parameters from the startup parameters
+		aligParams.setMaxGapSize(startParams.getMaxGapSize());
+		aligParams.setWinSize(startParams.getWinSize());
+		aligParams.setScoringStrategy(startParams.getScoringStrategy());
+		aligParams.setMaxOptRMSD(startParams.getMaxOptRMSD());
+		aligParams.setGapOpen(startParams.getGapOpen());
+		aligParams.setGapExtension(startParams.getGapExtension());
+		aligParams.setShowAFPRanges(startParams.isShowAFPRanges());
+		return aligParams;
+	}
+
+	@Override
+	public String getDbSearchLegend() {
+		// String legend = "#
+		// name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tsim1\tsim2\t " ;
+		// return legend;
+
+		return "# name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t ";
+
+	}
 
 	protected static class CeStartupParams extends StartupParameters {
 		protected int maxGapSize;
@@ -45,7 +88,6 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 		protected boolean showAFPRanges;
 
 		public CeStartupParams() {
-			super();
 			maxGapSize = 30;
 			winSize = 8;
 			scoringStrategy = CeParameters.ScoringStrategy.DEFAULT_SCORING_STRATEGY;
@@ -87,7 +129,9 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 			this.gapExtension = gapExtension;
 		}
 
-		/** CE specific parameter: set the Max gap size parameter G (during AFP extension). Default: 30
+		/**
+		 * CE specific parameter: set the Max gap size parameter G (during AFP
+		 * extension). Default: 30
 		 *
 		 * @return the maximum gap size G parameter.
 		 */
@@ -95,7 +139,9 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 			return maxGapSize;
 		}
 
-		/** CE specific parameter: set the Max gap size parameter G (during AFP extension). Default: 30
+		/**
+		 * CE specific parameter: set the Max gap size parameter G (during AFP
+		 * extension). Default: 30
 		 *
 		 * @param maxGapSize
 		 */
@@ -103,18 +149,16 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 			this.maxGapSize = maxGapSize;
 		}
 
-		public boolean isShowAFPRanges()
-		{
+		public boolean isShowAFPRanges() {
 			return showAFPRanges;
 		}
 
-		public void setShowAFPRanges(boolean showAFP)
-		{
+		public void setShowAFPRanges(boolean showAFP) {
 			this.showAFPRanges = showAFP;
 		}
 
-
-		/**(jCE specific): maximum RMSD that shall be calculated for the alignment.
+		/**
+		 * (jCE specific): maximum RMSD that shall be calculated for the alignment.
 		 *
 		 * @return maxOptRMSD parameter
 		 */
@@ -122,7 +166,8 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 			return maxOptRMSD;
 		}
 
-		/** (jCE specific): maximum RMSD that shall be calculated for the alignment.
+		/**
+		 * (jCE specific): maximum RMSD that shall be calculated for the alignment.
 		 *
 		 * @param maxOptRMSD max RMSD to calculate
 		 */
@@ -133,77 +178,22 @@ public class CeUserArgumentProcessor extends AbstractUserArgumentProcessor {
 		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
-			builder.append("CeStartupParams [maxGapSize=").append(maxGapSize)
-					.append(", winSize=").append(winSize)
-					.append(", scoringStrategy=").append(scoringStrategy)
-					.append(", maxOptRMSD=").append(maxOptRMSD)
-					.append(", gapOpen=").append(gapOpen)
-					.append(", gapExtension=").append(gapExtension)
-					.append(", showAFPRanges=").append(showAFPRanges)
-					.append(", pdbFilePath=").append(pdbFilePath)
-					.append(", cacheFilePath=").append(cacheFilePath)
-					.append(", outFile=").append(outFile).append(", pdb1=")
-					.append(pdb1).append(", pdb2=").append(pdb2)
-					.append(", file1=").append(file1).append(", file2=")
-					.append(file2).append(", showDBresult=")
-					.append(showDBresult).append(", printXML=")
-					.append(printXML).append(", printFatCat=")
-					.append(printFatCat).append(", show3d=").append(show3d)
-					.append(", autoFetch=").append(autoFetch)
-					.append(", printCE=").append(printCE).append(", showMenu=")
-					.append(showMenu).append(", printPDB=").append(printPDB)
-					.append(", isDomainSplit=").append(isDomainSplit)
-					.append(", alignPairs=").append(alignPairs)
-					.append(", searchFile=").append(searchFile)
-					.append(", saveOutputDir=").append(saveOutputDir)
+			builder.append("CeStartupParams [maxGapSize=").append(maxGapSize).append(", winSize=").append(winSize)
+					.append(", scoringStrategy=").append(scoringStrategy).append(", maxOptRMSD=").append(maxOptRMSD)
+					.append(", gapOpen=").append(gapOpen).append(", gapExtension=").append(gapExtension)
+					.append(", showAFPRanges=").append(showAFPRanges).append(", pdbFilePath=").append(pdbFilePath)
+					.append(", cacheFilePath=").append(cacheFilePath).append(", outFile=").append(outFile)
+					.append(", pdb1=").append(pdb1).append(", pdb2=").append(pdb2).append(", file1=").append(file1)
+					.append(", file2=").append(file2).append(", showDBresult=").append(showDBresult)
+					.append(", printXML=").append(printXML).append(", printFatCat=").append(printFatCat)
+					.append(", show3d=").append(show3d).append(", autoFetch=").append(autoFetch).append(", printCE=")
+					.append(printCE).append(", showMenu=").append(showMenu).append(", printPDB=").append(printPDB)
+					.append(", isDomainSplit=").append(isDomainSplit).append(", alignPairs=").append(alignPairs)
+					.append(", searchFile=").append(searchFile).append(", saveOutputDir=").append(saveOutputDir)
 					.append(", nrCPU=").append(nrCPU).append("]");
 			return builder.toString();
 		}
 
 	}
-
-	@Override
-	protected StartupParameters getStartupParametersInstance() {
-		return new CeStartupParams();
-	}
-
-	@Override
-	public StructureAlignment getAlgorithm() {
-		return new CeMain();
-	}
-
-
-	@Override
-	public Object getParameters() {
-
-		StructureAlignment alignment = getAlgorithm();
-
-		CeParameters aligParams = (CeParameters) alignment.getParameters();
-		CeStartupParams startParams = (CeStartupParams) params;
-
-		if ( aligParams == null)
-			aligParams = new CECPParameters();
-
-		// Copy relevant parameters from the startup parameters
-		aligParams.setMaxGapSize(startParams.getMaxGapSize());
-		aligParams.setWinSize(startParams.getWinSize());
-		aligParams.setScoringStrategy(startParams.getScoringStrategy());
-		aligParams.setMaxOptRMSD(startParams.getMaxOptRMSD());
-		aligParams.setGapOpen(startParams.getGapOpen());
-		aligParams.setGapExtension(startParams.getGapExtension());
-		aligParams.setShowAFPRanges(startParams.isShowAFPRanges());
-		return aligParams;
-	}
-
-
-	@Override
-	public String getDbSearchLegend(){
-		//String legend = "# name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tsim1\tsim2\t " ;
-		//return legend;
-
-		return "# name1\tname2\tscore\tz-score\trmsd\tlen1\tlen2\tcov1\tcov2\t%ID\tDescription\t " ;
-
-	}
-
 
 }

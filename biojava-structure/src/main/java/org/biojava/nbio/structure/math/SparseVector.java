@@ -26,57 +26,72 @@ package org.biojava.nbio.structure.math;
 
 import java.io.Serializable;
 
-
 /**
  *
- *  A sparse vector, implemented using a symbol table.
+ * A sparse vector, implemented using a symbol table.
  *
- *  Derived from http://introcs.cs.princeton.edu/java/44st/SparseVector.java.html
+ * Derived from http://introcs.cs.princeton.edu/java/44st/SparseVector.java.html
  *
- *  For additional documentation, see <a href="http://introcs.cs.princeton.edu/44st">Section 4.4</a> of
- *  <i>Introduction to Programming in Java: An Interdisciplinary Approach</i> by Robert Sedgewick and Kevin Wayne.
+ * For additional documentation, see
+ * <a href="http://introcs.cs.princeton.edu/44st">Section 4.4</a> of
+ * <i>Introduction to Programming in Java: An Interdisciplinary Approach</i> by
+ * Robert Sedgewick and Kevin Wayne.
  */
 
-public class SparseVector implements Serializable{
+public class SparseVector implements Serializable {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1174668523213431927L;
 
-	private final int N;             // length
+	private final int n; // length
 
-	private SymbolTable<Integer, Double> symbolTable;  // the vector, represented by index-value pairs
+	private SymbolTable<Integer, Double> symbolTable; // the vector, represented by index-value pairs
 
-
-	/** Constructor. initialize the all 0s vector of length N
+	/**
+	 * Constructor. initialize the all 0s vector of length N
 	 *
 	 * @param N
 	 */
 	public SparseVector(int N) {
-		this.N  = N;
-		this.symbolTable = new SymbolTable<Integer, Double>();
+		this.n = N;
+		this.symbolTable = new SymbolTable<>();
 	}
 
-	/** Setter method (should it be renamed to set?)
-	*
-	* @param i set symbolTable[i]
-	* @param value
-	*/
+	/**
+	 * Setter method (should it be renamed to set?)
+	 *
+	 * @param i     set symbolTable[i]
+	 * @param value
+	 */
 	public void put(int i, double value) {
-		if (i < 0 || i >= N) throw new IllegalArgumentException("Illegal index " + i + " should be > 0 and < " + N);
-		if (value == 0.0) symbolTable.delete(i);
-		else              symbolTable.put(i, value);
+		if (i < 0 || i >= n) {
+			throw new IllegalArgumentException(new StringBuilder().append("Illegal index ").append(i)
+					.append(" should be > 0 and < ").append(n).toString());
+		}
+		if (value == 0.0) {
+			symbolTable.delete(i);
+		} else {
+			symbolTable.put(i, value);
+		}
 	}
 
-	/** get a value
+	/**
+	 * get a value
 	 *
 	 * @param i
-	 * @return  return symbolTable[i]
+	 * @return return symbolTable[i]
 	 */
 	public double get(int i) {
-		if (i < 0 || i >= N) throw new IllegalArgumentException("Illegal index " + i + " should be > 0 and < " + N);
-		if (symbolTable.contains(i)) return symbolTable.get(i);
-		else                return 0.0;
+		if (i < 0 || i >= n) {
+			throw new IllegalArgumentException(new StringBuilder().append("Illegal index ").append(i)
+					.append(" should be > 0 and < ").append(n).toString());
+		}
+		if (symbolTable.contains(i)) {
+			return symbolTable.get(i);
+		} else {
+			return 0.0;
+		}
 	}
 
 	// return the number of nonzero entries
@@ -86,32 +101,42 @@ public class SparseVector implements Serializable{
 
 	// return the size of the vector
 	public int size() {
-		return N;
+		return n;
 	}
 
-	/** Calculates the dot product of this vector a with b
+	/**
+	 * Calculates the dot product of this vector a with b
 	 *
 	 * @param b
 	 * @return
 	 */
 	public double dot(SparseVector b) {
 		SparseVector a = this;
-		if (a.N != b.N) throw new IllegalArgumentException("Vector lengths disagree. " + a.N + " != " + b.N);
+		if (a.n != b.n) {
+			throw new IllegalArgumentException(new StringBuilder().append("Vector lengths disagree. ").append(a.n)
+					.append(" != ").append(b.n).toString());
+		}
 		double sum = 0.0;
 
 		// iterate over the vector with the fewest nonzeros
 		if (a.symbolTable.size() <= b.symbolTable.size()) {
-			for (int i : a.symbolTable)
-				if (b.symbolTable.contains(i)) sum += a.get(i) * b.get(i);
-		}
-		else  {
-			for (int i : b.symbolTable)
-				if (a.symbolTable.contains(i)) sum += a.get(i) * b.get(i);
+			for (int i : a.symbolTable) {
+				if (b.symbolTable.contains(i)) {
+					sum += a.get(i) * b.get(i);
+				}
+			}
+		} else {
+			for (int i : b.symbolTable) {
+				if (a.symbolTable.contains(i)) {
+					sum += a.get(i) * b.get(i);
+				}
+			}
 		}
 		return sum;
 	}
 
-	/** Calculates the 2-norm
+	/**
+	 * Calculates the 2-norm
 	 *
 	 * @return
 	 */
@@ -120,29 +145,40 @@ public class SparseVector implements Serializable{
 		return Math.sqrt(a.dot(a));
 	}
 
-	/** Calculates  alpha * a
+	/**
+	 * Calculates alpha * a
 	 *
 	 * @param alpha
 	 * @return
 	 */
 	public SparseVector scale(double alpha) {
 		SparseVector a = this;
-		SparseVector c = new SparseVector(N);
-		for (int i : a.symbolTable) c.put(i, alpha * a.get(i));
+		SparseVector c = new SparseVector(n);
+		for (int i : a.symbolTable) {
+			c.put(i, alpha * a.get(i));
+		}
 		return c;
 	}
 
-	/** Calcualtes return a + b
+	/**
+	 * Calcualtes return a + b
 	 *
 	 * @param b
 	 * @return
 	 */
 	public SparseVector plus(SparseVector b) {
 		SparseVector a = this;
-		if (a.N != b.N) throw new IllegalArgumentException("Vector lengths disagree : " + a.N + " != " + b.N);
-		SparseVector c = new SparseVector(N);
-		for (int i : a.symbolTable) c.put(i, a.get(i));                // c = a
-		for (int i : b.symbolTable) c.put(i, b.get(i) + c.get(i));     // c = c + b
+		if (a.n != b.n) {
+			throw new IllegalArgumentException(new StringBuilder().append("Vector lengths disagree : ").append(a.n)
+					.append(" != ").append(b.n).toString());
+		}
+		SparseVector c = new SparseVector(n);
+		for (int i : a.symbolTable) {
+			c.put(i, a.get(i)); // c = a
+		}
+		for (int i : b.symbolTable) {
+			c.put(i, b.get(i) + c.get(i)); // c = c + b
+		}
 		return c;
 	}
 
@@ -159,6 +195,4 @@ public class SparseVector implements Serializable{
 		return s.toString();
 	}
 
-
 }
-

@@ -37,17 +37,19 @@ import org.biojava.nbio.structure.StructureIdentifier;
 import org.biojava.nbio.structure.SubstructureIdentifier;
 import org.biojava.nbio.structure.align.util.AtomCache;
 
-
-/** Container for the information for a domain. Contains a line in the file
+/**
+ * Container for the information for a domain. Contains a line in the file
  * dir.cla.scop.txt_1.75
  *
- * e.g d1dlwa_	1dlw	A:	a.1.1.1	14982	cl=46456,cf=46457,sf=46458,fa=46459,dm=46460,sp=46461,px=14982
+ * e.g d1dlwa_ 1dlw A: a.1.1.1 14982
+ * cl=46456,cf=46457,sf=46458,fa=46459,dm=46460,sp=46461,px=14982
  *
  * Instantiated using {@link ScopDatabase#getDomainByScopID(String)}
+ * 
  * @author Andreas Prlic
  *
  */
-@XmlRootElement(name = "ScopDomain", namespace ="http://source.rcsb.org")
+@XmlRootElement(name = "ScopDomain", namespace = "http://source.rcsb.org")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class ScopDomain implements Serializable, Cloneable, StructureIdentifier {
 
@@ -67,31 +69,29 @@ public class ScopDomain implements Serializable, Cloneable, StructureIdentifier 
 	int speciesId;
 	int px;
 
-
-
-
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append(scopId);
-		buf.append("\t") ;
+		buf.append("\t");
 		buf.append(pdbId);
-		buf.append( "\t");
+		buf.append("\t");
 
 		int rangePos = 0;
-		for (String range: ranges){
+		for (String range : ranges) {
 			rangePos++;
 
 			buf.append(range);
 
-			if ( ( ranges.size()> 1 ) && (rangePos < ranges.size()))
+			if ((ranges.size() > 1) && (rangePos < ranges.size())) {
 				buf.append(",");
+			}
 		}
-		buf.append("\t") ;
+		buf.append("\t");
 		buf.append(classificationId);
-		buf.append("\t") ;
+		buf.append("\t");
 		buf.append(String.valueOf(sunid));
-		buf.append("\t") ;
+		buf.append("\t");
 
 		buf.append("cl=");
 		buf.append(String.valueOf(classId));
@@ -108,79 +108,101 @@ public class ScopDomain implements Serializable, Cloneable, StructureIdentifier 
 		buf.append(",px=");
 		buf.append(String.valueOf(px));
 
-
 		return buf.toString();
 	}
 
 	public String getScopId() {
 		return scopId;
 	}
+
 	public void setScopId(String scopId) {
 		this.scopId = scopId;
 	}
+
 	public String getPdbId() {
 		return pdbId;
 	}
+
 	public void setPdbId(String pdbId) {
 		this.pdbId = pdbId;
 	}
+
 	public List<String> getRanges() {
 		return ranges;
 	}
+
 	public void setRanges(List<String> ranges) {
 		this.ranges = ranges;
 	}
+
 	public String getClassificationId() {
 		return classificationId;
 	}
+
 	public void setClassificationId(String classificationId) {
 		this.classificationId = classificationId;
 	}
+
 	public Integer getSunid() {
 		return sunid;
 	}
+
 	public void setSunid(Integer sunid) {
 		this.sunid = sunid;
 	}
+
 	public int getClassId() {
 		return classId;
 	}
+
 	public void setClassId(int classId) {
 		this.classId = classId;
 	}
+
 	public int getFoldId() {
 		return foldId;
 	}
+
 	public void setFoldId(int foldId) {
 		this.foldId = foldId;
 	}
+
 	public int getSuperfamilyId() {
 		return superfamilyId;
 	}
+
 	public void setSuperfamilyId(int superfamilyId) {
 		this.superfamilyId = superfamilyId;
 	}
+
 	public int getFamilyId() {
 		return familyId;
 	}
+
 	public void setFamilyId(int familyId) {
 		this.familyId = familyId;
 	}
+
 	public int getDomainId() {
 		return domainId;
 	}
+
 	public void setDomainId(int domainId) {
 		this.domainId = domainId;
 	}
+
 	public int getSpeciesId() {
 		return speciesId;
 	}
+
 	public void setSpeciesId(int speciesId) {
 		this.speciesId = speciesId;
 	}
+
 	public int getPx() {
 		return px;
 	}
+
 	public void setPx(int px) {
 		this.px = px;
 	}
@@ -204,19 +226,18 @@ public class ScopDomain implements Serializable, Cloneable, StructureIdentifier 
 		n.setSunid(getSunid());
 		n.setSuperfamilyId(getSuperfamilyId());
 
-
 		return n;
-
 
 	}
 
 	/**
-	 * Returns the chains this domain is defined over; contains more than 1 element only if this domains is a multi-chain domain.
+	 * Returns the chains this domain is defined over; contains more than 1 element
+	 * only if this domains is a multi-chain domain.
 	 */
 	public Set<String> getChains() {
-		Set<String> chains = new HashSet<String>();
+		Set<String> chains = new HashSet<>();
 		List<ResidueRange> rrs = ResidueRange.parseMultiple(getRanges());
-		for (ResidueRange rr : rrs) chains.add(rr.getChainName());
+		rrs.forEach(rr -> chains.add(rr.getChainName()));
 		return chains;
 	}
 
@@ -240,8 +261,7 @@ public class ScopDomain implements Serializable, Cloneable, StructureIdentifier 
 	}
 
 	@Override
-	public Structure loadStructure(AtomCache cache) throws StructureException,
-	IOException {
+	public Structure loadStructure(AtomCache cache) throws StructureException, IOException {
 		return cache.getStructureForPdbId(pdbId);
 	}
 

@@ -25,6 +25,7 @@ package org.biojava.nbio.structure.io.sifts;
 
 /**
  * An entry in the chain-level SIFTS mapping between UniProt and the PDB.
+ * 
  * @author dmyersturnbull
  * @see SiftsChainToUniprotMapping
  * @since 3.0.7
@@ -44,7 +45,6 @@ public class SiftsChainEntry {
 
 	public SiftsChainEntry(String pdbId, String chainId, String uniProtId, String seqresStart, String seqresEnd,
 			String pdbStart, String pdbEnd, String uniprotStart, String uniprotEnd) {
-		super();
 		this.pdbId = pdbId;
 		this.chainId = chainId;
 		this.uniProtId = uniProtId;
@@ -58,37 +58,79 @@ public class SiftsChainEntry {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
 		SiftsChainEntry other = (SiftsChainEntry) obj;
 		if (chainId == null) {
-			if (other.chainId != null) return false;
-		} else if (!chainId.equals(other.chainId)) return false;
+			if (other.chainId != null) {
+				return false;
+			}
+		} else if (!chainId.equals(other.chainId)) {
+			return false;
+		}
 		if (pdbEnd == null) {
-			if (other.pdbEnd != null) return false;
-		} else if (!pdbEnd.equals(other.pdbEnd)) return false;
+			if (other.pdbEnd != null) {
+				return false;
+			}
+		} else if (!pdbEnd.equals(other.pdbEnd)) {
+			return false;
+		}
 		if (pdbId == null) {
-			if (other.pdbId != null) return false;
-		} else if (!pdbId.equals(other.pdbId)) return false;
+			if (other.pdbId != null) {
+				return false;
+			}
+		} else if (!pdbId.equals(other.pdbId)) {
+			return false;
+		}
 		if (pdbStart == null) {
-			if (other.pdbStart != null) return false;
-		} else if (!pdbStart.equals(other.pdbStart)) return false;
+			if (other.pdbStart != null) {
+				return false;
+			}
+		} else if (!pdbStart.equals(other.pdbStart)) {
+			return false;
+		}
 		if (seqresEnd == null) {
-			if (other.seqresEnd != null) return false;
-		} else if (!seqresEnd.equals(other.seqresEnd)) return false;
+			if (other.seqresEnd != null) {
+				return false;
+			}
+		} else if (!seqresEnd.equals(other.seqresEnd)) {
+			return false;
+		}
 		if (seqresStart == null) {
-			if (other.seqresStart != null) return false;
-		} else if (!seqresStart.equals(other.seqresStart)) return false;
+			if (other.seqresStart != null) {
+				return false;
+			}
+		} else if (!seqresStart.equals(other.seqresStart)) {
+			return false;
+		}
 		if (uniProtId == null) {
-			if (other.uniProtId != null) return false;
-		} else if (!uniProtId.equals(other.uniProtId)) return false;
+			if (other.uniProtId != null) {
+				return false;
+			}
+		} else if (!uniProtId.equals(other.uniProtId)) {
+			return false;
+		}
 		if (uniprotEnd == null) {
-			if (other.uniprotEnd != null) return false;
-		} else if (!uniprotEnd.equals(other.uniprotEnd)) return false;
+			if (other.uniprotEnd != null) {
+				return false;
+			}
+		} else if (!uniprotEnd.equals(other.uniprotEnd)) {
+			return false;
+		}
 		if (uniprotStart == null) {
-			if (other.uniprotStart != null) return false;
-		} else if (!uniprotStart.equals(other.uniprotStart)) return false;
+			if (other.uniprotStart != null) {
+				return false;
+			}
+		} else if (!uniprotStart.equals(other.uniprotStart)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -158,9 +200,11 @@ public class SiftsChainEntry {
 
 	@Override
 	public String toString() {
-		return "SiftsChainToUniprotEntry [pdbId=" + pdbId + ", chainName=" + chainId + ", uniProtId=" + uniProtId
-				+ ", seqresStart=" + seqresStart + ", seqresEnd=" + seqresEnd + ", pdbStart=" + pdbStart + ", pdbEnd="
-				+ pdbEnd + ", uniprotStart=" + uniprotStart + ", uniprotEnd=" + uniprotEnd + "]";
+		return new StringBuilder().append("SiftsChainToUniprotEntry [pdbId=").append(pdbId).append(", chainName=")
+				.append(chainId).append(", uniProtId=").append(uniProtId).append(", seqresStart=").append(seqresStart)
+				.append(", seqresEnd=").append(seqresEnd).append(", pdbStart=").append(pdbStart).append(", pdbEnd=")
+				.append(pdbEnd).append(", uniprotStart=").append(uniprotStart).append(", uniprotEnd=")
+				.append(uniprotEnd).append("]").toString();
 	}
 
 }

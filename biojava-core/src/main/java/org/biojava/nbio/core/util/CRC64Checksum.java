@@ -30,24 +30,25 @@ import java.util.zip.Checksum;
  * the bottom 32 bits. An int is 32-bit but encodes sign so we can get amusing
  * results if we don't allow for this.
  *
- * @author Unknown. Copied from Expasy4J for convenience. See <a
- *         href="http://dev.isb-sib.ch/projects/expasy4j/">http://dev.isb-sib.ch/projects/expasy4j/</a>
+ * @author Unknown. Copied from Expasy4J for convenience. See <a href=
+ *         "http://dev.isb-sib.ch/projects/expasy4j/">http://dev.isb-sib.ch/projects/expasy4j/</a>
  */
 public class CRC64Checksum implements Checksum {
 	private static final long POLY64 = 0xD800000000000000L;
 
 	private static final long[] crcTable = new long[256];
 
-	private long crc;
-
 	static {
 		for (int i = 0; i < 256; ++i) {
 			long part = i;
-			for (int j = 0; j < 8; ++j)
+			for (int j = 0; j < 8; ++j) {
 				part = ((part & 1) != 0) ? (part >>> 1) ^ POLY64 : (part >>> 1);
+			}
 			crcTable[i] = part;
 		}
 	}
+
+	private long crc;
 
 	@Override
 	public void update(int b) {
@@ -58,15 +59,17 @@ public class CRC64Checksum implements Checksum {
 
 	@Override
 	public void update(byte[] b, int offset, int length) {
-		for (int i = offset; i < length; ++i)
+		for (int i = offset; i < length; ++i) {
 			update(b[i]);
+		}
 	}
 
 	public void update(String s) {
 		// update(s.getBytes(), 0, s.length());
 		int size = s.length();
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < size; ++i) {
 			update(s.charAt(i));
+		}
 
 	}
 
@@ -76,16 +79,17 @@ public class CRC64Checksum implements Checksum {
 	}
 
 	/**
-	 * Returns a zero-padded 16 character wide string containing the current
-	 * value of this checksum in uppercase hexadecimal format.
+	 * Returns a zero-padded 16 character wide string containing the current value
+	 * of this checksum in uppercase hexadecimal format.
 	 */
 	@Override
 	public String toString() {
-		StringBuffer builder = new StringBuffer();
+		StringBuilder builder = new StringBuilder();
 		builder.append(Long.toHexString(crc >>> 4));
 		builder.append(Long.toHexString(crc & 0xF));
-		for (int i = 16 - builder.length(); i > 0; --i)
+		for (int i = 16 - builder.length(); i > 0; --i) {
 			builder.insert(0, '0');
+		}
 		return builder.toString().toUpperCase();
 	}
 

@@ -25,8 +25,7 @@ package org.biojava.nbio.genome.io.fastq;
  *
  * @since 3.0.3
  */
-public interface StreamListener
-{
+public interface StreamListener {
 	/**
 	 * Notify this listener of a FASTQ formatted sequence.
 	 *

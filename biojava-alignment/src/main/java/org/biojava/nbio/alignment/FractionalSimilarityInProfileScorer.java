@@ -31,12 +31,14 @@ import org.biojava.nbio.core.sequence.template.Compound;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
 /**
- * Implements an algorithm which computes a score for a sequence alignment pair picked from an alignment
- * {@link Profile}.  The reported score is the number of alignment columns which have similar {@link Compound}s.
+ * Implements an algorithm which computes a score for a sequence alignment pair
+ * picked from an alignment {@link Profile}. The reported score is the number of
+ * alignment columns which have similar {@link Compound}s.
  *
  * @author Mark Chapman
  * @param <S> each {@link Sequence} of the alignment pair is of type S
- * @param <C> each element of an {@link AlignedSequence} is a {@link Compound} of type C
+ * @param <C> each element of an {@link AlignedSequence} is a {@link Compound}
+ *        of type C
  */
 public class FractionalSimilarityInProfileScorer<S extends Sequence<C>, C extends Compound>
 		extends FractionalSimilarityScorer<S, C> implements PairInProfileScorer<S, C> {
@@ -44,11 +46,12 @@ public class FractionalSimilarityInProfileScorer<S extends Sequence<C>, C extend
 	private Profile<S, C> profile;
 
 	/**
-	 * Creates a fractional similarity scorer for an aligned pair of sequences in the given alignment profile.
+	 * Creates a fractional similarity scorer for an aligned pair of sequences in
+	 * the given alignment profile.
 	 *
 	 * @param profile alignment profile containing pair of sequences
-	 * @param query index in the profile of the first sequence of the pair
-	 * @param target index in the profile of the second sequence of the pair
+	 * @param query   index in the profile of the first sequence of the pair
+	 * @param target  index in the profile of the second sequence of the pair
 	 */
 	public FractionalSimilarityInProfileScorer(Profile<S, C> profile, int query, int target) {
 		super(new SimpleSequencePair<S, C>(profile.getAlignedSequence(query), profile.getAlignedSequence(target)));

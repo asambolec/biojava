@@ -38,17 +38,23 @@ import org.biojava.nbio.structure.io.FastaAFPChainConverter;
 import org.biojava.nbio.structure.io.FastaStructureParser;
 
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Demo displaying a structural alignment from a FASTA file using {@link FastaAFPChainConverter}.
+ * Demo displaying a structural alignment from a FASTA file using
+ * {@link FastaAFPChainConverter}.
  *
  * @author dmyerstu
- * @see {@link DemoAlignmentFromFasta} Also demonstrates the display of {@link StructureAlignment StructureAlignments} from FASTA sequences, but does so using the more general
- *      {@link FastaStructureParser}
+ * @see {@link DemoAlignmentFromFasta} Also demonstrates the display of
+ *      {@link StructureAlignment StructureAlignments} from FASTA sequences, but
+ *      does so using the more general {@link FastaStructureParser}
  */
 public class AFPFromFasta {
 
-	public static void main(String[] args) throws IOException, StructureException, Exception {
+	private static final Logger logger = LoggerFactory.getLogger(AFPFromFasta.class);
+
+	public static void main(String[] args) throws Exception {
 		Structure structure1 = StructureTools.getStructure("1w0p");
 		Structure structure2 = StructureTools.getStructure("1w0p");
 		String first = "alfdynatgdtefdspakqgwmqdntnngsgvltnadgmpawlvqgiggraqwtyslstnqhaqassfgwrmttemkvlsggmitnyyangtqrvlpiisldssgnlvvefegqtgrtvlatgtaateyhkfelvflpgsnpsasfyfdgklirdniqptaskQNMIVWGNGSSntdgvaayrdikfei------------------------------------------------------------------------------------------------------------------QGDVIf------------RGPDRIPSIVASsvTPGVVTAFAEKRVGGgdpgalsntNDIITRTSRDGGITWDTELNLTEQinvsdeFDFSDPRPIYDPs---SNTVLVSYARWPtdaaqngdrikpwmpNGIFYSVYDVASgnWQAPIDVTdqvkersfqiagwggselyrrntslnsqqdwqsnakirivdgaanqiqvadgsrkyvvtlsidesgglvanlngvsapiilqsehakvhsfhdyelqysalnhtttlfvdgqqittwagevsqenniqfgnadaqidgrlhvqkivltqqghnlvefdafylaqqtpevekdleklgwtkiktgntmslygNASVNPGpgHGITLtrqqnisgsqNGRLIYPAIVLdrfFLNVMSIYSDDGgsnwq-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------TGSTLpipfrwksssileTLEPSEADMVELQN--GDLLLTARLDFNQivngvny--SPRQQFLSKDGGITWSLLEANNANvfsnistgTVDASITRFEqsdgSHFLLFTNPQGnpagTNgr------------QNLGLWFSFDEG--VTWKGPIQ--LVNGasaysdiyqldsenaivivetdnsnmrilrmpitllkqklt";
@@ -57,10 +63,10 @@ public class AFPFromFasta {
 		Atom[] ca1 = StructureTools.getAtomCAArray(structure1);
 		Atom[] ca2 = StructureTools.getAtomCAArray(structure2);
 		String xml = AFPChainXMLConverter.toXML(afpChain);
-		System.out.println(xml);
+		logger.info(xml);
 		double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2);
 		afpChain.setTMScore(tmScore);
-		System.out.println(AfpChainWriter.toScoresList(afpChain));
+		logger.info(AfpChainWriter.toScoresList(afpChain));
 		StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 	}
 

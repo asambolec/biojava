@@ -22,7 +22,6 @@
  */
 package org.biojava.nbio.structure.align.gui.jmol;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,65 +42,58 @@ public class AtomInfoParser {
 	}
 
 	public AtomInfoParser() {
-		super();
-
-
 
 	}
 
-	public static void main(String[]args){
+	public static void main(String[] args) {
 		String s1 = "[GLY]371:A.CA #2811";
 		String s2 = "[ASP]1^A:A.CA/2 #2";
-		System.out.println(s1 + " got: " + AtomInfoParser.parse(s1));
-		System.out.println(s2 + " got: " + AtomInfoParser.parse(s2));
+		logger.info(new StringBuilder().append(s1).append(" got: ").append(AtomInfoParser.parse(s1)).toString());
+		logger.info(new StringBuilder().append(s2).append(" got: ").append(AtomInfoParser.parse(s2)).toString());
 	}
 
-
-	/** parses e.g.
-	 *  [MET]361:A.CA/1 #2843
-	 *  [GLY]339:A.CA #2573
-	 *  [ASN]44.CA #704
+	/**
+	 * parses e.g. [MET]361:A.CA/1 #2843 [GLY]339:A.CA #2573 [ASN]44.CA #704
 	 *
 	 * @param jmolAtomInfo
 	 * @return an AtomInfo
 	 */
-	public static AtomInfo parse(String jmolAtomInfo){
-
+	public static AtomInfo parse(String jmolAtomInfo) {
 
 		Matcher matcher = pattern.matcher(jmolAtomInfo);
 
 		boolean found = matcher.find();
-		if ( ! found) {
+		if (!found) {
 			logger.info("Could not parse the atomInfo string {}", jmolAtomInfo);
 			return new AtomInfo();
 		}
-		String residueName   = matcher.group(1);
+		String residueName = matcher.group(1);
 		String residueNumber = matcher.group(2);
-		String chainId       = matcher.group(3);
-		String atomName      = matcher.group(4);
-		String modelNumber   = matcher.group(5);
+		String chainId = matcher.group(3);
+		String atomName = matcher.group(4);
+		String modelNumber = matcher.group(5);
 
-
-
-		//System.out.println(jmolAtomInfo +" | " +  residueName + " number:" + residueNumber + " chain:" + chainName +
-		//		" atomName:" + atomName + " modelNumber:" + modelNumber );
+		// System.out.println(jmolAtomInfo +" | " + residueName + " number:" +
+		// residueNumber + " chain:" + chainName +
+		// " atomName:" + atomName + " modelNumber:" + modelNumber );
 
 		AtomInfo info = new AtomInfo();
 
 		info.setAtomName(atomName);
 		info.setResidueName(residueName);
-		info.setResidueNumber(residueNumber.replaceAll("\\^",""));
+		info.setResidueNumber(residueNumber.replaceAll("\\^", ""));
 
 		String ci = " ";
-		if (chainId != null)
-			ci = chainId.substring(1,chainId.length());
+		if (chainId != null) {
+			ci = chainId.substring(1, chainId.length());
+		}
 		info.setChainId(ci);
 
 		int mn = 1;
-		if ( modelNumber != null)
-			mn = Integer.parseInt(modelNumber.substring(1,modelNumber.length()));
+		if (modelNumber != null) {
+			mn = Integer.parseInt(modelNumber.substring(1, modelNumber.length()));
+		}
 		info.setModelNumber(mn);
-
 
 		return info;
 	}

@@ -37,39 +37,40 @@ public class MyJmolStatusListener implements JmolStatusListener {
 	private static final Logger logger = LoggerFactory.getLogger(MyJmolStatusListener.class);
 
 	JTextField status;
-	public MyJmolStatusListener(){
+
+	public MyJmolStatusListener() {
 	}
 
-	public void setTextField (JTextField statusField) {
+	public void setTextField(JTextField statusField) {
 		status = statusField;
 	}
 
 	@Override
 	public String createImage(String arg0, String arg1, Object arg2, int arg3) {
-		return null; //Cancelled
+		return null; // Cancelled
 	}
 
 	@Override
 	public String eval(String arg0) {
-		logger.debug("eval {}",arg0);
+		logger.debug("eval {}", arg0);
 		return null;
 	}
 
 	@Override
 	public float[][] functionXY(String arg0, int arg1, int arg2) {
-		logger.debug("XY {} {} {}",arg0,arg1, arg2);
-		return null; //Ignore isosurface commands
+		logger.debug("XY {} {} {}", arg0, arg1, arg2);
+		return null; // Ignore isosurface commands
 	}
 
 	@Override
 	public float[][][] functionXYZ(String arg0, int arg1, int arg2, int arg3) {
-		logger.debug("XYZ {} {} {} {}",arg0,arg1, arg2, arg3);
-		return null; //Ignore isosurface commands
+		logger.debug("XYZ {} {} {} {}", arg0, arg1, arg2, arg3);
+		return null; // Ignore isosurface commands
 	}
 
 	@Override
 	public Map<String, Object> getRegistryInfo() {
-		return null; //Ignore
+		return null; // Ignore
 	}
 
 	@Override
@@ -79,7 +80,7 @@ public class MyJmolStatusListener implements JmolStatusListener {
 	}
 
 	public void notifyCallback(int arg0, Object[] arg1) {
-		status.setText(arg0 +" " + arg1);
+		status.setText(new StringBuilder().append(arg0).append(" ").append(arg1).toString());
 
 	}
 
@@ -90,23 +91,21 @@ public class MyJmolStatusListener implements JmolStatusListener {
 	@Override
 	public void setCallbackFunction(String arg0, String arg1) {
 		logger.debug("callback: {} {}", arg0, arg1);
-		status.setText(arg0 + " " + arg1);
+		status.setText(new StringBuilder().append(arg0).append(" ").append(arg1).toString());
 	}
 
 	public String dialogAsk(String arg0, String arg1) {
-		logger.debug("dialogAsk {} {}",arg0,arg1);
-		return null; //Ignore
+		logger.debug("dialogAsk {} {}", arg0, arg1);
+		return null; // Ignore
 	}
 
 	public void handlePopupMenu(int arg0, int arg1) {
-		logger.debug("handlePopupMenu {} {}",arg0,arg1);
+		logger.debug("handlePopupMenu {} {}", arg0, arg1);
 	}
 
 	public void showConsole(boolean arg0) {
-		logger.debug("showConsole {}",arg0);
+		logger.debug("showConsole {}", arg0);
 	}
-
-
 
 	@Override
 	public void notifyCallback(CBK message, Object[] data) {
@@ -121,7 +120,6 @@ public class MyJmolStatusListener implements JmolStatusListener {
 	public Map<String, Object> getJSpecViewProperty(String arg0) {
 		return null;
 	}
-
 
 	@Override
 	public int[] resizeInnerPanel(String data) {

@@ -33,14 +33,16 @@ import org.biojava.nbio.structure.gui.BiojavaJmol;
 import org.biojava.nbio.structure.StructureIO;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoShowCATHDomain {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoShowCATHDomain.class);
+	private static final String DEFAULT_SCRIPT = "select * ; cartoon on; spacefill off; wireframe off; select ligands; wireframe on; spacefill on;";
+	private static final String[] colors = new String[] { "red", "green", "blue", "yellow" };
 
-	private static final String DEFAULT_SCRIPT ="select * ; cartoon on; spacefill off; wireframe off; select ligands; wireframe on; spacefill on;";
-	private static final String[] colors = new String[]{"red","green","blue","yellow"};
-
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		UserConfiguration config = new UserConfiguration();
 		config.setPdbFilePath("/tmp/");
@@ -58,27 +60,24 @@ public class DemoShowCATHDomain {
 			jmol.setStructure(StructureIO.getStructure(pdbID));
 			jmol.evalString(DEFAULT_SCRIPT);
 
-			System.out.println("got " + domains.size() + " domains");
+			logger.info(new StringBuilder().append("got ").append(domains.size()).append(" domains").toString());
 
 			// now color the domains on the structure
 			int colorpos = -1;
 
-			for ( CathDomain domain : domains){
+			for (CathDomain domain : domains) {
 
 				colorpos++;
 
-				showDomain(jmol, domain,colorpos);
+				showDomain(jmol, domain, colorpos);
 			}
-
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 
 	}
-
-
 
 	private static void showDomain(BiojavaJmol jmol, CathDomain domain, int colorpos) {
 		List<CathSegment> segments = domain.getSegments();
@@ -88,18 +87,20 @@ public class DemoShowCATHDomain {
 
 		String color = colors[colorpos];
 
-		System.out.println(" * domain " + domain.getDomainName() + " has # segments: " + domain.getSegments().size() + " color: " + color);
+		logger.info(new StringBuilder().append(" * domain ").append(domain.getDomainName()).append(" has # segments: ")
+				.append(domain.getSegments().size()).append(" color: ").append(color).toString());
 
-		for ( CathSegment segment : segments){
-			System.out.println("   * " + segment);
+		segments.forEach(segment -> {
+			logger.info("   * " + segment);
 			String start = segment.getStart();
 
 			String stop = segment.getStop();
 
-			String script = "select " + start + "-" + stop+":"+chainId + "; color " + color +";";
+			String script = new StringBuilder().append("select ").append(start).append("-").append(stop).append(":")
+					.append(chainId).append("; color ").append(color).append(";").toString();
 
-			jmol.evalString(script );
-		}
+			jmol.evalString(script);
+		});
 
 	}
 

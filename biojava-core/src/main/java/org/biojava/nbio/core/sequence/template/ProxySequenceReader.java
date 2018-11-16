@@ -25,7 +25,6 @@
  */
 package org.biojava.nbio.core.sequence.template;
 
-
 public interface ProxySequenceReader<C extends Compound> extends SequenceReader<C> {
 
 }

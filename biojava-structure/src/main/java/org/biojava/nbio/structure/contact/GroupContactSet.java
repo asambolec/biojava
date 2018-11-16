@@ -29,37 +29,36 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * A set of residue-residue contacts.
- * Relies on residue indices (based on SEQRES and starting with 1) to store the pairs
- * and thus to match contacts.
+ * A set of residue-residue contacts. Relies on residue indices (based on SEQRES
+ * and starting with 1) to store the pairs and thus to match contacts.
  *
  * @author duarte_j
  * @see ResidueIdentifier
  */
-public class GroupContactSet implements Serializable, Iterable<GroupContact>{
+public class GroupContactSet implements Serializable, Iterable<GroupContact> {
 
 	private static final long serialVersionUID = 1L;
 
 	private HashMap<Pair<ResidueIdentifier>, GroupContact> contacts;
 
 	public GroupContactSet() {
-		contacts = new HashMap<Pair<ResidueIdentifier>, GroupContact>();
+		contacts = new HashMap<>();
 	}
 
 	/**
-	 * Constructs a <code>GroupContactSet</code> by collapsing the given <code>AtomContactSet</code> into
-	 * residue-residue (group-group) contacts.
+	 * Constructs a <code>GroupContactSet</code> by collapsing the given
+	 * <code>AtomContactSet</code> into residue-residue (group-group) contacts.
+	 * 
 	 * @param atomContacts
 	 */
 	public GroupContactSet(AtomContactSet atomContacts) {
-		contacts = new HashMap<Pair<ResidueIdentifier>, GroupContact>();
+		contacts = new HashMap<>();
 		atoms2groups(atomContacts);
 	}
 
 	private void atoms2groups(AtomContactSet atomContacts) {
 
-
-		for (AtomContact atomContact:atomContacts) {
+		for (AtomContact atomContact : atomContacts) {
 
 			Pair<Atom> atomPair = atomContact.getPair();
 
@@ -67,10 +66,12 @@ public class GroupContactSet implements Serializable, Iterable<GroupContact>{
 			Group jResidue = atomPair.getSecond().getGroup();
 
 			// we skip the self-residue contacts
-			if (iResidue.equals(jResidue)) continue;
+			if (iResidue.equals(jResidue)) {
+				continue;
+			}
 
-			Pair<Group> residuePair = new Pair<Group> (iResidue, jResidue);
-			Pair<ResidueIdentifier> pair = new Pair<ResidueIdentifier>(new ResidueIdentifier(iResidue), new ResidueIdentifier(jResidue));
+			Pair<Group> residuePair = new Pair<>(iResidue, jResidue);
+			Pair<ResidueIdentifier> pair = new Pair<>(new ResidueIdentifier(iResidue), new ResidueIdentifier(jResidue));
 
 			if (!contacts.containsKey(pair)) {
 
@@ -92,23 +93,25 @@ public class GroupContactSet implements Serializable, Iterable<GroupContact>{
 	}
 
 	public void add(GroupContact groupContact) {
-		contacts.put(getResIdPairFromContact(groupContact),groupContact);
+		contacts.put(getResIdPairFromContact(groupContact), groupContact);
 	}
 
 	/**
-	 * Tell whether the given group pair is a contact in this GroupContactSet,
-	 * the comparison is done by matching residue numbers and chain identifiers
+	 * Tell whether the given group pair is a contact in this GroupContactSet, the
+	 * comparison is done by matching residue numbers and chain identifiers
+	 * 
 	 * @param group1
 	 * @param group2
 	 * @return
 	 */
 	public boolean hasContact(Group group1, Group group2) {
-		return hasContact(group1.getResidueNumber(),group2.getResidueNumber());
+		return hasContact(group1.getResidueNumber(), group2.getResidueNumber());
 	}
 
 	/**
-	 * Tell whether the given pair is a contact in this GroupContactSet,
-	 * the comparison is done by matching residue numbers and chain identifiers
+	 * Tell whether the given pair is a contact in this GroupContactSet, the
+	 * comparison is done by matching residue numbers and chain identifiers
+	 * 
 	 * @param resNumber1
 	 * @param resNumber2
 	 * @return
@@ -118,10 +121,11 @@ public class GroupContactSet implements Serializable, Iterable<GroupContact>{
 	}
 
 	/**
-	 * Tell whether the given pair is a contact in this GroupContactSet,
-	 * in a chain-identifier independent way: contacts happening between different copies of
-	 * the same Compound(Entity) will be considered equal as long as they have the same
-	 * residue numbers.
+	 * Tell whether the given pair is a contact in this GroupContactSet, in a
+	 * chain-identifier independent way: contacts happening between different copies
+	 * of the same Compound(Entity) will be considered equal as long as they have
+	 * the same residue numbers.
+	 * 
 	 * @param resId1
 	 * @param resId2
 	 * @return
@@ -132,14 +136,15 @@ public class GroupContactSet implements Serializable, Iterable<GroupContact>{
 	}
 
 	/**
-	 * Returns the corresponding GroupContact or null if no contact exists between the 2 given groups
+	 * Returns the corresponding GroupContact or null if no contact exists between
+	 * the 2 given groups
+	 * 
 	 * @param group1
 	 * @param group2
 	 * @return
 	 */
 	public GroupContact getContact(Group group1, Group group2) {
-		return contacts.get(
-				new Pair<ResidueNumber>(group1.getResidueNumber(),group2.getResidueNumber()));
+		return contacts.get(new Pair<ResidueNumber>(group1.getResidueNumber(), group2.getResidueNumber()));
 	}
 
 	public int size() {
@@ -152,9 +157,8 @@ public class GroupContactSet implements Serializable, Iterable<GroupContact>{
 	}
 
 	private Pair<ResidueIdentifier> getResIdPairFromContact(GroupContact groupContact) {
-		return new Pair<ResidueIdentifier>(
-				new ResidueIdentifier(groupContact.getPair().getFirst()),
-				new ResidueIdentifier(groupContact.getPair().getSecond()) );
+		return new Pair<>(new ResidueIdentifier(groupContact.getPair().getFirst()),
+				new ResidueIdentifier(groupContact.getPair().getSecond()));
 
 	}
 }

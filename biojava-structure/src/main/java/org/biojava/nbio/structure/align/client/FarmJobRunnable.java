@@ -51,11 +51,10 @@ import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
-
-
-
-/** Contains the single thread for a job that can run multiple alignments.
+/**
+ * Contains the single thread for a job that can run multiple alignments.
  *
  * @author Andreas Prlic
  *
@@ -64,72 +63,78 @@ public class FarmJobRunnable implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(FarmJobRunnable.class);
 
-
-	//private static final int DEFAULT_PAIR_FETCH_DELAY   = 30000;
-	//private static final String CONNECTION_PAIR_DELAY   = "connection.pair.delay";
-	private static final String JFATCAT_NAME            = "jfatcat.name";
-	private static final String JFATCAT_VERSION         = "jfatcat.version";
+	// private static final int DEFAULT_PAIR_FETCH_DELAY = 30000;
+	// private static final String CONNECTION_PAIR_DELAY = "connection.pair.delay";
+	private static final String JFATCAT_NAME = "jfatcat.name";
+	private static final String JFATCAT_VERSION = "jfatcat.version";
 
 	private static ResourceManager resourceManager = ResourceManager.getResourceManager("jfatcat");
 
+	private static final String randomUsername = getRandomUsername();
 
-	//private static DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy h:mm a",Locale.US);
+	private static final String alignURL = "/align/";
+
+	// private static DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy
+	// h:mm a",Locale.US);
 
 	FarmJobParameters params;
 
 	String prevName1;
-	Atom[] ca1 ;
 
+	Atom[] ca1;
 
 	long startTime;
+
 	long maxTime;
+
 	int maxNrAlignments;
+
 	int alignmentsCalculated;
 
 	boolean waitForAlignments;
 
-	private static final String randomUsername = getRandomUsername();
-
-	boolean terminated ;
+	boolean terminated;
 
 	List<AlignmentProgressListener> progressListeners;
-	CountProgressListener counter ;
+
+	CountProgressListener counter;
 
 	String userName = null;
+
 	protected AtomCache cache;
 
 	boolean verbose = false; // TODO dmyersturnbull: we should probably remove this in favor of SLF4J
+
 	String version = null;
 
-	private static final String alignURL = "/align/";
-	public FarmJobRunnable(FarmJobParameters params){
+	public FarmJobRunnable(FarmJobParameters params) {
 		terminated = false;
 		this.params = params;
 		verbose = false;
 
 		// multiple farm jobs share the same SoftHashMap for caching coordinates
-		cache = new AtomCache( params.getPdbFilePath(), params.getCacheFilePath());
+		cache = new AtomCache(params.getPdbFilePath(), params.getCacheFilePath());
 
-
-		if ( params.getServer()!= null && (!params.getServer().equals("") ) ) {
+		if (params.getServer() != null && (!"".equals(params.getServer()))) {
 
 			RemotePDPProvider pdpprovider = new RemotePDPProvider();
 
 			String serverURL = params.getServer();
-			if ( ! serverURL.endsWith("/"))
+			if (!serverURL.endsWith("/")) {
 				serverURL += "/";
-
-			if (  serverURL.endsWith(alignURL)) {
-				serverURL = serverURL.substring(0,serverURL.length()-alignURL.length());
 			}
 
-			pdpprovider.setServer(serverURL+"/domains/");
+			if (serverURL.endsWith(alignURL)) {
+				serverURL = serverURL.substring(0, serverURL.length() - alignURL.length());
+			}
+
+			pdpprovider.setServer(serverURL + "/domains/");
 
 			cache.setPdpprovider(pdpprovider);
 
 			RemoteScopInstallation scop = new RemoteScopInstallation();
 
-			scop.setServer(serverURL+"/domains/");
+			scop.setServer(serverURL + "/domains/");
 			ScopFactory.setScopDatabase(scop);
 
 		}
@@ -143,40 +148,42 @@ public class FarmJobRunnable implements Runnable {
 		} else {
 			userName = params.getUsername();
 		}
-		counter  = new CountProgressListener();
+		counter = new CountProgressListener();
 		addAlignmentProgressListener(counter);
 		waitForAlignments = true;
 
-		if ( params.isVerbose()){
+		if (params.isVerbose()) {
 			verbose = true;
 		}
 	}
 
-	public void addAlignmentProgressListener(AlignmentProgressListener listener){
+	public void addAlignmentProgressListener(AlignmentProgressListener listener) {
 
-		if (progressListeners == null)
-			progressListeners = new ArrayList<AlignmentProgressListener>();
+		if (progressListeners == null) {
+			progressListeners = new ArrayList<>();
+		}
 
 		progressListeners.add(listener);
 	}
 
-	public void clearListeners(){
-		if ( progressListeners == null)
+	public void clearListeners() {
+		if (progressListeners == null) {
 			return;
+		}
 		progressListeners.clear();
 		progressListeners = null;
 	}
 
-	protected static String getRandomUsername(){
+	protected static String getRandomUsername() {
 		String name = "";
 		try {
 			InetAddress i = InetAddress.getLocalHost();
 			name += i.getHostAddress();
 			name += "_";
-		} catch (UnknownHostException e){
+		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
-		name +=  UUID.randomUUID();
+		name += UUID.randomUUID();
 
 		return name;
 
@@ -187,18 +194,18 @@ public class FarmJobRunnable implements Runnable {
 
 		// Retrieve resource
 		String appVersion = resourceManager.getString(JFATCAT_VERSION);
-		String appName    = resourceManager.getString(JFATCAT_NAME);
+		String appName = resourceManager.getString(JFATCAT_NAME);
 		logger.info("{} version: {}", appName, appVersion);
-
 
 		startTime = System.currentTimeMillis();
 		// -t ime is in seconds.
 		long maxSec = params.getTime();
 
-		if ( maxSec < 5 )
+		if (maxSec < 5) {
 			maxTime = Long.MAX_VALUE;
-		else
+		} else {
 			maxTime = startTime + params.getTime() * 1000;
+		}
 
 		terminated = false;
 
@@ -206,14 +213,13 @@ public class FarmJobRunnable implements Runnable {
 
 		maxNrAlignments = params.getNrAlignments();
 
-		if ( maxNrAlignments < 0 ){
+		if (maxNrAlignments < 0) {
 			maxNrAlignments = Integer.MAX_VALUE;
 		}
 
 		logger.info("running job for max {} alignments", maxNrAlignments);
 
-
-		while (! terminated){
+		while (!terminated) {
 
 			// talk to server
 			// get list of alignments to run
@@ -221,53 +227,54 @@ public class FarmJobRunnable implements Runnable {
 			// otherwise we request all of them at once.
 			// we request
 			PdbPairsMessage msg = getAlignmentPairsFromServer();
-			if ( msg == null) {
+			if (msg == null) {
 				logger.error("Got null instead of alignment pairs from server.");
 				randomSleep();
 				continue;
 			}
 			SortedSet<PdbPair> alignmentPairs = msg.getPairs();
 			logger.debug("{}: Server responded with {} pairs.", userName, alignmentPairs.size());
-			List<String> results = new ArrayList<String>();
+			List<String> results = new ArrayList<>();
 
 			String algorithmName = msg.getMethod();
-			if ( version == null) {
+			if (version == null) {
 				setVersion(algorithmName);
 
 			}
-			for(PdbPair pair : alignmentPairs){
+			for (PdbPair pair : alignmentPairs) {
 
-				if ( terminated)
+				if (terminated) {
 					break;
+				}
 
 				long now = System.currentTimeMillis();
-				if ( now >= maxTime)  {
+				if (now >= maxTime) {
 					terminated = true;
 					break;
 				}
 
-				if ( alignmentsCalculated >= maxNrAlignments) {
+				if (alignmentsCalculated >= maxNrAlignments) {
 					terminated = true;
 					break;
 				}
-
 
 				String name1 = pair.getName1();
 				String name2 = pair.getName2();
 
-				if ( progressListeners != null)
-					notifyStartAlignment(name1,name2);
-
+				if (progressListeners != null) {
+					notifyStartAlignment(name1, name2);
+				}
 
 				try {
-					String resultXML = alignPair(name1, name2,algorithmName);
+					String resultXML = alignPair(name1, name2, algorithmName);
 
-					if ( progressListeners != null)
+					if (progressListeners != null) {
 						notifyEndAlignment();
+					}
 
 					results.add(resultXML);
 
-				} catch (Exception e){
+				} catch (Exception e) {
 					logger.error("Problem aligning {} with {}", name1, name2, e);
 
 					StringWriter sw = new StringWriter();
@@ -280,15 +287,15 @@ public class FarmJobRunnable implements Runnable {
 						xml.attribute("name2", name2);
 						xml.attribute("error", e.getMessage());
 						xml.closeTag("AFPChain");
-					} catch(IOException ex){
+					} catch (IOException ex) {
 						logger.error("Error occured converting alignment for {} and {} to XML", name1, name2, ex);
 					}
 
-					if ( progressListeners != null)
+					if (progressListeners != null) {
 						notifyEndAlignment();
+					}
 
 					results.add(sw.toString());
-
 
 				}
 
@@ -300,29 +307,34 @@ public class FarmJobRunnable implements Runnable {
 			sendResultsToServer(results);
 
 			long end = System.currentTimeMillis();
-			if ( end >= maxTime)  {
+			if (end >= maxTime) {
 				logger.info("OK end of job: reached maxTime {}", maxTime);
 				terminated = true;
 
 			}
 
-			if ( alignmentsCalculated >= maxNrAlignments) {
+			if (alignmentsCalculated >= maxNrAlignments) {
 				logger.info("OK end of job: reached maxNrAlignments", maxNrAlignments);
 				terminated = true;
 
 			}
 
 			long tdiff = (end - startTime);
-			if ( tdiff != 0) {
+			if (tdiff != 0) {
 
-				logger.info(userName + String.format(": job has run for :  %.2f", (tdiff) / 1000.0 / 60) + " min.");
+				logger.info(new StringBuilder().append(userName)
+						.append(String.format(": job has run for :  %.2f", (tdiff) / 1000.0 / 60)).append(" min.")
+						.toString());
 				logger.info("{}: total nr of alignments calculated: {}", userName, alignmentsCalculated);
-				if ( alignmentsCalculated > 0)
-					logger.info(userName + String.format(": average time / alignment: %.2f", (tdiff / alignmentsCalculated / 1000.0)) + " sec.");
+				if (alignmentsCalculated > 0) {
+					logger.info(new StringBuilder().append(userName).append(
+							String.format(": average time / alignment: %.2f", (tdiff / alignmentsCalculated / 1000.0)))
+							.append(" sec.").toString());
+				}
 			}
 		}
 
-		logger.info(userName + ": jFATCAT job result: " + counter);
+		logger.info(new StringBuilder().append(userName).append(": jFATCAT job result: ").append(counter).toString());
 
 		// clean up in the end...
 		clearListeners();
@@ -331,86 +343,73 @@ public class FarmJobRunnable implements Runnable {
 
 	}
 
-
 	private void setVersion(String algorithmName) {
 		StructureAlignment algorithm;
 		try {
 			algorithm = StructureAlignmentFactory.getAlgorithm(algorithmName);
 			version = algorithm.getVersion();
 		} catch (StructureException e) {
-			throw new RuntimeException("Couldn't set version for algorithm \"" + algorithmName + "\"", e);
-//			version = resourceManager.getString(JFATCAT_VERSION); // dmyersturnbull: was this
+			throw new RuntimeException(new StringBuilder().append("Couldn't set version for algorithm \"")
+					.append(algorithmName).append("\"").toString(), e);
+			// version = resourceManager.getString(JFATCAT_VERSION); // dmyersturnbull: was
+			// this
 		}
-
 
 	}
 
 	private void notifyStartAlignment(String name1, String name2) {
-		if ( progressListeners != null){
-			for (AlignmentProgressListener li : progressListeners){
-				li.alignmentStarted(name1, name2);
-			}
+		if (progressListeners != null) {
+			progressListeners.forEach(li -> li.alignmentStarted(name1, name2));
 		}
 	}
 
-	private void notifyEndAlignment(){
-		if ( progressListeners != null){
-			for (AlignmentProgressListener li : progressListeners){
-				li.alignmentEnded();
-
-			}
+	private void notifyEndAlignment() {
+		if (progressListeners != null) {
+			progressListeners.forEach(AlignmentProgressListener::alignmentEnded);
 		}
 	}
 
-	private void notifyRequestingAlignments(int nrAlignments){
-		if ( progressListeners != null){
-			for (AlignmentProgressListener li : progressListeners){
-				li.requestingAlignmentsFromServer(nrAlignments);
-
-			}
+	private void notifyRequestingAlignments(int nrAlignments) {
+		if (progressListeners != null) {
+			progressListeners.forEach(li -> li.requestingAlignmentsFromServer(nrAlignments));
 		}
 	}
 
-	private void notifySubmittingAlignments(int nrAlignments, String message){
-		if ( progressListeners != null){
-			for (AlignmentProgressListener li : progressListeners){
-				li.sentResultsToServer(nrAlignments,message);
-
-			}
+	private void notifySubmittingAlignments(int nrAlignments, String message) {
+		if (progressListeners != null) {
+			progressListeners.forEach(li -> li.sentResultsToServer(nrAlignments, message));
 		}
 	}
 
-
-	public String alignPair(String name1, String name2)
-		throws StructureException, IOException {
+	public String alignPair(String name1, String name2) throws StructureException, IOException {
 		return alignPair(name1, name2, FatCatRigid.algorithmName);
 	}
 
-	public String alignPair(String name1, String name2, String algorithmName)
-		throws StructureException, IOException {
+	public String alignPair(String name1, String name2, String algorithmName) throws StructureException, IOException {
 
-		// 	make sure each thread has an independent instance of the algorithm object ...
+		// make sure each thread has an independent instance of the algorithm object ...
 
 		StructureAlignment algorithm = getAlgorithm(algorithmName);
 
 		// we are running with default parameters
 
-		if ( verbose ) {
+		if (verbose) {
 			logger.debug("aligning {} against {}", name1, name2);
 		}
 
 		long startTime = System.currentTimeMillis();
 
-		if ( prevName1 == null)
+		if (prevName1 == null) {
 			initMaster(name1);
+		}
 
-		if ( ! prevName1.equals(name1) ) {
+		if (!prevName1.equals(name1)) {
 			// we need to reload the master
 			initMaster(name1);
 		}
 
 		// get a copy of the atoms, but clone them, since they will be rotated...
-		Atom[] ca2 =  cache.getAtoms(name2);
+		Atom[] ca2 = cache.getAtoms(name2);
 
 		AFPChain afpChain = algorithm.align(ca1, ca2);
 
@@ -421,31 +420,33 @@ public class FarmJobRunnable implements Runnable {
 			// add tmScore
 			double tmScore = AFPChainScorer.getTMScore(afpChain, ca1, ca2);
 			afpChain.setTMScore(tmScore);
-		} catch (RuntimeException e){
-			logger.error("ca1 size: {} ca2 length: {} {}  {}", ca1.length, ca2.length, afpChain.getName1(), afpChain.getName2(), e);
+		} catch (RuntimeException e) {
+			logger.error("ca1 size: {} ca2 length: {} {}  {}", ca1.length, ca2.length, afpChain.getName1(),
+					afpChain.getName2(), e);
 
 		}
 		long endTime = System.currentTimeMillis();
 
-		long calcTime = (endTime-startTime);
-		if ( verbose ){
+		long calcTime = (endTime - startTime);
+		if (verbose) {
 			boolean isCP = !AlignmentTools.isSequentialAlignment(afpChain, false);
-			String msg = "finished alignment: " + name1 + " vs. " + name2 + " in " + (calcTime) / 1000.0 + " sec.";
-			msg += " algo: " + algorithmName + " v:" + version + " " + afpChain;
+			String msg = new StringBuilder().append("finished alignment: ").append(name1).append(" vs. ").append(name2)
+					.append(" in ").append((calcTime) / 1000.0).append(" sec.").toString();
+			msg += new StringBuilder().append(" algo: ").append(algorithmName).append(" v:").append(version).append(" ")
+					.append(afpChain).toString();
 
-			if ( isCP ) msg += "HAS A CIRCULAR PERMUTATION!!!";
+			if (isCP) {
+				msg += "HAS A CIRCULAR PERMUTATION!!!";
+			}
 			logger.debug(msg);
 		}
-		if (verbose){
+		if (verbose) {
 			printMemory();
 		}
 		afpChain.setCalculationTime(calcTime);
 
 		return AFPChainXMLConverter.toXML(afpChain, ca1, ca2);
 	}
-
-
-
 
 	private void printMemory() {
 		int size = 1048576;
@@ -460,7 +461,7 @@ public class FarmJobRunnable implements Runnable {
 		long heapFreeSize = Runtime.getRuntime().freeMemory() / size;
 		StringBuilder msg = new StringBuilder();
 		msg.append("  total: ").append(heapSize).append(" M");
-		msg.append(" max: "). append(heapMaxSize).append(" M");
+		msg.append(" max: ").append(heapMaxSize).append(" M");
 		msg.append(" free: ").append(heapFreeSize).append(" M");
 
 		logger.debug(msg.toString());
@@ -469,26 +470,25 @@ public class FarmJobRunnable implements Runnable {
 
 	private StructureAlignment getAlgorithm(String algorithmName) throws StructureException {
 
+		StructureAlignment algorithm = null;
 
-		StructureAlignment algorithm    = null;
-
-		if ( algorithmName == null){
+		if (algorithmName == null) {
 
 			algorithm = new FatCatRigid();
 
-		} else if ( algorithmName.equalsIgnoreCase(FatCatRigid.algorithmName)){
+		} else if (algorithmName.equalsIgnoreCase(FatCatRigid.algorithmName)) {
 
-				algorithm = new FatCatRigid();
+			algorithm = new FatCatRigid();
 
-		} else if ( algorithmName.equalsIgnoreCase(CeMain.algorithmName)){
+		} else if (algorithmName.equalsIgnoreCase(CeMain.algorithmName)) {
 
 			algorithm = new CeMain();
 
-		} else if ( algorithmName.equalsIgnoreCase(CeCPMain.algorithmName)){
+		} else if (algorithmName.equalsIgnoreCase(CeCPMain.algorithmName)) {
 
 			algorithm = new CeCPMain();
 
-		} else if ( algorithmName.equalsIgnoreCase(FatCatFlexible.algorithmName)){
+		} else if (algorithmName.equalsIgnoreCase(FatCatFlexible.algorithmName)) {
 
 			algorithm = new FatCatFlexible();
 
@@ -498,17 +498,16 @@ public class FarmJobRunnable implements Runnable {
 
 		}
 
-		if ( algorithm == null) {
+		if (algorithm == null) {
 
 			algorithm = new FatCatRigid();
 
 		}
 
-
 		return algorithm;
 	}
 
-	private void initMaster(String name1) throws IOException, StructureException{
+	private void initMaster(String name1) throws IOException, StructureException {
 
 		ca1 = cache.getAtoms(name1);
 
@@ -516,34 +515,32 @@ public class FarmJobRunnable implements Runnable {
 
 	}
 
-
-	/** talk to centralized server and fetch all alignments to run.
+	/**
+	 * talk to centralized server and fetch all alignments to run.
 	 *
 	 * @return a list of pairs to align.
 	 */
 	protected PdbPairsMessage getAlignmentPairsFromServer() {
 
-
 		String url = params.getServer();
 
 		int nrPairs = params.getStepSize();
 
-		if ( maxNrAlignments < nrPairs )
+		if (maxNrAlignments < nrPairs) {
 			nrPairs = maxNrAlignments;
+		}
 
-		SortedSet<PdbPair> allPairs = new TreeSet<PdbPair>();
+		SortedSet<PdbPair> allPairs = new TreeSet<>();
 
 		PdbPairsMessage msg = null;
 
-
 		try {
 
-			if ( progressListeners != null)
+			if (progressListeners != null) {
 				notifyRequestingAlignments(nrPairs);
+			}
 
-
-
-			if ( ! waitForAlignments) {
+			if (!waitForAlignments) {
 				msg = JFatCatClient.getPdbPairs(url, nrPairs, userName);
 				allPairs = msg.getPairs();
 
@@ -558,7 +555,7 @@ public class FarmJobRunnable implements Runnable {
 					}
 				}
 			}
-		} catch ( JobKillException k ){
+		} catch (JobKillException k) {
 
 			logger.debug("Terminating job", k);
 			terminate();
@@ -569,7 +566,6 @@ public class FarmJobRunnable implements Runnable {
 
 			randomSleep();
 
-
 		}
 
 		return msg;
@@ -579,9 +575,9 @@ public class FarmJobRunnable implements Runnable {
 		try {
 
 			int delay = JFatCatClient.getRandomSleepTime();
-			logger.debug("sleeping {} sec.", delay/1000);
+			logger.debug("sleeping {} sec.", delay / 1000);
 			Thread.sleep(delay);
-		} catch (InterruptedException ex){
+		} catch (InterruptedException ex) {
 			logger.trace("InterruptedException occurred while sleeping", ex);
 		}
 
@@ -591,34 +587,34 @@ public class FarmJobRunnable implements Runnable {
 
 		String serverLocation = params.getServer();
 
-		if ( results.size() < 1)
+		if (results.size() < 1) {
 			return;
+		}
 
 		String fullXml = "<alignments>";
 
-		for (String xml: results){
-			fullXml +=xml;
-		}
+		fullXml += results.stream().collect(Collectors.joining());
 		fullXml += "</alignments>";
 		String msg = "";
 		try {
-			msg = JFatCatClient.sendMultiAFPChainToServer(serverLocation,fullXml, userName, version );
-		} catch (JobKillException e){
+			msg = JFatCatClient.sendMultiAFPChainToServer(serverLocation, fullXml, userName, version);
+		} catch (JobKillException e) {
 			logger.info("{} Got Job Kill message from server, terminating...", userName, e);
 			terminate();
 		}
 
-		if ( progressListeners != null)
+		if (progressListeners != null) {
 			notifySubmittingAlignments(results.size(), msg);
+		}
 		logger.info("{}: Sent {} results to server. job status: {}", userName, results.size(), counter);
 		logger.info("{}: fileCache size: {}", userName, FlatFileCache.size());
 	}
 
-
-	/** Send signal to terminate calculations
+	/**
+	 * Send signal to terminate calculations
 	 *
 	 */
-	public synchronized void terminate(){
+	public synchronized void terminate() {
 		terminated = true;
 	}
 
@@ -629,7 +625,5 @@ public class FarmJobRunnable implements Runnable {
 	public void setWaitForAlignments(boolean waitForAlignments) {
 		this.waitForAlignments = waitForAlignments;
 	}
-
-
 
 }

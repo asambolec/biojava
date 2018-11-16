@@ -30,29 +30,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mouse Motion Listener for the {@link MultipleAligPanel},
- * which provides methods to obtain positions of the mouse
- * and connect them to the sequence alignment positions using
- * the information in {@link MultipleAlignmentCoordManager}.
+ * Mouse Motion Listener for the {@link MultipleAligPanel}, which provides
+ * methods to obtain positions of the mouse and connect them to the sequence
+ * alignment positions using the information in
+ * {@link MultipleAlignmentCoordManager}.
  *
  * @author Aleix Lafita
  *
  */
-public class MultipleAligPanelMouseMotionListener
-implements MouseMotionListener, MouseListener {
+public class MultipleAligPanelMouseMotionListener implements MouseMotionListener, MouseListener {
 
 	private MultipleAligPanel parent;
 	private List<AlignmentPositionListener> aligPosListeners;
 	private int prevPos;
 
-	private boolean isDragging ;
+	private boolean isDragging;
 	private AlignedPosition selectionStart;
 	private AlignedPosition selectionEnd;
 	private boolean selectionLocked;
 
-	public MultipleAligPanelMouseMotionListener(MultipleAligPanel parent){
+	public MultipleAligPanelMouseMotionListener(MultipleAligPanel parent) {
 		this.parent = parent;
-		aligPosListeners = new ArrayList<AlignmentPositionListener>();
+		aligPosListeners = new ArrayList<>();
 		prevPos = -1;
 		isDragging = false;
 		selectionStart = null;
@@ -60,7 +59,7 @@ implements MouseMotionListener, MouseListener {
 		selectionLocked = false;
 	}
 
-	public void addAligPosListener(AlignmentPositionListener li){
+	public void addAligPosListener(AlignmentPositionListener li) {
 		aligPosListeners.add(li);
 	}
 
@@ -69,60 +68,77 @@ implements MouseMotionListener, MouseListener {
 
 		AlignedPosition pos = getCurrentAlignedPosition(e);
 
-		if (pos == null) return;
-		if (prevPos == pos.getPos1() && isDragging) return;
+		if (pos == null) {
+			return;
+		}
+		if (prevPos == pos.getPos1() && isDragging) {
+			return;
+		}
 
 		if (!isDragging) {
 			isDragging = true;
 			setSelectionLock(true);
 		}
 
-		if (selectionStart == null)	selectionStart = pos;
-		if (selectionEnd == null) selectionEnd = pos;
+		if (selectionStart == null) {
+			selectionStart = pos;
+		}
+		if (selectionEnd == null) {
+			selectionEnd = pos;
+		}
 
-		if (pos.getPos1() <= selectionStart.getPos1()) selectionStart = pos;
-		else selectionEnd = pos;
+		if (pos.getPos1() <= selectionStart.getPos1()) {
+			selectionStart = pos;
+		} else {
+			selectionEnd = pos;
+		}
 
 		if (!keyPressed(e)) {
 			triggerRangeSelected(selectionStart, selectionEnd);
-		} else triggerRangeSelected(selectionStart, selectionEnd);
+		} else {
+			triggerRangeSelected(selectionStart, selectionEnd);
+		}
 
 		prevPos = pos.getPos1();
 	}
 
 	private boolean keyPressed(MouseEvent e) {
-		if (e.isShiftDown() || e.isControlDown() || e.isAltDown())
+		if (e.isShiftDown() || e.isControlDown() || e.isAltDown()) {
 			return true;
+		}
 		return false;
 	}
 
-	private void triggerRangeSelected(
-			AlignedPosition start, AlignedPosition end) {
-		for (AlignmentPositionListener li : aligPosListeners){
-			li.rangeSelected(start, end);
-		}
+	private void triggerRangeSelected(AlignedPosition start, AlignedPosition end) {
+		aligPosListeners.forEach(li -> li.rangeSelected(start, end));
 	}
 
 	public void triggerSelectionLocked(boolean b) {
 		selectionLocked = b;
-		for (AlignmentPositionListener li : aligPosListeners){
-			if (b) li.selectionLocked();
-			else li.selectionUnlocked();
-		}
+		aligPosListeners.forEach(li -> {
+			if (b) {
+				li.selectionLocked();
+			} else {
+				li.selectionUnlocked();
+			}
+		});
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if ( selectionLocked) return;
+		if (selectionLocked) {
+			return;
+		}
 		AlignedPosition pos = getCurrentAlignedPosition(e);
-		if ( pos == null) return;
+		if (pos == null) {
+			return;
+		}
 
 		triggerMouseOverPosition(pos);
 	}
 
 	private void triggerMouseOverPosition(AlignedPosition pos) {
-		for (AlignmentPositionListener li : aligPosListeners)
-			li.mouseOverPosition(pos);
+		aligPosListeners.forEach(li -> li.mouseOverPosition(pos));
 	}
 
 	private AlignedPosition getCurrentAlignedPosition(MouseEvent e) {
@@ -130,19 +146,26 @@ implements MouseMotionListener, MouseListener {
 		MultipleAlignmentCoordManager coordManager = parent.getCoordManager();
 		int aligSeq = coordManager.getAligSeq(e.getPoint());
 
-		//We are not over a position in the sequences
-		if (aligSeq == -1) return null;
+		// We are not over a position in the sequences
+		if (aligSeq == -1) {
+			return null;
+		}
 
-		//Get sequence positions
+		// Get sequence positions
 		int seqPos = coordManager.getSeqPos(aligSeq, e.getPoint());
-		if (seqPos < 0) return null;
-		if (seqPos >= parent.length) return null;
+		if (seqPos < 0) {
+			return null;
+		}
+		if (seqPos >= parent.length) {
+			return null;
+		}
 
 		AlignedPosition pos = new AlignedPosition();
 		pos.setPos1(seqPos);
 
-		if (parent.getMapSeqToStruct().get(seqPos)!=-1)
+		if (parent.getMapSeqToStruct().get(seqPos) != -1) {
 			pos.setEquivalent(AlignedPosition.EQUIVALENT);
+		}
 
 		return pos;
 	}
@@ -153,18 +176,20 @@ implements MouseMotionListener, MouseListener {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e) {
+	}
 
 	private void triggerToggleSelection(AlignedPosition pos) {
-		for (AlignmentPositionListener li : aligPosListeners)
-			li.toggleSelection(pos);
+		aligPosListeners.forEach(li -> li.toggleSelection(pos));
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {
+	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -172,17 +197,18 @@ implements MouseMotionListener, MouseListener {
 		selectionStart = null;
 		selectionEnd = null;
 
-		if (!keyPressed(e)) {
-
-			setSelectionLock(false);
-			triggerSelectionLocked(false);
-
-			AlignedPosition pos = getCurrentAlignedPosition(e);
-			if (pos != null) prevPos = pos.getPos1();
+		if (keyPressed(e)) {
+			return;
+		}
+		setSelectionLock(false);
+		triggerSelectionLocked(false);
+		AlignedPosition pos = getCurrentAlignedPosition(e);
+		if (pos != null) {
+			prevPos = pos.getPos1();
 		}
 	}
 
-	private void setSelectionLock(boolean flag){
+	private void setSelectionLock(boolean flag) {
 		selectionLocked = flag;
 		triggerSelectionLocked(flag);
 	}
@@ -192,18 +218,24 @@ implements MouseMotionListener, MouseListener {
 
 		isDragging = false;
 
-		if (keyPressed(e)) {
-			boolean keepOn = false;
-			if (!selectionLocked) keepOn = true;
-			setSelectionLock(true);
-
-			// add to selection
-			AlignedPosition pos = getCurrentAlignedPosition(e);
-			if (pos == null) return;
-
-			if (keepOn) triggerMouseOverPosition(pos);
-			else triggerToggleSelection(pos);
-			prevPos = pos.getPos1();
+		if (!keyPressed(e)) {
+			return;
 		}
+		boolean keepOn = false;
+		if (!selectionLocked) {
+			keepOn = true;
+		}
+		setSelectionLock(true);
+		// add to selection
+		AlignedPosition pos = getCurrentAlignedPosition(e);
+		if (pos == null) {
+			return;
+		}
+		if (keepOn) {
+			triggerMouseOverPosition(pos);
+		} else {
+			triggerToggleSelection(pos);
+		}
+		prevPos = pos.getPos1();
 	}
 }

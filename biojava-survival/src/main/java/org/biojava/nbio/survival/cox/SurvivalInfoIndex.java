@@ -22,6 +22,7 @@ package org.biojava.nbio.survival.cox;
 
 /**
  * Not used and probably should be deleted
+ * 
  * @author Scooter Willis <willishf at gmail dot com>
  */
 public class SurvivalInfoIndex implements Comparable<SurvivalInfoIndex> {
@@ -74,16 +75,17 @@ public class SurvivalInfoIndex implements Comparable<SurvivalInfoIndex> {
 
 	@Override
 	public String toString() {
-		return "t=" + time + " e=" + event + " o=" + index;
+		return new StringBuilder().append("t=").append(time).append(" e=").append(event).append(" o=").append(index)
+				.toString();
 	}
-	//    double CompNum4Sort(double[] a, double[] b) {
-	//(time - time - (event -event) /1024)
-	//    return (a[0] - b[0] - (a[1] - b[1]) / 1024);
+	// double CompNum4Sort(double[] a, double[] b) {
+	// (time - time - (event -event) /1024)
+	// return (a[0] - b[0] - (a[1] - b[1]) / 1024);
 	// }
 
 	@Override
 	public int compareTo(SurvivalInfoIndex o) {
-	//    double compare = (this.time - o.time - (this.event - o.event) / 1024);
+		// double compare = (this.time - o.time - (this.event - o.event) / 1024);
 		if (time < o.time) {
 			return -1;
 		} else if (time > o.time) {

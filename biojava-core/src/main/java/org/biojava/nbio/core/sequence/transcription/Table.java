@@ -39,27 +39,24 @@ import java.util.List;
  */
 public interface Table {
 
-	List<Codon> getCodons(CompoundSet<NucleotideCompound> nucelotides,
-			CompoundSet<AminoAcidCompound> aminoAcids);
+	List<Codon> getCodons(CompoundSet<NucleotideCompound> nucelotides, CompoundSet<AminoAcidCompound> aminoAcids);
 
-	CompoundSet<Codon> getCodonCompoundSet(
-			final CompoundSet<NucleotideCompound> rnaCompounds,
+	CompoundSet<Codon> getCodonCompoundSet(final CompoundSet<NucleotideCompound> rnaCompounds,
 			final CompoundSet<AminoAcidCompound> aminoAcidCompounds);
 
 	/**
-	 * Returns true if the given compound could have been a start amino acid;
-	 * this does not assert if the codon that actually coded for the amino
-	 * acid was a start codon. This is as accurate a call as we can make with an
+	 * Returns true if the given compound could have been a start amino acid; this
+	 * does not assert if the codon that actually coded for the amino acid was a
+	 * start codon. This is as accurate a call as we can make with an
 	 * {@link AminoAcidCompound}.
 	 */
 	boolean isStart(AminoAcidCompound compound);
 
 	/**
-	 * Instance of a Codon which is 3 {@link NucleotideCompound}s, its
-	 * corresponding {@link AminoAcidCompound} and if it is a start or stop codon.
-	 * The object implements hashCode & equals but according to the nucleotide
-	 * compounds & not to the designation of it being a start, stop & amino
-	 * acid compound
+	 * Instance of a Codon which is 3 {@link NucleotideCompound}s, its corresponding
+	 * {@link AminoAcidCompound} and if it is a start or stop codon. The object
+	 * implements hashCode & equals but according to the nucleotide compounds & not
+	 * to the designation of it being a start, stop & amino acid compound
 	 *
 	 * @author ayates
 	 *
@@ -72,8 +69,7 @@ public interface Table {
 		private final AminoAcidCompound aminoAcid;
 		private final String stringified;
 
-		public Codon(CaseInsensitiveTriplet triplet, AminoAcidCompound aminoAcid, boolean start,
-				boolean stop) {
+		public Codon(CaseInsensitiveTriplet triplet, AminoAcidCompound aminoAcid, boolean start, boolean stop) {
 			this.triplet = triplet;
 			this.start = start;
 			this.stop = stop;
@@ -116,12 +112,11 @@ public interface Table {
 		@Override
 		public boolean equals(Object obj) {
 			boolean equals = false;
-			if(Equals.classEqual(this, obj)) {
+			if (Equals.classEqual(this, obj)) {
 				Codon casted = (Codon) obj;
-				equals =   Equals.equal(getTriplet(), casted.getTriplet()) &&
-							Equals.equal(isStart(), casted.isStart()) &&
-							Equals.equal(isStop(), casted.isStop()) &&
-							Equals.equal(getAminoAcid(), casted.getAminoAcid());
+				equals = Equals.equal(getTriplet(), casted.getTriplet()) && Equals.equal(isStart(), casted.isStart())
+						&& Equals.equal(isStop(), casted.isStop())
+						&& Equals.equal(getAminoAcid(), casted.getAminoAcid());
 			}
 			return equals;
 		}
@@ -188,8 +183,8 @@ public interface Table {
 	}
 
 	/**
-	 * Class used to hold three nucleotides together and allow for equality
-	 * to be assessed in a case insensitive manner.
+	 * Class used to hold three nucleotides together and allow for equality to be
+	 * assessed in a case insensitive manner.
 	 */
 	public static class CaseInsensitiveTriplet {
 
@@ -202,8 +197,7 @@ public interface Table {
 		private transient boolean stringSet = false;
 		private transient String stringify;
 
-		public CaseInsensitiveTriplet(NucleotideCompound one,
-				NucleotideCompound two, NucleotideCompound three) {
+		public CaseInsensitiveTriplet(NucleotideCompound one, NucleotideCompound two, NucleotideCompound three) {
 			this.one = one;
 			this.two = two;
 			this.three = three;
@@ -225,16 +219,16 @@ public interface Table {
 		@Override
 		public boolean equals(Object obj) {
 			boolean equals = false;
-			if(Equals.classEqual(this, obj)) {
-				CaseInsensitiveTriplet casted = (CaseInsensitiveTriplet) obj;
-				return toString().equals(casted.toString());
+			if (!Equals.classEqual(this, obj)) {
+				return equals;
 			}
-			return equals;
+			CaseInsensitiveTriplet casted = (CaseInsensitiveTriplet) obj;
+			return toString().equals(casted.toString());
 		}
 
 		@Override
 		public int hashCode() {
-			if(!hashSet) {
+			if (!hashSet) {
 				hash = toString().hashCode();
 				hashSet = true;
 			}
@@ -243,41 +237,38 @@ public interface Table {
 
 		@Override
 		public String toString() {
-			if(!stringSet) {
-				stringify = getOne().getUpperedBase() +
-					getTwo().getUpperedBase() +
-					getThree().getUpperedBase();
+			if (!stringSet) {
+				stringify = new StringBuilder().append(getOne().getUpperedBase()).append(getTwo().getUpperedBase())
+						.append(getThree().getUpperedBase()).toString();
 			}
 			return stringify;
 		}
 
 		/**
-		 * Attempts to provide an int version of this codon which multiplies
-		 * each position by
+		 * Attempts to provide an int version of this codon which multiplies each
+		 * position by
 		 */
 		public int intValue() {
-			return (16 * compoundToInt(getOne())) +
-					(4 * compoundToInt(getTwo())) +
-					(compoundToInt(getThree()));
+			return (16 * compoundToInt(getOne())) + (4 * compoundToInt(getTwo())) + (compoundToInt(getThree()));
 		}
 
 		public int compoundToInt(NucleotideCompound c) {
 			char b = c.getUpperedBase().charAt(0);
 			return b;
-//            int v = -1;
-//            if('A' == b) {
-//                v = 1;
-//            }
-//            else if('C' == b) {
-//                v = 2;
-//            }
-//            else if('G' == b) {
-//                v = 3;
-//            }
-//            else if('T' == b || 'U' == b) {
-//                v = 4;
-//            }
-//            return v;
+			// int v = -1;
+			// if('A' == b) {
+			// v = 1;
+			// }
+			// else if('C' == b) {
+			// v = 2;
+			// }
+			// else if('G' == b) {
+			// v = 3;
+			// }
+			// else if('T' == b || 'U' == b) {
+			// v = 4;
+			// }
+			// return v;
 		}
 	}
 }

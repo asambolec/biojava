@@ -30,9 +30,10 @@ import org.biojava.nbio.structure.io.mmcif.model.ChemComp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/** Unlike the {@link DownloadChemCompProvider}, this  {@link ChemCompProvider} does not download any chem comp definitions.
- * It has access to a limited set of files that are part of the biojava distribution.
+/**
+ * Unlike the {@link DownloadChemCompProvider}, this {@link ChemCompProvider}
+ * does not download any chem comp definitions. It has access to a limited set
+ * of files that are part of the biojava distribution.
  *
  * @author Andreas Prlic
  * @since 3.0
@@ -41,22 +42,23 @@ public class ReducedChemCompProvider implements ChemCompProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReducedChemCompProvider.class);
 
-	public ReducedChemCompProvider(){
+	public ReducedChemCompProvider() {
 		logger.debug("Initialising ReducedChemCompProvider");
 	}
-
 
 	@Override
 	public ChemComp getChemComp(String recordName) {
 		String name = recordName.toUpperCase().trim();
-		try(InputStream inStream = this.getClass().getResourceAsStream("/chemcomp/"+name + ".cif.gz")) {
+		try (InputStream inStream = this.getClass().getResourceAsStream(
+				new StringBuilder().append("/chemcomp/").append(name).append(".cif.gz").toString())) {
 
-			logger.debug("Reading chemcomp/"+name+".cif.gz");
+			logger.debug(new StringBuilder().append("Reading chemcomp/").append(name).append(".cif.gz").toString());
 
-			if ( inStream == null){
-				//System.out.println("Could not find chem comp: " + name + " ... using generic Chem Comp");
+			if (inStream == null) {
+				// System.out.println("Could not find chem comp: " + name + " ... using generic
+				// Chem Comp");
 				// could not find the chem comp definition for this in the jar file
-				logger.debug("Getting empty chem comp for {}",name);
+				logger.debug("Getting empty chem comp for {}", name);
 				ChemComp cc = ChemComp.getEmptyChemComp();
 				cc.setId(name);
 				return cc;
@@ -78,14 +80,13 @@ public class ReducedChemCompProvider implements ChemCompProvider {
 
 			return chemComp;
 
-		} catch (IOException e){
-			logger.error("IOException caught while reading chem comp {}.",name,e);
+		} catch (IOException e) {
+			logger.error("IOException caught while reading chem comp {}.", name, e);
 		}
 		logger.warn("Problem when loading chem comp {}, will use an empty chem comp for it", name);
 		ChemComp cc = ChemComp.getEmptyChemComp();
 		cc.setId(name);
 		return cc;
 	}
-
 
 }

@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 /**
  * A term in an ontology which identifies another ontology.
  *
@@ -62,7 +61,7 @@ public interface OntologyTerm extends Term {
 
 	public final static class Impl
 
-	implements OntologyTerm, java.io.Serializable {
+			implements OntologyTerm, java.io.Serializable {
 
 		private static final long serialVersionUID = 1L;
 		private final Ontology ontology;
@@ -85,7 +84,9 @@ public interface OntologyTerm extends Term {
 			this.target = target;
 
 			this.synonyms = new TreeSet();
-			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
+			if (synonyms != null) {
+				this.synonyms.addAll(Arrays.asList(synonyms));
+			}
 		}
 
 		@Override
@@ -112,9 +113,10 @@ public interface OntologyTerm extends Term {
 		public String getDescription() {
 			return target.getDescription();
 		}
+
 		@Override
 		public void setDescription(String description) {
-			 target.setDescription(description);
+			target.setDescription(description);
 		}
 
 		@Override
@@ -135,7 +137,6 @@ public interface OntologyTerm extends Term {
 		public Annotation getAnnotation() {
 			return Annotation.EMPTY_ANNOTATION;
 		}
-
 
 	}
 }

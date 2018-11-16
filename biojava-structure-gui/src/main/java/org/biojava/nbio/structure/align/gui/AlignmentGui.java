@@ -51,10 +51,12 @@ import org.biojava.nbio.structure.align.webstart.WebStartMain;
 import org.biojava.nbio.structure.gui.util.PDBUploadPanel;
 import org.biojava.nbio.structure.gui.util.ScopSelectPanel;
 import org.biojava.nbio.structure.gui.util.StructurePairSelector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** A JFrame that allows to trigger a pairwise structure alignment,
- * either from files in a directory,
- * or after manual upload.
+/**
+ * A JFrame that allows to trigger a pairwise structure alignment, either from
+ * files in a directory, or after manual upload.
  *
  * @author Andreas Prlic
  *
@@ -63,65 +65,42 @@ import org.biojava.nbio.structure.gui.util.StructurePairSelector;
  *
  *
  */
-public class AlignmentGui extends JFrame{
+public class AlignmentGui extends JFrame {
 
-	private final static long serialVersionUID =0l;
+	private static final Logger logger = LoggerFactory.getLogger(AlignmentGui.class);
+
+	private final static long serialVersionUID = 0l;
+
+	static final ResourceManager resourceManager = ResourceManager.getResourceManager("ce");
+
+	private static final String MAIN_TITLE = "Pairwise Structure Alignment - Main - V."
+			+ resourceManager.getString("ce.version");
+
+	private static final AlignmentGui me = new AlignmentGui();
 
 	StructureAlignment algorithm;
 
 	JButton abortB;
 
-	SelectPDBPanel  tab1 ;
-	PDBUploadPanel  tab2;
+	SelectPDBPanel tab1;
+
+	PDBUploadPanel tab2;
+
 	ScopSelectPanel tab3;
 
 	Thread thread;
-	AlignmentCalculationRunnable alicalc;
-	JTabbedPane masterPane;
-	JTabbedPane tabPane;
-	JProgressBar progress;
 
+	AlignmentCalculationRunnable alicalc;
+
+	JTabbedPane masterPane;
+
+	JTabbedPane tabPane;
+
+	JProgressBar progress;
 
 	private DBSearchGUI dbsearch;
 
-
-	public static void main(String[] args){
-
-		AlignmentGui.getInstance();
-
-	}
-
-	static final ResourceManager resourceManager = ResourceManager.getResourceManager("ce");
-
-	private static final String MAIN_TITLE = "Pairwise Structure Alignment - Main - V." + resourceManager.getString("ce.version");;
-
-	private static final AlignmentGui me = new AlignmentGui();
-
-	public static AlignmentGui getInstance(){
-
-		AbstractUserArgumentProcessor.printAboutMe();
-
-		AligUIManager.setLookAndFeel();
-
-		if (!  me.isVisible())
-			me.setVisible(true);
-
-		if ( ! me.isActive())
-			me.requestFocus();
-
-
-		return me;
-	}
-
-	public static AlignmentGui getInstanceNoVisibilityChange(){
-
-		return me;
-	}
-
-
 	protected AlignmentGui() {
-		super();
-
 		thread = null;
 
 		JMenuBar menu = MenuCreator.initAlignmentGUIMenu(this);
@@ -141,23 +120,20 @@ public class AlignmentGui extends JFrame{
 
 		tabPane.addTab("Select PDB ID", null, tab1, "Select PDB ID to align");
 
-		tabPane.addTab("Domains",null, tab3,"Select domains to align.");
+		tabPane.addTab("Domains", null, tab3, "Select domains to align.");
 
-		tabPane.addTab("Custom files",null, tab2,"Align your own files.");
-
-
+		tabPane.addTab("Custom files", null, tab2, "Align your own files.");
 
 		Box hBoxAlgo = setupAlgorithm();
 
 		Box vBox = Box.createVerticalBox();
 
-
-		//vBox.add(hBoxAlgo);
+		// vBox.add(hBoxAlgo);
 
 		vBox.add(tabPane);
 		vBox.add(Box.createGlue());
 
-		//vBox.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		// vBox.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 		masterPane = new JTabbedPane();
 
@@ -165,9 +141,9 @@ public class AlignmentGui extends JFrame{
 
 		dbsearch = new DBSearchGUI();
 
-		masterPane.addTab("Database Search",dbsearch);
+		masterPane.addTab("Database Search", dbsearch);
 
-		//JPanel dir = tab1.getPDBDirPanel(pdbDir);
+		// JPanel dir = tab1.getPDBDirPanel(pdbDir);
 
 		Box vBoxMain = Box.createVerticalBox();
 		vBoxMain.add(hBoxAlgo);
@@ -179,27 +155,53 @@ public class AlignmentGui extends JFrame{
 		// algorithm selection
 
 		// PDB install config
-		//vBoxMain.add(dir);
+		// vBoxMain.add(dir);
 		// buttons
 		vBoxMain.add(initButtons());
 
 		this.getContentPane().add(vBoxMain);
 
-		//SwingUtilities.updateComponentTreeUI( me);
+		// SwingUtilities.updateComponentTreeUI( me);
 
 		this.pack();
 		this.setVisible(true);
 
+	}
+
+	public static void main(String[] args) {
+
+		AlignmentGui.getInstance();
 
 	}
 
-	private Box setupAlgorithm()
-	{
+	public static AlignmentGui getInstance() {
+
+		AbstractUserArgumentProcessor.printAboutMe();
+
+		AligUIManager.setLookAndFeel();
+
+		if (!me.isVisible()) {
+			me.setVisible(true);
+		}
+
+		if (!me.isActive()) {
+			me.requestFocus();
+		}
+
+		return me;
+	}
+
+	public static AlignmentGui getInstanceNoVisibilityChange() {
+
+		return me;
+	}
+
+	private Box setupAlgorithm() {
 		String[] algorithms = StructureAlignmentFactory.getAllAlgorithmNames();
 		try {
 			algorithm = StructureAlignmentFactory.getAlgorithm(algorithms[0]);
-		} catch (StructureException e){
-			e.printStackTrace();
+		} catch (StructureException e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		JLabel algoLabel = new JLabel("Select alignment algorithm: ");
@@ -209,29 +211,29 @@ public class AlignmentGui extends JFrame{
 
 		Action actionAlgorithm = new AbstractAction("Algorithm") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				JComboBox cb = (JComboBox)evt.getSource();
-				String algorithmName = (String)cb.getSelectedItem();
+				JComboBox cb = (JComboBox) evt.getSource();
+				String algorithmName = (String) cb.getSelectedItem();
 				// Perform action...
-				//System.out.println("calc structure alignment");
+				// System.out.println("calc structure alignment");
 				updateAlgorithm(algorithmName);
 
 			}
 		};
 
-
 		algorithmList.addActionListener(actionAlgorithm);
-
 
 		Action paramAction = new AbstractAction("Parameters") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				// Perform action...
-				//System.out.println("calc structure alignment");
+				// System.out.println("calc structure alignment");
 				configureParameters();
 
 			}
@@ -239,8 +241,6 @@ public class AlignmentGui extends JFrame{
 		};
 
 		JButton parameterButton = new JButton(paramAction);
-
-
 
 		Box hBoxAlgo = Box.createHorizontalBox();
 		hBoxAlgo.add(Box.createGlue());
@@ -252,36 +252,33 @@ public class AlignmentGui extends JFrame{
 		return hBoxAlgo;
 	}
 
+	private Box initButtons() {
 
-
-
-
-	private Box initButtons(){
-
-		//        Box hBox42 = Box.createHorizontalBox();
-		progress =new JProgressBar();
+		// Box hBox42 = Box.createHorizontalBox();
+		progress = new JProgressBar();
 		progress.setIndeterminate(false);
-		progress.setMaximumSize(new Dimension(10,100));
+		progress.setMaximumSize(new Dimension(10, 100));
 		progress.setVisible(false);
 
-		//        hBox42.add(Box.createGlue());
-		//        hBox42.add(progress);
-		//        hBox42.add(Box.createGlue());
-		//        vBox.add(hBox42);
+		// hBox42.add(Box.createGlue());
+		// hBox42.add(progress);
+		// hBox42.add(Box.createGlue());
+		// vBox.add(hBox42);
 		Action action1 = new AbstractAction("Align") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				// Perform action...
-				//System.out.println("calc structure alignment");
+				// System.out.println("calc structure alignment");
 				int selectedIndex = masterPane.getSelectedIndex();
-				if (selectedIndex == 0)
+				if (selectedIndex == 0) {
 					calcAlignment();
-				else if ( selectedIndex == 1)
+				} else if (selectedIndex == 1) {
 					calcDBSearch();
-				else {
-					System.err.println("Unknown TAB: " + selectedIndex);
+				} else {
+					logger.error("Unknown TAB: " + selectedIndex);
 				}
 
 			}
@@ -291,6 +288,7 @@ public class AlignmentGui extends JFrame{
 
 		Action action3 = new AbstractAction("Abort") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
@@ -305,6 +303,7 @@ public class AlignmentGui extends JFrame{
 
 		Action action2 = new AbstractAction("Exit") {
 			public static final long serialVersionUID = 0l;
+
 			// This method is called when the button is pressed
 			@Override
 			public void actionPerformed(ActionEvent evt) {
@@ -320,7 +319,7 @@ public class AlignmentGui extends JFrame{
 		hBox.add(Box.createGlue());
 		hBox.add(progress);
 		hBox.add(abortB);
-		//hBox.add(Box.createGlue());
+		// hBox.add(Box.createGlue());
 		hBox.add(submitB);
 
 		return hBox;
@@ -328,59 +327,52 @@ public class AlignmentGui extends JFrame{
 
 	protected void configureParameters() {
 		StructureAlignment algorithm = getStructureAlignment();
-		System.out.println("configure parameters for " + algorithm.getAlgorithmName());
+		logger.info("configure parameters for " + algorithm.getAlgorithmName());
 
 		// show a new config GUI
 		new ParameterGUI(algorithm.getParameters(), algorithm.getAlgorithmName());
 	}
 
-
-
 	public void cleanUp() {
 
-		if ( alicalc != null) {
+		if (alicalc != null) {
 			alicalc.cleanup();
 		}
 	}
-
-
-
-
 
 	private void calcAlignment() {
 
 		int pos = tabPane.getSelectedIndex();
 		StructurePairSelector tab = null;
 
-		if (pos == 0 ){
+		if (pos == 0) {
 			tab = tab1;
 
-		} else if (pos == 1){
+		} else if (pos == 1) {
 			tab = tab3;
 
-		} else if (pos == 2){
+		} else if (pos == 2) {
 			tab = tab2;
 		}
-
 
 		try {
 			Structure s1 = tab.getStructure1();
 			Structure s2 = tab.getStructure2();
 
-			if ( s1 == null) {
-				System.err.println("please select structure 1");
-				return ;
+			if (s1 == null) {
+				logger.error("please select structure 1");
+				return;
 			}
 
-			if ( s2 == null) {
-				System.err.println("please select structure 2");
+			if (s2 == null) {
+				logger.error("please select structure 2");
 				return;
 			}
 
 			String name1 = "custom1";
 			String name2 = "custom2";
 
-			if  ( pos == 0){
+			if (pos == 0) {
 				name1 = tab1.getName1().getIdentifier();
 				name2 = tab1.getName2().getIdentifier();
 			} else {
@@ -388,11 +380,9 @@ public class AlignmentGui extends JFrame{
 				name2 = s2.getName();
 			}
 
-			System.out.println("aligning: " + name1 + " " + name2);
+			logger.info(new StringBuilder().append("aligning: ").append(name1).append(" ").append(name2).toString());
 
-
-			alicalc = new AlignmentCalc(this,s1,s2, name1, name2);
-
+			alicalc = new AlignmentCalc(this, s1, s2, name1, name2);
 
 			thread = new Thread(alicalc);
 			thread.start();
@@ -400,19 +390,16 @@ public class AlignmentGui extends JFrame{
 			progress.setIndeterminate(true);
 			ProgressThreadDrawer drawer = new ProgressThreadDrawer(progress);
 			drawer.start();
-		} catch (StructureException e){
-			JOptionPane.showMessageDialog(null,"Could not align structures. Exception: " + e.getMessage());
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null,"Could not align structures. Exception: " + e.getMessage());
+		} catch (IOException | StructureException e) {
+			JOptionPane.showMessageDialog(null, "Could not align structures. Exception: " + e.getMessage());
 		}
 
 	}
 
-
 	private void calcDBSearch() {
 
 		JTabbedPane tabPane = dbsearch.getTabPane();
-		System.out.println("run DB search " + tabPane.getSelectedIndex());
+		logger.info("run DB search " + tabPane.getSelectedIndex());
 
 		Structure s = null;
 		boolean domainSplit = dbsearch.isDomainSplit();
@@ -420,16 +407,15 @@ public class AlignmentGui extends JFrame{
 		StructurePairSelector tab = null;
 		int pos = tabPane.getSelectedIndex();
 
-		if (pos == 0 ){
+		if (pos == 0) {
 
 			tab = dbsearch.getSelectPDBPanel();
 
-		}  else if (pos == 1){
+		} else if (pos == 1) {
 
 			tab = dbsearch.getScopSelectPanel();
 
-
-		} else if (pos == 2){
+		} else if (pos == 2) {
 
 			tab = dbsearch.getPDBUploadPanel();
 
@@ -439,33 +425,32 @@ public class AlignmentGui extends JFrame{
 
 			s = tab.getStructure1();
 
-			if ( s == null) {
-				JOptionPane.showMessageDialog(null,"please select structure 1");
-				return ;
+			if (s == null) {
+				JOptionPane.showMessageDialog(null, "please select structure 1");
+				return;
 			}
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		String name1 = s.getName();
-		if ( name1 == null || name1.equals(""))
+		if (name1 == null || "".equals(name1)) {
 			name1 = s.getPDBCode();
+		}
 
-
-
-		System.out.println("name1 in alig gui:" + name1);
+		logger.info("name1 in alig gui:" + name1);
 		String file = dbsearch.getOutFileLocation();
-		if ( file == null || file.equals("") ){
-			JOptionPane.showMessageDialog(null,"Please select a directory to contain the DB search results.");
+		if (file == null || "".equals(file)) {
+			JOptionPane.showMessageDialog(null, "Please select a directory to contain the DB search results.");
 			return;
 		}
 		File outFile = new File(file);
-		if( !outFile.exists() ) {
+		if (!outFile.exists()) {
 			outFile.mkdirs();
 		}
-		if( !outFile.isDirectory() || !outFile.canWrite()) {
-			JOptionPane.showMessageDialog(null,"Unable to write to "+outFile.getAbsolutePath());
+		if (!outFile.isDirectory() || !outFile.canWrite()) {
+			JOptionPane.showMessageDialog(null, "Unable to write to " + outFile.getAbsolutePath());
 			return;
 		}
 
@@ -474,29 +459,26 @@ public class AlignmentGui extends JFrame{
 		int totalNrCPUs = Runtime.getRuntime().availableProcessors();
 
 		int useNrCPUs = 1;
-		if ( totalNrCPUs > 1){
+		if (totalNrCPUs > 1) {
 			Object[] options = new Integer[totalNrCPUs];
 			int posX = 0;
-			for ( int i = totalNrCPUs; i> 0 ; i--){
+			for (int i = totalNrCPUs; i > 0; i--) {
 				options[posX] = i;
 				posX++;
 			}
-			int n = JOptionPane.showOptionDialog(null,
-					"How many would you like to use for the calculations?",
-					"We detected " + totalNrCPUs + " processors on your system.",
-					JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE,
-					null,
-					options,
-					options[0]);
+			int n = JOptionPane.showOptionDialog(null, "How many would you like to use for the calculations?",
+					new StringBuilder().append("We detected ").append(totalNrCPUs).append(" processors on your system.")
+							.toString(),
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-			if ( n < 0)
+			if (n < 0) {
 				return;
+			}
 			useNrCPUs = (Integer) options[n];
-			System.out.println("will use " + useNrCPUs + " CPUs." );
+			logger.info(new StringBuilder().append("will use ").append(useNrCPUs).append(" CPUs.").toString());
 		}
-		System.out.println("using domainSplit data");
-		alicalc = new AlignmentCalcDB(this, s,  name1,config,file, domainSplit);
+		logger.info("using domainSplit data");
+		alicalc = new AlignmentCalcDB(this, s, name1, config, file, domainSplit);
 		alicalc.setNrCPUs(useNrCPUs);
 		abortB.setEnabled(true);
 		progress.setIndeterminate(true);
@@ -507,27 +489,25 @@ public class AlignmentGui extends JFrame{
 		t.start();
 	}
 
-
-	public DBSearchGUI getDBSearch(){
+	public DBSearchGUI getDBSearch() {
 		return dbsearch;
 	}
 
-	public void notifyCalcFinished(){
+	public void notifyCalcFinished() {
 		abortB.setEnabled(false);
 		thread = null;
 		progress.setIndeterminate(false);
 		this.repaint();
 	}
 
-	private void abortCalc(){
-		System.err.println("Interrupting alignment ...");
-		if ( alicalc != null )
+	private void abortCalc() {
+		logger.error("Interrupting alignment ...");
+		if (alicalc != null) {
 			alicalc.interrupt();
+		}
 		notifyCalcFinished();
 
-
 	}
-
 
 	public StructureAlignment getStructureAlignment() {
 
@@ -536,11 +516,11 @@ public class AlignmentGui extends JFrame{
 
 	private void updateAlgorithm(String algorithmName) {
 
-		//String algorithmName = (String)algorithmList.getSelectedItem();
+		// String algorithmName = (String)algorithmList.getSelectedItem();
 		try {
 			algorithm = StructureAlignmentFactory.getAlgorithm(algorithmName);
-		} catch (StructureException ex){
-			ex.printStackTrace();
+		} catch (StructureException ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 
 	}
@@ -549,28 +529,29 @@ public class AlignmentGui extends JFrame{
 
 class ProgressThreadDrawer extends Thread {
 
-	JProgressBar progress;
+	private static final Logger logger = LoggerFactory.getLogger(ProgressThreadDrawer.class);
 	static int interval = 300;
+	JProgressBar progress;
 
 	public ProgressThreadDrawer(JProgressBar progress) {
 		this.progress = progress;
 	}
 
-
 	@Override
 	public void run() {
 		progress.setVisible(true);
 		boolean finished = false;
-		while ( ! finished) {
+		while (!finished) {
 			try {
 				progress.repaint();
-				if ( ! progress.isIndeterminate() ){
-					finished =false;
+				if (!progress.isIndeterminate()) {
+					finished = false;
 					break;
 				}
 
 				sleep(interval);
-			} catch (InterruptedException e){
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
 			}
 			progress.repaint();
 		}

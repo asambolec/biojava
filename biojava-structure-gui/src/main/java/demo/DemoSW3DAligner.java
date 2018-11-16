@@ -32,12 +32,14 @@ import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.seq.SmithWaterman3DParameters;
 import org.biojava.nbio.structure.align.seq.SmithWaterman3Daligner;
 import org.biojava.nbio.structure.align.util.AtomCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DemoSW3DAligner {
 
+	private static final Logger logger = LoggerFactory.getLogger(DemoSW3DAligner.class);
 
-
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		String name1 = "1MBN.A";
 		String name2 = "4ODC.A";
@@ -49,14 +51,14 @@ public class DemoSW3DAligner {
 
 		try {
 
-			StructureAlignment algorithm  = StructureAlignmentFactory.getAlgorithm(SmithWaterman3Daligner.algorithmName);
+			StructureAlignment algorithm = StructureAlignmentFactory.getAlgorithm(SmithWaterman3Daligner.algorithmName);
 
-			System.out.println("using " + algorithm.getAlgorithmName());
+			logger.info("using " + algorithm.getAlgorithmName());
 
 			SmithWaterman3DParameters params = new SmithWaterman3DParameters();
 
-			System.out.println("Gap open:" + params.getGapOpen());
-			System.out.println("Gap extension:" + params.getGapExtend());
+			logger.info("Gap open:" + params.getGapOpen());
+			logger.info("Gap extension:" + params.getGapExtend());
 
 			structure1 = cache.getStructure(name1);
 			structure2 = cache.getStructure(name2);
@@ -64,29 +66,27 @@ public class DemoSW3DAligner {
 			Atom[] ca1 = StructureTools.getAtomCAArray(structure1);
 			Atom[] ca2 = StructureTools.getAtomCAArray(structure2);
 
-
-			AFPChain afpChain = algorithm.align(ca1,ca2,params);
+			AFPChain afpChain = algorithm.align(ca1, ca2, params);
 
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
 			// flexible original results:
-			System.out.println(afpChain.toFatcat(ca1,ca2));
+			logger.info(afpChain.toFatcat(ca1, ca2));
 
 			// print rotation matrices
-			System.out.println(afpChain.toRotMat());
-			//System.out.println(afpChain.toCE(ca1, ca2));
+			logger.info(afpChain.toRotMat());
+			// System.out.println(afpChain.toCE(ca1, ca2));
 
 			// print XML representation
-			//System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
+			// System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
 
 			StructureAlignmentDisplay.display(afpChain, ca1, ca2);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 	}
-
 
 }

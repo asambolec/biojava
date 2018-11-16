@@ -46,9 +46,8 @@ public class SuperPositionSVD extends SuperPositionAbstract {
 	/**
 	 * Constructor for the SVD superposition algorithm.
 	 * 
-	 * @param centered
-	 *            true if the point arrays are centered at the origin (faster),
-	 *            false otherwise
+	 * @param centered true if the point arrays are centered at the origin (faster),
+	 *                 false otherwise
 	 */
 	public SuperPositionSVD(boolean centered) {
 		super(centered);
@@ -129,7 +128,7 @@ public class SuperPositionSVD extends SuperPositionAbstract {
 
 		Matrix cb_tmp = centroidB.times(rot);
 		Matrix tran = centroidA.minus(cb_tmp);
-		
+
 		return Matrices.getTransformation(rot, tran);
 
 	}

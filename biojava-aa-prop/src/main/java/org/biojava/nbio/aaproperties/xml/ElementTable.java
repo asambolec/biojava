@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@XmlRootElement(name="elements", namespace="http://biojava.org")
+@XmlRootElement(name = "elements", namespace = "http://biojava.org")
 public class ElementTable {
 
 	/**
@@ -43,13 +43,14 @@ public class ElementTable {
 	 */
 	private Map<String, Isotope> isotopeName2Isotope;
 
-	public ElementTable(){}
+	public ElementTable() {
+	}
 
-	public ElementTable(List<Element> eList){
+	public ElementTable(List<Element> eList) {
 		this.setElement(eList);
 	}
 
-	public void setElement(List<Element> eList){
+	public void setElement(List<Element> eList) {
 		this.element = eList;
 		populateMaps();
 	}
@@ -57,30 +58,28 @@ public class ElementTable {
 	/**
 	 * Populate the Maps for quick retrieval
 	 */
-	public void populateMaps(){
-		this.elementName2Element = new HashMap<String, Element>();
-		this.isotopeName2Isotope = new HashMap<String, Isotope>();
-		if(this.element != null){
-			for(Element e:this.element){
+	public void populateMaps() {
+		this.elementName2Element = new HashMap<>();
+		this.isotopeName2Isotope = new HashMap<>();
+		if (this.element != null) {
+			this.element.forEach(e -> {
 				this.elementName2Element.put(e.getName(), e);
-				if(e.getIsotopes() != null){
-					for(Isotope i:e.getIsotopes()){
-						this.isotopeName2Isotope.put(i.getName(), i);
-					}
+				if (e.getIsotopes() != null) {
+					e.getIsotopes().forEach(i -> this.isotopeName2Isotope.put(i.getName(), i));
 				}
-			}
+			});
 		}
 	}
 
-	public List<Element> getElement(){
+	public List<Element> getElement() {
 		return this.element;
 	}
 
-	public Element getElement(String name){
+	public Element getElement(String name) {
 		return this.elementName2Element.get(name);
 	}
 
-	public Isotope getIsotope(String name){
+	public Isotope getIsotope(String name) {
 		return this.isotopeName2Isotope.get(name);
 	}
 }

@@ -26,8 +26,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * Implementation of XMLWriter which emits nicely formatted documents
- * to a PrintWriter.
+ * Implementation of XMLWriter which emits nicely formatted documents to a
+ * PrintWriter.
  *
  * @author Thomas Down
  * @since 1.3
@@ -41,19 +41,17 @@ public class PrettyXMLWriter implements XMLWriter {
 	private boolean afterNewline = true;
 	private int indent = 0;
 
-	private Map<String, String> namespacePrefixes = new HashMap<String, String>();
+	private Map<String, String> namespacePrefixes = new HashMap<>();
 	private int namespaceSeed = 0;
-	private LinkedList<List<String>> namespaceBindings = new LinkedList<List<String>>();
-	private List<String> namespacesDeclared = new ArrayList<String>();
+	private LinkedList<List<String>> namespaceBindings = new LinkedList<>();
+	private List<String> namespacesDeclared = new ArrayList<>();
 
 	public PrettyXMLWriter(PrintWriter writer) {
 		this.writer = writer;
 	}
 
 	@Override
-	public void declareNamespace(String nsURI, String prefixHint)
-		throws IOException
-	{
+	public void declareNamespace(String nsURI, String prefixHint) throws IOException {
 		if (!namespacePrefixes.containsKey(nsURI)) {
 			if (isOpeningTag) {
 				String prefix = allocPrefix(nsURI);
@@ -64,32 +62,26 @@ public class PrettyXMLWriter implements XMLWriter {
 		}
 	}
 
-	private void handleDeclaredNamespaces()
-		throws IOException
-	{
-		if (namespacesDeclared.size() == 0) {
-			for (Iterator<String> nsi = namespacesDeclared.iterator(); nsi.hasNext(); ) {
-				String nsURI = nsi.next();
-				if (!namespacePrefixes.containsKey(nsURI)) {
-					String prefix = allocPrefix(nsURI);
-					attribute("xmlns:" + prefix, nsURI);
-				}
-			}
-			namespacesDeclared.clear();
+	private void handleDeclaredNamespaces() throws IOException {
+		if (namespacesDeclared.size() != 0) {
+			return;
 		}
+		for (String nsURI : namespacesDeclared) {
+			if (!namespacePrefixes.containsKey(nsURI)) {
+				String prefix = allocPrefix(nsURI);
+				attribute("xmlns:" + prefix, nsURI);
+			}
+		}
+		namespacesDeclared.clear();
 	}
 
-	protected void writeIndent()
-		throws IOException
-	{
+	protected void writeIndent() throws IOException {
 		for (int i = 0; i < indent * indentUnit; ++i) {
 			writer.write(' ');
 		}
 	}
 
-	private void _openTag()
-		throws IOException
-	{
+	private void _openTag() throws IOException {
 		if (isOpeningTag) {
 			writer.println('>');
 			afterNewline = true;
@@ -108,7 +100,7 @@ public class PrettyXMLWriter implements XMLWriter {
 		namespacePrefixes.put(nsURI, prefix);
 		List<String> bindings = namespaceBindings.getLast();
 		if (bindings == null) {
-			bindings = new ArrayList<String>();
+			bindings = new ArrayList<>();
 			namespaceBindings.removeLast();
 			namespaceBindings.add(bindings);
 		}
@@ -117,12 +109,9 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void openTag(String nsURI, String localName)
-		throws IOException
-	{
-		if (nsURI == null || nsURI.length() == 0)
-		{
-			throw new IOException("Invalid namespace URI: "+nsURI);
+	public void openTag(String nsURI, String localName) throws IOException {
+		if (nsURI == null || nsURI.isEmpty()) {
+			throw new IOException("Invalid namespace URI: " + nsURI);
 		}
 		_openTag();
 		boolean alloced = false;
@@ -142,9 +131,7 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void openTag(String qName)
-		throws IOException
-	{
+	public void openTag(String qName) throws IOException {
 		_openTag();
 		writer.print('<');
 		writer.print(qName);
@@ -152,10 +139,8 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void attribute(String nsURI, String localName, String value)
-		throws IOException
-	{
-		if (! isOpeningTag) {
+	public void attribute(String nsURI, String localName, String value) throws IOException {
+		if (!isOpeningTag) {
 			throw new IOException("attributes must follow an openTag");
 		}
 
@@ -175,10 +160,8 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void attribute(String qName, String value)
-		throws IOException
-	{
-		if (! isOpeningTag) {
+	public void attribute(String qName, String value) throws IOException {
+		if (!isOpeningTag) {
 			throw new IOException("attributes must follow an openTag");
 		}
 
@@ -194,16 +177,12 @@ public class PrettyXMLWriter implements XMLWriter {
 		afterNewline = true;
 		List<String> hereBindings = namespaceBindings.removeLast();
 		if (hereBindings != null) {
-			for (Iterator<String> bi = hereBindings.iterator(); bi.hasNext(); ) {
-				namespacePrefixes.remove(bi.next());
-			}
+			hereBindings.forEach(namespacePrefixes::remove);
 		}
 	}
 
 	@Override
-	public void closeTag(String nsURI, String localName)
-		throws IOException
-	{
+	public void closeTag(String nsURI, String localName) throws IOException {
 		String prefix = namespacePrefixes.get(nsURI);
 		if (prefix == null) {
 			throw new IOException("Assertion failed: unknown namespace when closing tag");
@@ -226,9 +205,7 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void closeTag(String qName)
-		throws IOException
-	{
+	public void closeTag(String qName) throws IOException {
 		indent--;
 
 		if (isOpeningTag) {
@@ -245,85 +222,71 @@ public class PrettyXMLWriter implements XMLWriter {
 	}
 
 	@Override
-	public void println(String data)
-		throws IOException
-	{
-	if (isOpeningTag) {
-		writer.println('>');
-		isOpeningTag = false;
-	}
-	printChars(data);
-	writer.println();
-	afterNewline = true;
+	public void println(String data) throws IOException {
+		if (isOpeningTag) {
+			writer.println('>');
+			isOpeningTag = false;
+		}
+		printChars(data);
+		writer.println();
+		afterNewline = true;
 	}
 
 	@Override
-	public void print(String data)
-		throws IOException
-	{
-	if (isOpeningTag) {
-		writer.print('>');
-		isOpeningTag = false;
-	}
-	printChars(data);
-	afterNewline = false;
+	public void print(String data) throws IOException {
+		if (isOpeningTag) {
+			writer.print('>');
+			isOpeningTag = false;
+		}
+		printChars(data);
+		afterNewline = false;
 	}
 
 	@Override
-	public void printRaw(String data)
-		throws IOException
-	{
-	writer.println(data);
+	public void printRaw(String data) throws IOException {
+		writer.println(data);
 	}
 
-	protected void printChars(String data)
-		throws IOException
-	{
-	if (data == null) {
-		printChars("null");
-		return;
-	}
+	protected void printChars(String data) throws IOException {
+		if (data == null) {
+			printChars("null");
+			return;
+		}
 
-	for (int pos = 0; pos < data.length(); ++pos) {
-		char c = data.charAt(pos);
-		if (c == '<' || c == '>' || c == '&') {
-		numericalEntity(c);
-		} else {
-		writer.write(c);
+		for (int pos = 0; pos < data.length(); ++pos) {
+			char c = data.charAt(pos);
+			if (c == '<' || c == '>' || c == '&') {
+				numericalEntity(c);
+			} else {
+				writer.write(c);
+			}
 		}
 	}
-	}
 
-	protected void printAttributeValue(String data)
-		throws IOException
-	{
-	if (data == null) {
-		printAttributeValue("null");
-		return;
-	}
+	protected void printAttributeValue(String data) throws IOException {
+		if (data == null) {
+			printAttributeValue("null");
+			return;
+		}
 
-	for (int pos = 0; pos < data.length(); ++pos) {
-		char c = data.charAt(pos);
-		if (c == '<' || c == '>' || c == '&' || c == '"') {
-		numericalEntity(c);
-		} else {
-		writer.write(c);
+		for (int pos = 0; pos < data.length(); ++pos) {
+			char c = data.charAt(pos);
+			if (c == '<' || c == '>' || c == '&' || c == '"') {
+				numericalEntity(c);
+			} else {
+				writer.write(c);
+			}
 		}
 	}
-	}
 
-	protected void numericalEntity(char c)
-		throws IOException
-	{
-	writer.print("&#");
-	writer.print((int) c);
-	writer.print(';');
+	protected void numericalEntity(char c) throws IOException {
+		writer.print("&#");
+		writer.print((int) c);
+		writer.print(';');
 	}
 
 	@Override
-	public void close()
-		throws IOException
-	{
+	public void close() throws IOException {
 		writer.close();
 	}
 }

@@ -29,14 +29,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * This class contains information about a specific protein
- * modification.
+ * This class contains information about a specific protein modification.
  *
  * @author Jianjiong Gao
  * @since 3.0
  */
-public class ProteinModificationImpl
-implements ProteinModification , Comparable<ProteinModification> {
+public class ProteinModificationImpl implements ProteinModification, Comparable<ProteinModification> {
 
 	private final String id;
 	private final ModificationCondition condition;
@@ -53,6 +51,26 @@ implements ProteinModification , Comparable<ProteinModification> {
 	private final String formula;
 
 	private final Set<String> keywords;
+
+	/**
+	 *
+	 */
+	private ProteinModificationImpl(Builder builder) {
+		this.id = builder.id;
+		this.category = builder.category;
+		this.occurrenceType = builder.occurrenceType;
+		this.condition = builder.condition;
+		this.pdbccId = builder.pdbccId;
+		this.pdbccName = builder.pdbccName;
+		this.residId = builder.residId;
+		this.residName = builder.residName;
+		this.psimodId = builder.psimodId;
+		this.psimodName = builder.psimodName;
+		this.sysName = builder.sysName;
+		this.formula = builder.formula;
+
+		this.keywords = new LinkedHashSet<>(builder.keywords);
+	}
 
 	@Override
 	public String getId() {
@@ -97,7 +115,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 	@Override
 	public String getDescription() {
 		return toString();
-		//return description;
+		// return description;
 	}
 
 	@Override
@@ -127,85 +145,60 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 	@Override
 	public String toString() {
-		return "ProteinModificationImpl [id=" + id + ", condition=" + condition
-				+ ", category=" + category + ", occurrenceType="
-				+ occurrenceType + ", pdbccId=" + pdbccId + ", pdbccName="
-				+ pdbccName + ", residId=" + residId + ", residName="
-				+ residName + ", psimodId=" + psimodId + ", psimodName="
-				+ psimodName + ", sysName=" + sysName + ", formula=" + formula
-				+ ", keywords=" + keywords + "]";
+		return new StringBuilder().append("ProteinModificationImpl [id=").append(id).append(", condition=")
+				.append(condition).append(", category=").append(category).append(", occurrenceType=")
+				.append(occurrenceType).append(", pdbccId=").append(pdbccId).append(", pdbccName=").append(pdbccName)
+				.append(", residId=").append(residId).append(", residName=").append(residName).append(", psimodId=")
+				.append(psimodId).append(", psimodName=").append(psimodName).append(", sysName=").append(sysName)
+				.append(", formula=").append(formula).append(", keywords=").append(keywords).append("]").toString();
 	}
 
 	/*
-	private String printModification(ProteinModificationImpl mod) {
-		StringBuilder sb = new StringBuilder();
-
-		String name = getBestPossibleName(mod);
-		boolean hasName = true;
-		if (  name.equals(""))
-			hasName = false;
-		sb.append(name);
-
-		Set<String> keywords = mod.getKeywords();
-		if (keywords!=null && !keywords.isEmpty()) {
-			if ( hasName)
-				sb.append(" (");
-			for (String keyword : keywords) {
-
-				sb.append(keyword);
-				sb.append(", ");
-			}
-			sb.delete(sb.length()-2,sb.length());
-		}
-		if ( hasName)
-			sb.append(")");
-		return sb.toString();
-	}
-
-
-	private String getBestPossibleName(ProteinModificationImpl mod) {
-
-		//System.out.println(mod.getResidName() + " : " + mod.getPsimodName() + " : " + mod.getPdbccName() + " : " + mod.getSystematicName());
-
-		// first: get resid
-		String resid = mod.getResidId();
-		if (resid != null) {
-			String residname = mod.getResidName();
-			if (residname != null) {
-				return residname;
-			}
-		}
-
-		// 2nd: PSI-MOD
-
-		String name = mod.getPsimodName();
-		if ( name != null) {
-			//System.out.println("PSI_MOD name:" + name);
-			return name;
-		}
-
-		// 3rd PDB-CC
-
-		String pdbcc = mod.getPdbccName();
-		if ( pdbcc != null ) {
-			//System.out.println("PDBCC name: " + pdbcc);
-			return pdbcc;
-		}
-
-
-		// no public name know, use the systematic name
-
-		String systematic = mod.getSystematicName();
-		if ( systematic != null) {
-			//System.out.println("SYSTEMATIC NAME: " + mod.getSystematicName());
-			return systematic;
-		}
-
-
-		return "";
-
-	}
-	*/
+	 * private String printModification(ProteinModificationImpl mod) { StringBuilder
+	 * sb = new StringBuilder();
+	 * 
+	 * String name = getBestPossibleName(mod); boolean hasName = true; if (
+	 * name.equals("")) hasName = false; sb.append(name);
+	 * 
+	 * Set<String> keywords = mod.getKeywords(); if (keywords!=null &&
+	 * !keywords.isEmpty()) { if ( hasName) sb.append(" ("); for (String keyword :
+	 * keywords) {
+	 * 
+	 * sb.append(keyword); sb.append(", "); } sb.delete(sb.length()-2,sb.length());
+	 * } if ( hasName) sb.append(")"); return sb.toString(); }
+	 * 
+	 * 
+	 * private String getBestPossibleName(ProteinModificationImpl mod) {
+	 * 
+	 * //System.out.println(mod.getResidName() + " : " + mod.getPsimodName() + " : "
+	 * + mod.getPdbccName() + " : " + mod.getSystematicName());
+	 * 
+	 * // first: get resid String resid = mod.getResidId(); if (resid != null) {
+	 * String residname = mod.getResidName(); if (residname != null) { return
+	 * residname; } }
+	 * 
+	 * // 2nd: PSI-MOD
+	 * 
+	 * String name = mod.getPsimodName(); if ( name != null) {
+	 * //System.out.println("PSI_MOD name:" + name); return name; }
+	 * 
+	 * // 3rd PDB-CC
+	 * 
+	 * String pdbcc = mod.getPdbccName(); if ( pdbcc != null ) {
+	 * //System.out.println("PDBCC name: " + pdbcc); return pdbcc; }
+	 * 
+	 * 
+	 * // no public name know, use the systematic name
+	 * 
+	 * String systematic = mod.getSystematicName(); if ( systematic != null) {
+	 * //System.out.println("SYSTEMATIC NAME: " + mod.getSystematicName()); return
+	 * systematic; }
+	 * 
+	 * 
+	 * return "";
+	 * 
+	 * }
+	 */
 
 	@Override
 	public int hashCode() {
@@ -216,21 +209,30 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof ProteinModification))
+		if (!(obj instanceof ProteinModification)) {
 			return false;
+		}
 
-		ProteinModification mod = (ProteinModification)obj;
-		if (!id.equals(mod.getId()))
+		ProteinModification mod = (ProteinModification) obj;
+		if (!id.equals(mod.getId())) {
 			return false;
+		}
 
-		if (category != mod.getCategory())
+		if (category != mod.getCategory()) {
 			return false;
+		}
 
 		return true;
 	}
 
+	@Override
+	public int compareTo(ProteinModification arg0) {
+		if (this.equals(arg0)) {
+			return 0;
+		}
 
-
+		return this.toString().compareTo(arg0.toString());
+	}
 
 	/**
 	 * Uses Builder pattern to build a ProteinModification.
@@ -251,7 +253,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 		private String sysName = null;
 		private String formula = null;
 
-		private Set<String> keywords = new LinkedHashSet<String>();
+		private Set<String> keywords = new LinkedHashSet<>();
 
 		/**
 		 *
@@ -260,13 +262,20 @@ implements ProteinModification , Comparable<ProteinModification> {
 		 * @param occType
 		 * @param condition
 		 */
-		public Builder(final String id, final ModificationCategory cat,
-				final ModificationOccurrenceType occType,
+		public Builder(final String id, final ModificationCategory cat, final ModificationOccurrenceType occType,
 				final ModificationCondition condition) {
-			if ( id == null) throw new IllegalArgumentException("id == null!");
-			if ( cat == null) throw new IllegalArgumentException("cat == null!");
-			if ( occType == null) throw new IllegalArgumentException("occType == null!");
-			if ( condition == null) throw new IllegalArgumentException("condition == null!");
+			if (id == null) {
+				throw new IllegalArgumentException("id == null!");
+			}
+			if (cat == null) {
+				throw new IllegalArgumentException("cat == null!");
+			}
+			if (occType == null) {
+				throw new IllegalArgumentException("occType == null!");
+			}
+			if (condition == null) {
+				throw new IllegalArgumentException("condition == null!");
+			}
 
 			this.id = id;
 			this.category = cat;
@@ -276,6 +285,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Create a Builder from an existing ProteinModification.
+		 * 
 		 * @param copyFrom the ProteinModification to be copied from.
 		 */
 		public Builder(final ProteinModification copyFrom) {
@@ -289,29 +299,36 @@ implements ProteinModification , Comparable<ProteinModification> {
 			this.sysName = copyFrom.getSystematicName();
 			this.formula = copyFrom.getFormula();
 
-			this.keywords = new LinkedHashSet<String>(copyFrom.getKeywords());
+			this.keywords = new LinkedHashSet<>(copyFrom.getKeywords());
 		}
 
 		public Builder setCategory(final ModificationCategory cat) {
-			if (cat == null) throw new IllegalArgumentException("cat == null!");
+			if (cat == null) {
+				throw new IllegalArgumentException("cat == null!");
+			}
 			this.category = cat;
 			return this;
 		}
 
 		public Builder setOccurrenceType(final ModificationOccurrenceType occType) {
-			if (occType == null) throw new IllegalArgumentException("occType == null!");
-			this.occurrenceType =occType;
+			if (occType == null) {
+				throw new IllegalArgumentException("occType == null!");
+			}
+			this.occurrenceType = occType;
 			return this;
 		}
 
 		public Builder setCondition(final ModificationCondition condition) {
-			if (condition == null) throw new IllegalArgumentException("condition == null!");
+			if (condition == null) {
+				throw new IllegalArgumentException("condition == null!");
+			}
 			this.condition = condition;
 			return this;
 		}
 
 		/**
 		 * Set the Protein Data Bank Chemical Component ID.
+		 * 
 		 * @param pdbccId Protein Data Bank Chemical Component ID.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -322,6 +339,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the Protein Data Bank Chemical Component name.
+		 * 
 		 * @param pdbccName Protein Data Bank Chemical Component name.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -332,6 +350,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the RESID ID.
+		 * 
 		 * @param residId RESID ID.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -342,6 +361,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the RESID name.
+		 * 
 		 * @param residName RESID name.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -352,6 +372,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the PSI-MOD ID.
+		 * 
 		 * @param psimodId PSI-MOD ID.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -362,6 +383,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the PSI-MOD name.
+		 * 
 		 * @param psimodName PSI-MOD name.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -372,6 +394,7 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Set the systematic name.
+		 * 
 		 * @param sysName systematic name.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -392,28 +415,32 @@ implements ProteinModification , Comparable<ProteinModification> {
 
 		/**
 		 * Add a keyword associate with the PTM.
+		 * 
 		 * @param keyword a keyword.
 		 * @return the same Builder object so you can chain setters.
 		 * @throws IllegalArgumentException if the keyword is null.
 		 */
 		public Builder addKeyword(String keyword) {
-			if (keyword == null) throw new IllegalArgumentException("Keyword cannot be null.");
+			if (keyword == null) {
+				throw new IllegalArgumentException("Keyword cannot be null.");
+			}
 			keywords.add(keyword);
 			return this;
 		}
 
 		public Builder addKeywords(Collection<String> keywords) {
-			if (keywords==null)	throw new IllegalArgumentException("Keywords cannot be null.");
-
-			for (String keyword : keywords) {
-				addKeyword(keyword);
+			if (keywords == null) {
+				throw new IllegalArgumentException("Keywords cannot be null.");
 			}
+
+			keywords.forEach(this::addKeyword);
 
 			return this;
 		}
 
 		/**
 		 * Set the residue formula.
+		 * 
 		 * @param formula residue formula.
 		 * @return the same Builder object so you can chain setters.
 		 */
@@ -429,33 +456,5 @@ implements ProteinModification , Comparable<ProteinModification> {
 		public ProteinModificationImpl build() {
 			return new ProteinModificationImpl(this);
 		}
-	}
-
-	/**
-	 *
-	 */
-	private ProteinModificationImpl(Builder builder) {
-		this.id = builder.id;
-		this.category = builder.category;
-		this.occurrenceType = builder.occurrenceType;
-		this.condition = builder.condition;
-		this.pdbccId = builder.pdbccId;
-		this.pdbccName = builder.pdbccName;
-		this.residId = builder.residId;
-		this.residName = builder.residName;
-		this.psimodId = builder.psimodId;
-		this.psimodName = builder.psimodName;
-		this.sysName = builder.sysName;
-		this.formula = builder.formula;
-
-		this.keywords = new LinkedHashSet<String>(builder.keywords);
-	}
-
-	@Override
-	public int compareTo(ProteinModification arg0) {
-		if ( this.equals(arg0))
-			return 0;
-
-		return this.toString().compareTo(arg0.toString());
 	}
 }

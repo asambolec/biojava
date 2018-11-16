@@ -55,8 +55,8 @@ public class CensorStatus implements Comparable<CensorStatus> {
 	 */
 	public Double weight = 1.0; // assume default weight 1.0
 
-
-	private Double percentage = null; //allow the percentage to be set externally for various weighted correction methods.
+	private Double percentage = null; // allow the percentage to be set externally for various weighted correction
+										// methods.
 	/**
 	 *
 	 */
@@ -92,7 +92,7 @@ public class CensorStatus implements Comparable<CensorStatus> {
 	 *
 	 * @return
 	 */
-	public CensorStatus getCopy(){
+	public CensorStatus getCopy() {
 		CensorStatus cs = new CensorStatus();
 		cs.row = row;
 		cs.time = time;
@@ -105,12 +105,13 @@ public class CensorStatus implements Comparable<CensorStatus> {
 
 	@Override
 	public String toString() {
-		return time + " " + censored + " " + group + " " + row;
+		return new StringBuilder().append(time).append(" ").append(censored).append(" ").append(group).append(" ")
+				.append(row).toString();
 	}
 
 	@Override
 	public int compareTo(CensorStatus o) {
-	//    System.out.println("Comparing " + this + " " + o);
+		// System.out.println("Comparing " + this + " " + o);
 		if (time == null) {
 			return -1;
 		}
@@ -126,7 +127,7 @@ public class CensorStatus implements Comparable<CensorStatus> {
 			if (censored.equals(o.censored)) {
 				return 0;
 			}
-			if (censored.equals("0")) {
+			if ("0".equals(censored)) {
 				return -1;
 			} else {
 				return 1;

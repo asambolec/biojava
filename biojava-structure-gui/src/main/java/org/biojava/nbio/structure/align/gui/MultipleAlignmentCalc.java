@@ -36,10 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  A class that obtains structures via DAS and aligns them.
- *  This is done in a separate thread.
- *  It is possible to register Event listeners to get notification of when
- *  the download has finished.
+ * A class that obtains structures via DAS and aligns them. This is done in a
+ * separate thread. It is possible to register Event listeners to get
+ * notification of when the download has finished.
  *
  * @author Aleix Lafita
  * @since 4.2.0
@@ -47,8 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MultipleAlignmentCalc implements AlignmentCalculationRunnable {
 
-	private static final Logger logger =
-			LoggerFactory.getLogger(MultipleAlignmentCalc.class);
+	private static final Logger logger = LoggerFactory.getLogger(MultipleAlignmentCalc.class);
 
 	private List<StructureIdentifier> names;
 	private List<Structure> structures;
@@ -56,17 +54,17 @@ public class MultipleAlignmentCalc implements AlignmentCalculationRunnable {
 	private MultipleAlignmentGUI parent;
 
 	/**
-	 * Requests an alignment of the pdbs.
-	 * If they are empty strings, they are ignored.
+	 * Requests an alignment of the pdbs. If they are empty strings, they are
+	 * ignored.
 	 *
-	 * @param parent the gui frame that interacts with this class
+	 * @param parent     the gui frame that interacts with this class
 	 * @param structures
 	 * @param names
 	 */
-	public MultipleAlignmentCalc(MultipleAlignmentGUI parent,
-			List<Structure> structures, List<StructureIdentifier> names) {
+	public MultipleAlignmentCalc(MultipleAlignmentGUI parent, List<Structure> structures,
+			List<StructureIdentifier> names) {
 
-		this.parent= parent;
+		this.parent = parent;
 		this.structures = structures;
 		this.names = names;
 	}
@@ -74,15 +72,14 @@ public class MultipleAlignmentCalc implements AlignmentCalculationRunnable {
 	@Override
 	public void run() {
 
-		MultipleStructureAligner algorithm =
-				parent.getMultipleStructureAligner();
+		MultipleStructureAligner algorithm = parent.getMultipleStructureAligner();
 		try {
 
-			List<Atom[]> atomArrays = new ArrayList<Atom[]>();
-			for (Structure s:structures){
+			List<Atom[]> atomArrays = new ArrayList<>();
+			structures.forEach(s -> {
 				Atom[] ca = StructureTools.getRepresentativeAtomArray(s);
 				atomArrays.add(ca);
-			}
+			});
 
 			MultipleAlignment msa = algorithm.align(atomArrays);
 			msa.getEnsemble().setStructureIdentifiers(names);
@@ -90,7 +87,7 @@ public class MultipleAlignmentCalc implements AlignmentCalculationRunnable {
 			MultipleAlignmentJmolDisplay.display(msa);
 
 		} catch (StructureException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			logger.warn(e.getMessage());
 		}
 
@@ -98,13 +95,14 @@ public class MultipleAlignmentCalc implements AlignmentCalculationRunnable {
 	}
 
 	@Override
-	public void interrupt() {}
+	public void interrupt() {
+	}
 
 	@Override
 	public void cleanup() {
 
 		parent.notifyCalcFinished();
-		parent=null;
+		parent = null;
 		structures = null;
 		names = null;
 	}

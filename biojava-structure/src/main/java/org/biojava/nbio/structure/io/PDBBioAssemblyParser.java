@@ -38,13 +38,14 @@ import java.util.*;
  */
 public class PDBBioAssemblyParser {
 
-	//private static final Logger logger = LoggerFactory.getLogger(PDBBioAssemblyParser.class);
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(PDBBioAssemblyParser.class);
 
 	private Integer currentBioMolecule = null;
-	private List<String> currentChainIDs = new ArrayList<String>();
+	private List<String> currentChainIDs = new ArrayList<>();
 	private Matrix currentMatrix = null;
 	private double[] shift = null;
-	private Map<Integer,BioAssemblyInfo> transformationMap = new HashMap<Integer, BioAssemblyInfo>();
+	private Map<Integer, BioAssemblyInfo> transformationMap = new HashMap<>();
 	private int modelNumber = 1;
 
 	private List<BiologicalAssemblyTransformation> transformations;
@@ -58,31 +59,32 @@ public class PDBBioAssemblyParser {
 	public void pdb_REMARK_350_Handler(String line) {
 
 		if (line.startsWith("REMARK 350 BIOMOLECULE:")) {
-		    initialize();
+			initialize();
 			currentBioMolecule = Integer.parseInt(line.substring(24).trim());
 
-		} 
-		// not parsing anymore the size (from biojava 5.0), thus this is not needed anymore
+		}
+		// not parsing anymore the size (from biojava 5.0), thus this is not needed
+		// anymore
 		// eventually if needed this could be used to
 		// infer if bioassembly is author or software determined
-		//else if ( line.matches("REMARK 350 \\w+ DETERMINED BIOLOGICAL UNIT:.*" ) ||
-		//			line.matches("REMARK 350 \\w+ DETERMINED QUATERNARY STRUCTURE:.*" )) {
-			// text can be :
-			// author determined biological unit
-			// software determined quaternary structure
-		//} 
-		else if ( line.startsWith("REMARK 350 APPLY THE FOLLOWING TO CHAINS:")) {
+		// else if ( line.matches("REMARK 350 \\w+ DETERMINED BIOLOGICAL UNIT:.*" ) ||
+		// line.matches("REMARK 350 \\w+ DETERMINED QUATERNARY STRUCTURE:.*" )) {
+		// text can be :
+		// author determined biological unit
+		// software determined quaternary structure
+		// }
+		else if (line.startsWith("REMARK 350 APPLY THE FOLLOWING TO CHAINS:")) {
 			currentChainIDs.clear();
 			addToCurrentChainList(line);
 
-		} else if ( line.startsWith("REMARK 350 IN ADDITION APPLY THE FOLLOWING TO CHAINS:")) {
+		} else if (line.startsWith("REMARK 350 IN ADDITION APPLY THE FOLLOWING TO CHAINS:")) {
 			currentChainIDs.clear();
 			addToCurrentChainList(line);
 
-		} else if ( line.startsWith("REMARK 350") && line.contains("AND CHAINS:")) {
+		} else if (line.startsWith("REMARK 350") && line.contains("AND CHAINS:")) {
 			addToCurrentChainList(line);
 
-		} else if ( line.startsWith("REMARK 350   BIOMT")) {
+		} else if (line.startsWith("REMARK 350   BIOMT")) {
 			if (readMatrix(line)) {
 				saveMatrix();
 				modelNumber++;
@@ -92,6 +94,7 @@ public class PDBBioAssemblyParser {
 
 	/**
 	 * Returns a map of bioassembly transformations
+	 * 
 	 * @return
 	 */
 	public Map<Integer, BioAssemblyInfo> getTransformationMap() {
@@ -99,8 +102,9 @@ public class PDBBioAssemblyParser {
 	}
 
 	/**
-	 * Parses a row of a BIOMT matrix in a REMARK 350 record.
-	 * Example: REMARK 350   BIOMT1   2  1.000000  0.000000  0.000000        0.00000
+	 * Parses a row of a BIOMT matrix in a REMARK 350 record. Example: REMARK 350
+	 * BIOMT1 2 1.000000 0.000000 0.000000 0.00000
+	 * 
 	 * @param line
 	 * @return true if 3rd line of matrix has been parsed (matrix is complete)
 	 */
@@ -112,14 +116,14 @@ public class PDBBioAssemblyParser {
 		String pos = items[2].substring(5);
 		int row = Integer.parseInt(pos);
 		if (row == 1) {
-			currentMatrix = Matrix.identity(3,3);
+			currentMatrix = Matrix.identity(3, 3);
 			shift = new double[3];
 		}
 
-		currentMatrix.set((row-1), 0,Float.parseFloat(items[4]));
-		currentMatrix.set((row-1), 1,Float.parseFloat(items[5]));
-		currentMatrix.set((row-1), 2,Float.parseFloat(items[6]));
-		shift[row-1] = Float.parseFloat(items[7]);
+		currentMatrix.set((row - 1), 0, Float.parseFloat(items[4]));
+		currentMatrix.set((row - 1), 1, Float.parseFloat(items[5]));
+		currentMatrix.set((row - 1), 2, Float.parseFloat(items[6]));
+		shift[row - 1] = Float.parseFloat(items[7]);
 
 		// return true if 3rd row of matrix has been processed
 		return row == 3;
@@ -130,21 +134,22 @@ public class PDBBioAssemblyParser {
 	 */
 	private void saveMatrix() {
 
-		for (String chainId : currentChainIDs) {
+		currentChainIDs.forEach(chainId -> {
 			BiologicalAssemblyTransformation transformation = new BiologicalAssemblyTransformation();
 			transformation.setRotationMatrix(currentMatrix.getArray());
 			transformation.setTranslation(shift);
 			transformation.setId(String.valueOf(modelNumber));
 			transformation.setChainId(chainId);
 			transformations.add(transformation);
-		}
+		});
 
-		if (!transformationMap.containsKey(currentBioMolecule)) {
-			BioAssemblyInfo bioAssembly = new BioAssemblyInfo();
-			bioAssembly.setId(currentBioMolecule);
-			bioAssembly.setTransforms(transformations);
-			transformationMap.put(currentBioMolecule,bioAssembly);
+		if (transformationMap.containsKey(currentBioMolecule)) {
+			return;
 		}
+		BioAssemblyInfo bioAssembly = new BioAssemblyInfo();
+		bioAssembly.setId(currentBioMolecule);
+		bioAssembly.setTransforms(transformations);
+		transformationMap.put(currentBioMolecule, bioAssembly);
 	}
 
 	/**
@@ -152,32 +157,31 @@ public class PDBBioAssemblyParser {
 	 */
 	private void addToCurrentChainList(String line) {
 		int index = line.indexOf(":");
-		String chainList = line.substring(index+1).trim();
+		String chainList = line.substring(index + 1).trim();
 		// split by spaces or commas
 		String[] chainIds = chainList.split("[ ,]+");
 		currentChainIDs.addAll(Arrays.asList(chainIds));
 	}
 
 	private void initialize() {
-		transformations = new ArrayList<BiologicalAssemblyTransformation>();
-		currentMatrix = Matrix.identity(3,3);
+		transformations = new ArrayList<>();
+		currentMatrix = Matrix.identity(3, 3);
 		currentBioMolecule = null;
 		shift = new double[3];
 		modelNumber = 1;
 	}
-	
+
 	/**
-	 * Set the macromolecularSize fields of the parsed bioassemblies.
-	 * This can only be called after the full PDB file has been read so that
-	 * all the info for all bioassemblies has been gathered.
-	 * Note that an explicit method to set the field is necessary here because 
-	 * in PDB files the transformations contain only the author chain ids, corresponding 
-	 * to polymeric chains, whilst in mmCIF files the transformations 
-	 * contain all asym ids of both polymers and non-polymers.
+	 * Set the macromolecularSize fields of the parsed bioassemblies. This can only
+	 * be called after the full PDB file has been read so that all the info for all
+	 * bioassemblies has been gathered. Note that an explicit method to set the
+	 * field is necessary here because in PDB files the transformations contain only
+	 * the author chain ids, corresponding to polymeric chains, whilst in mmCIF
+	 * files the transformations contain all asym ids of both polymers and
+	 * non-polymers.
 	 */
 	public void setMacromolecularSizes() {
-		for (BioAssemblyInfo bioAssembly : transformationMap.values()) {
-			bioAssembly.setMacromolecularSize(bioAssembly.getTransforms().size());
-		}
+		transformationMap.values()
+				.forEach(bioAssembly -> bioAssembly.setMacromolecularSize(bioAssembly.getTransforms().size()));
 	}
 }

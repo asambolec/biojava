@@ -135,18 +135,16 @@ import javax.vecmath.Matrix4d;
  */
 public class StructurePairAligner {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(StructurePairAligner.class);
+	private final static Logger logger = LoggerFactory.getLogger(StructurePairAligner.class);
 
 	AlternativeAlignment[] alts;
 	Matrix distanceMatrix;
 	StrucAligParameters params;
 	FragmentPair[] fragPairs;
 
-	List<AlignmentProgressListener> listeners = new ArrayList<AlignmentProgressListener>();
+	List<AlignmentProgressListener> listeners = new ArrayList<>();
 
 	public StructurePairAligner() {
-		super();
 		params = StrucAligParameters.getDefaultParameters();
 		reset();
 		alts = new AlternativeAlignment[0];
@@ -177,7 +175,8 @@ public class StructurePairAligner {
 
 		String pdb1 = "1buz";
 		String pdb2 = "1ali";
-		String outputfile = "/tmp/alig_" + pdb1 + "_" + pdb2 + ".pdb";
+		String outputfile = new StringBuilder().append("/tmp/alig_").append(pdb1).append("_").append(pdb2)
+				.append(".pdb").toString();
 
 		// NO NEED TO DO CHANGE ANYTHING BELOW HERE...
 
@@ -243,8 +242,7 @@ public class StructurePairAligner {
 	}
 
 	/**
-	 * get the results of step 1 - the FragmentPairs used for seeding the
-	 * alignment
+	 * get the results of step 1 - the FragmentPairs used for seeding the alignment
 	 * 
 	 * @return a FragmentPair[] array
 	 */
@@ -258,8 +256,7 @@ public class StructurePairAligner {
 	}
 
 	/**
-	 * return the alternative alignments that can be found for the two
-	 * structures
+	 * return the alternative alignments that can be found for the two structures
 	 *
 	 * @return AlternativeAlignment[] array
 	 */
@@ -288,8 +285,7 @@ public class StructurePairAligner {
 	/**
 	 * set the parameters to be used for the algorithm
 	 *
-	 * @param params
-	 *            the Parameter object
+	 * @param params the Parameter object
 	 */
 	public void setParams(StrucAligParameters params) {
 		this.params = params;
@@ -309,16 +305,15 @@ public class StructurePairAligner {
 	}
 
 	/**
-	 * Calculate the alignment between the two full structures with user
-	 * provided parameters
+	 * Calculate the alignment between the two full structures with user provided
+	 * parameters
 	 *
 	 * @param s1
 	 * @param s2
 	 * @param params
 	 * @throws StructureException
 	 */
-	public void align(Structure s1, Structure s2, StrucAligParameters params)
-			throws StructureException {
+	public void align(Structure s1, Structure s2, StrucAligParameters params) throws StructureException {
 		// step 1 convert the structures to Atom Arrays
 
 		Atom[] ca1 = getAlignmentAtoms(s1);
@@ -336,8 +331,7 @@ public class StructurePairAligner {
 	 * @param s2
 	 * @param chainId2
 	 */
-	public void align(Structure s1, String chainId1, Structure s2,
-			String chainId2) throws StructureException {
+	public void align(Structure s1, String chainId1, Structure s2, String chainId2) throws StructureException {
 		align(s1, chainId1, s2, chainId2, params);
 	}
 
@@ -351,8 +345,7 @@ public class StructurePairAligner {
 	 * @param params
 	 * @throws StructureException
 	 */
-	public void align(Structure s1, String chainId1, Structure s2,
-			String chainId2, StrucAligParameters params)
+	public void align(Structure s1, String chainId1, Structure s2, String chainId2, StrucAligParameters params)
 			throws StructureException {
 		reset();
 		this.params = params;
@@ -374,8 +367,8 @@ public class StructurePairAligner {
 	}
 
 	/**
-	 * Returns the atoms that are being used for the alignment. (E.g. Calpha
-	 * only, etc.)
+	 * Returns the atoms that are being used for the alignment. (E.g. Calpha only,
+	 * etc.)
 	 *
 	 * @param s
 	 * @return an array of Atoms objects
@@ -386,21 +379,16 @@ public class StructurePairAligner {
 	}
 
 	/**
-	 * calculate the protein structure superimposition, between two sets of
-	 * atoms.
+	 * calculate the protein structure superimposition, between two sets of atoms.
 	 *
 	 *
 	 *
-	 * @param ca1
-	 *            set of Atoms of structure 1
-	 * @param ca2
-	 *            set of Atoms of structure 2
-	 * @param params
-	 *            the parameters to use for the alignment
+	 * @param ca1    set of Atoms of structure 1
+	 * @param ca2    set of Atoms of structure 2
+	 * @param params the parameters to use for the alignment
 	 * @throws StructureException
 	 */
-	public void align(Atom[] ca1, Atom[] ca2, StrucAligParameters params)
-			throws StructureException {
+	public void align(Atom[] ca1, Atom[] ca2, StrucAligParameters params) throws StructureException {
 
 		reset();
 		this.params = params;
@@ -419,12 +407,12 @@ public class StructurePairAligner {
 		int fragmentLength = params.getFragmentLength();
 
 		if (ca1.length < (fragmentLength + 1)) {
-			throw new StructureException("structure 1 too short (" + ca1.length
-					+ "), can not align");
+			throw new StructureException(new StringBuilder().append("structure 1 too short (").append(ca1.length)
+					.append("), can not align").toString());
 		}
 		if (ca2.length < (fragmentLength + 1)) {
-			throw new StructureException("structure 2 too short (" + ca2.length
-					+ "), can not align");
+			throw new StructureException(new StringBuilder().append("structure 2 too short (").append(ca2.length)
+					.append("), can not align").toString());
 		}
 		int rows = ca1.length - fragmentLength + 1;
 		int cols = ca2.length - fragmentLength + 1;
@@ -444,7 +432,7 @@ public class StructurePairAligner {
 		Atom unitvector = new AtomImpl();
 		unitvector.setCoords(utmp[0]);
 
-		List<FragmentPair> fragments = new ArrayList<FragmentPair>();
+		List<FragmentPair> fragments = new ArrayList<>();
 
 		for (int i = 0; i < rows; i++) {
 
@@ -453,29 +441,24 @@ public class StructurePairAligner {
 
 			for (int j = 0; j < cols; j++) {
 
-				double rdd1 = AlignUtils.rms_dk_diag(dist1, dist2, i, j,
-						fragmentLength, k);
+				double rdd1 = AlignUtils.rms_dk_diag(dist1, dist2, i, j, fragmentLength, k);
 				double rdd2 = 0;
-				if (k2 > 0)
-					rdd2 = AlignUtils.rms_dk_diag(dist3, dist4, i, j,
-							fragmentLength, k2);
+				if (k2 > 0) {
+					rdd2 = AlignUtils.rms_dk_diag(dist3, dist4, i, j, fragmentLength, k2);
+				}
 				double rdd = rdd1 + rdd2;
 				distanceMatrix.set(i, j, rdd);
 
 				if (rdd < params.getFragmentMiniDistance()) {
 					FragmentPair f = new FragmentPair(fragmentLength, i, j);
-					Atom[] catmp2 = AlignUtils.getFragment(ca2, j,
-							fragmentLength);
-					Atom center2 = AlignUtils.getCenter(ca2, j,
-							fragmentLength);
+					Atom[] catmp2 = AlignUtils.getFragment(ca2, j, fragmentLength);
+					Atom center2 = AlignUtils.getCenter(ca2, j, fragmentLength);
 
 					f.setCenter1(center1);
 					f.setCenter2(center2);
 
-					Matrix4d t = SuperPositions.superpose(
-							Calc.atomsToPoints(catmp1),
-							Calc.atomsToPoints(catmp2));
-					
+					Matrix4d t = SuperPositions.superpose(Calc.atomsToPoints(catmp1), Calc.atomsToPoints(catmp2));
+
 					Matrix rotmat = Matrices.getRotationJAMA(t);
 					f.setRot(rotmat);
 
@@ -485,12 +468,12 @@ public class StructurePairAligner {
 
 					boolean doNotAdd = false;
 					if (params.reduceInitialFragments()) {
-						doNotAdd = FragmentJoiner.reduceFragments(
-								fragments, f, distanceMatrix);
+						doNotAdd = FragmentJoiner.reduceFragments(fragments, f, distanceMatrix);
 
 					}
-					if (doNotAdd)
+					if (doNotAdd) {
 						continue;
+					}
 
 					fragments.add(f);
 				}
@@ -499,8 +482,7 @@ public class StructurePairAligner {
 
 		notifyFragmentListeners(fragments);
 
-		FragmentPair[] fp = fragments
-				.toArray(new FragmentPair[fragments.size()]);
+		FragmentPair[] fp = fragments.toArray(new FragmentPair[fragments.size()]);
 		setFragmentPairs(fp);
 
 		logger.debug(" got # fragment pairs: {}", fp.length);
@@ -521,8 +503,8 @@ public class StructurePairAligner {
 
 		} else if (params.isJoinPlo()) {
 			// this approach by StrComPy (peter lackner):
-			frags = joiner.frag_pairwise_compat(fp, params.getAngleDiff(),
-					params.getFragCompat(), params.getMaxrefine());
+			frags = joiner.frag_pairwise_compat(fp, params.getAngleDiff(), params.getFragCompat(),
+					params.getMaxrefine());
 
 		} else {
 
@@ -536,7 +518,7 @@ public class StructurePairAligner {
 
 		logger.debug("step 3 - refine alignments");
 
-		List<AlternativeAlignment> aas = new ArrayList<AlternativeAlignment>();
+		List<AlternativeAlignment> aas = new ArrayList<>();
 		for (int i = 0; i < frags.length; i++) {
 			JointFragments f = frags[i];
 			AlternativeAlignment a = new AlternativeAlignment();
@@ -573,29 +555,21 @@ public class StructurePairAligner {
 			a.setAltAligNumber(aanbr);
 		}
 
-		logger.debug("total calculation time: {} ms.",
-				(System.currentTimeMillis() - timeStart));
+		logger.debug("total calculation time: {} ms.", (System.currentTimeMillis() - timeStart));
 	}
 
-	private void notifyStartingAlignment(String name1, Atom[] ca1,
-			String name2, Atom[] ca2) {
-		for (AlignmentProgressListener li : listeners) {
-			li.startingAlignment(name1, ca1, name2, ca2);
-		}
+	private void notifyStartingAlignment(String name1, Atom[] ca1, String name2, Atom[] ca2) {
+		listeners.forEach(li -> li.startingAlignment(name1, ca1, name2, ca2));
 	}
 
 	private void notifyFragmentListeners(List<FragmentPair> fragments) {
 
-		for (AlignmentProgressListener li : listeners) {
-			li.calculatedFragmentPairs(fragments);
-		}
+		listeners.forEach(li -> li.calculatedFragmentPairs(fragments));
 
 	}
 
 	private void notifyJointFragments(JointFragments[] fragments) {
-		for (AlignmentProgressListener li : listeners) {
-			li.jointFragments(fragments);
-		}
+		listeners.forEach(li -> li.jointFragments(fragments));
 	}
 
 }

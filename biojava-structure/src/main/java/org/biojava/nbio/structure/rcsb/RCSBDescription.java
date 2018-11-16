@@ -30,7 +30,8 @@ import java.util.List;
 /**
  * Corresponds to the wrapper element in an RCSB {@code describeMol} XML file.
  *
- * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB RESTful</a>
+ * @see <a href="http://www.pdb.org/pdb/software/rest.do#descPDB">RCSB
+ *      RESTful</a>
  *
  * @author dmyerstu
  * @since 3.0.6
@@ -42,7 +43,7 @@ public class RCSBDescription {
 	private List<RCSBPolymer> polymers;
 
 	public RCSBDescription() {
-		polymers = new ArrayList<RCSBPolymer>();
+		polymers = new ArrayList<>();
 	}
 
 	public void addPolymer(RCSBPolymer polymer) {

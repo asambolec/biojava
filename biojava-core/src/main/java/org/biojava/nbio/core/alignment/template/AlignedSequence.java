@@ -33,77 +33,83 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  *
  * @author Mark Chapman
  * @author Paolo Pavan
- * @param <C> each element of the {@link Sequence} is a {@link Compound} of type C
+ * @param <C> each element of the {@link Sequence} is a {@link Compound} of type
+ *        C
  */
 public interface AlignedSequence<S extends Sequence<C>, C extends Compound> extends Sequence<C> {
-
-	/**
-	 * Defines an alignment step in order to pass alignment information from an {@link Aligner} to a constructor.
-	 */
-	enum Step { COMPOUND, GAP }
 
 	/**
 	 * Nullifies cached arrays/objects.
 	 */
 	void clearCache();
 
-	/** Returns the alignment.
+	/**
+	 * Returns the alignment.
 	 *
 	 * @return the alignment
 	 */
 	int[] getAlignmentFromSequence();
 
-	/** Returns the sequence positions at each alignment index
+	/**
+	 * Returns the sequence positions at each alignment index
 	 *
 	 * @return array of the sequence positions
 	 */
 	int[] getSequenceFromAlignment();
 
 	/**
-	 * Returns the column index within an alignment corresponding to the given index in the original {@link Sequence}.
-	 * Both indices are 1-indexed and inclusive.
+	 * Returns the column index within an alignment corresponding to the given index
+	 * in the original {@link Sequence}. Both indices are 1-indexed and inclusive.
 	 *
 	 * @param sequenceIndex index in the original {@link Sequence}
 	 * @return column index within an alignment
 	 * @throws IndexOutOfBoundsException if sequenceIndex < 1 or sequenceIndex >
-	 *         {@link #getOriginalSequence()}.{@link #getLength()}
+	 *                                   {@link #getOriginalSequence()}.{@link #getLength()}
 	 */
 	int getAlignmentIndexAt(int sequenceIndex);
 
 	/**
-	 * Returns the {@link Point} within an alignment of the last element of the original {@link Sequence}.
+	 * Returns the {@link Point} within an alignment of the last element of the
+	 * original {@link Sequence}.
 	 *
-	 * @return position within an alignment of final original {@link Sequence} element
+	 * @return position within an alignment of final original {@link Sequence}
+	 *         element
 	 */
 	Point getEnd();
 
 	/**
-	 * Returns the {@link Location} of the original {@link Sequence} within an alignment.  This provides access to
-	 * additional substructure beyond start and end points.
+	 * Returns the {@link Location} of the original {@link Sequence} within an
+	 * alignment. This provides access to additional substructure beyond start and
+	 * end points.
 	 *
 	 * @return location within an alignment
 	 */
 	Location getLocationInAlignment();
 
 	/**
-	 * Returns number of gaps (gap openings) in the sequence. This could be determined from the {@link Location} information or from
-	 * gap {@link Compound}s, which may not necessarily result in the same number.
+	 * Returns number of gaps (gap openings) in the sequence. This could be
+	 * determined from the {@link Location} information or from gap
+	 * {@link Compound}s, which may not necessarily result in the same number.
 	 *
 	 * @return number of gaps in the sequence
 	 */
 	int getNumGaps();
-	
+
 	/**
-	 * Returns number of gap positions (gap openings and extensions) in the sequence. This could be determined from the {@link Location} 
-	 * information or from gap {@link Compound}s, which may not necessarily result in the same number.
+	 * Returns number of gap positions (gap openings and extensions) in the
+	 * sequence. This could be determined from the {@link Location} information or
+	 * from gap {@link Compound}s, which may not necessarily result in the same
+	 * number.
 	 *
 	 * @return number of gap positions in the sequence
 	 */
 	int getNumGapPositions();
-	
+
 	/**
-	 * Returns the coverage, as a fraction between 0 and 1, of this {@link AlignedSequence} with respect to the original sequence. 
-	 * This is equivalent to ({@link #getLength()} - {@link #getNumGapPositions()}) / getOriginalSequence().getLength().
+	 * Returns the coverage, as a fraction between 0 and 1, of this
+	 * {@link AlignedSequence} with respect to the original sequence. This is
+	 * equivalent to ({@link #getLength()} - {@link #getNumGapPositions()}) /
+	 * getOriginalSequence().getLength().
 	 *
 	 * @return coverage of the original sequence by the aligned sequence
 	 */
@@ -117,45 +123,60 @@ public interface AlignedSequence<S extends Sequence<C>, C extends Compound> exte
 	S getOriginalSequence();
 
 	/**
-	 * Returns the maximum number of elements contributed to a column of an alignment by this {@link Sequence}.  If
-	 * this {@link Sequence} is circular, this number is >= 1.  If not, this overlap count is definitely 1.
+	 * Returns the maximum number of elements contributed to a column of an
+	 * alignment by this {@link Sequence}. If this {@link Sequence} is circular,
+	 * this number is >= 1. If not, this overlap count is definitely 1.
 	 *
 	 * @return the most elements contributed to any alignment column
 	 */
 	int getOverlapCount();
 
 	/**
-	 * Returns the index in the original {@link Sequence} corresponding to the given index within an alignment.  Both
-	 * indices are 1-indexed and inclusive.
+	 * Returns the index in the original {@link Sequence} corresponding to the given
+	 * index within an alignment. Both indices are 1-indexed and inclusive.
 	 *
 	 * @param alignmentIndex column index within an alignment
 	 * @return index in the original {@link Sequence}
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	int getSequenceIndexAt(int alignmentIndex);
 
 	/**
-	 * Returns the {@link Point} within an alignment of the first element of the original {@link Sequence}.
+	 * Returns the {@link Point} within an alignment of the first element of the
+	 * original {@link Sequence}.
 	 *
-	 * @return position within an alignment of first original {@link Sequence} element
+	 * @return position within an alignment of first original {@link Sequence}
+	 *         element
 	 */
 	Point getStart();
 
 	/**
-	 * Returns true if this {@link Sequence} wraps around from the last alignment column back to the first.  This makes
-	 * overlap possible, but does not require an overlap count > 1.
+	 * Returns true if this {@link Sequence} wraps around from the last alignment
+	 * column back to the first. This makes overlap possible, but does not require
+	 * an overlap count > 1.
 	 *
 	 * @return true for circular alignment elements
 	 */
 	boolean isCircular();
 
 	/**
-	 * Returns true if this {@link Sequence} has a gap at a particular alignment column.
+	 * Returns true if this {@link Sequence} has a gap at a particular alignment
+	 * column.
 	 *
 	 * @param alignmentIndex column index within an alignment
 	 * @return true if this column has a gap
-	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex > {@link #getLength()}
+	 * @throws IndexOutOfBoundsException if alignmentIndex < 1 or alignmentIndex >
+	 *                                   {@link #getLength()}
 	 */
 	boolean isGap(int alignmentIndex);
+
+	/**
+	 * Defines an alignment step in order to pass alignment information from an
+	 * {@link Aligner} to a constructor.
+	 */
+	enum Step {
+		COMPOUND, GAP
+	}
 
 }

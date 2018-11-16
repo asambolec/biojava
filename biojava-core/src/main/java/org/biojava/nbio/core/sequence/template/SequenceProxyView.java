@@ -49,7 +49,7 @@ public class SequenceProxyView<C extends Compound> implements SequenceView<C> {
 	 *
 	 * @param sequence Sequence to proxy
 	 * @param bioStart Start; cannot be less than 1
-	 * @param bioEnd End; cannot be greater than the sequence length
+	 * @param bioEnd   End; cannot be greater than the sequence length
 	 */
 	public SequenceProxyView(Sequence<C> sequence, Integer bioStart, Integer bioEnd) {
 		this.sequence = sequence;
@@ -75,17 +75,17 @@ public class SequenceProxyView<C extends Compound> implements SequenceView<C> {
 	@Override
 	public boolean equals(Object o) {
 
-		if(! Equals.classEqual(this, o)) {
+		if (!Equals.classEqual(this, o)) {
 			return false;
 		}
 
-		Sequence<C> other = (Sequence<C>)o;
+		Sequence<C> other = (Sequence<C>) o;
 
 		return sequence.equals(other);
 	}
 
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		String s = getSequenceAsString();
 		return s.hashCode();
 	}
@@ -117,12 +117,12 @@ public class SequenceProxyView<C extends Compound> implements SequenceView<C> {
 
 	@Override
 	public SequenceView<C> getSubSequence(final Integer bioStart, final Integer bioEnd) {
-		return new SequenceProxyView<C>(this, bioStart, bioEnd);
+		return new SequenceProxyView<>(this, bioStart, bioEnd);
 	}
 
 	@Override
 	public Iterator<C> iterator() {
-		return new SequenceMixin.SequenceIterator<C>(this);
+		return new SequenceMixin.SequenceIterator<>(this);
 	}
 
 	@Override
@@ -143,8 +143,8 @@ public class SequenceProxyView<C extends Compound> implements SequenceView<C> {
 	 */
 	public void setBioStart(Integer bioStart) {
 		if (bioStart < 1) {
-			throw new IllegalArgumentException("The given start "
-					+ bioStart + " is less than 1; cannot index less than 1");
+			throw new IllegalArgumentException(new StringBuilder().append("The given start ").append(bioStart)
+					.append(" is less than 1; cannot index less than 1").toString());
 		}
 		this.bioStart = bioStart;
 	}
@@ -161,17 +161,19 @@ public class SequenceProxyView<C extends Compound> implements SequenceView<C> {
 	 * @param bioEnd the bioEnd to set
 	 */
 	public void setBioEnd(Integer bioEnd) {
-		if(sequence == null) {
+		if (sequence == null) {
 			throw new NullPointerException("No sequence given before setting the end coordinate; cannot be done");
 		}
-		// had a bug in the code that allowed this to work. The length of a any exon or cds sequence was always the length of the
-		//parent sequence. Sequence class doesn't have bioStart and bioEnd exposed to do a proper comparison of getting
+		// had a bug in the code that allowed this to work. The length of a any exon or
+		// cds sequence was always the length of the
+		// parent sequence. Sequence class doesn't have bioStart and bioEnd exposed to
+		// do a proper comparison of getting
 		// a subsequence. Januar-20=2011 Scooter
-	 //   if (bioEnd > sequence.getLength()) {
-	 //       throw new IllegalArgumentException("The given end "
-	 //               + bioEnd + " is greater than sequence length"
-	 //               + sequence.getLength());
-	 //   }
+		// if (bioEnd > sequence.getLength()) {
+		// throw new IllegalArgumentException("The given end "
+		// + bioEnd + " is greater than sequence length"
+		// + sequence.getLength());
+		// }
 		this.bioEnd = bioEnd;
 	}
 

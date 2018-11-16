@@ -33,19 +33,20 @@ import org.biojava.nbio.structure.align.fatcat.FatCatRigid;
 import org.biojava.nbio.structure.align.fatcat.calc.FatCatParameters;
 import org.biojava.nbio.structure.align.model.AFPChain;
 import org.biojava.nbio.structure.align.util.AtomCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DemoFATCAT
-{
+public class DemoFATCAT {
 
-	public static void main(String[] args){
+	private static final Logger logger = LoggerFactory.getLogger(DemoFATCAT.class);
 
-		//String name1 = "4hhb.A";
-		//String name2 = "4hhb.B";
+	public static void main(String[] args) {
+
+		// String name1 = "4hhb.A";
+		// String name2 = "4hhb.B";
 
 		String name1 = "1cdg.A";
 		String name2 = "1tim.B";
-
-
 
 		AtomCache cache = new AtomCache();
 
@@ -54,7 +55,7 @@ public class DemoFATCAT
 
 		try {
 
-			StructureAlignment algorithm  = StructureAlignmentFactory.getAlgorithm(FatCatRigid.algorithmName);
+			StructureAlignment algorithm = StructureAlignmentFactory.getAlgorithm(FatCatRigid.algorithmName);
 
 			structure1 = cache.getStructure(name1);
 			structure2 = cache.getStructure(name2);
@@ -65,21 +66,21 @@ public class DemoFATCAT
 			// the default parameters
 			FatCatParameters params = new FatCatParameters();
 
-			AFPChain afpChain = algorithm.align(ca1,ca2,params);
+			AFPChain afpChain = algorithm.align(ca1, ca2, params);
 
 			afpChain.setName1(name1);
 			afpChain.setName2(name2);
 
 			// flexible original results:
-			System.out.println(afpChain.toFatcat(ca1,ca2));
+			logger.info(afpChain.toFatcat(ca1, ca2));
 
-			System.out.println(afpChain.toRotMat());
-			//System.out.println(afpChain.toCE(ca1, ca2));
+			logger.info(afpChain.toRotMat());
+			// System.out.println(afpChain.toCE(ca1, ca2));
 
-			//System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
+			// System.out.println(AFPChainXMLConverter.toXML(afpChain,ca1,ca2));
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return;
 		}
 	}

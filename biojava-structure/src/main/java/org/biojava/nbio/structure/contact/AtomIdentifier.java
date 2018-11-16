@@ -61,28 +61,32 @@ public class AtomIdentifier implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		AtomIdentifier other = (AtomIdentifier) obj;
 		if (chainId == null) {
-			if (other.chainId != null)
+			if (other.chainId != null) {
 				return false;
-		} else if (!chainId.equals(other.chainId))
+			}
+		} else if (!chainId.equals(other.chainId)) {
 			return false;
-		if (pdbSerial != other.pdbSerial)
+		}
+		if (pdbSerial != other.pdbSerial) {
 			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return " [" + pdbSerial + " - "
-				+ chainId + "]";
+		return new StringBuilder().append(" [").append(pdbSerial).append(" - ").append(chainId).append("]").toString();
 	}
-
 
 }

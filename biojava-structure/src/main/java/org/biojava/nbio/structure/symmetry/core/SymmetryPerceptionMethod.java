@@ -28,8 +28,5 @@ package org.biojava.nbio.structure.symmetry.core;
  *
  */
 public enum SymmetryPerceptionMethod {
-	NO_ROTATION,
-	C2_ROTATION,
-	ROTATION,
-	ROTO_TRANSLATION;
+	NO_ROTATION, C2_ROTATION, ROTATION, ROTO_TRANSLATION;
 }

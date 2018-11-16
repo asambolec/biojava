@@ -33,41 +33,43 @@ import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A ChemComp provider that downloads and caches the components.cif file from the wwPDB site. It then loads
- * all chemical components at startup and keeps them in memory. This provider is not used as a default
- * since it is slower at startup and requires more memory than the {@link DownloadChemCompProvider} that is used by default.
+ * A ChemComp provider that downloads and caches the components.cif file from
+ * the wwPDB site. It then loads all chemical components at startup and keeps
+ * them in memory. This provider is not used as a default since it is slower at
+ * startup and requires more memory than the {@link DownloadChemCompProvider}
+ * that is used by default.
  *
  * @author Andreas Prlic
  *
  */
-public class AllChemCompProvider implements ChemCompProvider, Runnable{
+public class AllChemCompProvider implements ChemCompProvider, Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(AllChemCompProvider.class);
 
 	public static final String COMPONENTS_FILE_LOCATION = "pub/pdb/data/monomers/components.cif.gz";
 
-
 	private static String path;
 
 	private static String serverName;
-
 
 	// there will be only one copy of the dictionary across all instances
 	// to reduce memory impact
 	static ChemicalComponentDictionary dict;
 
-	// flags to make sure there is only one thread running that is loading the dictionary
-	static AtomicBoolean loading       = new AtomicBoolean(false);
+	// flags to make sure there is only one thread running that is loading the
+	// dictionary
+	static AtomicBoolean loading = new AtomicBoolean(false);
 	static AtomicBoolean isInitialized = new AtomicBoolean(false);
 
-	public AllChemCompProvider(){
+	public AllChemCompProvider() {
 
-		if ( loading.get()) {
+		if (loading.get()) {
 			logger.warn("other thread is already loading all chemcomps, no need to init twice");
 			return;
 		}
-		if ( isInitialized.get())
+		if (isInitialized.get()) {
 			return;
+		}
 
 		loading.set(true);
 
@@ -76,44 +78,43 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 
 	}
 
-
-	/** make sure all paths are initialized correctly
+	/**
+	 * make sure all paths are initialized correctly
 	 *
 	 */
-	private static void initPath(){
+	private static void initPath() {
 
-		if (path==null) {
-			UserConfiguration config = new UserConfiguration();
-			path = config.getCacheFilePath();
+		if (path != null) {
+			return;
 		}
+		UserConfiguration config = new UserConfiguration();
+		path = config.getCacheFilePath();
 	}
 
 	private static void initServerName() {
 
-		if (serverName==null) {
+		if (serverName == null) {
 			serverName = LocalPDBDirectory.getServerName();
 		}
 	}
 
 	private void ensureFileExists() {
 
-
 		String fileName = getLocalFileName();
 		File f = new File(fileName);
 
-		if ( ! f.exists()) {
+		if (!f.exists()) {
 			try {
-			downloadFile();
+				downloadFile();
 			} catch (IOException e) {
-				logger.error("Caught IOException",e);
+				logger.error("Caught IOException", e);
 			}
 		}
 
-
-
 	}
 
-	/** Downloads the components.cif.gz file from the wwPDB site.
+	/**
+	 * Downloads the components.cif.gz file from the wwPDB site.
 	 *
 	 */
 	public static void downloadFile() throws IOException {
@@ -124,16 +125,15 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 
 		String localName = getLocalFileName();
 
-		String u = serverName + "/" + COMPONENTS_FILE_LOCATION;
+		String u = new StringBuilder().append(serverName).append("/").append(COMPONENTS_FILE_LOCATION).toString();
 
 		downloadFileFromRemote(new URL(u), new File(localName));
 
-
 	}
 
-
-	private static  void downloadFileFromRemote(URL remoteURL, File localFile) throws FileNotFoundException, IOException{
-		logger.info("Downloading " + remoteURL + " to: " + localFile);
+	private static void downloadFileFromRemote(URL remoteURL, File localFile) throws IOException {
+		logger.info(new StringBuilder().append("Downloading ").append(remoteURL).append(" to: ").append(localFile)
+				.toString());
 		FileOutputStream out = new FileOutputStream(localFile);
 
 		InputStream in = remoteURL.openStream();
@@ -145,15 +145,13 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 		in.close();
 		out.close();
 
-
 	}
 
-
-	private static String getLocalFileName(){
+	private static String getLocalFileName() {
 
 		File dir = new File(path, DownloadChemCompProvider.CHEM_COMP_CACHE_DIRECTORY);
 
-		if (! dir.exists()){
+		if (!dir.exists()) {
 			logger.info("Creating directory {}", dir.toString());
 			dir.mkdir();
 		}
@@ -163,14 +161,14 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 		return fileName;
 	}
 
-	/** Load all {@link ChemComp} definitions into memory.
+	/**
+	 * Load all {@link ChemComp} definitions into memory.
 	 *
 	 */
 	private void loadAllChemComps() throws IOException {
 		String fileName = getLocalFileName();
 		logger.debug("Loading " + fileName);
 		InputStreamProvider isp = new InputStreamProvider();
-
 
 		InputStream inStream = isp.getInputStream(fileName);
 
@@ -190,14 +188,14 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 
 	}
 
-
-	/** {@inheritDoc}
+	/**
+	 * {@inheritDoc}
 	 *
 	 */
 	@Override
 	public ChemComp getChemComp(String recordName) {
 
-		while ( loading.get()) {
+		while (loading.get()) {
 
 			// another thread is still initializing the definitions
 			try {
@@ -205,18 +203,16 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				logger.error("Interrepted thread while waiting: "+e.getMessage());
-				//e.printStackTrace();
+				logger.error("Interrepted thread while waiting: " + e.getMessage());
+				// e.printStackTrace();
 			}
 		}
-
-
 
 		return dict.getChemComp(recordName);
 	}
 
-
-	/** Do the actual loading of the dictionary in a thread.
+	/**
+	 * Do the actual loading of the dictionary in a thread.
 	 *
 	 */
 	@Override
@@ -231,11 +227,12 @@ public class AllChemCompProvider implements ChemCompProvider, Runnable{
 			loadAllChemComps();
 
 			long timeE = System.currentTimeMillis();
-			logger.debug("Time to init chem comp dictionary: " + (timeE - timeS) / 1000 + " sec.");
-
+			logger.debug(new StringBuilder().append("Time to init chem comp dictionary: ")
+					.append((timeE - timeS) / 1000).append(" sec.").toString());
 
 		} catch (IOException e) {
-			logger.error("Could not load chemical components definition file {}. Error: {}", getLocalFileName(), e.getMessage());
+			logger.error("Could not load chemical components definition file {}. Error: {}", getLocalFileName(),
+					e.getMessage());
 
 		} finally {
 			loading.set(false);

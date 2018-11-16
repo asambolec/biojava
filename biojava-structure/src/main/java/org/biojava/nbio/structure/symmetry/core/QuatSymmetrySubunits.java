@@ -45,13 +45,13 @@ import java.util.stream.Collectors;
  */
 public class QuatSymmetrySubunits {
 
-	private List<Point3d[]> caCoords = new ArrayList<Point3d[]>();
-	private List<Point3d> originalCenters = new ArrayList<Point3d>();
-	private List<Point3d> centers = new ArrayList<Point3d>();
-	private List<Vector3d> unitVectors = new ArrayList<Vector3d>();
+	private List<Point3d[]> caCoords = new ArrayList<>();
+	private List<Point3d> originalCenters = new ArrayList<>();
+	private List<Point3d> centers = new ArrayList<>();
+	private List<Vector3d> unitVectors = new ArrayList<>();
 
-	private List<Integer> folds = new ArrayList<Integer>();
-	private List<Integer> clusterIds = new ArrayList<Integer>();
+	private List<Integer> folds = new ArrayList<>();
+	private List<Integer> clusterIds = new ArrayList<>();
 	private List<SubunitCluster> clusters;
 
 	private Point3d centroid;
@@ -60,8 +60,7 @@ public class QuatSymmetrySubunits {
 	/**
 	 * Converts the List of {@link SubunitCluster} to a Subunit object.
 	 * 
-	 * @param clusters
-	 *            List of SubunitCluster
+	 * @param clusters List of SubunitCluster
 	 */
 	public QuatSymmetrySubunits(List<SubunitCluster> clusters) {
 
@@ -77,16 +76,16 @@ public class QuatSymmetrySubunits {
 
 				// Convert atoms to points
 				Point3d[] points = new Point3d[atoms.length];
-				for (int i = 0; i < atoms.length; i++)
+				for (int i = 0; i < atoms.length; i++) {
 					points[i] = atoms[i].getCoordsAsPoint3d();
+				}
 
 				caCoords.add(points);
 			}
 		}
 
 		// List number of members in each cluster
-		List<Integer> stoichiometries = clusters.stream().map(c -> c.size())
-				.collect(Collectors.toList());
+		List<Integer> stoichiometries = clusters.stream().map(SubunitCluster::size).collect(Collectors.toList());
 		folds = SymmetryTools.getValidFolds(stoichiometries);
 	}
 
@@ -99,41 +98,42 @@ public class QuatSymmetrySubunits {
 	}
 
 	/**
-	 * This method is provisional and should only be used for coloring Subunits.
-	 * A new coloring schema has to be implemented to allow the coloring of
-	 * Subunits, without implying one Subunit = one Chain.
+	 * This method is provisional and should only be used for coloring Subunits. A
+	 * new coloring schema has to be implemented to allow the coloring of Subunits,
+	 * without implying one Subunit = one Chain.
 	 * 
 	 * @return A List of the Chain Ids of each Subunit
 	 */
 	public List<String> getChainIds() {
-		
-		List<String> chains = new ArrayList<String>(getSubunitCount());
+
+		List<String> chains = new ArrayList<>(getSubunitCount());
 
 		// Loop through all subunits in the clusters and fill Lists
-		for (int c = 0; c < clusters.size(); c++) {
-			for (int s = 0; s < clusters.get(c).size(); s++)
-				chains.add(clusters.get(c).getSubunits().get(s).getName());
-		}
-		
+		clusters.forEach(cluster -> {
+			for (int s = 0; s < cluster.size(); s++) {
+				chains.add(cluster.getSubunits().get(s).getName());
+			}
+		});
+
 		return chains;
 	}
 
 	/**
-	 * This method is provisional and should only be used for coloring Subunits.
-	 * A new coloring schema has to be implemented to allow the coloring of
-	 * Subunits, without implying one Subunit = one Chain.
+	 * This method is provisional and should only be used for coloring Subunits. A
+	 * new coloring schema has to be implemented to allow the coloring of Subunits,
+	 * without implying one Subunit = one Chain.
 	 * 
 	 * @return A List of the Model number of each Subunit
 	 */
 	public List<Integer> getModelNumbers() {
-		
-		List<Integer> models = new ArrayList<Integer>(getSubunitCount());
+
+		List<Integer> models = new ArrayList<>(getSubunitCount());
 
 		// Loop through all subunits in the clusters and fill Lists
-		for (int c = 0; c < clusters.size(); c++) {
-			for (int s = 0; s < clusters.get(c).size(); s++) {
+		for (SubunitCluster cluster : clusters) {
+			for (int s = 0; s < cluster.size(); s++) {
 
-				Atom[] atoms = clusters.get(c).getAlignedAtomsSubunit(s);
+				Atom[] atoms = cluster.getAlignedAtomsSubunit(s);
 
 				// TODO guess them chain and model (very ugly)
 				Chain chain = atoms[0].getGroup().getChain();
@@ -219,32 +219,27 @@ public class QuatSymmetrySubunits {
 	}
 
 	private void calcOriginalCenters() {
-		for (Point3d[] trace : caCoords) {
-			Point3d com = CalcPoint.centroid(trace);
-			originalCenters.add(com);
-		}
+		caCoords.stream().map(CalcPoint::centroid).forEach(originalCenters::add);
 	}
 
 	private void calcCentroid() {
-		Point3d[] orig = originalCenters.toArray(new Point3d[originalCenters
-				.size()]);
+		Point3d[] orig = originalCenters.toArray(new Point3d[originalCenters.size()]);
 		centroid = CalcPoint.centroid(orig);
 	}
 
 	private void calcCenters() {
-		for (Point3d p : originalCenters) {
-			Point3d c = new Point3d(p);
+		originalCenters.stream().map(Point3d::new).forEach(c -> {
 			c.sub(centroid);
 			centers.add(c);
 			Vector3d v = new Vector3d(c);
 			v.normalize();
 			unitVectors.add(v);
-		}
+		});
 	}
 
 	public Point3d getLowerBound() {
 		Point3d lower = new Point3d();
-		for (Point3d p : centers) {
+		centers.forEach(p -> {
 			if (p.x < lower.x) {
 				lower.x = p.x;
 			}
@@ -254,13 +249,13 @@ public class QuatSymmetrySubunits {
 			if (p.z < lower.z) {
 				lower.z = p.z;
 			}
-		}
+		});
 		return lower;
 	}
 
 	public Point3d getUpperBound() {
 		Point3d upper = new Point3d();
-		for (Point3d p : centers) {
+		centers.forEach(p -> {
 			if (p.x > upper.x) {
 				upper.x = p.x;
 			}
@@ -270,16 +265,16 @@ public class QuatSymmetrySubunits {
 			if (p.z > upper.z) {
 				upper.z = p.z;
 			}
-		}
+		});
 		return upper;
 	}
 
 	private void calcMomentsOfIntertia() {
-		for (Point3d[] trace : caCoords) {
+		caCoords.forEach(trace -> {
 			for (Point3d p : trace) {
 				momentsOfInertia.addPoint(p, 1.0f);
 			}
-		}
+		});
 	}
 
 }

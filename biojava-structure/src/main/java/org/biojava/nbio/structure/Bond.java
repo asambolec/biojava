@@ -33,8 +33,8 @@ public interface Bond extends Serializable {
 
 	/**
 	 * Gets atom 'A' of this bond. There is no meaning to which atom is 'A' and
-	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in
-	 * which they are passed to this class's constructor.
+	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in which
+	 * they are passed to this class's constructor.
 	 *
 	 * @see #getAtomB()
 	 * @return one of the two atoms in this bond
@@ -43,8 +43,8 @@ public interface Bond extends Serializable {
 
 	/**
 	 * Gets atom 'B' of this bond. There is no meaning to which atom is 'A' and
-	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in
-	 * which they are passed to this class's constructor.
+	 * which is 'B'; the atoms are labeled 'A' or 'B' based on the order in which
+	 * they are passed to this class's constructor.
 	 *
 	 * @see #getAtomA()
 	 * @return one of the two atoms in this bond
@@ -52,18 +52,16 @@ public interface Bond extends Serializable {
 	public Atom getAtomB();
 
 	/**
-	 * A utility method to get the other atom in a bond, given one of its atoms.
-	 * If the atom passed is one of the atoms in this bond, then this method is
+	 * A utility method to get the other atom in a bond, given one of its atoms. If
+	 * the atom passed is one of the atoms in this bond, then this method is
 	 * essentially equivalent to saying
 	 * <code>atom == bond.getAtomA() ? bond.getAtomB() : bond.getAtomA()</code>.
 	 * <p>
-	 * <i>Note:</i> Comparison of atoms in this method is done with
-	 * <code>==</code>, not <code>equals</code>.
+	 * <i>Note:</i> Comparison of atoms in this method is done with <code>==</code>,
+	 * not <code>equals</code>.
 	 *
-	 * @param exclude
-	 *            the atom of the bond to not return
-	 * @throws IllegalArgumentException
-	 *             if the passed atom is not in this bond
+	 * @param exclude the atom of the bond to not return
+	 * @throws IllegalArgumentException if the passed atom is not in this bond
 	 * @return the atom in this bond that was not passed as an argument
 	 */
 	public Atom getOther(Atom exclude);
@@ -79,9 +77,9 @@ public interface Bond extends Serializable {
 	/**
 	 * Gets the distance between the two atoms of this bond.
 	 * <p>
-	 * This distance is calculated by {@link Calc#getDistance(Atom, Atom)}, but
-	 * this method will suppress the empty threat of a
-	 * {@link StructureException} that method makes.
+	 * This distance is calculated by {@link Calc#getDistance(Atom, Atom)}, but this
+	 * method will suppress the empty threat of a {@link StructureException} that
+	 * method makes.
 	 *
 	 * @return the distance between the two atoms of this bond.
 	 */

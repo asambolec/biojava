@@ -39,7 +39,7 @@ public class HeaderInfo {
 
 	@Override
 	public String toString() {
-		return index + ":" + hide;
+		return new StringBuilder().append(index).append(":").append(hide).toString();
 	}
 
 	/**
@@ -69,6 +69,5 @@ public class HeaderInfo {
 	public void setHide(boolean hide) {
 		this.hide = hide;
 	}
-
 
 }

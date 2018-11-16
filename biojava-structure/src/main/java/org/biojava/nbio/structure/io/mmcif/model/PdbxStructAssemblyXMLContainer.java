@@ -29,32 +29,36 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@XmlRootElement(name="PdbxStructAssemblyXMLContainer")
+@XmlRootElement(name = "PdbxStructAssemblyXMLContainer")
 public class PdbxStructAssemblyXMLContainer {
 
-	private List<PdbxStructAssembly> data ;
+	private static final Logger logger = LoggerFactory.getLogger(PdbxStructAssemblyXMLContainer.class);
 
 	static JAXBContext jaxbContext;
 	static {
 		try {
-			jaxbContext= JAXBContext.newInstance(PdbxStructAssemblyXMLContainer.class);
-		} catch (Exception e){
-			e.printStackTrace();
+			jaxbContext = JAXBContext.newInstance(PdbxStructAssemblyXMLContainer.class);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
+	private List<PdbxStructAssembly> data;
+
 	@XmlElementWrapper
-	public List<PdbxStructAssembly> getPdbxStructAssemblies(){
+	public List<PdbxStructAssembly> getPdbxStructAssemblies() {
 		return data;
 
 	}
 
-	public void setPdbxStructAssemblies(List<PdbxStructAssembly> d){
+	public void setPdbxStructAssemblies(List<PdbxStructAssembly> d) {
 		data = d;
 	}
 
-	public  String toXML(){
+	public String toXML() {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -66,18 +70,17 @@ public class PdbxStructAssemblyXMLContainer {
 
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			m.marshal( this, ps);
+			m.marshal(this, ps);
 
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return baos.toString();
 
 	}
 
-	public static PdbxStructAssemblyXMLContainer fromXML(String xml){
+	public static PdbxStructAssemblyXMLContainer fromXML(String xml) {
 
 		PdbxStructAssemblyXMLContainer job = null;
 
@@ -89,8 +92,8 @@ public class PdbxStructAssemblyXMLContainer {
 
 			job = (PdbxStructAssemblyXMLContainer) un.unmarshal(bais);
 
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return job;
